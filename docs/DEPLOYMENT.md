@@ -47,20 +47,13 @@ The build synchronizes `frontend/` to the tracked `public/` directory so Vercel 
 
 ## 5. Seed production data once
 
-Do not seed on every deployment. After the first production deployment, set `MONGO_URI` temporarily in a trusted local terminal and run:
+Do not seed on every deployment. After the first production deployment, run the secure interactive helper from the project root:
 
 ```powershell
-$env:MONGO_URI='YOUR_ATLAS_CONNECTION_STRING'
-$env:SEED_CUSTOMER_PASSWORD='YOUR_PRIVATE_DEMO_PASSWORD'
-$env:ADMIN_PASSWORD='YOUR_PRIVATE_ADMIN_PASSWORD'
-npm run seed
-npm run seed:admin
-Remove-Item Env:MONGO_URI
-Remove-Item Env:SEED_CUSTOMER_PASSWORD
-Remove-Item Env:ADMIN_PASSWORD
+npm run seed:production
 ```
 
-Review the seed scripts and set a private administrator password before running them against production.
+The helper asks for the Atlas URI and passwords using hidden prompts, validates that the target database is `ecommerce`, seeds products and demo customers, creates the administrator, then adds coupons and a sample review. It removes all temporary secrets from the terminal process when finished.
 
 ## 6. Verify production
 

@@ -8,7 +8,8 @@
     "start": "npm --prefix backend start",
     "dev": "npm --prefix backend run dev",
     "seed": "npm --prefix backend run seed",
-    "seed:admin": "npm --prefix backend run seed:admin"
+    "seed:admin": "npm --prefix backend run seed:admin",
+    "seed:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/seed-production.ps1"
   },
   "engines": {
     "node": "22.x"

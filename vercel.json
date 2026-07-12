@@ -3,11 +3,10 @@
   "framework": "express",
   "buildCommand": "npm run build",
   "regions": ["sin1"],
-  "redirects": [
+  "rewrites": [
     {
       "source": "/",
-      "destination": "/index.html",
-      "permanent": false
+      "destination": "/index.html"
     }
   ],
   "headers": [
