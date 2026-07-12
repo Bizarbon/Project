@@ -1,1 +1,5 @@
-module.exports = require('./backend/server');
+require('express');
+
+const app = require('./backend/server');
+
+module.exports = app;
