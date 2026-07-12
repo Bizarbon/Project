@@ -1,8 +1,11 @@
 services:
   - type: web
     name: techecommerce
+    repo: https://github.com/Bizarbon/Project.git
+    branch: techecommerce-deploy
     runtime: node
     plan: free
+    region: singapore
     buildCommand: npm --prefix backend ci --omit=dev
     startCommand: npm start
     healthCheckPath: /api/health

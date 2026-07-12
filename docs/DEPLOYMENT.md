@@ -15,24 +15,26 @@ mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/ecommerce?retryWrites=true&w
 
 Encode special characters in the username or password before placing them in the URI.
 
-## 2. Push the project to GitHub
+## 2. GitHub repository
 
-Run these commands from the `Web/ecommerce` directory:
+The production-ready source is published here:
 
-```powershell
-git init
-git add .
-git commit -m "Prepare TechEcommerce for production deployment"
-git branch -M main
-git remote add origin https://github.com/YOUR_ACCOUNT/techecommerce.git
-git push -u origin main
+```text
+Repository: https://github.com/Bizarbon/Project
+Branch: techecommerce-deploy
 ```
 
 Confirm that `backend/.env`, `node_modules`, and log files are not visible on GitHub.
 
 ## 3. Create the Render service
 
-The repository includes `render.yaml`, so use **New > Blueprint** in Render and select the GitHub repository.
+The repository includes `render.yaml`. Open the direct deployment link below, authorize Render to access GitHub, and deploy the Blueprint:
+
+```text
+https://render.com/deploy?repo=https://github.com/Bizarbon/Project/tree/techecommerce-deploy
+```
+
+Alternatively, use **New > Blueprint**, select `Bizarbon/Project`, then select the `techecommerce-deploy` branch.
 
 Render reads these settings automatically:
 
