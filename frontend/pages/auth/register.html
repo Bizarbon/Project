@@ -57,21 +57,6 @@
                 </div>
             </form>
 
-            <!-- Social Register -->
-            <div class="social-login">
-                <span class="social-label">Hoặc đăng ký nhanh với</span>
-                <div class="social-btns">
-                    <button type="button" class="btn-social google" onclick="handleSocialLogin('Google')">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                        <span>Google</span>
-                    </button>
-                    <button type="button" class="btn-social facebook" onclick="handleSocialLogin('Facebook')">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg" alt="Facebook">
-                        <span>Facebook</span>
-                    </button>
-                </div>
-            </div>
-
             <div class="auth-switch">
                 Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
             </div>
@@ -93,47 +78,6 @@
     <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
     <script src="../../assets/js/fish.js"></script>
     <script>
-        function handleSocialLogin(provider) {
-            const width = 500;
-            const height = 600;
-            const left = (window.screen.width / 2) - (width / 2);
-            const top = (window.screen.height / 2) - (height / 2);
-            
-            const url = provider === 'Google' ? 'mock-login-google.html' : 'mock-login-facebook.html';
-            
-            window.open(url, `Login with ${provider}`, 
-                `width=${width},height=${height},top=${top},left=${left},toolbar=no,menubar=no,scrollbars=no,location=no,status=no`);
-        }
-
-        // Listen for mock login success
-        window.addEventListener('message', (event) => {
-            if (event.data.type === 'social-login-success') {
-                const user = event.data.user;
-                showToast(`Đã xác thực ${user.provider}! Đang tạo tài khoản...`);
-                
-                // Simulation: Save mock auth data
-                setTimeout(() => {
-                    const mockToken = 'mock_social_token_' + Date.now();
-                    const mockUser = {
-                        id: 'social_id_' + Date.now(),
-                        name: user.name,
-                        username: user.email.split('@')[0],
-                        email: user.email,
-                        role: 'user'
-                    };
-                    
-                    if (typeof auth !== 'undefined') {
-                        auth.saveAuth(mockToken, mockUser);
-                    } else {
-                        localStorage.setItem('token', mockToken);
-                        localStorage.setItem('user', JSON.stringify(mockUser));
-                    }
-                    
-                    window.location.href = '../../index.html';
-                }, 1500);
-            }
-        });
-
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
