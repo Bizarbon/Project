@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm --prefix backend ci --omit=dev",
     "build": "node scripts/prepare-vercel.js",
     "install:backend": "npm --prefix backend ci",
     "start": "npm --prefix backend start",
@@ -13,5 +12,15 @@
   },
   "engines": {
     "node": ">=20 <26"
+  },
+  "dependencies": {
+    "axios": "^1.15.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.0.0"
   }
 }

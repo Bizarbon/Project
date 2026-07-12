@@ -40,7 +40,6 @@ Click **Deploy**. The build performs these steps automatically:
 
 ```text
 npm install
-npm --prefix backend ci --omit=dev
 npm run build
 ```
 
