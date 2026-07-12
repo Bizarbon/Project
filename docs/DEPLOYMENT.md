@@ -43,7 +43,7 @@ npm install
 npm run build
 ```
 
-The build copies `frontend/` to the ignored `public/` directory. Do not commit generated files from `public/`.
+The build synchronizes `frontend/` to the tracked `public/` directory so Vercel can discover and serve the static storefront through its CDN.
 
 ## 5. Seed production data once
 

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/auth.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <div class="bg-visuals">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="auth-container" style="max-width: 800px;">
+        <!-- Logo -->
+        <div class="brand-logo" onclick="window.location.href='../../index.html'">
+            <h2>🛒 TechEcommerce</h2>
+        </div>
+
+        <!-- Card -->
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Tham gia ngay ✨</h1>
+                <p>Khám phá thế giới công nghệ đỉnh cao</p>
+            </div>
+
+            <form id="registerForm" class="form-grid">
+                <div class="form-group">
+                    <input type="text" id="name" class="input-field" placeholder=" " required>
+                    <label class="form-label">Họ và tên</label>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="phone" class="input-field" placeholder=" " required>
+                    <label class="form-label">Số điện thoại</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" class="input-field" placeholder=" ">
+                    <label class="form-label">Email (Không bắt buộc)</label>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="username" class="input-field" placeholder=" " required autocomplete="username">
+                    <label class="form-label">Tên đăng nhập</label>
+                </div>
+                <div class="form-group full">
+                    <input type="password" id="password" class="input-field" placeholder=" " required minlength="6" autocomplete="new-password">
+                    <label class="form-label">Mật khẩu (Ít nhất 6 ký tự)</label>
+                </div>
+
+                <div class="form-group full">
+                    <button type="submit" class="btn-auth" id="submitBtn">Tạo tài khoản ngay</button>
+                </div>
+            </form>
+
+            <div class="auth-switch">
+                Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
+            </div>
+        </div>
+
+        <!-- Back to Home -->
+        <a href="../../index.html" class="back-link">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                style="width: 20px; height: 20px; margin-right: 0.6rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Quay lại trang chủ
+        </a>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/fish.js"></script>
+    <script>
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = (type === 'success' ? '✨ ' : '❌ ') + `<span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 600);
+            }, 3000);
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const username = document.getElementById('username').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader"></div> <span>Đang xử lý...</span>';
+
+            try {
+                const res = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, name, phone, email, password })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Lỗi đăng ký');
+
+                showToast('Chào mừng! Đăng ký thành công.');
+
+                const authCard = document.querySelector('.auth-card');
+                authCard.innerHTML = `
+                    <div style="text-align: center; padding: 2rem 0;">
+                        <div style="font-size: 4rem; margin-bottom: 2rem; animation: bounce 2s infinite;">🎉</div>
+                        <h2 style="color: white; margin-bottom: 1rem; font-size: 2rem;">Chúc mừng bạn!</h2>
+                        <p style="color: #94a3b8; margin-bottom: 3rem;">Tài khoản đã sẵn sàng. Hãy bắt đầu mua sắm ngay.</p>
+                        <a href="login.html" class="btn-auth" style="text-decoration: none;">Đăng nhập ngay</a>
+                    </div>
+                `;
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+    </script>
+    <style>
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+    </style>
+</body>
+
+</html>

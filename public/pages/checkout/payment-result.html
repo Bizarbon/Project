@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả thanh toán - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+    <style>
+        .result-card {
+            max-width: 620px;
+            margin: 4rem auto;
+            text-align: center;
+            padding: 3rem 2rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+        .result-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .result-card p { color: var(--text-secondary); margin: 0.7rem 0 1.5rem; }
+        .result-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <h1 onclick="window.location.href='../../index.html'">TechEcommerce</h1>
+        <ul id="main-navbar">
+            <li><a href="../../index.html">Cửa hàng</a></li>
+            <li><a href="../account/orders.html">Đơn hàng</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+
+    <main class="container">
+        <section class="result-card">
+            <div class="result-icon" id="resultIcon">...</div>
+            <h2 id="resultTitle">Đang kiểm tra thanh toán</h2>
+            <p id="resultMessage">Vui lòng chờ trong giây lát.</p>
+            <div class="result-actions">
+                <a href="../account/orders.html" class="btn btn-primary">Xem đơn hàng</a>
+                <a href="../../index.html" class="btn btn-secondary">Tiếp tục mua sắm</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        const provider = params.get('provider') || 'cổng thanh toán';
+        const orderId = params.get('orderId');
+        const message = params.get('message') || '';
+        const success = status === 'success';
+
+        document.getElementById('resultIcon').textContent = success ? 'OK' : '!';
+        document.getElementById('resultTitle').textContent = success
+            ? `Thanh toán ${provider.toUpperCase()} thành công`
+            : `Thanh toán ${provider.toUpperCase()} chưa hoàn tất`;
+        document.getElementById('resultMessage').textContent =
+            `${message}${orderId ? ` Mã đơn #${orderId}.` : ''}`;
+    </script>
+    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../../assets/js/chatbox.js"></script>
+</body>
+
+</html>

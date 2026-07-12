@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Quản lý khách hàng - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+</head>
+
+<body class="admin-page">
+    <nav>
+        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+        <ul id="main-navbar">
+            <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
+            <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
+            <li><a href="orders.html?v=techecommerce-20260709-2">Đơn hàng</a></li>
+            <li><a href="customers.html?v=techecommerce-20260709-2" class="active">Khách hàng</a></li>
+            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
+            <li><a href="finance.html?v=techecommerce-20260709-2">Tài chính</a></li>
+            <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <main class="container fade-in">
+        <div class="page-header reveal">
+            <h2>Quản lý khách hàng</h2>
+            <p>Quản lý hồ sơ khách hàng, liên hệ và lịch sử mua hàng.</p>
+        </div>
+
+        <section class="form-section glass-card reveal">
+            <h2><span id="formTitle">Thêm khách hàng mới</span></h2>
+            <form id="customerForm">
+                <input type="hidden" id="customerId">
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" id="name" placeholder="Nhập họ tên khách hàng..." required>
+                </div>
+                <div class="form-group">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" id="username" placeholder="vuphilong, ..." required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="text" id="phone" placeholder="09xxxxxxxx" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Địa chỉ</label>
+                    <input type="text" id="address" placeholder="Nhập địa chỉ nhận hàng...">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Lưu khách hàng</button>
+                    <button type="button" class="btn-secondary" onclick="resetForm()">Hủy bỏ</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="table-section glass-card reveal">
+            <h2>Danh sách khách hàng (<span id="customerCount">0</span>)</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">STT</th>
+                            <th>Họ tên</th>
+                            <th>Tên đăng nhập</th>
+                            <th>SĐT</th>
+                            <th>Email</th>
+                            <th>Địa chỉ</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTable"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="../assets/js/customers.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+</body>
+
+</html>

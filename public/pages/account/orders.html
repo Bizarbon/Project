@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+    <style>
+        .orders-shell { display: grid; gap: 1rem; }
+        .order-card {
+            padding: 1.4rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+        .order-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .order-head h3 { margin: 0; }
+        .order-head p { color: var(--text-muted); margin-top: 0.2rem; }
+        .order-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .pay-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .pay-paid { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .pay-failed { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .pay-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .order-products-list {
+            display: grid;
+            gap: 0.45rem;
+            margin-bottom: 1rem;
+        }
+        .order-products-list div,
+        .order-meta-grid div {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .order-products-list span,
+        .order-meta-grid span {
+            color: var(--text-secondary);
+            text-align: right;
+        }
+        .order-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.7rem 1.5rem;
+        }
+        .money { color: var(--primary) !important; font-weight: 800; }
+        .order-actions {
+            margin-top: 1.2rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        @media (max-width: 700px) {
+            .order-head { flex-direction: column; }
+            .order-meta-grid { grid-template-columns: 1fr; }
+            .order-products-list div,
+            .order-meta-grid div { flex-direction: column; gap: 0.2rem; }
+            .order-products-list span,
+            .order-meta-grid span { text-align: left; }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <h1 onclick="window.location.href='../../index.html'">TechEcommerce</h1>
+        <ul id="main-navbar">
+            <li><a href="../../index.html">Cửa hàng</a></li>
+            <li><a href="orders.html" class="active">Đơn hàng</a></li>
+            <li><a href="profile.html">Hồ sơ</a></li>
+            <li class="admin-only"><a href="../../admin/dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../../assets/js/animations.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+
+    <main class="container fade-in">
+        <div class="page-header reveal">
+            <h2>Đơn hàng của tôi</h2>
+            <p>Theo dõi trạng thái xử lý, thanh toán và vận chuyển.</p>
+        </div>
+        <div class="stats-grid reveal" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="stat-card">
+                <div class="stat-icon">ORD</div>
+                <div class="stat-value" id="orderCount">0</div>
+                <div class="stat-label">Tổng đơn</div>
+            </div>
+        </div>
+        <section id="ordersList" class="orders-shell reveal">
+            <div class="empty-state">Đang tải đơn hàng...</div>
+        </section>
+    </main>
+
+    <script src="../../assets/js/my-orders.js"></script>
+    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../../assets/js/chatbox.js"></script>
+</body>
+
+</html>

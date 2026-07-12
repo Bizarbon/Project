@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Phân tích tài chính - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <style>
+        .finance-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .finance-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .finance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        .finance-card.revenue::before { background: linear-gradient(90deg, var(--success), #059669); }
+        .finance-card.expense::before { background: linear-gradient(90deg, var(--danger), #dc2626); }
+        .finance-card.profit::before { background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+        .finance-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary-light);
+        }
+        .fc-icon {
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+        .fc-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .revenue .fc-value { color: var(--success); }
+        .expense .fc-value { color: var(--danger); }
+        .profit .fc-value { color: var(--primary); }
+        .fc-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .fc-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        .comparison-board {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .comp-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .comp-label {
+            width: 110px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .comp-track {
+            flex: 1;
+            height: 12px;
+            background: rgba(47, 128, 237, 0.12);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .comp-bar {
+            height: 100%;
+            width: 0;
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .comp-value {
+            width: 140px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .bar-rev { background: var(--success); }
+        .bar-exp { background: var(--danger); }
+        .bar-prof { background: var(--primary); }
+        .chart-section {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .type-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+        }
+        .expense-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(47, 128, 237, 0.1);
+            color: var(--primary);
+        }
+        @media (max-width: 900px) {
+            .finance-summary { grid-template-columns: 1fr; }
+            .comp-item { align-items: flex-start; flex-direction: column; }
+            .comp-label, .comp-value { width: auto; text-align: left; }
+            .comp-track { width: 100%; }
+        }
+    </style>
+</head>
+
+<body class="admin-page">
+    <nav>
+        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+        <ul id="main-navbar">
+            <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
+            <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
+            <li><a href="orders.html?v=techecommerce-20260709-2">Đơn hàng</a></li>
+            <li><a href="customers.html?v=techecommerce-20260709-2">Khách hàng</a></li>
+            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
+            <li><a href="finance.html?v=techecommerce-20260709-2" class="active">Tài chính</a></li>
+            <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <main class="container fade-in">
+        <div class="page-header reveal">
+            <h2>Phân tích tài chính</h2>
+            <p>Theo dõi doanh thu, chi phí và hiệu quả vận hành cửa hàng.</p>
+        </div>
+
+        <div class="filter-bar reveal">
+            <div class="form-group" style="flex-direction:row; align-items:center; gap:0.5rem; margin-bottom:0;">
+                <label style="margin-bottom:0;">Từ:</label>
+                <input type="date" id="filterFrom" style="width:160px;">
+            </div>
+            <div class="form-group" style="flex-direction:row; align-items:center; gap:0.5rem; margin-bottom:0;">
+                <label style="margin-bottom:0;">Đến:</label>
+                <input type="date" id="filterTo" style="width:160px;">
+            </div>
+            <button class="btn-primary" onclick="applyFilter()">Lọc dữ liệu</button>
+            <button class="btn-secondary" onclick="clearFilter()">Reset</button>
+        </div>
+
+        <div class="finance-summary reveal">
+            <div class="finance-card revenue glass-card">
+                <div class="fc-icon">REVENUE</div>
+                <div class="fc-value" id="fcRevenue">0 đ</div>
+                <div class="fc-label">Doanh thu</div>
+                <div class="fc-sub" id="fcOrderCount">(0 đơn hoàn thành)</div>
+            </div>
+            <div class="finance-card expense glass-card">
+                <div class="fc-icon">EXPENSE</div>
+                <div class="fc-value" id="fcExpense">0 đ</div>
+                <div class="fc-label">Tổng chi phí</div>
+                <div class="fc-sub">Ads, đóng gói, phí vận hành...</div>
+            </div>
+            <div class="finance-card profit glass-card">
+                <div class="fc-icon">PROFIT</div>
+                <div class="fc-value" id="fcProfit">0 đ</div>
+                <div class="fc-label">Lợi nhuận ròng</div>
+                <div class="fc-sub">Doanh thu trừ chi phí</div>
+            </div>
+        </div>
+
+        <section class="chart-section glass-card reveal">
+            <h3>So sánh thu chi</h3>
+            <div class="comparison-board">
+                <div class="comp-item">
+                    <div class="comp-label">Doanh thu</div>
+                    <div class="comp-track"><div class="comp-bar bar-rev" id="barRevenue"></div></div>
+                    <div class="comp-value" id="barRevAmt">0 đ</div>
+                </div>
+                <div class="comp-item">
+                    <div class="comp-label">Chi phí</div>
+                    <div class="comp-track"><div class="comp-bar bar-exp" id="barExpense"></div></div>
+                    <div class="comp-value" id="barExpAmt">0 đ</div>
+                </div>
+                <div class="comp-item" style="border-top: 1px solid var(--border); padding-top: 1.5rem;">
+                    <div class="comp-label">Lợi nhuận</div>
+                    <div class="comp-track"><div class="comp-bar bar-prof" id="barProfit"></div></div>
+                    <div class="comp-value" id="barProfAmt" style="color:var(--primary)">0 đ</div>
+                </div>
+            </div>
+
+            <div style="margin-top:3rem;">
+                <h4 style="margin-bottom:1rem; font-size:1rem;">Chi phí theo danh mục</h4>
+                <div class="type-breakdown" id="typeBreakdown" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:1rem;"></div>
+            </div>
+        </section>
+
+        <section class="form-section glass-card">
+            <h2>Ghi nhận chi phí mới</h2>
+            <form id="expenseForm">
+                <div class="form-group">
+                    <label>Loại chi phí</label>
+                    <select id="eType" required>
+                        <option value="ads">Quảng cáo</option>
+                        <option value="packaging">Bao bì đóng gói</option>
+                        <option value="platform_fee">Phí sàn</option>
+                        <option value="shipping_fee">Phí vận chuyển</option>
+                        <option value="import_cost">Chi phí nhập hàng</option>
+                        <option value="other">Khác</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Số tiền (VNĐ)</label>
+                    <input type="number" id="eAmount" placeholder="VD: 500000" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Ngày phát sinh</label>
+                    <input type="date" id="eDate">
+                </div>
+                <div class="form-group full-width">
+                    <label>Mô tả chi tiết</label>
+                    <input type="text" id="eDescription" placeholder="VD: Chạy ads Facebook tháng 4...">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Lưu ghi nhận</button>
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('expenseForm').reset()">Xóa form</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="table-section glass-card">
+            <h2>Lịch sử chi phí</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ngày</th>
+                            <th>Loại</th>
+                            <th>Mô tả</th>
+                            <th>Số tiền</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expenseBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="../assets/js/finance.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+</body>
+
+</html>
