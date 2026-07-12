@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: techecommerce
+    runtime: node
+    plan: free
+    buildCommand: npm --prefix backend ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: PAYMENT_GATEWAY_MODE
+        value: mock

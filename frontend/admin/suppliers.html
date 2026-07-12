@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Quản lý nhà cung cấp - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <style>
+        .policy-badge {
+            display: inline-block;
+            padding: 0.25rem 0.7rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .policy-no_return { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .policy-7_days { background: rgba(245,158,11,0.15); color: #d97706; }
+        .policy-15_days { background: rgba(59,130,246,0.15); color: #2563eb; }
+        .policy-30_days { background: rgba(16,185,129,0.15); color: #059669; }
+        .policy-negotiable { background: rgba(139,92,246,0.15); color: #7c3aed; }
+        .delivery-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        .supplier-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .supplier-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.8rem;
+            transition: var(--transition);
+        }
+        .supplier-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-4px);
+        }
+        .supplier-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+        }
+        .supplier-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .supplier-info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1.2rem;
+        }
+        .supplier-info-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .supplier-notes {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        .supplier-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+
+<body class="admin-page">
+    <nav>
+        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+        <ul id="main-navbar">
+            <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
+            <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
+            <li><a href="orders.html?v=techecommerce-20260709-2">Đơn hàng</a></li>
+            <li><a href="customers.html?v=techecommerce-20260709-2">Khách hàng</a></li>
+            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
+            <li><a href="finance.html?v=techecommerce-20260709-2">Tài chính</a></li>
+            <li><a href="suppliers.html?v=techecommerce-20260709-2" class="active">Nhà cung cấp</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <main class="container fade-in">
+        <div class="page-header reveal">
+            <h2>Quản lý nhà cung cấp</h2>
+            <p>Quản lý đối tác cung ứng, bảo hành và nguồn hàng.</p>
+        </div>
+
+        <section class="form-section glass-card reveal">
+            <h2 id="formTitle">Thêm nhà cung cấp mới</h2>
+            <form id="supplierForm">
+                <div class="form-group">
+                    <label>Tên nhà cung cấp</label>
+                    <input type="text" id="sName" placeholder="VD: Công ty TNHH ABC" required>
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" id="sPhone" placeholder="0901 234 567">
+                </div>
+                <div class="form-group">
+                    <label>Email liên hệ</label>
+                    <input type="email" id="sEmail" placeholder="supplier@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Thời gian giao hàng (ngày)</label>
+                    <input type="number" id="sDelivery" placeholder="3" min="0" value="3">
+                </div>
+                <div class="form-group full-width">
+                    <label>Địa điểm kho/văn phòng</label>
+                    <input type="text" id="sAddress" placeholder="Số nhà, đường, quận, thành phố...">
+                </div>
+                <div class="form-group">
+                    <label>Chính sách bảo hành/đổi trả</label>
+                    <select id="sPolicy">
+                        <option value="7_days">Đổi trả 7 ngày</option>
+                        <option value="15_days">Đổi trả 15 ngày</option>
+                        <option value="30_days">Đổi trả 30 ngày</option>
+                        <option value="no_return">Không đổi trả</option>
+                        <option value="negotiable">Thỏa thuận riêng</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Ghi chú quan trọng</label>
+                    <textarea id="sNotes" placeholder="Nhập lưu ý đặc biệt, ưu đãi, chiết khấu..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="submitBtn">Lưu thông tin</button>
+                    <button type="button" class="btn-secondary" onclick="resetForm()">Hủy bỏ</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="table-section glass-card reveal">
+            <h2>Danh sách đối tác <span id="supplierCount"></span></h2>
+            <div id="supplierCards" class="supplier-cards" style="margin-top:2rem;">
+                <div class="empty-state"><p>Đang tải dữ liệu đối tác...</p></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../assets/js/suppliers.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+</body>
+
+</html>

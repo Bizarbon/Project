@@ -1,0 +1,298 @@
+.login-page {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    color: var(--neo-text);
+    background: var(--neo-bg);
+}
+
+.login-page .account-storefront-header {
+    position: sticky;
+}
+
+.login-page-main {
+    min-height: 570px;
+    padding: clamp(2rem, 5vw, 4.5rem) 24px;
+}
+
+.login-layout {
+    display: grid;
+    width: min(100%, 1180px);
+    margin-inline: auto;
+    grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.92fr);
+    align-items: stretch;
+    gap: clamp(2rem, 6vw, 5rem);
+}
+
+.login-visual {
+    position: relative;
+    min-height: 520px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #dff2ff;
+}
+
+.login-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(4, 20, 40, 0.9), rgba(4, 20, 40, 0.04) 66%);
+}
+
+.login-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 44%;
+}
+
+.login-visual-copy {
+    position: absolute;
+    z-index: 2;
+    right: clamp(1.5rem, 4vw, 3rem);
+    bottom: clamp(1.5rem, 4vw, 3rem);
+    left: clamp(1.5rem, 4vw, 3rem);
+    color: #ffffff;
+}
+
+.login-visual-copy span,
+.auth-eyebrow {
+    display: block;
+    margin-bottom: 0.65rem;
+    color: #7dd3fc;
+    font: 700 0.76rem/1.4 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+}
+
+.login-visual-copy h1 {
+    max-width: 520px;
+    margin: 0 0 0.8rem;
+    color: #ffffff;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.05;
+}
+
+.login-visual-copy p {
+    max-width: 520px;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 1rem;
+}
+
+.login-form-panel {
+    display: grid;
+    place-items: center;
+}
+
+.login-page .auth-container {
+    max-width: 480px;
+    perspective: none;
+}
+
+.login-page .auth-card {
+    padding: clamp(2rem, 4vw, 3rem);
+    overflow: visible;
+    border: 1px solid var(--neo-border);
+    border-radius: 8px;
+    color: var(--neo-text);
+    background: var(--neo-panel-solid);
+    box-shadow: 0 22px 65px rgba(47, 128, 237, 0.13);
+    animation: none;
+    backdrop-filter: none;
+}
+
+.login-page .auth-card::before {
+    display: none;
+}
+
+.login-page .auth-header {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.login-page .auth-header h1 {
+    margin-bottom: 0.5rem;
+    color: var(--neo-text);
+    font-size: clamp(1.8rem, 3vw, 2.35rem);
+    letter-spacing: 0;
+    text-shadow: none;
+}
+
+.login-page .auth-header p {
+    color: var(--neo-muted);
+    font-size: 0.96rem;
+}
+
+.login-page .form-group {
+    margin-bottom: 1.35rem;
+}
+
+.login-page .input-field {
+    min-height: 50px;
+    padding: 1rem 1rem;
+    border: 1px solid var(--neo-border-strong) !important;
+    border-radius: 8px !important;
+    color: var(--neo-text) !important;
+    background: var(--neo-panel) !important;
+    font: 500 0.95rem/1.3 'Inter', sans-serif;
+}
+
+.login-page .input-field:focus {
+    transform: none;
+    border-color: var(--neo-primary) !important;
+    box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.14) !important;
+}
+
+.login-page .input-field:-webkit-autofill,
+.login-page .input-field:-webkit-autofill:hover,
+.login-page .input-field:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--neo-text);
+    -webkit-box-shadow: 0 0 0 1000px var(--neo-panel) inset;
+}
+
+.login-page .form-label {
+    left: 1rem;
+    color: var(--neo-muted);
+}
+
+.login-page .input-field:focus ~ .form-label,
+.login-page .input-field:not(:placeholder-shown) ~ .form-label,
+.login-page .input-field:-webkit-autofill ~ .form-label {
+    top: -0.55rem;
+    left: 0.75rem;
+    color: var(--neo-primary);
+    background: var(--neo-panel-solid);
+}
+
+.login-page .btn-auth {
+    min-height: 50px;
+    margin-top: 0.25rem;
+    border-radius: 8px !important;
+    font-size: 1rem;
+    box-shadow: 0 12px 28px rgba(47, 128, 237, 0.2) !important;
+}
+
+.login-page .btn-auth:hover {
+    transform: translateY(-1px);
+}
+
+.login-page .social-login {
+    margin-top: 2rem;
+}
+
+.login-page .social-login::before {
+    background: var(--neo-border);
+}
+
+.login-page .social-label {
+    color: var(--neo-muted);
+    background: var(--neo-panel-solid);
+}
+
+.login-page .btn-social {
+    min-height: 44px;
+    border: 1px solid var(--neo-border) !important;
+    border-radius: 8px !important;
+    color: var(--neo-text) !important;
+    background: var(--neo-panel) !important;
+}
+
+.login-page .auth-switch {
+    margin-top: 1.8rem;
+    color: var(--neo-muted);
+    font-size: 0.92rem;
+}
+
+.login-page .auth-switch a,
+.login-page .back-link {
+    color: var(--neo-primary);
+}
+
+.login-page .back-link {
+    margin-top: 1rem;
+    border-radius: 8px;
+}
+
+.login-footer {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+    padding: 2.25rem max(24px, calc((100vw - 1180px) / 2));
+    border-top: 1px solid var(--neo-border);
+    color: var(--neo-muted);
+    background: var(--neo-panel-solid);
+}
+
+.login-footer > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.login-footer strong {
+    margin-bottom: 0.25rem;
+    color: var(--neo-text);
+}
+
+.login-footer a {
+    color: var(--neo-muted);
+    text-decoration: none;
+}
+
+.login-footer a:hover {
+    color: var(--neo-primary);
+}
+
+@media (max-width: 900px) {
+    .login-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .login-visual {
+        min-height: 300px;
+    }
+
+    .login-form-panel {
+        margin-top: -70px;
+        padding-inline: 18px;
+        z-index: 3;
+    }
+
+    .login-page .auth-container {
+        max-width: 560px;
+    }
+
+    .login-footer {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .login-page-main {
+        padding: 12px 0 2rem;
+    }
+
+    .login-visual {
+        min-height: 260px;
+        border-radius: 0;
+    }
+
+    .login-visual-copy h1 {
+        font-size: 1.8rem;
+    }
+
+    .login-form-panel {
+        padding-inline: 12px;
+    }
+
+    .login-page .auth-card {
+        padding: 1.5rem;
+    }
+
+    .login-footer {
+        grid-template-columns: 1fr;
+    }
+}

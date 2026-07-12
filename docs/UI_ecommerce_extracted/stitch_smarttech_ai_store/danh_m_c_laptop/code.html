@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Laptops - TECH_CORE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#323537",
+                    "on-secondary-fixed": "#131b2e",
+                    "secondary-fixed": "#dae2fd",
+                    "on-primary-fixed": "#001a41",
+                    "outline": "#8b90a0",
+                    "secondary": "#bec6e0",
+                    "primary-container": "#4b8eff",
+                    "on-secondary-container": "#adb4ce",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-tertiary-container": "#002d40",
+                    "error": "#ffb4ab",
+                    "error-container": "#93000a",
+                    "on-tertiary": "#00354a",
+                    "on-secondary": "#283044",
+                    "surface-container-low": "#191c1e",
+                    "background": "#101415",
+                    "surface-container": "#1d2022",
+                    "inverse-surface": "#e0e3e5",
+                    "on-error": "#690005",
+                    "tertiary-fixed": "#c4e7ff",
+                    "inverse-primary": "#005bc1",
+                    "on-error-container": "#ffdad6",
+                    "surface": "#101415",
+                    "tertiary-fixed-dim": "#7bd0ff",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-surface-variant": "#c1c6d7",
+                    "on-background": "#e0e3e5",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-primary-container": "#00285c",
+                    "surface-tint": "#adc6ff",
+                    "secondary-container": "#3f465c",
+                    "surface-dim": "#101415",
+                    "on-tertiary-fixed-variant": "#004c69",
+                    "tertiary-container": "#009bd1",
+                    "surface-bright": "#363a3b",
+                    "on-primary": "#002e69",
+                    "surface-variant": "#323537",
+                    "surface-container-high": "#272a2c",
+                    "primary-fixed": "#d8e2ff",
+                    "primary": "#adc6ff",
+                    "primary-fixed-dim": "#adc6ff",
+                    "outline-variant": "#414755",
+                    "surface-container-lowest": "#0b0f10",
+                    "on-surface": "#e0e3e5",
+                    "inverse-on-surface": "#2d3133",
+                    "tertiary": "#7bd0ff",
+                    "on-tertiary-fixed": "#001e2c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "margin-mobile": "20px",
+                    "gutter": "24px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "display-lg-mobile": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "JetBrains Mono"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .glow-hover:hover {
+            box-shadow: 0 0 15px rgba(75, 142, 255, 0.5);
+        }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.background');
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-container-high');
+            border-radius: theme('borderRadius.full');
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline');
+        }
+        
+        /* Checkbox styling */
+        .form-checkbox {
+            background-color: theme('colors.surface-container-highest');
+            border-color: theme('colors.outline');
+        }
+        .form-checkbox:checked {
+            background-color: theme('colors.primary');
+            border-color: theme('colors.primary');
+        }
+        .form-checkbox:focus {
+            --tw-ring-color: theme('colors.primary');
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background font-body-md text-body-md docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center px-margin-desktop h-20 w-full sticky top-0 z-50">
+<!-- Brand -->
+<div class="flex items-center">
+<a class="font-display-lg-mobile text-display-lg-mobile font-bold text-primary tracking-tighter" href="#">TECH_CORE</a>
+</div>
+<!-- Navigation Links (Desktop) -->
+<nav class="hidden md:flex gap-gutter items-center h-full">
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 h-full flex items-center" href="#">Processors</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 h-full flex items-center" href="#">Graphics</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 h-full flex items-center" href="#">Storage</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 h-full flex items-center" href="#">Displays</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 h-full flex items-center mt-1" href="#">Laptops</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 h-full flex items-center" href="#">Peripherals</a>
+</nav>
+<!-- Right Actions -->
+<div class="flex items-center gap-6">
+<!-- Search Bar (on_right) -->
+<div class="hidden lg:flex relative">
+<input class="bg-surface-container-highest border border-outline rounded-full py-2 pl-4 pr-10 font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary w-64 transition-all" placeholder="Search..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none" style="font-variation-settings: 'FILL' 0;">search</span>
+</div>
+<button class="text-on-surface-variant hover:text-primary hover:text-primary-container transition-all duration-200 scale-95 duration-100 p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">shopping_cart</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary hover:text-primary-container transition-all duration-200 scale-95 duration-100 p-2 rounded-full hover:bg-surface-container-high">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Layout Grid -->
+<main class="flex-grow w-full max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-12 flex flex-col md:flex-row gap-gutter">
+<!-- Sidebar Filters -->
+<aside class="w-full md:w-64 flex-shrink-0 flex flex-col gap-8">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Filters</h2>
+<button class="font-label-sm text-label-sm text-primary hover:text-primary-container transition-colors">Clear All</button>
+</div>
+<!-- Filter Category: Brand -->
+<div class="border-t border-outline-variant pt-6">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase tracking-wider">Brand</h3>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">NovaTech</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">(42)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">AeroBlade</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">(18)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Quantum</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">(27)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Zenith</span>
+<span class="ml-auto font-label-sm text-label-sm text-outline">(11)</span>
+</label>
+</div>
+</div>
+<!-- Filter Category: Price -->
+<div class="border-t border-outline-variant pt-6">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase tracking-wider">Price Range</h3>
+<div class="flex items-center gap-4">
+<div class="flex-1 relative">
+<span class="absolute left-3 top-2.5 font-label-sm text-label-sm text-outline">$</span>
+<input class="w-full bg-surface-container-highest border border-outline rounded py-2 pl-6 pr-2 font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none" placeholder="Min" style="-moz-appearance: textfield;" type="number"/>
+</div>
+<span class="text-outline">-</span>
+<div class="flex-1 relative">
+<span class="absolute left-3 top-2.5 font-label-sm text-label-sm text-outline">$</span>
+<input class="w-full bg-surface-container-highest border border-outline rounded py-2 pl-6 pr-2 font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none" placeholder="Max" style="-moz-appearance: textfield;" type="number"/>
+</div>
+</div>
+</div>
+<!-- Filter Category: RAM -->
+<div class="border-t border-outline-variant pt-6">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase tracking-wider">Memory (RAM)</h3>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">16GB</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">32GB</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">64GB</span>
+</label>
+</div>
+</div>
+<!-- Filter Category: GPU -->
+<div class="border-t border-outline-variant pt-6">
+<h3 class="font-label-sm text-label-sm text-on-surface-variant mb-4 uppercase tracking-wider">Graphics Card</h3>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">RTX 4090 Mobile</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">RTX 4080 Mobile</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="form-checkbox rounded text-primary border-outline focus:ring-primary h-4 w-4 bg-surface-container-highest transition-colors" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">RX 7900M</span>
+</label>
+</div>
+</div>
+</aside>
+<!-- Product Grid Area -->
+<div class="flex-1 flex flex-col">
+<!-- Active Filters & Sort -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+<div class="flex flex-wrap gap-2">
+<div class="inline-flex items-center gap-2 bg-surface-container-high border border-outline-variant rounded-full px-3 py-1">
+<span class="font-label-sm text-label-sm text-on-surface">32GB RAM</span>
+<button class="text-on-surface-variant hover:text-error transition-colors flex items-center">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<div class="inline-flex items-center gap-2 bg-surface-container-high border border-outline-variant rounded-full px-3 py-1">
+<span class="font-label-sm text-label-sm text-on-surface">NovaTech</span>
+<button class="text-on-surface-variant hover:text-error transition-colors flex items-center">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sort by:</span>
+<select class="bg-surface-container border border-outline rounded py-1.5 pl-3 pr-8 font-label-sm text-label-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer">
+<option>Recommended</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Newest Arrivals</option>
+</select>
+</div>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Product Card 1 -->
+<div class="group relative flex flex-col bg-[#0F172A] border border-[#1E293B] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_10px_40px_rgba(75,142,255,0.1)]">
+<div class="relative aspect-[4/3] bg-surface-container-highest p-6 flex items-center justify-center overflow-hidden">
+<img alt="NovaTech ProBook X" class="object-contain w-full h-full transform group-hover:scale-105 transition-transform duration-500 z-10" data-alt="A sleek, high-end gaming laptop open on a stark white pedestal against a deep black background. The laptop features a brushed dark gray metal chassis with sharp, angular, futuristic design lines. The screen displays a vibrant, high-contrast abstract blue and purple digital wave graphic. The keyboard is backlit with an intense, precise electric blue glow. Dramatic studio lighting highlights the metallic textures and creates an atmosphere of premium, cutting-edge technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATmGzEX0CA-20-5nc51HrP6faT-ArMcpdKyLbW78qwmm9o2rzR6LWoiVZN-UM7bf0p6uuCe0gT8Y08ZnxgNPuOh8gKsRdaSEgXnc13TRnPwZYUDjl0jO-mhuxZgM5XhGfFfhzmF_EVquj8Vr_KaBsLQe3Tqx7H-Yno_nEeAdV_3koMJ-HV7gfPCvOw6CwQlert-nMmaA4c7Fv-7HKq8_75rIrJv_ZrI9H6Be7YD2zSyugFDrxGR_1t"/>
+<!-- Decorative glow -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="absolute top-3 left-3 flex flex-col gap-2 z-20">
+<span class="bg-surface/80 backdrop-blur border border-outline-variant font-label-sm text-label-sm text-on-surface px-2 py-0.5 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-tertiary">bolt</span> NEW
+                            </span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">NovaTech</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 leading-tight">ProBook X Series 9</h3>
+<div class="flex flex-wrap gap-2 mb-4 mt-1">
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">i9-14900HX</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">RTX 4090</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">64GB RAM</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between border-t border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline line-through mb-0.5">$3,499.00</span>
+<span class="font-body-lg text-body-lg font-bold text-primary">$3,299.00</span>
+</div>
+<button class="bg-[#005bc1] hover:bg-primary-container text-white p-2.5 rounded-full transition-colors glow-hover flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group relative flex flex-col bg-[#0F172A] border border-[#1E293B] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_10px_40px_rgba(75,142,255,0.1)]">
+<div class="relative aspect-[4/3] bg-surface-container-highest p-6 flex items-center justify-center overflow-hidden">
+<img alt="AeroBlade Stealth" class="object-contain w-full h-full transform group-hover:scale-105 transition-transform duration-500 z-10" data-alt="A minimalist, ultra-thin workstation laptop shown in a closed profile view floating slightly above a polished obsidian surface. The laptop shell is constructed from smooth matte black carbon fiber. A single, very thin line of cyan LED light runs along the front edge, glowing softly. The environment is pitch black, with a single cool white spotlight casting long, dramatic shadows. The visual style is highly technical, precise, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU7zWeWvEDLRrKkzIF6JXQfOIOYDRs7y884G4Xna2Wc68PWRjXf_u4rT7EU_Mw_zkPrT2TYiyYmuOKE4QZTd11XQdkqvRElnkYvMoyF3UIpywwTUhPyhiJSN1q7_X_7CfnmVBDau8LIS5zHFbAVXeycE8Aq2JPU0Nj5KTjZ4GFjoKTbOOAB6RaqCoi4rId4TMKRwERQfyU0rQ4fhnDDKdeEt1IBpvWK3nHauJf8zwfyHIiyM4PZ1LE"/>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">AeroBlade</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 leading-tight">Stealth 16 Studio</h3>
+<div class="flex flex-wrap gap-2 mb-4 mt-1">
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">Core Ultra 9</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">RTX 4070</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">OLED 4K</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between border-t border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-bold text-on-surface">$2,499.00</span>
+</div>
+<button class="bg-[#005bc1] hover:bg-primary-container text-white p-2.5 rounded-full transition-colors glow-hover flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group relative flex flex-col bg-[#0F172A] border border-[#1E293B] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_10px_40px_rgba(75,142,255,0.1)]">
+<div class="relative aspect-[4/3] bg-surface-container-highest p-6 flex items-center justify-center overflow-hidden">
+<img alt="Quantum Workstation" class="object-contain w-full h-full transform group-hover:scale-105 transition-transform duration-500 z-10" data-alt="A robust, heavy-duty mobile workstation laptop shown partially disassembled in an exploded view isometric perspective. Components like the cooling fans, copper heat pipes, and motherboard are suspended in mid-air above the chassis. The background is a deep navy grid pattern reminiscent of a technical blueprint. Soft ambient blue lighting highlights the internal hardware components, emphasizing precision engineering, modularity, and high-performance computing capabilities." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcSpZSgGUwigRxylXI8AGQVmIQSqp2caGIgkpjLZgw2ocdwXAJMyowLLSyaYYIZbEFw0BkvvLcBK-w2wGueJ44FFc7AIZIDOMfxJyradg86pg0sutlmm3T43u6hPjSMSsyWW8oVnmNdRv0cP3Ca63H0h7Cik1LybRd6KnLLKCoB6ePZDyT5V7JtY2gWI2P_P1zowwZtNJLefO07gu2r6mQeMY1ONq8qHkDJXDUkpZMG-v9bHJLzUyn"/>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Quantum</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 leading-tight">Forge W7 Mobile</h3>
+<div class="flex flex-wrap gap-2 mb-4 mt-1">
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">Ryzen Threadripper</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">Pro W7900</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">128GB ECC</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between border-t border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-bold text-on-surface">$5,999.00</span>
+</div>
+<button class="bg-transparent border border-outline hover:border-primary hover:text-primary text-on-surface p-2.5 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="group relative flex flex-col bg-[#0F172A] border border-[#1E293B] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_10px_40px_rgba(75,142,255,0.1)]">
+<div class="relative aspect-[4/3] bg-surface-container-highest p-6 flex items-center justify-center overflow-hidden">
+<img alt="Zenith Creator Pro" class="object-contain w-full h-full transform group-hover:scale-105 transition-transform duration-500 z-10" data-alt="A high-end creator laptop displaying a vibrant, hyper-realistic color spectrum on its edgeless screen. The laptop sits on a minimal dark gray desk surface. The ambient lighting in the room is low, allowing the brilliance of the screen to illuminate the surrounding space with soft, colorful reflections. The chassis is a pale, anodized silver, contrasting with the dark environment. The visual mood is creative, precise, and premium." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDT8V-P3XGoH7OTqZhKXxj-zWa56JhnVQ9Sur_AvQbhJmLur6Rw9kJlqnopgBvdG1fToHkgSSBIPoVWisU15YOxvzkFUjD7KkNx1Hkxf3zBIW3WOP8ET0J0_TwdhnfpidcwsENMaxNj8yYVeC_I5iFHyEA_Xqb8U12w0ZEhIDMsXkAicjCyZdJapfxhCSM5UYK0H1I2HIaBB5vSGi1taHOnt7AvtOk49jGoEzveFT523-P79wi_P8bS"/>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">Zenith</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 leading-tight">Creator Pro 14</h3>
+<div class="flex flex-wrap gap-2 mb-4 mt-1">
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">M3 Max</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">36GB Unified</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">Mini-LED</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between border-t border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-bold text-on-surface">$3,199.00</span>
+</div>
+<button class="bg-[#005bc1] hover:bg-primary-container text-white p-2.5 rounded-full transition-colors glow-hover flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Product Card 5 -->
+<div class="group relative flex flex-col bg-[#0F172A] border border-[#1E293B] rounded-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_10px_40px_rgba(75,142,255,0.1)] opacity-60">
+<div class="relative aspect-[4/3] bg-surface-container-highest p-6 flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 bg-background/50 z-20 flex items-center justify-center backdrop-blur-sm">
+<span class="bg-surface px-4 py-2 rounded font-label-sm text-label-sm tracking-widest text-on-surface border border-outline-variant uppercase">Out of Stock</span>
+</div>
+<img alt="NovaTech Rugged" class="object-contain w-full h-full grayscale z-10" data-alt="An ultra-rugged tactical laptop closed and resting on rough concrete. The device features reinforced rubberized bumpers on the corners, a thick matte black casing, and visible metallic screws holding the chassis together. There are subtle dust and scuff marks indicating heavy use. The lighting is harsh and directional, creating strong, deep shadows that emphasize the robust, indestructible nature of the hardware. The aesthetic is industrial and secure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTJ27iJf72-1E9ljhlrnExURxJ4roVyW44yU0ggabAjQ0KY7_dT56SfdrgrpQoKr-QA_NAEzIqZBiCykxqVotpBcPZ13A5VkufBI9rgGSpLSApyopEjyuZZGsdYaynUcMAic9H0nZLDJJZlqT9rpFKp4FcxlBwhjXhFowH2JzHGD3dog_uHe_hCrHWTcV6Wqj5e01eVGOsel7ps8nYgJxdmE7uZdEbJT5Qkqwubixk9oPM73AVXhsF"/>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<div class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">NovaTech</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2 leading-tight">ShieldBook Extreme</h3>
+<div class="flex flex-wrap gap-2 mb-4 mt-1">
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">i7-13700H</span>
+<span class="bg-surface-container-high border border-outline-variant rounded px-2 py-0.5 font-label-sm text-label-sm text-on-surface-variant">MIL-STD-810G</span>
+</div>
+<div class="mt-auto pt-4 flex items-end justify-between border-t border-outline-variant/50">
+<div class="flex flex-col">
+<span class="font-body-lg text-body-lg font-bold text-on-surface-variant">$1,899.00</span>
+</div>
+<button class="bg-surface-container border border-outline-variant text-on-surface-variant p-2.5 rounded-full cursor-not-allowed flex items-center justify-center" disabled="">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-12 flex justify-center items-center gap-2">
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded bg-primary text-on-primary-fixed flex items-center justify-center font-label-sm text-label-sm font-bold">1</button>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors font-label-sm text-label-sm">2</button>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors font-label-sm text-label-sm">3</button>
+<span class="text-on-surface-variant px-2">...</span>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-on-surface hover:border-primary hover:text-primary transition-colors font-label-sm text-label-sm">8</button>
+<button class="w-10 h-10 rounded border border-outline-variant flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest font-label-sm text-label-sm full-width border-t border-outline-variant flat mt-auto">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter px-margin-desktop py-12 w-full max-w-[1280px] mx-auto">
+<div class="col-span-2 md:col-span-1 flex flex-col gap-4 mb-8 md:mb-0">
+<span class="font-headline-md text-headline-md text-on-surface">TECH_CORE</span>
+<p class="text-on-surface-variant font-body-md text-body-md mt-2 max-w-xs">Precision Engineered Performance. Delivering next-generation computing hardware for professionals.</p>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-on-surface font-bold mb-2">Support</span>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Technical Support</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Warranty Policy</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Shipping &amp; Returns</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-on-surface font-bold mb-2">Legal</span>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Security</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-3">
+<span class="text-on-surface font-bold mb-2">Business</span>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Developer API</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Corporate Sales</a>
+</div>
+</div>
+<div class="border-t border-outline-variant/30 px-margin-desktop py-6 flex justify-between items-center w-full max-w-[1280px] mx-auto">
+<span class="text-secondary dark:text-secondary opacity-60">© 2024 TECH_CORE. Precision Engineered Performance.</span>
+</div>
+</footer>
+</body></html>

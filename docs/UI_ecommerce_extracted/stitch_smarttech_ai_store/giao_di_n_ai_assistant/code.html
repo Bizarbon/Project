@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CoreAI Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#323537",
+                    "on-secondary-fixed": "#131b2e",
+                    "secondary-fixed": "#dae2fd",
+                    "on-primary-fixed": "#001a41",
+                    "outline": "#8b90a0",
+                    "secondary": "#bec6e0",
+                    "primary-container": "#4b8eff",
+                    "on-secondary-container": "#adb4ce",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "on-tertiary-container": "#002d40",
+                    "error": "#ffb4ab",
+                    "error-container": "#93000a",
+                    "on-tertiary": "#00354a",
+                    "on-secondary": "#283044",
+                    "surface-container-low": "#191c1e",
+                    "background": "#101415",
+                    "surface-container": "#1d2022",
+                    "inverse-surface": "#e0e3e5",
+                    "on-error": "#690005",
+                    "tertiary-fixed": "#c4e7ff",
+                    "inverse-primary": "#005bc1",
+                    "on-error-container": "#ffdad6",
+                    "surface": "#101415",
+                    "tertiary-fixed-dim": "#7bd0ff",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-surface-variant": "#c1c6d7",
+                    "on-background": "#e0e3e5",
+                    "on-primary-fixed-variant": "#004493",
+                    "on-primary-container": "#00285c",
+                    "surface-tint": "#adc6ff",
+                    "secondary-container": "#3f465c",
+                    "surface-dim": "#101415",
+                    "on-tertiary-fixed-variant": "#004c69",
+                    "tertiary-container": "#009bd1",
+                    "surface-bright": "#363a3b",
+                    "on-primary": "#002e69",
+                    "surface-variant": "#323537",
+                    "surface-container-high": "#272a2c",
+                    "primary-fixed": "#d8e2ff",
+                    "primary": "#adc6ff",
+                    "primary-fixed-dim": "#adc6ff",
+                    "outline-variant": "#414755",
+                    "surface-container-lowest": "#0b0f10",
+                    "on-surface": "#e0e3e5",
+                    "inverse-on-surface": "#2d3133",
+                    "tertiary": "#7bd0ff",
+                    "on-tertiary-fixed": "#001e2c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "base": "8px",
+                    "margin-mobile": "20px",
+                    "gutter": "24px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-sm": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glow-effect {
+            box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
+        }
+        .ai-message-bg {
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 122, 255, 0.3);
+            box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.05);
+        }
+        .pulse-orb {
+            animation: pulse-glow 2s infinite alternate;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 255, 0.4); transform: scale(0.95); }
+            100% { box-shadow: 0 0 20px rgba(0, 255, 255, 0.8); transform: scale(1.05); }
+        }
+        .typing-dot {
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 144, 160, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 144, 160, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md antialiased overflow-hidden flex flex-col items-center justify-center relative">
+<!-- Background ambiance -->
+<div class="absolute inset-0 z-0 pointer-events-none opacity-20" style="background: radial-gradient(circle at 50% 50%, rgba(0, 122, 255, 0.15) 0%, transparent 60%);"></div>
+<!-- Main Modal Container -->
+<div class="relative z-10 w-full max-w-4xl h-[90vh] md:h-[85vh] bg-surface-container/80 backdrop-blur-xl border border-primary/20 rounded-xl overflow-hidden flex flex-col shadow-[0_20px_50px_rgba(0,122,255,0.1)]">
+<!-- Header -->
+<header class="flex-none p-6 border-b border-outline-variant/30 flex items-center justify-between" style="background: linear-gradient(90deg, rgba(0, 91, 193, 0.1) 0%, rgba(0, 155, 209, 0.1) 100%);">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center pulse-orb relative">
+<div class="absolute inset-0 rounded-full bg-cyan-400 opacity-20 blur-md"></div>
+<span class="material-symbols-outlined text-on-primary-container text-2xl relative z-10">smart_toy</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">CoreAI</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span> Online &amp; Ready
+                    </p>
+</div>
+</div>
+<button class="w-10 h-10 rounded-full hover:bg-surface-variant flex items-center justify-center transition-colors text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined" data-weight="fill">close</span>
+</button>
+</header>
+<!-- Chat History -->
+<main class="flex-1 overflow-y-auto p-6 md:p-8 flex flex-col gap-6">
+<!-- Date Divider -->
+<div class="flex justify-center">
+<span class="font-label-sm text-label-sm text-outline-variant bg-surface-container-highest px-3 py-1 rounded-full">Today</span>
+</div>
+<!-- AI Message -->
+<div class="flex gap-4 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center self-end border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+</div>
+<div class="ai-message-bg rounded-2xl rounded-bl-sm p-4 text-on-surface font-body-md text-body-md">
+<p>Hello. I am CoreAI, your technical assistant. I can help you compare specifications, check warranty details, or find the perfect component for your build.</p>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex gap-4 max-w-[85%] self-end flex-row-reverse">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex-shrink-0 flex items-center justify-center self-end">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">person</span>
+</div>
+<div class="bg-surface-variant rounded-2xl rounded-br-sm p-4 text-on-surface font-body-md text-body-md border border-outline/10">
+<p>I'm looking at the new Titan X9 laptop. Can you tell me about it?</p>
+</div>
+</div>
+<!-- AI Message with Product Card embedded -->
+<div class="flex gap-4 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center self-end border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+</div>
+<div class="ai-message-bg rounded-2xl rounded-bl-sm p-4 text-on-surface font-body-md text-body-md flex flex-col gap-4 w-full">
+<p>The Titan X9 is a high-performance workstation designed for intensive tasks. Here are the key specifications:</p>
+<div class="bg-surface-container p-3 rounded-lg border border-outline-variant/30 flex gap-4 items-center">
+<div class="w-20 h-20 bg-surface-bright rounded flex-shrink-0 relative overflow-hidden" data-alt="A sleek, futuristic black laptop shown from a three-quarter angle against a dark minimalist background, glowing electric blue accents around the vents and keyboard, high contrast, premium tech aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD9ARYymHY2aiSrP8A998-_HibNSONnmZ8W6ru3qvSMhf8hKFplpW9I4byYkASE0Xdg70ZqcwOf4mYmAfeInRQu6G-SOTvMpy724nhpmDVmXjVYAzdAq4xoNaN8OIvM6S5TKmlELJ3GOxDTc4d2Gcj_Aa_Vl1p0Fme7ODYBTQFdFdT97GXvfIvfnfxn2skCe7bI_XbrkShtsMzQ5BNt42Yvr2jEIAV7NlTP-V_VcBuFbC_kTVnFWxl8')">
+<!-- Product Image Placeholder -->
+</div>
+<div class="flex-1">
+<h4 class="font-headline-md text-[16px] font-semibold text-primary">Titan X9 Workstation</h4>
+<div class="flex flex-wrap gap-2 mt-2">
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant">Intel i9 13900K</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant">64GB DDR5</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant">RTX 4090</span>
+</div>
+</div>
+</div>
+<p>Would you like to compare it with another model?</p>
+</div>
+</div>
+<!-- Typing Indicator -->
+<div class="flex gap-4 max-w-[85%]">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center self-end border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm">smart_toy</span>
+</div>
+<div class="ai-message-bg rounded-2xl rounded-bl-sm p-4 flex items-center gap-1 w-16 h-[52px]">
+<div class="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+<div class="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+<div class="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+</div>
+</div>
+<!-- Suggested Actions -->
+<div class="mt-4 flex flex-wrap gap-2 pl-12">
+<button class="font-label-sm text-label-sm px-4 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">compare_arrows</span>
+                    So sánh laptop này với model X
+                </button>
+<button class="font-label-sm text-label-sm px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+                    Chính sách bảo hành là gì?
+                </button>
+<button class="font-label-sm text-label-sm px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary/50 hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+                    Kiểm tra tình trạng kho
+                </button>
+</div>
+</main>
+<!-- Input Area -->
+<footer class="flex-none p-4 md:p-6 border-t border-outline-variant/30 bg-surface-container-lowest/50">
+<div class="relative flex items-center">
+<button class="absolute left-4 w-8 h-8 flex items-center justify-center text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<input class="w-full bg-surface-container border border-outline-variant rounded-full py-4 pl-14 pr-16 text-on-surface font-body-md text-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-outline/70" placeholder="Ask CoreAI anything..." type="text"/>
+<button class="absolute right-2 w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container hover:text-on-primary-container transition-all hover:glow-effect">
+<span class="material-symbols-outlined" data-weight="fill">send</span>
+</button>
+</div>
+<div class="text-center mt-3">
+<span class="font-label-sm text-[10px] text-outline/50 uppercase tracking-widest">CoreAI can make mistakes. Verify technical specs.</span>
+</div>
+</footer>
+</div>
+</body></html>

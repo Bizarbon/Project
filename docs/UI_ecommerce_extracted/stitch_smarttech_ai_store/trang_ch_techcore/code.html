@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TechCore - Premium Electronics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#323537",
+                      "on-secondary-fixed": "#131b2e",
+                      "secondary-fixed": "#dae2fd",
+                      "on-primary-fixed": "#001a41",
+                      "outline": "#8b90a0",
+                      "secondary": "#bec6e0",
+                      "primary-container": "#4b8eff",
+                      "on-secondary-container": "#adb4ce",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "on-tertiary-container": "#002d40",
+                      "error": "#ffb4ab",
+                      "error-container": "#93000a",
+                      "on-tertiary": "#00354a",
+                      "on-secondary": "#283044",
+                      "surface-container-low": "#191c1e",
+                      "background": "#101415",
+                      "surface-container": "#1d2022",
+                      "inverse-surface": "#e0e3e5",
+                      "on-error": "#690005",
+                      "tertiary-fixed": "#c4e7ff",
+                      "inverse-primary": "#005bc1",
+                      "on-error-container": "#ffdad6",
+                      "surface": "#101415",
+                      "tertiary-fixed-dim": "#7bd0ff",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "on-surface-variant": "#c1c6d7",
+                      "on-background": "#e0e3e5",
+                      "on-primary-fixed-variant": "#004493",
+                      "on-primary-container": "#00285c",
+                      "surface-tint": "#adc6ff",
+                      "secondary-container": "#3f465c",
+                      "surface-dim": "#101415",
+                      "on-tertiary-fixed-variant": "#004c69",
+                      "tertiary-container": "#009bd1",
+                      "surface-bright": "#363a3b",
+                      "on-primary": "#002e69",
+                      "surface-variant": "#323537",
+                      "surface-container-high": "#272a2c",
+                      "primary-fixed": "#d8e2ff",
+                      "primary": "#adc6ff",
+                      "primary-fixed-dim": "#adc6ff",
+                      "outline-variant": "#414755",
+                      "surface-container-lowest": "#0b0f10",
+                      "on-surface": "#e0e3e5",
+                      "inverse-on-surface": "#2d3133",
+                      "tertiary": "#7bd0ff",
+                      "on-tertiary-fixed": "#001e2c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "base": "8px",
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { background-color: #020617; color: #e0e3e5; }
+        .glow-effect:hover { box-shadow: 0 0 15px rgba(0, 122, 255, 0.5); }
+        .ai-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+        }
+        .ai-backdrop {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: linear-gradient(145deg, rgba(15,23,42,0.8) 0%, rgba(2,6,23,0.9) 100%);
+            border: 1px solid transparent;
+            background-image: linear-gradient(#0F172A, #020617), linear-gradient(to bottom right, #007AFF, #00FFFF);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background text-primary dark:text-primary font-body-md text-body-md docked full-width top-0 border-b border-outline-variant flat no shadows flex justify-between items-center px-margin-desktop h-20 w-full sticky top-0 z-50">
+<div class="font-display-lg-mobile text-display-lg-mobile font-bold text-primary tracking-tighter">
+            TECH_CORE
+        </div>
+<nav class="hidden md:flex gap-gutter">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary-container transition-all duration-200" href="#">Processors</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200" href="#">Graphics</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200" href="#">Storage</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200" href="#">Displays</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200" href="#">Laptops</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200" href="#">Peripherals</a>
+</nav>
+<div class="flex gap-base">
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 scale-95 duration-100 flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors hover:text-primary-container transition-all duration-200 scale-95 duration-100 flex items-center justify-center p-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-gutter">
+<!-- Hero Section -->
+<section class="relative rounded-xl overflow-hidden mb-gutter border border-outline-variant bg-[#0F172A] min-h-[500px] flex items-center">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-60" data-alt="A sleek, ultra-high-definition close-up of a futuristic computer processor chip glowing with intricate, microscopic circuit lines in vibrant electric blue and cyan against a deep slate navy background. The lighting is cinematic, highlighting the precision engineering and metallic textures of the silicon architecture. The mood is high-tech, premium, and powerful, perfectly aligning with a top-tier electronics brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy_RHLXrGbLi8U0_di-q30FCdi9CrROjVxXA5QJk7sJjJM7tkreINMmETQDKfOVmJltF6s21wVGawgfvF4_DikBRqOEgAjjwaymG33GYSqm36X3jYKLVBCobd7xXaeThrAEIilbRwZaThEcgaDANwA4kHMqn1QlMXfp80-1EbYgqkkzJmTvGhO1Vn78WrwJ0fqwiYC6_QTdcHSPnleuqawBkrdFtT6kGFV5bQQWG2ird9mTNPq76zV"/>
+<div class="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/80 to-transparent"></div>
+</div>
+<div class="relative z-10 p-margin-mobile md:p-margin-desktop max-w-2xl">
+<span class="inline-block px-3 py-1 mb-4 rounded border border-outline-variant text-primary font-label-sm text-label-sm tracking-widest uppercase">Next-Gen Architecture</span>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-6">Quantum Core X9. Unbridled Performance.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Engineered for extreme workloads. Experience unparalleled multi-threaded processing power with advanced thermal dynamics.</p>
+<div class="flex gap-4">
+<button class="bg-[#007AFF] text-white px-6 py-3 rounded-lg font-headline-md text-headline-md glow-effect transition-all duration-300">Shop Now</button>
+<button class="bg-transparent border border-outline text-on-surface px-6 py-3 rounded-lg font-headline-md text-headline-md hover:bg-surface-container transition-all duration-300">View Specs</button>
+</div>
+</div>
+</section>
+<!-- Bento Grid - Featured Products -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-gutter">
+<!-- Large Card -->
+<div class="md:col-span-2 bg-[#0F172A] rounded-xl border border-outline-variant overflow-hidden relative group h-[400px]">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A premium, ultra-thin laptop half-open, floating in a dark, minimalist studio space. Soft, ambient blue lighting outlines the sharp, precise aluminum chassis and reflects off the high-resolution, edge-to-edge display. The dark slate background enhances the sophisticated, modern corporate tech aesthetic, emphasizing sleek lines and professional high-performance hardware." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEkGaA1mllxFb8mnpKizjvviWFXW4ks5OV8UiJBbQR_49GcPVog3ckn2BEWIM4a-ccOmFzDxgsFG1hmzPz0R-tAlqTrb0aEdQPnJQq1jUDIHh0ZgERc8GPJcc4Whjtb9ippvx_NR9mzN9WPHk_ka4FtMfNUewQivmvRp0RVivPso15kr3Msyiwz-4wzrdwvBoWFcKvay4efFcE9qA9-vMUDXSTx7G7GxIVjbkK72dzC-62wS-Plv18"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">AeroBook Pro 16</h2>
+<p class="text-on-surface-variant font-body-md text-body-md mb-4">The ultimate workstation for creative professionals.</p>
+<button class="text-primary hover:text-tertiary transition-colors flex items-center gap-2 font-headline-md text-headline-md">
+                        Learn More <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Small Card 1 -->
+<div class="bg-[#0F172A] rounded-xl border border-outline-variant overflow-hidden relative group h-[400px]">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A massive, high-end graphics card with intricate cooling fans and glowing geometric LED accents in cyan and deep blue. It is positioned diagonally against an absolute dark slate gray background, strongly lit from the side to emphasize its rugged, metallic heatsinks and advanced technical design. The visual style is aggressive yet refined, screaming raw computational power." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFT3bowTzbbGKSTaQchjW0nS9bg6R7ldjZ4DzX5RxqrcuGQShmK5_j9ml82Sp9f_HqCidHsem3PnfUqfFb2Hb1bs2KHQWEAeCaAoyTZPbfUpcy4H6lUuS_FymJGXV2R3EiyYCFCebWPb8GbPoLupig38hIbNKWlc6_ASRtSMNU1wWuSehZe9OI_AN2N27Ml-wlqxVT8sw2Yv5mW8GJX-BxF3XVL0yAYNSPS7YX1y-lsD7i1tz_Ddi0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Titan RTX 5090</h2>
+<button class="text-primary hover:text-tertiary transition-colors flex items-center gap-2 font-headline-md text-headline-md">
+                        Buy Now <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Small Card 2 -->
+<div class="bg-[#0F172A] rounded-xl border border-outline-variant overflow-hidden relative group h-[300px]">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A sleek, curved ultrawide gaming monitor resting on a minimalist desk surface. The screen displays a subtle, abstract digital wave pattern in deep blues and bright cyan, reflecting the UI's brand colors. The surrounding environment is pitch dark, making the monitor appear as a floating window into a digital realm. Clean, sharp lines dominate the composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqetZ1l7wdfj4q75aEk2Ev3yPOFNrfgowVkVexpPJ1X_LnjxU025lKfZB_3-crwYibzDiSt9DVxa4iRrOj5_53y1wd2Rz59AnNqlxgUX4PsWyxpfAfOjKbMek3sKYDVnXryL0f20RhQ7mZWBkT5piif2xYs_x8dJXOYIY2oxzQM_tIxcxsmTOE-YZ1dBn9v53Dr9xr2hFTovMXy8E9iWMXCmKLRMVVs4mvZZIPClJ_5NkVovtsLar2"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">UltraVision 4K Curved</h2>
+</div>
+</div>
+<!-- Small Card 3 -->
+<div class="bg-[#0F172A] rounded-xl border border-outline-variant overflow-hidden relative group h-[300px] flex items-center justify-center text-center p-6">
+<div>
+<span class="material-symbols-outlined text-primary text-6xl mb-4" style="font-variation-settings: 'FILL' 0;">precision_manufacturing</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Custom Builds</h2>
+<p class="text-on-surface-variant font-body-md text-body-md mb-4 text-sm">Configure your dream machine with our interactive builder.</p>
+<button class="border border-primary text-primary px-4 py-2 rounded font-headline-md text-headline-md hover:bg-primary hover:text-on-primary transition-colors">Start Building</button>
+</div>
+</div>
+<!-- Small Card 4 -->
+<div class="bg-[#0F172A] rounded-xl border border-outline-variant overflow-hidden relative group h-[300px]">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A close-up of a high-speed NVMe solid-state drive module. The PCB is a deep, matte black with pristine silver and gold contact pins. A subtle, laser-etched branding pattern is visible on the thermal shield. The lighting is extremely focused, creating sharp specular highlights that convey speed, reliability, and precision engineering typical of premium data storage solutions." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH0heH2IALa_O7EXJlVWUw8p1weSCXK769BT9_-U96hgowamhmzBuxze35seZNK3qNrZPGcYtHAxf4V51vxAjHWncQ25fVeHN6W5bK9Py7i_0y12WsH9n9MVWNZUhsI7MUnt9k4MGyR2p8t7vjIB88pEBiFicH_hrai_WBqldhxikDmwhOFBoQ5Bkuynf-0rONmwKKRDT-r--IRHKV-56n4gYv_CFMhfqzdOy5fgQ2kwM5XKMqSSC5"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Velocity SSD 4TB</h2>
+</div>
+</div>
+</section>
+</main>
+<!-- AI Assistant Floating Button -->
+<div class="fixed bottom-[32px] right-[32px] z-[100]">
+<button class="ai-backdrop text-white w-14 h-14 rounded-full flex items-center justify-center ai-pulse hover:scale-110 transition-transform duration-300 relative group">
+<span class="material-symbols-outlined text-3xl text-[#00FFFF]" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<div class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-[#0F172A] border border-outline-variant text-on-surface px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap font-label-sm text-label-sm">
+                Need tech advice?
+            </div>
+</button>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest text-secondary dark:text-secondary font-label-sm text-label-sm full-width border-t border-outline-variant flat grid grid-cols-2 md:grid-cols-4 gap-gutter px-margin-desktop py-12 w-full mt-auto">
+<div class="col-span-2 md:col-span-4 mb-8">
+<div class="font-headline-md text-headline-md text-on-surface">TECH_CORE</div>
+</div>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Technical Support</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Warranty Policy</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Shipping &amp; Returns</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Security</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Developer API</a>
+<a class="text-on-surface-variant hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Corporate Sales</a>
+<div class="col-span-2 md:col-span-4 mt-8 pt-8 border-t border-outline-variant text-on-surface-variant opacity-60">
+            © 2024 TECH_CORE. Precision Engineered Performance.
+        </div>
+</footer>
+</body></html>

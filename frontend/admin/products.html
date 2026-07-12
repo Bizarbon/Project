@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Quản lý sản phẩm - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+</head>
+
+<body class="admin-page">
+    <nav>
+        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+        <ul id="main-navbar">
+            <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
+            <li><a href="products.html?v=techecommerce-20260709-2" class="active">Sản phẩm</a></li>
+            <li><a href="orders.html?v=techecommerce-20260709-2">Đơn hàng</a></li>
+            <li><a href="customers.html?v=techecommerce-20260709-2">Khách hàng</a></li>
+            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
+            <li><a href="finance.html?v=techecommerce-20260709-2">Tài chính</a></li>
+            <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <main class="container fade-in">
+        <div class="page-header reveal">
+            <h2>Quản lý sản phẩm</h2>
+            <p>Quản lý tồn kho, thông số kỹ thuật, giá bán và danh mục sản phẩm công nghệ.</p>
+        </div>
+
+        <section class="form-section glass-card reveal">
+            <h2><span id="formTitle">Thêm sản phẩm mới</span></h2>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+
+                <div class="form-group">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" id="name" placeholder="Nhập tên sản phẩm..." required>
+                </div>
+                <div class="form-group">
+                    <label>SKU / Mã hàng</label>
+                    <input type="text" id="sku" placeholder="VD: IP15PM-256-BLK">
+                </div>
+                <div class="form-group">
+                    <label>Thương hiệu</label>
+                    <input type="text" id="brand" placeholder="VD: Apple, Samsung, Dell...">
+                </div>
+                <div class="form-group">
+                    <label>Giá bán (VNĐ)</label>
+                    <input type="number" id="price" placeholder="Nhập giá..." required>
+                </div>
+                <div class="form-group">
+                    <label>Giá niêm yết / Giá gạch (VNĐ)</label>
+                    <input type="number" id="compareAtPrice" placeholder="VD: 32990000">
+                </div>
+                <div class="form-group">
+                    <label>Danh mục</label>
+                    <input type="text" id="category" placeholder="VD: Điện thoại, Laptop..." required>
+                </div>
+                <div class="form-group">
+                    <label>Số lượng tồn kho</label>
+                    <input type="number" id="stock" placeholder="Nhập số lượng..." required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Mô tả chi tiết</label>
+                    <textarea id="description" placeholder="Nhập mô tả sản phẩm..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Nhà cung cấp</label>
+                    <select id="supplier">
+                        <option value="">-- Chọn nhà cung cấp --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tồn kho tối thiểu (cảnh báo)</label>
+                    <input type="number" id="minStock" placeholder="VD: 5" min="0" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Chính sách bảo hành</label>
+                    <input type="text" id="warranty" placeholder="VD: 12 tháng, bao test 7 ngày..." value="Không bảo hành">
+                </div>
+                <div class="form-group">
+                    <label>Đánh giá / lượt đánh giá</label>
+                    <input type="text" id="ratingReview" placeholder="VD: 4.8/126">
+                </div>
+                <div class="form-group">
+                    <label>Đã bán</label>
+                    <input type="number" id="soldCount" placeholder="VD: 250" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Nổi bật</label>
+                    <select id="featured">
+                        <option value="false">Không</option>
+                        <option value="true">Có</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>URL hình ảnh sản phẩm</label>
+                    <input type="text" id="image" placeholder="https://...">
+                </div>
+                <div class="form-group full-width">
+                    <label>Tags tìm kiếm</label>
+                    <input type="text" id="tags" placeholder="VD: flagship, gaming, văn phòng, sinh viên">
+                </div>
+                <div class="form-group full-width">
+                    <label>Thông số kỹ thuật</label>
+                    <div class="spec-grid">
+                        <input type="text" id="specCpu" placeholder="CPU / Chip">
+                        <input type="text" id="specRam" placeholder="RAM">
+                        <input type="text" id="specStorage" placeholder="Bộ nhớ / SSD">
+                        <input type="text" id="specScreen" placeholder="Màn hình">
+                        <input type="text" id="specCamera" placeholder="Camera">
+                        <input type="text" id="specBattery" placeholder="Pin">
+                        <input type="text" id="specOs" placeholder="Hệ điều hành">
+                        <input type="text" id="specGpu" placeholder="GPU">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Lưu sản phẩm</button>
+                    <button type="button" class="btn-secondary" onclick="resetForm()">Hủy bỏ</button>
+                </div>
+            </form>
+        </section>
+
+        <div class="filter-bar reveal admin-filter-bar">
+            <input id="adminProductSearch" type="search" placeholder="Tìm sản phẩm...">
+            <select id="adminStockFilter">
+                <option value="">Tất cả tồn kho</option>
+                <option value="low">Sắp hết hàng</option>
+                <option value="out">Hết hàng</option>
+                <option value="in">Còn hàng</option>
+            </select>
+            <select id="adminSortProducts">
+                <option value="">Mặc định</option>
+                <option value="price_asc">Giá tăng dần</option>
+                <option value="price_desc">Giá giảm dần</option>
+                <option value="stock_asc">Tồn kho thấp</option>
+                <option value="stock_desc">Tồn kho cao</option>
+                <option value="name">Tên A-Z</option>
+            </select>
+        </div>
+
+        <section class="table-section glass-card reveal">
+            <h2>Danh sách sản phẩm (<span id="productCount">0</span>)</h2>
+            <div class="table-wrapper">
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">STT</th>
+                            <th>Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Thương hiệu</th>
+                            <th>SKU</th>
+                            <th>Giá bán</th>
+                            <th>Danh mục</th>
+                            <th>Tồn kho</th>
+                            <th>Nhà cung cấp</th>
+                            <th>Bảo hành</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="../assets/js/products.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+</body>
+
+</html>

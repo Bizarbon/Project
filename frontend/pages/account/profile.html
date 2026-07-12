@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hồ sơ cá nhân - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css?v=account-ui-20260711-1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=account-ui-20260711-1">
+    <style>
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .bio-card {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .profile-avatar-large {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 15px 35px rgba(47, 128, 237, 0.25);
+        }
+        .role-badge {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0;
+            margin-top: 1rem;
+        }
+        .role-admin { background: rgba(245, 158, 11, 0.2); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .role-member { background: rgba(16, 185, 129, 0.2); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .bio-info { margin-top: 2rem; text-align: left; }
+        .bio-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .bio-label { color: var(--text-muted); font-size: 0.9rem; }
+        .bio-value { font-weight: 600; }
+        .settings-card { padding: 2.5rem; }
+        .settings-card h3 { margin-bottom: 2rem; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .btn-save {
+            width: auto;
+            padding: 1rem 2.5rem;
+            margin-top: 1rem;
+        }
+        @media (max-width: 992px) { .profile-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+    <link rel="stylesheet" href="../../assets/css/profile.css?v=profile-alignment-20260712-2">
+</head>
+
+<body class="profile-page">
+    <header class="storefront-header account-storefront-header">
+        <div class="header-main">
+            <div class="header-shell header-main-inner">
+                <a class="storefront-logo" href="../../index.html" aria-label="TechEcommerce - Trang chủ">
+                    <span class="storefront-logo-mark">TE</span>
+                    <span class="storefront-logo-text">TechEcommerce</span>
+                </a>
+                <form class="header-search" action="../../index.html" method="get" role="search">
+                    <label class="sr-only" for="profileHeaderSearch">Tìm kiếm sản phẩm</label>
+                    <span class="header-search-icon" aria-hidden="true">⌕</span>
+                    <input id="profileHeaderSearch" name="search" type="search" placeholder="Bạn đang tìm sản phẩm gì?">
+                    <button type="submit">Tìm kiếm</button>
+                </form>
+                <div class="header-actions">
+                    <div id="nav-auth-section"></div>
+                    <a class="header-action-btn" href="../../index.html?openCart=1">
+                        <span class="header-action-icon" aria-hidden="true">🛒</span>
+                        <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
+                    </a>
+                    <a class="header-action-btn" href="../../index.html#catalogStart">
+                        <span class="header-action-icon" aria-hidden="true">⌖</span>
+                        <span class="header-action-copy"><small>Khu vực</small><strong id="profileLocationLabel">Hồ Chí Minh</strong></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="header-categories" role="navigation" aria-label="Danh mục sản phẩm">
+            <div class="header-shell header-category-list">
+                <a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a>
+                <a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a>
+                <a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a>
+                <a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a>
+                <a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a>
+                <a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a>
+                <a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a>
+            </div>
+        </div>
+    </header>
+    <script src="../../assets/js/animations.js"></script>
+    <script src="../../assets/js/auth.js?v=account-ui-20260711-1"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+
+    <main class="container fade-in">
+        <div class="page-header reveal">
+            <h2>Hồ sơ cá nhân</h2>
+            <p>Quản lý thông tin tài khoản và thiết lập bảo mật của bạn.</p>
+        </div>
+
+        <div class="profile-grid">
+            <section class="bio-card glass-card reveal">
+                <div class="avatar-editor">
+                    <div class="profile-avatar-large">
+                        <img id="profileAvatarImage" alt="Ảnh đại diện" hidden>
+                        <span id="profileInitial">-</span>
+                    </div>
+                    <div class="avatar-actions">
+                        <label for="profileAvatarInput" class="avatar-upload-btn">Chọn ảnh</label>
+                        <button type="button" class="avatar-remove-btn" id="removeAvatarBtn">Xóa ảnh</button>
+                    </div>
+                    <input type="file" id="profileAvatarInput" accept="image/png,image/jpeg,image/webp" hidden>
+                    <p class="avatar-hint">PNG, JPG hoặc WebP. Tối đa 2 MB.</p>
+                </div>
+                <h2 id="profileName" style="margin-bottom: 0.5rem;">Đang tải...</h2>
+                <p id="profileUsername" style="color: var(--text-muted);">@username</p>
+                <div id="profileRoleBadge" class="role-badge">Đang tải...</div>
+
+                <div class="bio-info">
+                    <div class="bio-row">
+                        <span class="bio-label">Ngày gia nhập</span>
+                        <span class="bio-value" id="profileJoinDate">---</span>
+                    </div>
+                    <div class="bio-row">
+                        <span class="bio-label">Trạng thái</span>
+                        <span class="bio-value" style="color: var(--success);">Đang hoạt động</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-card glass-card reveal">
+                <div class="settings-heading">
+                    <div><span>Thông tin tài khoản</span><h3>Chỉnh sửa thông tin</h3></div>
+                    <p>Cập nhật thông tin liên hệ và địa chỉ nhận hàng.</p>
+                </div>
+                <form id="profileForm">
+                    <div class="profile-form-grid">
+                        <div class="form-group">
+                            <label>Họ và tên</label>
+                            <input type="text" id="pName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="text" id="pPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ Email</label>
+                            <input type="email" id="pEmail">
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ nhận hàng</label>
+                            <input type="text" id="pAddress">
+                        </div>
+                    </div>
+
+                    <section class="security-section">
+                        <div class="security-heading">
+                            <span>Bảo mật tài khoản</span>
+                            <h3>Đổi mật khẩu</h3>
+                            <p>Để trống cả hai ô nếu bạn không muốn thay đổi mật khẩu.</p>
+                        </div>
+                        <div class="security-fields">
+                            <div class="form-group">
+                                <label>Mật khẩu mới</label>
+                                <input type="password" id="pPassword" autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label>Xác nhận mật khẩu mới</label>
+                                <input type="password" id="pPasswordConfirm" autocomplete="new-password">
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="profile-form-actions">
+                        <button type="submit" class="btn-primary btn-save">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script src="../../assets/js/profile.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../../assets/js/chatbox.js"></script>
+</body>
+
+</html>

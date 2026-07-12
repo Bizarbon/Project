@@ -1,0 +1,15 @@
+{
+  "name": "techecommerce",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:backend": "npm --prefix backend ci",
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix backend run dev",
+    "seed": "npm --prefix backend run seed",
+    "seed:admin": "npm --prefix backend run seed:admin"
+  },
+  "engines": {
+    "node": ">=20 <26"
+  }
+}

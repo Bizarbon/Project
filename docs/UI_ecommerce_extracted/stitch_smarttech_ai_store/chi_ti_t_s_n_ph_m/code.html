@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TECH_CORE - Flagship Gaming Laptop</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#323537",
+                      "on-secondary-fixed": "#131b2e",
+                      "secondary-fixed": "#dae2fd",
+                      "on-primary-fixed": "#001a41",
+                      "outline": "#8b90a0",
+                      "secondary": "#bec6e0",
+                      "primary-container": "#4b8eff",
+                      "on-secondary-container": "#adb4ce",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "on-tertiary-container": "#002d40",
+                      "error": "#ffb4ab",
+                      "error-container": "#93000a",
+                      "on-tertiary": "#00354a",
+                      "on-secondary": "#283044",
+                      "surface-container-low": "#191c1e",
+                      "background": "#101415",
+                      "surface-container": "#1d2022",
+                      "inverse-surface": "#e0e3e5",
+                      "on-error": "#690005",
+                      "tertiary-fixed": "#c4e7ff",
+                      "inverse-primary": "#005bc1",
+                      "on-error-container": "#ffdad6",
+                      "surface": "#101415",
+                      "tertiary-fixed-dim": "#7bd0ff",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "on-surface-variant": "#c1c6d7",
+                      "on-background": "#e0e3e5",
+                      "on-primary-fixed-variant": "#004493",
+                      "on-primary-container": "#00285c",
+                      "surface-tint": "#adc6ff",
+                      "secondary-container": "#3f465c",
+                      "surface-dim": "#101415",
+                      "on-tertiary-fixed-variant": "#004c69",
+                      "tertiary-container": "#009bd1",
+                      "surface-bright": "#363a3b",
+                      "on-primary": "#002e69",
+                      "surface-variant": "#323537",
+                      "surface-container-high": "#272a2c",
+                      "primary-fixed": "#d8e2ff",
+                      "primary": "#adc6ff",
+                      "primary-fixed-dim": "#adc6ff",
+                      "outline-variant": "#414755",
+                      "surface-container-lowest": "#0b0f10",
+                      "on-surface": "#e0e3e5",
+                      "inverse-on-surface": "#2d3133",
+                      "tertiary": "#7bd0ff",
+                      "on-tertiary-fixed": "#001e2c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "64px",
+                      "base": "8px",
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid theme('colors.outline-variant');
+        }
+
+        .ai-chatbox {
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid;
+            border-image: linear-gradient(45deg, theme('colors.primary-container'), theme('colors.tertiary')) 1;
+            box-shadow: 0 20px 50px rgba(0, 122, 255, 0.1);
+        }
+
+        .btn-primary {
+            background-color: theme('colors.inverse-primary');
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
+        }
+
+        .tech-chip {
+            background-color: theme('colors.surface-container-high');
+            border: 1px solid theme('colors.outline-variant');
+        }
+
+        .pulse-glow {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(123, 208, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(123, 208, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(123, 208, 255, 0); }
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="bg-background dark:bg-background border-b border-outline-variant flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 w-full sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="font-display-lg-mobile text-display-lg-mobile font-bold text-primary tracking-tighter cursor-pointer">TECH_CORE</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary-container transition-all duration-200" href="#">Processors</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary-container transition-all duration-200" href="#">Graphics</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary-container transition-all duration-200" href="#">Storage</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary-container transition-all duration-200" href="#">Displays</a>
+<a class="font-body-md text-body-md text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary-container transition-all duration-200" href="#">Laptops</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-primary-container transition-all duration-200" href="#">Peripherals</a>
+</div>
+</div>
+<div class="flex items-center gap-4 text-primary dark:text-primary">
+<button class="hover:text-primary-container transition-all duration-200 scale-95 duration-100 p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_cart</span>
+</button>
+<button class="hover:text-primary-container transition-all duration-200 scale-95 duration-100 p-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</nav>
+<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-12 flex flex-col gap-16">
+<!-- Product Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+<!-- Gallery -->
+<div class="flex flex-col gap-4">
+<div class="glass-panel rounded-lg overflow-hidden aspect-video relative flex items-center justify-center p-8 bg-surface-container-low">
+<img class="w-full h-full object-cover rounded-DEFAULT shadow-lg relative z-10" data-alt="A sleek, futuristic gaming laptop presented on a minimalist black surface. The laptop is open, displaying a vibrant, high-contrast abstract digital artwork on its screen, showcasing deep blacks and striking electric blue highlights. The chassis is a dark, matte slate gray with sharp, precise, geometric lines. Subtle, ambient blue lighting emanates from the keyboard and a thin light strip around the base, creating a premium, high-tech aesthetic against the dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKjTcWZ58Mg7wG67r4_YsWMdJ7cGzc7BaP78p6cW4bflM-3rbZKtBFixZAnuyDsRMsC_cI-z9JxQbCWrvDiIX83M1aJgFxbmwl2SxbhGmTvzxa0u5DqrGnq2rEvBLZZ5wUPAUupziY0W7QgJ7VTtb0gEMDxttK0YWdiBFzZNuTnpZGmvcURSnmzlqBL-EIuLhaBzE-Ulih4PO-C0qYzb_8VC-kYRLOyiBcw1Lr5dPvpX_r_21sYevT"/>
+<!-- Subtle background glow behind main image -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/20 to-transparent blur-3xl z-0"></div>
+</div>
+<div class="grid grid-cols-4 gap-4">
+<div class="glass-panel rounded-DEFAULT overflow-hidden aspect-square cursor-pointer border-primary p-2">
+<img class="w-full h-full object-cover" data-alt="Close up view of the mechanical keyboard of a premium gaming laptop. The keys are matte black, illuminated by precise, per-key electric blue LED backlighting. The metallic texture of the laptop deck is visible, conveying durability and high build quality. The lighting is focused, highlighting the crisp typography on the keys." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAukbg2q7206lBaNTGXLs2NQxsk0ezVq4nCqIJDWCdxgOenrg1dhUga0KwaS3Wj3b4TeL4DUF7ycIItiWjpxEmurdzTQV0ly5Lf-dI-TEDVF9x0bCO_UuikpBCN9cNyvPjHNkTuVijK_DQnnKWBlkgneGOSfjqfWGiGS3MPicSFN6NvROu-0VHDVqNiD-X4z1j58u0lpt2pR-o6AAPHZ1gKH7OC3AMRpR1Z43hjxVNtGZvRvl9qa3Jy"/>
+</div>
+<div class="glass-panel rounded-DEFAULT overflow-hidden aspect-square cursor-pointer opacity-70 hover:opacity-100 transition-opacity p-2">
+<img class="w-full h-full object-cover" data-alt="Detailed view of the side ports of a sleek, dark slate gray gaming laptop. The image highlights a precise array of USB-C, Thunderbolt, and HDMI ports. The metal casing shows a high-quality finish with sharp, chamfered edges. The lighting is cinematic, casting subtle shadows to emphasize the thinness and structural integrity of the device." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8kukWUfiu0ilbrESmrdKQzcN_3no_HVpwBRxOWcX2g4TAhK31nzJVK4yC7VJx2tBf2QSAAwQXhWEdnSSLF4q1iamSTkqMsYK1O-G_RSqmqmEl4PAqXvou865I88rOSaqMRwkmMpLyC4DIybej0MmnEnEmt2tJANaRGjm7mjflF22ftymjJi2NYstlQkU2YOQhXzVD7nL0sUWrebUDcIMNBBxq9wOy-wE6eipO3RAwz4VBX5Yc856A"/>
+</div>
+<div class="glass-panel rounded-DEFAULT overflow-hidden aspect-square cursor-pointer opacity-70 hover:opacity-100 transition-opacity p-2">
+<img class="w-full h-full object-cover" data-alt="Rear angle of a high-performance gaming laptop, showcasing aggressive yet refined exhaust vents. The design is stealthy and modern, predominantly dark gray with subtle metallic blue accents near the thermal outputs. Soft, volumetric blue light spills slightly from the vents, suggesting raw power and advanced cooling capabilities within a premium corporate-tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVYsnloY3x5bt7GchjZbfmAOyjsZfRJW-Fx-SpNxXUArwYM9y1DO4SpuqDdUH-UT7KQZAbXEW1sfNT_6jE9VvzkYEMdJhIDOFS28ZfWaSVpbs4Pk2IDZlOQ3YAQfDEmUFfsA7pgX8eWRN8n0HW-zpd5XsTui7f6jwpNAbcNRP7ALruQmMg_4fmIdydtYmazWaJi6mQ_VR9uxSgCajEHsWiZ2YE_5ByGGgxhBwKUDzIx-FcFf2CZS7z"/>
+</div>
+<div class="glass-panel rounded-DEFAULT overflow-hidden aspect-square cursor-pointer opacity-70 hover:opacity-100 transition-opacity p-2">
+<img class="w-full h-full object-cover" data-alt="Overhead shot of a premium gaming laptop closed, resting on a clean, dark surface. The lid features a minimalist, laser-etched geometric pattern and a subtle, softly glowing logo in cyan. The overall mood is sleek, secure, and technologically advanced, fitting a high-end electronics brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCymqQhdjeMyW1uubB-3zs5SbWORtC2K3iVXSiqJbhOvoNtJVpP-UTBdg0RdoG8V_u9H5qaJD_kpJm_S_aSJ4-F2QLekmo2OSPVSNGTH8swVQqgvIl7S-9jvCriz4EkUVIxAP_9H187UlWmN-jFNvTbokqjmYtrgmIam52KXNmwL_N0NIMUXo10J1tt8lry2FyNWuQOGmBZcHnGWNrNRhWe5gqKqhvMwsp2NwdTYfj4mx2FiEi0JVU8"/>
+</div>
+</div>
+</div>
+<!-- Product Info & Buy Action -->
+<div class="flex flex-col gap-8">
+<div class="flex flex-col gap-2">
+<div class="flex gap-2 mb-2">
+<span class="tech-chip font-label-sm text-label-sm text-on-surface-variant px-3 py-1 rounded">RTX 4090</span>
+<span class="tech-chip font-label-sm text-label-sm text-on-surface-variant px-3 py-1 rounded">240Hz OLED</span>
+<span class="tech-chip font-label-sm text-label-sm text-on-surface-variant px-3 py-1 rounded">i9-14900HX</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Nexus Blade X16</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Precision Engineered Mobile Dominance.</p>
+</div>
+<div class="flex items-end gap-4">
+<span class="font-headline-md text-headline-md text-primary">$3,499.00</span>
+<span class="font-body-md text-body-md text-on-surface-variant line-through mb-1">$3,799.00</span>
+</div>
+<div class="glass-panel p-6 rounded-lg flex flex-col gap-6">
+<div class="flex flex-col gap-4">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase">Configuration</label>
+<div class="grid grid-cols-2 gap-4">
+<button class="border border-primary bg-primary/10 text-primary py-3 rounded-DEFAULT font-label-sm text-label-sm transition-colors">64GB RAM | 2TB SSD</button>
+<button class="border border-outline-variant hover:border-primary/50 text-on-surface py-3 rounded-DEFAULT font-label-sm text-label-sm transition-colors">32GB RAM | 1TB SSD</button>
+</div>
+</div>
+<button class="btn-primary w-full py-4 rounded-lg font-headline-md text-body-md flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">shopping_bag</span>
+                        Add to Cart
+                    </button>
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">local_shipping</span> Free Overnight Shipping</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">verified</span> 2-Year Warranty</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Technical Specifications (Bento Grid Style) -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline-md text-headline-md text-on-surface border-b border-outline-variant pb-4">Technical Specifications</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Processor -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-2">
+<span class="material-symbols-outlined text-primary mb-2">memory</span>
+<h3 class="font-body-md text-body-md text-on-surface-variant font-bold">Processor</h3>
+<p class="font-body-md text-body-md text-on-surface">Intel Core i9-14900HX</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">24 Cores (8P+16E), up to 5.8 GHz</p>
+</div>
+<!-- Graphics -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-2">
+<span class="material-symbols-outlined text-tertiary mb-2">developer_board</span>
+<h3 class="font-body-md text-body-md text-on-surface-variant font-bold">Graphics</h3>
+<p class="font-body-md text-body-md text-on-surface">NVIDIA GeForce RTX 4090</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">16GB GDDR6, 175W Max TGP</p>
+</div>
+<!-- Display -->
+<div class="glass-panel p-6 rounded-xl flex flex-col gap-2">
+<span class="material-symbols-outlined text-primary mb-2">desktop_windows</span>
+<h3 class="font-body-md text-body-md text-on-surface-variant font-bold">Display</h3>
+<p class="font-body-md text-body-md text-on-surface">16" QHD+ (2560x1600) OLED</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">240Hz, 0.2ms, 100% DCI-P3</p>
+</div>
+<!-- Expanded Specs Table spanning 2 cols -->
+<div class="glass-panel p-6 rounded-xl md:col-span-2">
+<table class="w-full text-left font-body-md text-body-md">
+<tbody>
+<tr class="border-b border-outline-variant/50">
+<td class="py-3 text-on-surface-variant w-1/3">Memory</td>
+<td class="py-3 text-on-surface">64GB DDR5 5600MHz (2x32GB)</td>
+</tr>
+<tr class="border-b border-outline-variant/50">
+<td class="py-3 text-on-surface-variant">Storage</td>
+<td class="py-3 text-on-surface">2TB PCIe 4.0 NVMe M.2 Performance SSD</td>
+</tr>
+<tr class="border-b border-outline-variant/50">
+<td class="py-3 text-on-surface-variant">Connectivity</td>
+<td class="py-3 text-on-surface">Wi-Fi 7 (802.11be) + Bluetooth 5.4</td>
+</tr>
+<tr>
+<td class="py-3 text-on-surface-variant">Battery &amp; Power</td>
+<td class="py-3 text-on-surface">99.9Whr, 330W GaN Power Adapter</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Cooling Highlight -->
+<div class="glass-panel p-6 rounded-xl flex flex-col justify-between bg-gradient-to-br from-surface-container to-surface-container-highest relative overflow-hidden">
+<div class="z-10 relative">
+<span class="material-symbols-outlined text-tertiary mb-2">ac_unit</span>
+<h3 class="font-body-md text-body-md text-on-surface-variant font-bold">CryoCore Cooling</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">Vapor chamber technology with liquid metal thermal compound.</p>
+</div>
+<!-- Decorative subtle glow -->
+<div class="absolute -bottom-10 -right-10 w-32 h-32 bg-tertiary/20 rounded-full blur-3xl z-0"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- AI Assistant Chatbox (Floating) -->
+<div class="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4">
+<!-- Notification Bubble -->
+<div class="bg-surface-container-high border border-primary/30 rounded-lg px-4 py-3 shadow-lg flex items-center gap-3 transform translate-y-0 transition-transform duration-300">
+<div class="w-2 h-2 rounded-full bg-tertiary pulse-glow"></div>
+<p class="font-label-sm text-label-sm text-on-surface">AI Assistant ready to analyze specs</p>
+<button class="text-on-surface-variant hover:text-primary ml-2">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Chat Toggle Button -->
+<button class="ai-chatbox w-14 h-14 rounded-full flex items-center justify-center text-primary hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[28px]">smart_toy</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant grid grid-cols-2 md:grid-cols-4 gap-gutter px-margin-mobile md:px-margin-desktop py-12 w-full mt-24">
+<div class="col-span-2 md:col-span-1 flex flex-col gap-4 mb-8 md:mb-0">
+<span class="font-headline-md text-headline-md text-on-surface">TECH_CORE</span>
+<p class="font-label-sm text-label-sm text-secondary dark:text-secondary">© 2024 TECH_CORE. Precision Engineered Performance.</p>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Support</h4>
+<a class="font-label-sm text-label-sm text-secondary dark:text-secondary hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Technical Support</a>
+<a class="font-label-sm text-label-sm text-secondary dark:text-secondary hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Warranty Policy</a>
+<a class="font-label-sm text-label-sm text-secondary dark:text-secondary hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Shipping &amp; Returns</a>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Company</h4>
+<a class="font-label-sm text-label-sm text-secondary dark:text-secondary hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Security</a>
+<a class="font-label-sm text-label-sm text-secondary dark:text-secondary hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Developer API</a>
+<a class="font-label-sm text-label-sm text-secondary dark:text-secondary hover:text-tertiary transition-colors opacity-80 hover:opacity-100" href="#">Corporate Sales</a>
+</div>
+</footer>
+</body></html>

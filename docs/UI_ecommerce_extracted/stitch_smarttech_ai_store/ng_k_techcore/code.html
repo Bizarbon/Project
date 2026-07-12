@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TechCore - Sign Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-container": "#4b8eff",
+                        "surface": "#101415",
+                        "on-secondary-container": "#adb4ce",
+                        "on-background": "#e0e3e5",
+                        "inverse-surface": "#e0e3e5",
+                        "surface-container": "#1d2022",
+                        "surface-tint": "#adc6ff",
+                        "surface-container-low": "#191c1e",
+                        "on-secondary": "#283044",
+                        "on-primary-fixed-variant": "#004493",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-surface": "#e0e3e5",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "surface-container-highest": "#323537",
+                        "inverse-on-surface": "#2d3133",
+                        "on-error": "#690005",
+                        "primary": "#adc6ff",
+                        "error": "#ffb4ab",
+                        "outline-variant": "#414755",
+                        "on-tertiary": "#00354a",
+                        "tertiary-fixed-dim": "#7bd0ff",
+                        "tertiary-container": "#009bd1",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-tertiary-container": "#002d40",
+                        "surface-dim": "#101415",
+                        "secondary-container": "#3f465c",
+                        "secondary-fixed": "#dae2fd",
+                        "on-primary": "#002e69",
+                        "primary-fixed": "#d8e2ff",
+                        "on-tertiary-fixed": "#001e2c",
+                        "tertiary": "#7bd0ff",
+                        "on-surface-variant": "#c1c6d7",
+                        "tertiary-fixed": "#c4e7ff",
+                        "surface-bright": "#363a3b",
+                        "outline": "#8b90a0",
+                        "background": "#101415",
+                        "surface-container-high": "#272a2c",
+                        "error-container": "#93000a",
+                        "inverse-primary": "#005bc1",
+                        "on-secondary-fixed": "#131b2e",
+                        "on-primary-container": "#00285c",
+                        "on-primary-fixed": "#001a41",
+                        "secondary": "#bec6e0",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#323537",
+                        "surface-container-lowest": "#0b0f10",
+                        "on-tertiary-fixed-variant": "#004c69"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "container-max": "1280px",
+                        "base": "8px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #020617; /* Deep Slate Navy Base */
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 122, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 255, 0.03) 0%, transparent 50%);
+            color: theme('colors.on-background');
+        }
+        .tech-card {
+            background-color: #0F172A; /* Slate Gray Level 1 */
+            border: 1px solid #1E293B;
+            box-shadow: 0 20px 50px rgba(0, 122, 255, 0.05);
+        }
+        .tech-input {
+            background-color: #020617; /* Darker than surface */
+            border: 1px solid #1E293B;
+            transition: all 0.2s ease;
+        }
+        .tech-input:focus {
+            border-color: #007AFF; /* Electric Blue focus */
+            box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+            outline: none;
+        }
+        .tech-btn-primary {
+            background-color: #007AFF; /* Electric Blue */
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .tech-btn-primary:hover {
+            box-shadow: 0 0 15px rgba(0, 122, 255, 0.5); /* Outer glow */
+            transform: translateY(-1px);
+        }
+        .tech-btn-ghost {
+            background-color: transparent;
+            border: 1px solid #1E293B;
+            transition: all 0.3s ease;
+        }
+        .tech-btn-ghost:hover {
+            border-color: #007AFF;
+            background-color: rgba(0, 122, 255, 0.05);
+        }
+        .checkbox-tech {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #1E293B;
+            border-radius: 4px;
+            background-color: #020617;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checkbox-tech:checked {
+            background-color: #007AFF;
+            border-color: #007AFF;
+        }
+        .checkbox-tech:checked::after {
+            content: '\e5ca';
+            font-family: 'Material Symbols Outlined';
+            font-size: 14px;
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-margin-mobile md:p-gutter antialiased">
+<!-- Suppressed Header/Nav as per rules for linear/transactional intent -->
+<main class="w-full max-w-md mx-auto z-10">
+<!-- Logo Area -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-xl tech-card mb-4">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="memory">memory</span>
+</div>
+<h1 class="text-display-lg-mobile font-display-lg-mobile text-primary tracking-tight">TechCore</h1>
+<p class="text-body-md font-body-md text-on-surface-variant mt-2">Initialize your system profile.</p>
+</div>
+<!-- Registration Card -->
+<div class="tech-card rounded-xl p-8 backdrop-blur-sm">
+<form class="space-y-6">
+<!-- Full Name -->
+<div class="space-y-2">
+<label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest" for="fullName">Full Name</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="person">person</span>
+</span>
+<input class="tech-input block w-full pl-10 pr-3 py-3 rounded-lg text-body-md font-body-md text-on-surface placeholder-outline-variant w-full" id="fullName" placeholder="John Doe" type="text"/>
+</div>
+</div>
+<!-- Email -->
+<div class="space-y-2">
+<label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest" for="email">Email Address</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="mail">mail</span>
+</span>
+<input class="tech-input block w-full pl-10 pr-3 py-3 rounded-lg text-body-md font-body-md text-on-surface placeholder-outline-variant w-full" id="email" placeholder="john.doe@techcore.com" type="email"/>
+</div>
+</div>
+<!-- Phone Number -->
+<div class="space-y-2">
+<label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest" for="phone">Phone Number</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="phone_iphone">phone_iphone</span>
+</span>
+<input class="tech-input block w-full pl-10 pr-3 py-3 rounded-lg text-body-md font-body-md text-on-surface placeholder-outline-variant w-full" id="phone" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+</div>
+<!-- Password -->
+<div class="space-y-2">
+<label class="block text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest" for="password">Secure Password</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-lg" data-icon="lock">lock</span>
+</span>
+<input class="tech-input block w-full pl-10 pr-3 py-3 rounded-lg text-body-md font-body-md text-on-surface placeholder-outline-variant w-full" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- TOS Checkbox -->
+<div class="flex items-start mt-4">
+<div class="flex items-center h-5">
+<input class="checkbox-tech" id="terms" type="checkbox"/>
+</div>
+<div class="ml-3 text-sm">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="terms">
+                            I accept the <a class="text-primary hover:underline" href="#">Terms of Service</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+                        </label>
+</div>
+</div>
+<!-- Submit Action -->
+<button class="w-full flex justify-center items-center py-3 px-4 rounded-lg tech-btn-primary text-body-md font-headline-md shadow-sm" type="submit">
+                    Create Account
+                    <span class="material-symbols-outlined ml-2 text-lg" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<div class="mt-8">
+<div class="relative">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant"></div>
+</div>
+<div class="relative flex justify-center text-sm">
+<span class="px-2 bg-slate-900 text-label-sm font-label-sm text-outline uppercase tracking-widest bg-surface-container">Or Authenticate Via</span>
+</div>
+</div>
+<div class="mt-6 grid grid-cols-3 gap-3">
+<button class="tech-btn-ghost rounded-lg py-2 flex justify-center items-center">
+<span class="material-symbols-outlined text-on-surface" data-icon="g_mobiledata">g_mobiledata</span>
+</button>
+<button class="tech-btn-ghost rounded-lg py-2 flex justify-center items-center">
+<span class="material-symbols-outlined text-on-surface" data-icon="facebook">face_nod</span>
+</button>
+<button class="tech-btn-ghost rounded-lg py-2 flex justify-center items-center">
+<span class="material-symbols-outlined text-on-surface" data-icon="call">call</span>
+</button>
+</div>
+</div>
+<div class="mt-8 text-center">
+<p class="text-label-sm font-label-sm text-on-surface-variant">
+                    Already have an access node? 
+                    <a class="text-primary hover:underline font-bold ml-1" href="#">Login here</a>
+</p>
+</div>
+</div>
+</main>
+<!-- Suppressed Footer as per rules for linear/transactional intent -->
+</body></html>

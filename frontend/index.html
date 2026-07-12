@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TechEcommerce - Cửa hàng công nghệ</title>
+    <link rel="stylesheet" href="assets/css/style.css?v=cart-flash-20260709-1" />
+    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=address-tools-20260712-1" />
+    <style>
+      .cart-drawer[aria-hidden='true'] {
+        transform: translateX(calc(100% + 96px)) !important;
+        visibility: hidden;
+      }
+      .cart-overlay[aria-hidden='true'] {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden;
+      }
+      body.cart-open .cart-drawer[aria-hidden='false'],
+      body.cart-open .cart-overlay[aria-hidden='false'] {
+        visibility: visible;
+      }
+      .hero-banner {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.16),
+          rgba(6, 182, 212, 0.1)
+        );
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 2.2rem;
+        margin-bottom: 1.5rem;
+      }
+      .hero-banner h2 {
+        font-size: 2rem;
+        margin-bottom: 0.4rem;
+        background: linear-gradient(
+          135deg,
+          var(--primary-light),
+          var(--secondary)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .shop-toolbar {
+        display: grid;
+        grid-template-columns: minmax(220px, 1.2fr) repeat(
+            5,
+            minmax(130px, 0.6fr)
+          );
+        gap: 0.8rem;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: rgba(30, 41, 59, 0.45);
+      }
+      .category-nav {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .category-btn {
+        padding: 0.55rem 1rem;
+        border-radius: 50px;
+        background: rgba(30, 41, 59, 0.7);
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+      }
+      .category-btn.active {
+        color: white;
+        border-color: var(--primary);
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+      }
+      .category-section {
+        margin-bottom: 2.5rem;
+      }
+      .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.7rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .category-count {
+        color: var(--primary-light);
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+      .product-card {
+        position: relative;
+      }
+      .product-card h3 a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .product-link {
+        display: block;
+        overflow: hidden;
+      }
+      .product-desc {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        min-height: 2.6rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+      .wishlist-btn {
+        position: absolute;
+        top: 0.7rem;
+        right: 0.7rem;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: 50%;
+        z-index: 2;
+        background: rgba(15, 23, 42, 0.78);
+        border: 1px solid var(--border);
+        color: white;
+        font-size: 1.2rem;
+      }
+      .wishlist-btn.active {
+        color: #fb7185;
+        border-color: #fb7185;
+      }
+      .btn-add-cart:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        filter: grayscale(1);
+      }
+      .low-stock-text {
+        color: var(--warning) !important;
+      }
+      .checkout-panel {
+        display: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+      .checkout-panel .form-group {
+        margin-bottom: 0.75rem;
+      }
+      .cart-total {
+        display: none;
+        border-top: 2px solid var(--border);
+        padding-top: 1rem;
+        margin-top: 1rem;
+      }
+      .cart-total-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 0.4rem;
+      }
+      .bank-box {
+        display: none;
+        border: 1px dashed var(--primary-light);
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: var(--radius-sm);
+        padding: 0.85rem;
+        color: var(--text-secondary);
+        font-size: 0.86rem;
+        margin-bottom: 0.8rem;
+      }
+      .cart-section {
+        max-height: calc(100vh - 110px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+      }
+      .cart-section .cart-wrapper {
+        max-height: min(260px, 28vh);
+      }
+      .cart-section::-webkit-scrollbar {
+        width: 6px;
+      }
+      .cart-section::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .cart-section::-webkit-scrollbar-thumb {
+        background: var(--primary);
+        border-radius: 10px;
+      }
+      .cart-section .btn-checkout {
+        position: sticky;
+        bottom: 0;
+        z-index: 4;
+      }
+      .hide-admin-stats .admin-metric {
+        display: none;
+      }
+      @media (max-width: 1024px) {
+        .cart-section {
+          max-height: none;
+          overflow: visible;
+          scrollbar-gutter: auto;
+        }
+        .cart-section .cart-wrapper {
+          max-height: 400px;
+        }
+        .cart-section .btn-checkout {
+          position: static;
+        }
+      }
+      @media (max-width: 1100px) {
+        .shop-toolbar {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 640px) {
+        .shop-toolbar {
+          grid-template-columns: 1fr;
+        }
+        .hero-banner {
+          padding: 1.4rem;
+        }
+        .hero-banner h2 {
+          font-size: 1.45rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="storefront-header">
+      <div class="header-promotion">
+        <div class="header-shell promotion-inner">
+          <span class="promotion-label">Ưu đãi sinh viên</span>
+          <strong>Giảm đến 3 triệu khi mua MacBook và iPad</strong>
+          <button type="button" data-header-category="Laptop">Xem ưu đãi</button>
+        </div>
+      </div>
+
+      <div class="header-main">
+        <div class="header-shell header-main-inner">
+          <a class="storefront-logo" href="index.html" aria-label="TechEcommerce - Trang chủ">
+            <span class="storefront-logo-mark">TE</span>
+            <span class="storefront-logo-text">TechEcommerce</span>
+          </a>
+
+          <form class="header-search" id="headerSearchForm" role="search">
+            <label class="sr-only" for="headerSearchInput">Tìm kiếm sản phẩm</label>
+            <span class="header-search-icon" aria-hidden="true">⌕</span>
+            <input id="headerSearchInput" type="search" autocomplete="off" placeholder="Bạn đang tìm sản phẩm gì?" />
+            <button type="submit">Tìm kiếm</button>
+          </form>
+
+          <div class="header-actions">
+            <div id="nav-auth-section"><!-- Auth section injected by auth.js --></div>
+
+            <button class="header-action-btn header-cart-btn" id="headerCartButton" type="button" onclick="toggleCartDrawer()" aria-label="Mở giỏ hàng">
+              <span class="header-action-icon" aria-hidden="true">🛒</span>
+              <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
+              <span class="header-cart-badge" id="headerCartBadge" hidden>0</span>
+            </button>
+
+            <div class="header-location">
+              <button class="header-action-btn header-location-toggle" id="headerLocationToggle" type="button" aria-expanded="false" aria-controls="addressModal">
+                <span class="header-action-icon" aria-hidden="true">⌖</span>
+                <span class="header-action-copy"><small>Khu vực</small><strong id="headerLocationLabel">Hồ Chí Minh</strong></span>
+                <span aria-hidden="true">›</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-categories" role="navigation" aria-label="Danh mục sản phẩm">
+        <div class="header-shell header-category-list">
+          <button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản phẩm</button>
+          <button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện thoại</button>
+          <button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg" alt="" />Laptop</button>
+          <button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg" alt="" />Tablet</button>
+          <button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai nghe</button>
+          <button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg" alt="" />Đồng hồ thông minh</button>
+          <button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ kiện</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="address-modal" id="addressModal" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle" aria-hidden="true">
+      <div class="address-modal-backdrop" data-address-close></div>
+      <section class="address-dialog">
+        <header class="address-dialog-header">
+          <h2 id="addressModalTitle">Chọn địa chỉ nhận hàng</h2>
+          <button type="button" class="address-close" data-address-close aria-label="Đóng cửa sổ chọn địa chỉ">×</button>
+        </header>
+
+        <div class="address-view is-active" id="addressEntryView">
+          <div class="address-quick-area">
+            <form class="address-quick-form" id="addressQuickForm">
+              <label class="sr-only" for="addressQuickInput">Nhập địa chỉ nhận hàng</label>
+              <input id="addressQuickInput" type="search" autocomplete="off" aria-autocomplete="list" aria-controls="addressSuggestions" aria-expanded="false" placeholder="Nhập số nhà, tên đường để nhận gợi ý" />
+              <button type="submit">Dùng địa chỉ này</button>
+            </form>
+            <div class="address-suggestions" id="addressSuggestions" role="listbox" aria-label="Địa chỉ gợi ý" hidden></div>
+          </div>
+          <button type="button" class="address-use-location" id="addressUseLocation">
+            <span class="address-pin-icon" aria-hidden="true">⌖</span>
+            <span><strong>Sử dụng vị trí hiện tại</strong><small id="addressLocationStatus">Cho phép trình duyệt xác định địa chỉ của bạn</small></span>
+            <span class="address-location-arrow" aria-hidden="true">›</span>
+          </button>
+          <div class="address-divider"><span>Hoặc</span></div>
+          <button type="button" class="address-manual-choice" id="addressManualChoice">
+            <span class="address-pin-icon" aria-hidden="true">⌖</span>
+            <span><strong>Chọn địa chỉ</strong><small>Nhập địa chỉ theo Tỉnh/Thành, Phường/Xã/Đặc khu</small></span>
+            <span aria-hidden="true">›</span>
+          </button>
+          <div class="address-map-visual" aria-hidden="true">
+            <span class="map-pin pin-one">●</span><span class="map-pin pin-two">●</span><span class="map-pin pin-three">●</span>
+            <div class="map-window"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+
+        <div class="address-view" id="addressSelectionView">
+          <div class="address-progress">
+            <div class="address-step is-active" id="provinceStep"><span>1</span><div><strong>Chọn Tỉnh/Thành</strong><small>Chọn khu vực giao hàng</small></div><button type="button" class="address-change-province" id="changeProvinceButton" aria-label="Quay lại chọn Tỉnh/Thành" hidden>↶ <span>Chọn lại</span></button></div>
+            <div class="address-step" id="wardStep"><span>2</span><div><strong>Chọn Phường/Xã/Đặc khu</strong><small id="wardStepHint">Chọn Tỉnh/Thành trước</small></div></div>
+          </div>
+          <label class="address-list-search">
+            <span class="sr-only">Tìm khu vực</span>
+            <input id="addressListSearch" type="search" autocomplete="off" placeholder="Tìm nhanh tỉnh thành" />
+            <span aria-hidden="true">⌕</span>
+          </label>
+          <div class="address-options" id="addressOptions"></div>
+          <button type="button" class="address-back" id="addressBackButton">‹ Nhập bằng gợi ý địa chỉ</button>
+        </div>
+      </section>
+    </div>
+
+    <script src="assets/js/animations.js"></script>
+    <script src="assets/js/auth.js?v=account-ui-20260711-1"></script>
+
+    <main class="container fade-in">
+      <section
+        class="hero-carousel reveal"
+        id="promoCarousel"
+        aria-label="Ưu đãi nổi bật"
+        aria-roledescription="carousel"
+      >
+        <div class="hero-slides">
+          <article
+            class="hero-slide is-active"
+            style="--hero-image: url('assets/images/banner-phone.jpg')"
+            aria-hidden="false"
+          >
+            <div class="hero-slide-content">
+              <span class="hero-eyebrow">Điện thoại chính hãng</span>
+              <h2>Công nghệ mới trong tầm tay</h2>
+              <p>
+                Khám phá các mẫu điện thoại nổi bật, cấu hình mạnh và chính sách
+                bảo hành rõ ràng.
+              </p>
+              <button class="hero-cta" type="button" data-carousel-category="Điện thoại">
+                Xem điện thoại
+              </button>
+            </div>
+          </article>
+          <article
+            class="hero-slide"
+            style="--hero-image: url('assets/images/banner-laptop.jpg')"
+            aria-hidden="true"
+          >
+            <div class="hero-slide-content">
+              <span class="hero-eyebrow">Laptop cho mọi nhu cầu</span>
+              <h2>Hiệu năng tốt cho học tập và công việc</h2>
+              <p>
+                Chọn laptop theo nhu cầu sử dụng, thương hiệu và mức giá phù hợp
+                với bạn.
+              </p>
+              <button class="hero-cta" type="button" data-carousel-category="Laptop">
+                Xem laptop
+              </button>
+            </div>
+          </article>
+          <article
+            class="hero-slide"
+            style="--hero-image: url('assets/images/banner-watch.jpg')"
+            aria-hidden="true"
+          >
+            <div class="hero-slide-content">
+              <span class="hero-eyebrow">Thiết bị thông minh</span>
+              <h2>Kết nối liền mạch mỗi ngày</h2>
+              <p>
+                Đồng hồ thông minh và phụ kiện thiết thực giúp hoàn thiện hệ sinh
+                thái công nghệ của bạn.
+              </p>
+              <button
+                class="hero-cta"
+                type="button"
+                data-carousel-category="Đồng hồ thông minh"
+              >
+                Xem đồng hồ
+              </button>
+            </div>
+          </article>
+        </div>
+        <button
+          class="hero-control hero-control-prev"
+          type="button"
+          data-carousel-direction="prev"
+          aria-label="Ảnh trước"
+          title="Ảnh trước"
+        >
+          ‹
+        </button>
+        <button
+          class="hero-control hero-control-next"
+          type="button"
+          data-carousel-direction="next"
+          aria-label="Ảnh tiếp theo"
+          title="Ảnh tiếp theo"
+        >
+          ›
+        </button>
+        <div class="hero-dots" role="group" aria-label="Chọn ảnh quảng cáo">
+          <button class="hero-dot is-active" type="button" data-carousel-slide="0" aria-label="Ảnh 1" aria-current="true"></button>
+          <button class="hero-dot" type="button" data-carousel-slide="1" aria-label="Ảnh 2" aria-current="false"></button>
+          <button class="hero-dot" type="button" data-carousel-slide="2" aria-label="Ảnh 3" aria-current="false"></button>
+        </div>
+      </section>
+
+      <section
+        class="stats-grid reveal"
+        id="adminStats"
+        style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr))"
+      >
+        <div class="stat-card admin-metric">
+          <div class="stat-icon">💵</div>
+          <div
+            class="stat-value"
+            id="statRevenue"
+            style="color: var(--success)"
+          >
+            0 đ
+          </div>
+          <div class="stat-label">Doanh thu</div>
+        </div>
+        <div class="stat-card admin-metric">
+          <div class="stat-icon">📈</div>
+          <div
+            class="stat-value"
+            id="statProfit"
+            style="color: var(--primary-light)"
+          >
+            0 đ
+          </div>
+          <div class="stat-label">Lợi nhuận</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-value" id="statProducts">0</div>
+          <div class="stat-label">Sản phẩm</div>
+        </div>
+        <div class="stat-card admin-metric">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="statCustomers">0</div>
+          <div class="stat-label">Khách hàng</div>
+        </div>
+      </section>
+
+      <div class="flex-layout">
+        <section class="main-content">
+          <div class="shop-toolbar reveal">
+            <input
+              data-product-filter
+              id="searchInput"
+              type="search"
+              placeholder="Tìm sản phẩm, danh mục..."
+            />
+            <input
+              data-product-filter
+              id="minPrice"
+              type="number"
+              min="0"
+              placeholder="Giá từ"
+            />
+            <input
+              data-product-filter
+              id="maxPrice"
+              type="number"
+              min="0"
+              placeholder="Giá đến"
+            />
+            <select data-product-filter id="brandFilter">
+              <option value="all">Tất cả thương hiệu</option>
+            </select>
+            <select data-product-filter id="sortProducts">
+              <option value="">Sắp xếp mặc định</option>
+              <option value="newest">Mới nhất</option>
+              <option value="price_asc">Giá tăng dần</option>
+              <option value="price_desc">Giá giảm dần</option>
+              <option value="rating">Đánh giá cao</option>
+              <option value="best_seller">Bán chạy</option>
+              <option value="stock_desc">Tồn kho nhiều</option>
+              <option value="name">Tên A-Z</option>
+            </select>
+            <label class="stock-filter-toggle">
+              <input
+                data-product-filter
+                id="inStockOnly"
+                type="checkbox"
+                style="width: auto"
+              />
+              Còn hàng
+            </label>
+          </div>
+          <div class="catalog-heading" id="catalogStart">
+            <div>
+              <span class="catalog-eyebrow">Danh mục sản phẩm</span>
+              <h2 id="catalogTitle">Tất cả sản phẩm</h2>
+            </div>
+            <div id="resultCount">0 sản phẩm</div>
+          </div>
+          <div
+            class="category-nav reveal"
+            id="categoryNav"
+            role="group"
+            aria-label="Lọc theo danh mục"
+          ></div>
+          <div id="productSections" class="reveal"></div>
+        </section>
+
+        <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+          <section class="cart-section reveal glass-card">
+            <div class="cart-drawer-header">
+              <div>
+                <span class="cart-eyebrow">Đơn hàng của bạn</span>
+                <h2>Giỏ hàng</h2>
+              </div>
+              <button
+                type="button"
+                class="cart-close-btn"
+                onclick="closeCartDrawer()"
+                aria-label="Đóng giỏ hàng"
+              >
+                ×
+              </button>
+            </div>
+            <h2>🛒 Giỏ hàng</h2>
+
+            <div
+              id="customerSelectionGroup"
+              class="form-group"
+              style="display: none"
+            >
+              <label>Chọn khách hàng</label>
+              <select id="customerSelect" class="customer-select"></select>
+            </div>
+
+            <div class="cart-wrapper">
+              <div id="cartList"></div>
+            </div>
+
+            <div class="cart-total" id="cartTotal">
+              <div class="cart-total-row">
+                <span>Tạm tính:</span><strong id="cartSubtotal">0 đ</strong>
+              </div>
+              <div class="cart-total-row">
+                <span>Phí ship:</span
+                ><strong id="cartShippingPreview">Theo ô bên dưới</strong>
+              </div>
+              <div
+                class="cart-total-row"
+                id="cartDiscountRow"
+                style="display: none; color: var(--success)"
+              >
+                <span>Giảm giá:</span><strong id="cartDiscount">-0 đ</strong>
+              </div>
+              <div class="cart-total-row" style="font-size: 1.15rem">
+                <span>Tổng cộng:</span
+                ><strong class="amount" id="total">0 đ</strong>
+              </div>
+            </div>
+
+            <div class="guest-checkout-gate" id="guestCheckoutGate">
+              <strong>Đăng nhập để tiếp tục thanh toán</strong>
+              <p>Sản phẩm trong giỏ của bạn vẫn được giữ nguyên.</p>
+              <button type="button" class="btn-primary" onclick="goToLoginForCheckout()">Đăng nhập để thanh toán</button>
+            </div>
+
+            <div class="checkout-panel" id="checkoutPanel">
+              <div class="form-group">
+                <label>Người nhận</label>
+                <input
+                  id="recipientName"
+                  type="text"
+                  placeholder="Họ tên người nhận"
+                />
+              </div>
+              <div class="form-group">
+                <label>Số điện thoại</label>
+                <input
+                  id="recipientPhone"
+                  type="tel"
+                  placeholder="09xxxxxxxx"
+                />
+              </div>
+              <div class="form-group">
+                <label>Địa chỉ giao hàng</label>
+                <input
+                  id="shippingAddress"
+                  type="text"
+                  placeholder="Số nhà, đường, quận/huyện..."
+                />
+              </div>
+              <div class="form-group">
+                <label>Phí vận chuyển</label>
+                <input id="shippingFee" type="number" min="0" value="30000" />
+              </div>
+              <div class="form-group">
+                <label>Mã giảm giá</label>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem">
+                  <input id="couponCode" type="text" placeholder="VD: TECH10" />
+                  <button type="button" class="btn-secondary" onclick="applyCoupon()">Áp dụng</button>
+                </div>
+                <div
+                  id="couponHint"
+                  style="margin-top: 0.45rem; font-size: 0.8rem; color: var(--text-muted); min-height: 1.1rem"
+                ></div>
+              </div>
+              <div class="form-group">
+                <label>Phương thức thanh toán</label>
+                <select id="paymentMethod">
+                  <option value="cod">Thanh toán khi nhận hàng (COD)</option>
+                  <option value="bank_transfer">Chuyển khoản thủ công</option>
+                  <option value="vnpay">VNPay Sandbox</option>
+                  <option value="momo">MoMo Sandbox</option>
+                  <option value="installment">Trả góp</option>
+                </select>
+                <div
+                  id="paymentMethodHint"
+                  style="
+                    margin-top: 0.45rem;
+                    font-size: 0.78rem;
+                    color: var(--warning);
+                    min-height: 1.1rem;
+                  "
+                ></div>
+              </div>
+              <div class="bank-box" id="bankTransferInfo">
+                <strong>Thông tin chuyển khoản</strong><br />
+                Ngân hàng: MB Bank<br />
+                STK: 123456789 - TECHECOMMERCE<br />
+                Nội dung: TECHECOMMERCE + mã đơn sau khi đặt.
+              </div>
+              <div class="form-group">
+                <label>Ghi chú</label>
+                <textarea
+                  id="orderNote"
+                  placeholder="Lưu ý giao hàng, thời gian nhận..."
+                ></textarea>
+              </div>
+              <button
+                class="btn-checkout"
+                id="checkoutBtn"
+                onclick="createOrder()"
+              >
+                Đặt hàng
+              </button>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <div
+        class="cart-overlay"
+        id="cartOverlay"
+        onclick="closeCartDrawer()"
+        aria-hidden="true"
+      ></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-top">
+        <div class="footer-brand footer-col">
+          <div class="footer-logo">🛒 TechEcommerce</div>
+          <p>
+            Nền tảng mua sắm công nghệ mini với giỏ hàng, thanh toán online,
+            quản trị kho và đơn hàng.
+          </p>
+          <div class="payment-badges">
+            <span class="payment-badge">💵 COD</span>
+            <span class="payment-badge">🏦 CK</span>
+            <span class="payment-badge">💳 VNPay</span>
+            <span class="payment-badge">📱 MoMo</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Tài khoản</h4>
+          <ul>
+            <li><a href="pages/account/orders.html">📋 Đơn hàng của tôi</a></li>
+            <li><a href="pages/account/profile.html">👤 Hồ sơ cá nhân</a></li>
+            <li><a href="pages/auth/login.html">🔐 Đăng nhập</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Hỗ trợ</h4>
+          <ul>
+            <li><a href="pages/legal/faq.html">❓ FAQ</a></li>
+            <li><a href="pages/legal/return-policy.html">🔄 Đổi trả</a></li>
+            <li><a href="pages/legal/warranty.html">🛡️ Bảo hành</a></li>
+            <li><a href="pages/legal/shipping.html">🚚 Vận chuyển</a></li>
+          </ul>
+        </div>
+        <div class="footer-col footer-newsletter">
+          <h4>Nhận ưu đãi</h4>
+          <p>Đăng ký nhận mã giảm giá và tin khuyến mãi mới.</p>
+          <div class="newsletter-form">
+            <input
+              type="email"
+              placeholder="Email của bạn..."
+              id="newsletterEmail"
+            />
+            <button onclick="subscribeNewsletter()">Đăng ký</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <div class="footer-bottom-left">© 2026 TechEcommerce.</div>
+        <div class="footer-bottom-right">
+          <a href="pages/legal/terms.html">Điều khoản</a>
+          <a href="pages/legal/privacy.html">Bảo mật</a>
+          <a href="pages/legal/cookie.html">Cookie</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/js/shop.js?v=navigation-sync-20260712-2"></script>
+    <script src="assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="assets/js/chatbox.js?v=cart-flash-20260709-1"></script>
+  </body>
+</html>
