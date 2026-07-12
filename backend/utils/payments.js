@@ -43,8 +43,15 @@ function sanitizeBaseUrl(value) {
     }
 }
 
+function vercelBaseUrl() {
+    const host = envValue('VERCEL_PROJECT_PRODUCTION_URL') || envValue('VERCEL_URL');
+    if (!host) return '';
+    return sanitizeBaseUrl(/^https?:\/\//i.test(host) ? host : `https://${host}`);
+}
+
 function appBaseUrl() {
     return sanitizeBaseUrl(process.env.APP_BASE_URL)
+        || vercelBaseUrl()
         || sanitizeBaseUrl(process.env.RENDER_EXTERNAL_URL)
         || `http://localhost:${process.env.PORT || 5000}`;
 }
@@ -52,6 +59,7 @@ function appBaseUrl() {
 function frontendBaseUrl(override) {
     return sanitizeBaseUrl(override)
         || sanitizeBaseUrl(process.env.FRONTEND_BASE_URL)
+        || vercelBaseUrl()
         || sanitizeBaseUrl(process.env.RENDER_EXTERNAL_URL)
         || DEFAULT_FRONTEND_BASE_URL;
 }

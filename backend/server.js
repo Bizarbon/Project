@@ -20,6 +20,7 @@ const locationRoutes = require('./routes/locationRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
+const IS_VERCEL = Boolean(process.env.VERCEL);
 
 app.disable('x-powered-by');
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
@@ -33,6 +34,16 @@ app.use((req, res, next) => {
         console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
     }
     next();
+});
+
+app.use('/api', async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        console.error('MongoDB connection error:', error.message);
+        res.status(503).json({ message: 'Không thể kết nối cơ sở dữ liệu.' });
+    }
 });
 
 app.get('/api/health', (req, res) => {
@@ -61,22 +72,30 @@ app.use('/api', (req, res) => {
     res.status(404).json({ message: 'API endpoint không tồn tại.' });
 });
 
-app.use(express.static(FRONTEND_DIR, {
-    extensions: ['html'],
-    maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
-    setHeaders: res => {
-        res.setHeader('X-Content-Type-Options', 'nosniff');
-        res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    }
-}));
+if (!IS_VERCEL) {
+    app.use(express.static(FRONTEND_DIR, {
+        extensions: ['html'],
+        maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
+        setHeaders: res => {
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        }
+    }));
 
-app.get('*', (req, res, next) => {
-    if (path.extname(req.path)) return next();
-    return res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
-});
+    app.get('*', (req, res, next) => {
+        if (path.extname(req.path)) return next();
+        return res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
+    });
+}
 
 app.use((req, res) => {
     res.status(404).send('Không tìm thấy tài nguyên.');
+});
+
+app.use((error, req, res, next) => {
+    console.error('Unhandled request error:', error);
+    if (res.headersSent) return next(error);
+    return res.status(500).json({ message: 'Đã xảy ra lỗi máy chủ.' });
 });
 
 async function startServer() {
@@ -86,4 +105,11 @@ async function startServer() {
     });
 }
 
-startServer();
+if (require.main === module) {
+    startServer().catch(error => {
+        console.error('Server startup error:', error.message);
+        process.exit(1);
+    });
+}
+
+module.exports = app;

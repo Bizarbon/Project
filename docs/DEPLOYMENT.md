@@ -1,89 +1,86 @@
-# Deploy TechEcommerce to Render
+# Deploy TechEcommerce to Vercel
 
-TechEcommerce is deployed as one Node.js web service. Express serves both `/api/*` and the static files in `frontend/`, while MongoDB Atlas stores production data.
+TechEcommerce runs as one Express application on Vercel. The files in `frontend/` are copied to `public/` during the build and served by Vercel's CDN. MongoDB Atlas stores production data.
 
-## 1. Prepare MongoDB Atlas
-
-1. Create an Atlas project and an M0 cluster.
-2. Create a database user with a strong, unique password.
-3. In **Network Access**, allow connections from Render. For a school demo on Render Free, use `0.0.0.0/0` and protect the database with a strong user/password.
-4. Copy the Node.js connection string and set the database name to `ecommerce`:
-
-```text
-mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/ecommerce?retryWrites=true&w=majority
-```
-
-Encode special characters in the username or password before placing them in the URI.
-
-## 2. GitHub repository
-
-The production-ready source is published here:
+## 1. Production source
 
 ```text
 Repository: https://github.com/Bizarbon/Project
 Branch: techecommerce-deploy
 ```
 
-Confirm that `backend/.env`, `node_modules`, and log files are not visible on GitHub.
+The deployment branch does not contain the previous mock Google or Facebook login pages. Never commit `.env`, database credentials, or payment secrets.
 
-## 3. Create the Render service
+## 2. Import the project
 
-The repository includes `render.yaml`. Open the direct deployment link below, authorize Render to access GitHub, and deploy the Blueprint:
+1. Open `https://vercel.com/new` and sign in with GitHub.
+2. Import `Bizarbon/Project`.
+3. Select the `techecommerce-deploy` branch.
+4. Keep the project root as `./`.
+5. Vercel reads `vercel.json`; do not set a separate output directory.
+
+## 3. Environment variables
+
+Add these variables for Production, Preview, and Development as needed:
 
 ```text
-https://render.com/deploy?repo=https://github.com/Bizarbon/Project/tree/techecommerce-deploy
+MONGO_URI=mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/ecommerce?retryWrites=true&w=majority
+JWT_SECRET=YOUR_LONG_RANDOM_SECRET
+NODE_ENV=production
+PAYMENT_GATEWAY_MODE=mock
 ```
 
-Alternatively, use **New > Blueprint**, select `Bizarbon/Project`, then select the `techecommerce-deploy` branch.
+`MONGO_URI` must use the Atlas database user password, not the Atlas account password. Keep Atlas Network Access configured for Vercel's dynamic outbound addresses. For a graduation demo, `0.0.0.0/0` can be used with a strong database password.
 
-Render reads these settings automatically:
+Vercel automatically provides `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL`. The payment callback helpers use these values, so `APP_BASE_URL` and `FRONTEND_BASE_URL` are optional.
+
+## 4. Deploy
+
+Click **Deploy**. The build performs these steps automatically:
 
 ```text
-Runtime: Node
-Build command: npm --prefix backend ci --omit=dev
-Start command: npm start
-Health check: /api/health
+npm install
+npm --prefix backend ci --omit=dev
+npm run build
 ```
 
-When prompted for `MONGO_URI`, paste the Atlas connection string. Render generates `JWT_SECRET` automatically.
+The build copies `frontend/` to the ignored `public/` directory. Do not commit generated files from `public/`.
 
-The first deployment uses mock payment mode. VNPay and MoMo can be enabled later by setting `PAYMENT_GATEWAY_MODE=real` and adding all gateway sandbox secrets.
+## 5. Seed production data once
 
-## 4. Seed production data once
-
-Do not add seed commands to every deployment. Seed only once from a trusted machine:
+Do not seed on every deployment. After the first production deployment, set `MONGO_URI` temporarily in a trusted local terminal and run:
 
 ```powershell
-$env:MONGO_URI='mongodb+srv://USERNAME:PASSWORD@CLUSTER.mongodb.net/ecommerce'
+$env:MONGO_URI='YOUR_ATLAS_CONNECTION_STRING'
+$env:SEED_CUSTOMER_PASSWORD='YOUR_PRIVATE_DEMO_PASSWORD'
+$env:ADMIN_PASSWORD='YOUR_PRIVATE_ADMIN_PASSWORD'
 npm run seed
 npm run seed:admin
 Remove-Item Env:MONGO_URI
+Remove-Item Env:SEED_CUSTOMER_PASSWORD
+Remove-Item Env:ADMIN_PASSWORD
 ```
 
-Review seed scripts before running them against a database that already contains orders or customers.
+Review the seed scripts and set a private administrator password before running them against production.
 
-## 5. Verify the deployment
+## 6. Verify production
 
-Open the Render URL and verify:
+Check these routes on the generated `.vercel.app` domain:
 
 ```text
-https://YOUR-SERVICE.onrender.com/
-https://YOUR-SERVICE.onrender.com/api/health
-https://YOUR-SERVICE.onrender.com/pages/auth/login.html
-https://YOUR-SERVICE.onrender.com/pages/legal/privacy.html
+/
+/api/health
+/pages/auth/login.html
+/pages/auth/register.html
+/pages/legal/privacy.html
 ```
 
-Then test registration, login, product loading, cart, address suggestions, order creation and the admin pages.
+Then test registration, login, product loading, cart persistence, address selection, order creation, profile editing, chatbot responses, and admin authorization.
 
-## 6. Add a custom domain
+## Vercel notes
 
-In Render, open **Settings > Custom Domains**, add the domain, configure the DNS records shown by Render and click **Verify**. Render provisions and renews HTTPS automatically.
-
-## Production checklist
-
-- Never commit `.env` or payment/database secrets.
-- Replace mock social login before treating it as a real authentication provider.
-- Keep payment gateways in mock or sandbox mode until callback URLs and signatures are verified.
-- Use HTTPS and a long random `JWT_SECRET`.
-- Back up Atlas before reseeding or changing schemas.
-- Replace the public Photon demo with a dedicated geocoder for sustained commercial traffic.
+- Vercel Functions limit request and response payloads to 4.5 MB. Keep avatar payloads below this limit.
+- Express reuses the cached Mongoose connection when the function instance stays warm.
+- Frontend assets are served from `public/`; `express.static()` is used only for local and traditional Node hosting.
+- Mock payment mode is suitable only for the graduation demonstration. Configure signed sandbox credentials before enabling real VNPay or MoMo flows.
+- Do not reintroduce pages that imitate third-party login screens. Use real OAuth integrations when social login is implemented.

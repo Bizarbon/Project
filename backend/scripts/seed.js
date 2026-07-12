@@ -1,17 +1,11 @@
-const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const path = require('path');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const Order = require('../models/Order');
+const connectDB = require('../config/db');
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect('mongodb://localhost:27017/ecommerce_mini');
-        console.log('✅ MongoDB Connected');
-    } catch (error) {
-        console.error('❌ MongoDB connection error:', error.message);
-        process.exit(1);
-    }
-};
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // Dữ liệu sản phẩm mẫu - chia theo danh mục
 const sampleProducts = [
@@ -248,62 +242,55 @@ const sampleCustomers = [
     {
         name: 'Vũ Phi Long',
         username: 'vuphilong',
-        password: '123456',
         email: 'vuphilong@shopmini.vn',
         phone: '0987654321',
-        address: 'IUH - Gò Vấp, TP.HCM',
-        isAdmin: true
+        address: 'IUH - Gò Vấp, TP.HCM'
     },
     {
         name: 'Nguyễn Văn A',
         username: 'nguyenvana',
-        password: 'password123',
         email: 'nguyenvana@email.com',
         phone: '0901234567',
-        address: '123 Đường Lê Lợi, Q1, TP.HCM',
-        isAdmin: true
+        address: '123 Đường Lê Lợi, Q1, TP.HCM'
     },
     {
         name: 'Trần Thị B',
         username: 'tranthib',
-        password: 'password123',
         email: 'tranthib@email.com',
         phone: '0912345678',
-        address: '456 Đường Nguyễn Huệ, Q1, TP.HCM',
-        isAdmin: true
+        address: '456 Đường Nguyễn Huệ, Q1, TP.HCM'
     },
     {
         name: 'Lê Văn C',
         username: 'levanc',
-        password: 'password123',
         email: 'levanc@email.com',
         phone: '0923456789',
-        address: '789 Đường Hai Bà Trưng, Q3, TP.HCM',
-        isAdmin: true
+        address: '789 Đường Hai Bà Trưng, Q3, TP.HCM'
     },
     {
         name: 'Phạm Thị D',
         username: 'phamthid',
-        password: 'password123',
         email: 'phamthid@email.com',
         phone: '0934567890',
-        address: '100 Đường CMT8, Q10, TP.HCM',
-        isAdmin: true
+        address: '100 Đường CMT8, Q10, TP.HCM'
     },
     {
         name: 'Hoàng Văn E',
         username: 'hoangvane',
-        password: 'password123',
         email: 'hoangvane@email.com',
         phone: '0945678901',
-        address: '200 Đường 3/2, Q11, TP.HCM',
-        isAdmin: true
+        address: '200 Đường 3/2, Q11, TP.HCM'
     }
 ];
 
 // Hàm seed dữ liệu
 const seedData = async () => {
     try {
+        const customerPassword = String(process.env.SEED_CUSTOMER_PASSWORD || '');
+        if (customerPassword.length < 12) {
+            throw new Error('SEED_CUSTOMER_PASSWORD phải có ít nhất 12 ký tự.');
+        }
+
         await connectDB();
 
         console.log('🗑️  Đang xóa dữ liệu cũ...');
@@ -320,8 +307,12 @@ const seedData = async () => {
 
         console.log('👥 Đang thêm khách hàng...');
         const customers = [];
-        for (let c of sampleCustomers) {
-            customers.push(await new Customer(c).save());
+        for (const customer of sampleCustomers) {
+            customers.push(await new Customer({
+                ...customer,
+                password: customerPassword,
+                isAdmin: false
+            }).save());
         }
         console.log(`✅ Đã thêm ${customers.length} khách hàng`);
 

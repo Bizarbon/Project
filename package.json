@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "postinstall": "npm --prefix backend ci --omit=dev",
+    "build": "node scripts/prepare-vercel.js",
     "install:backend": "npm --prefix backend ci",
     "start": "npm --prefix backend start",
     "dev": "npm --prefix backend run dev",
