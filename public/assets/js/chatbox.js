@@ -27,7 +27,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=layout-20260715-1`;
+        link.href = `${root}assets/css/chatbox.css?v=ai-workspace-20260720-1`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }
@@ -51,11 +51,12 @@
                     <div class="ai-chat-title">
                         <div class="ai-chat-avatar">AI</div>
                         <div>
-                            <strong>TechEcommerce Assistant</strong>
+                            <strong>AI tư vấn khách hàng</strong>
                             <span>Tư vấn sản phẩm và hỗ trợ đơn hàng</span>
                         </div>
                     </div>
                     <div class="ai-chat-header-actions">
+                        <a class="ai-chat-expand" href="${root}pages/ai/assistant.html" aria-label="Mở giao diện AI đầy đủ" title="Mở giao diện AI đầy đủ">↗</a>
                         <button class="ai-chat-voice" type="button" aria-label="Bật đọc câu trả lời" aria-pressed="false" title="Đọc câu trả lời bằng giọng nói">🔊</button>
                         <button class="ai-chat-close" type="button" aria-label="Đóng chat">×</button>
                     </div>

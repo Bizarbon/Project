@@ -130,6 +130,23 @@
     cursor: pointer;
 }
 
+.ai-chat-expand {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+    text-decoration: none;
+    flex: 0 0 34px;
+}
+
+.ai-chat-expand:hover {
+    color: #052e2b;
+    background: #a7f3d0;
+}
+
 .ai-chat-voice {
     width: 34px;
     height: 34px;

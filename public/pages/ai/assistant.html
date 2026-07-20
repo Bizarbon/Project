@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI tư vấn khách hàng TechEcommerce hỗ trợ chọn sản phẩm, so sánh cấu hình và giải đáp kỹ thuật.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AI tư vấn khách hàng - TechEcommerce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <link rel="stylesheet" href="../../assets/css/ai-assistant.css?v=ai-workspace-20260720-1">
+</head>
+<body>
+    <section class="ai-workspace">
+        <aside class="ai-sidebar" aria-label="Điều hướng AI tư vấn">
+            <header class="ai-brand">
+                <a href="../../index.html" class="ai-brand-mark" aria-label="Về cửa hàng TechEcommerce">AI</a>
+                <span>
+                    <strong>AI tư vấn khách hàng</strong>
+                    <small>TechEcommerce</small>
+                </span>
+            </header>
+
+            <nav class="ai-navigation" aria-label="Chức năng trợ lý">
+                <button class="ai-nav-item active" type="button" data-view="chat">
+                    <span aria-hidden="true">+</span>
+                    <strong>Cuộc trò chuyện mới</strong>
+                </button>
+                <button class="ai-nav-item" type="button" data-view="history">
+                    <span aria-hidden="true">↺</span>
+                    <strong>Lịch sử</strong>
+                    <small id="historyCount">0</small>
+                </button>
+                <button class="ai-nav-item" type="button" data-view="saved">
+                    <span aria-hidden="true">♡</span>
+                    <strong>Sản phẩm đã lưu</strong>
+                    <small id="savedCount">0</small>
+                </button>
+                <button class="ai-nav-item" type="button" data-view="support">
+                    <span aria-hidden="true">?</span>
+                    <strong>Hỗ trợ kỹ thuật</strong>
+                </button>
+            </nav>
+
+            <footer class="ai-sidebar-footer">
+                <a href="../../index.html">← Quay lại cửa hàng</a>
+                <p>AI có thể đưa ra thông tin chưa chính xác. Hãy kiểm tra thông số quan trọng trước khi mua.</p>
+            </footer>
+        </aside>
+
+        <main class="ai-main">
+            <header class="ai-topbar">
+                <button id="sidebarToggle" class="ai-icon-button mobile-only" type="button" aria-label="Mở menu" aria-expanded="false">☰</button>
+                <p>Mô hình hiện tại: <strong>TechEcommerce Advisor v1</strong></p>
+                <button id="settingsButton" class="ai-icon-button" type="button" aria-label="Cài đặt trợ lý" title="Cài đặt">⚙</button>
+            </header>
+
+            <section id="chatView" class="ai-view active" aria-labelledby="chatHeading">
+                <header class="view-heading sr-only">
+                    <h1 id="chatHeading">Trò chuyện với AI tư vấn khách hàng</h1>
+                </header>
+                <section id="conversation" class="ai-conversation" aria-live="polite"></section>
+                <form id="assistantForm" class="ai-composer">
+                    <label class="sr-only" for="assistantInput">Nhập câu hỏi cần tư vấn</label>
+                    <textarea id="assistantInput" rows="1" maxlength="1000" placeholder="Hỏi về sản phẩm, cấu hình, đơn hàng hoặc bảo hành..." required></textarea>
+                    <button id="voiceInputButton" class="ai-icon-button" type="button" aria-label="Nhập bằng giọng nói" title="Nhập bằng giọng nói">●</button>
+                    <button id="sendButton" class="ai-send-button" type="submit" aria-label="Gửi câu hỏi">→</button>
+                </form>
+            </section>
+
+            <section id="historyView" class="ai-view" aria-labelledby="historyHeading" hidden>
+                <header class="view-heading">
+                    <span>Lịch sử tư vấn</span>
+                    <h1 id="historyHeading">Các cuộc trò chuyện trước</h1>
+                    <p>Mở lại nội dung đã trao đổi hoặc xóa những phiên bạn không còn cần.</p>
+                </header>
+                <section id="historyList" class="history-list" aria-label="Danh sách lịch sử"></section>
+            </section>
+
+            <section id="savedView" class="ai-view" aria-labelledby="savedHeading" hidden>
+                <header class="view-heading">
+                    <span>Danh sách quan tâm</span>
+                    <h1 id="savedHeading">Sản phẩm đã lưu</h1>
+                    <p>Xem lại các sản phẩm yêu thích và tiếp tục hỏi AI trước khi lựa chọn.</p>
+                </header>
+                <section id="savedProductList" class="saved-product-grid" aria-label="Danh sách sản phẩm đã lưu"></section>
+            </section>
+
+            <section id="supportView" class="ai-view" aria-labelledby="supportHeading" hidden>
+                <header class="view-heading">
+                    <span>Trung tâm hỗ trợ</span>
+                    <h1 id="supportHeading">Hỗ trợ kỹ thuật</h1>
+                    <p>Chọn vấn đề đang gặp, AI sẽ hỏi thêm thông tin và hướng dẫn từng bước.</p>
+                </header>
+                <section class="support-topic-grid" aria-label="Chủ đề hỗ trợ">
+                    <button type="button" data-support-prompt="Tôi cần hỗ trợ kiểm tra lỗi thiết bị mới mua."><strong>Kiểm tra thiết bị</strong><span>Lỗi nguồn, màn hình, pin, kết nối hoặc phụ kiện.</span></button>
+                    <button type="button" data-support-prompt="Tôi cần hỗ trợ cài đặt và kết nối sản phẩm."><strong>Cài đặt và kết nối</strong><span>Thiết lập phần mềm, Bluetooth, Wi-Fi và đồng bộ.</span></button>
+                    <button type="button" data-support-prompt="Hãy hướng dẫn tôi về bảo hành và đổi trả sản phẩm."><strong>Bảo hành và đổi trả</strong><span>Điều kiện tiếp nhận, giấy tờ và quy trình xử lý.</span></button>
+                    <button type="button" data-support-prompt="Tôi cần kiểm tra trạng thái đơn hàng và quá trình giao hàng."><strong>Đơn hàng và giao nhận</strong><span>Trạng thái xử lý, vận đơn và thời gian nhận hàng.</span></button>
+                </section>
+                <article class="support-contact">
+                    <header>
+                        <span>Hỗ trợ trực tiếp</span>
+                        <h2>Vẫn chưa giải quyết được?</h2>
+                    </header>
+                    <p>Gửi mã đơn hàng, tên sản phẩm và mô tả tình trạng qua email để nhân viên kỹ thuật kiểm tra.</p>
+                    <a href="mailto:vuphilong@techecommerce.vn?subject=Yêu cầu hỗ trợ kỹ thuật">Gửi email hỗ trợ</a>
+                </article>
+            </section>
+        </main>
+    </section>
+
+    <dialog id="settingsDialog" class="ai-settings">
+        <form method="dialog">
+            <header>
+                <h2>Cài đặt trợ lý</h2>
+                <button class="ai-icon-button" type="submit" value="cancel" aria-label="Đóng cài đặt">×</button>
+            </header>
+            <label>
+                <span><strong>Đọc câu trả lời</strong><small>Sử dụng giọng nói tiếng Việt của trình duyệt.</small></span>
+                <input id="voiceOutputToggle" type="checkbox" role="switch">
+            </label>
+            <button id="clearHistoryButton" class="danger-button" type="button">Xóa toàn bộ lịch sử</button>
+        </form>
+    </dialog>
+
+    <script src="../../assets/js/ai-assistant.js?v=ai-workspace-20260720-1"></script>
+</body>
+</html>
