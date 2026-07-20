@@ -61,8 +61,10 @@ router.post('/register', [
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg });
 
-        const { name, email, phone, address, password } = req.body;
+        const { name, address, password } = req.body;
         const username = String(req.body.username || '').toLowerCase();
+        const email = String(req.body.email || '').trim().toLowerCase();
+        const phone = String(req.body.phone || '').trim();
 
         if (await Customer.findOne({ username })) {
             return res.status(400).json({ message: 'Tên đăng nhập đã tồn tại!' });
@@ -74,14 +76,32 @@ router.post('/register', [
             return res.status(400).json({ message: 'Số điện thoại đã tồn tại!' });
         }
 
-        const customer = await new Customer({ name, username, email, phone, address, password }).save();
+        const customerData = { name, username, password };
+        if (email) customerData.email = email;
+        if (phone) customerData.phone = phone;
+        if (address) customerData.address = String(address).trim();
+
+        const customer = await new Customer(customerData).save();
         res.status(201).json({
             message: 'Đăng ký thành công!',
             token: signToken(customer),
             user: publicUser(customer)
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error?.code === 11000) {
+            const duplicateField = Object.keys(error.keyPattern || error.keyValue || {})[0];
+            const duplicateMessages = {
+                username: 'Tên đăng nhập đã tồn tại!',
+                email: 'Email đã được sử dụng!',
+                phone: 'Số điện thoại đã được sử dụng!'
+            };
+            return res.status(409).json({
+                message: duplicateMessages[duplicateField] || 'Thông tin đăng ký đã tồn tại.'
+            });
+        }
+
+        console.error('Registration error:', error);
+        res.status(500).json({ message: 'Không thể tạo tài khoản lúc này. Vui lòng thử lại.' });
     }
 });
 

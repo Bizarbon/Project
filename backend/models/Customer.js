@@ -18,7 +18,13 @@ const customerSchema = new mongoose.Schema({
         type: String,
         required: false,
         unique: true,
-        sparse: true
+        sparse: true,
+        trim: true,
+        lowercase: true,
+        set: value => {
+            const normalized = String(value || '').trim().toLowerCase();
+            return normalized || undefined;
+        }
     },
     phone: {
         type: String,

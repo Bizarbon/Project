@@ -164,6 +164,7 @@
                 email: document.getElementById('email').value.trim(),
                 password: document.getElementById('password').value
             };
+            if (!payload.email) delete payload.email;
 
             button.disabled = true;
             const originalText = button.textContent;
