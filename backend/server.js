@@ -22,6 +22,7 @@ const locationRoutes = require('./routes/locationRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
+const PUBLIC_DIR = path.resolve(__dirname, '../public');
 const IS_VERCEL = Boolean(process.env.VERCEL);
 
 function validateSecurityConfig() {
@@ -114,6 +115,12 @@ app.use('/api/locations', locationRoutes);
 app.use('/api', (req, res) => {
     res.status(404).json({ message: 'API endpoint không tồn tại.' });
 });
+
+if (IS_VERCEL) {
+    app.get(['/', '/index.html'], (req, res) => {
+        res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
+    });
+}
 
 if (!IS_VERCEL) {
     app.use(express.static(FRONTEND_DIR, {
