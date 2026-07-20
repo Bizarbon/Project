@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const Supplier = require('../models/Supplier');
-const { protect, admin } = require('../middleware/auth');
+const { protect, optionalAuth, admin } = require('../middleware/auth');
+const { recommendProducts } = require('../utils/recommendations');
 
 function escapeRegex(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -133,6 +134,26 @@ router.get('/meta/options', async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// GET personalized or contextual product recommendations
+router.get('/recommendations', optionalAuth, async (req, res) => {
+    try {
+        const products = await recommendProducts({
+            user: req.user,
+            limit: req.query.limit,
+            category: req.query.category,
+            maxPrice: req.query.maxPrice,
+            referenceProductId: req.query.productId,
+            search: req.query.search
+        });
+        res.json({
+            personalized: Boolean(req.user),
+            products
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Không thể tạo gợi ý sản phẩm lúc này.' });
     }
 });
 

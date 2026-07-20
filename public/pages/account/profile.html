@@ -3,10 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản lý hồ sơ, địa chỉ nhận hàng, ảnh đại diện và bảo mật tài khoản TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/account/profile.html">
     <title>Hồ sơ cá nhân - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css?v=account-ui-20260711-1">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=account-ui-20260711-1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
     <style>
         .profile-grid {
             display: grid;
@@ -100,33 +103,33 @@
                 </div>
             </div>
         </div>
-        <div class="header-categories" role="navigation" aria-label="Danh mục sản phẩm">
-            <div class="header-shell header-category-list">
-                <a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a>
-                <a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a>
-                <a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a>
-                <a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a>
-                <a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a>
-                <a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a>
-                <a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a>
-            </div>
-        </div>
+        <nav class="header-categories" aria-label="Danh mục sản phẩm">
+            <ul class="header-shell header-category-list">
+                <li><a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a></li>
+                <li><a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a></li>
+                <li><a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a></li>
+                <li><a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a></li>
+                <li><a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a></li>
+                <li><a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a></li>
+                <li><a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a></li>
+            </ul>
+        </nav>
     </header>
     <script src="../../assets/js/animations.js"></script>
     <script src="../../assets/js/auth.js?v=account-ui-20260711-1"></script>
     <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Hồ sơ cá nhân</h2>
+        <header class="page-header reveal">
+            <h1>Hồ sơ cá nhân</h1>
             <p>Quản lý thông tin tài khoản và thiết lập bảo mật của bạn.</p>
-        </div>
+        </header>
 
         <div class="profile-grid">
             <section class="bio-card glass-card reveal">
-                <div class="avatar-editor">
+                <figure class="avatar-editor">
                     <div class="profile-avatar-large">
-                        <img id="profileAvatarImage" alt="Ảnh đại diện" hidden>
+                        <img id="profileAvatarImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Ảnh đại diện" hidden>
                         <span id="profileInitial">-</span>
                     </div>
                     <div class="avatar-actions">
@@ -135,44 +138,44 @@
                     </div>
                     <input type="file" id="profileAvatarInput" accept="image/png,image/jpeg,image/webp" hidden>
                     <p class="avatar-hint">PNG, JPG hoặc WebP. Tối đa 2 MB.</p>
-                </div>
+                </figure>
                 <h2 id="profileName" style="margin-bottom: 0.5rem;">Đang tải...</h2>
                 <p id="profileUsername" style="color: var(--text-muted);">@username</p>
                 <div id="profileRoleBadge" class="role-badge">Đang tải...</div>
 
-                <div class="bio-info">
+                <dl class="bio-info">
                     <div class="bio-row">
-                        <span class="bio-label">Ngày gia nhập</span>
-                        <span class="bio-value" id="profileJoinDate">---</span>
+                        <dt class="bio-label">Ngày gia nhập</dt>
+                        <dd class="bio-value" id="profileJoinDate">---</dd>
                     </div>
                     <div class="bio-row">
-                        <span class="bio-label">Trạng thái</span>
-                        <span class="bio-value" style="color: var(--success);">Đang hoạt động</span>
+                        <dt class="bio-label">Trạng thái</dt>
+                        <dd class="bio-value" style="color: var(--success);">Đang hoạt động</dd>
                     </div>
-                </div>
+                </dl>
             </section>
 
             <section class="settings-card glass-card reveal">
-                <div class="settings-heading">
+                <header class="settings-heading">
                     <div><span>Thông tin tài khoản</span><h3>Chỉnh sửa thông tin</h3></div>
                     <p>Cập nhật thông tin liên hệ và địa chỉ nhận hàng.</p>
-                </div>
+                </header>
                 <form id="profileForm">
                     <div class="profile-form-grid">
                         <div class="form-group">
-                            <label>Họ và tên</label>
+                            <label for="pName">Họ và tên</label>
                             <input type="text" id="pName" required>
                         </div>
                         <div class="form-group">
-                            <label>Số điện thoại</label>
-                            <input type="text" id="pPhone" required>
+                            <label for="pPhone">Số điện thoại</label>
+                            <input type="tel" id="pPhone" autocomplete="tel" required>
                         </div>
                         <div class="form-group">
-                            <label>Địa chỉ Email</label>
-                            <input type="email" id="pEmail">
+                            <label for="pEmail">Địa chỉ Email</label>
+                            <input type="email" id="pEmail" autocomplete="email">
                         </div>
                         <div class="form-group">
-                            <label>Địa chỉ nhận hàng</label>
+                            <label for="pAddress">Địa chỉ nhận hàng</label>
                             <input type="text" id="pAddress">
                         </div>
                     </div>
@@ -181,15 +184,19 @@
                         <div class="security-heading">
                             <span>Bảo mật tài khoản</span>
                             <h3>Đổi mật khẩu</h3>
-                            <p>Để trống cả hai ô nếu bạn không muốn thay đổi mật khẩu.</p>
+                            <p>Nhập mật khẩu hiện tại để xác nhận. Phiên đăng nhập cũ sẽ kết thúc sau khi đổi thành công.</p>
                         </div>
                         <div class="security-fields">
+                            <div class="form-group security-current-password">
+                                <label for="pCurrentPassword">Mật khẩu hiện tại</label>
+                                <input type="password" id="pCurrentPassword" autocomplete="current-password">
+                            </div>
                             <div class="form-group">
-                                <label>Mật khẩu mới</label>
+                                <label for="pPassword">Mật khẩu mới</label>
                                 <input type="password" id="pPassword" autocomplete="new-password">
                             </div>
                             <div class="form-group">
-                                <label>Xác nhận mật khẩu mới</label>
+                                <label for="pPasswordConfirm">Xác nhận mật khẩu mới</label>
                                 <input type="password" id="pPasswordConfirm" autocomplete="new-password">
                             </div>
                         </div>

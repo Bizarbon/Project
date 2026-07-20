@@ -1,5 +1,7 @@
 # Ecommerce Project Structure
 
+Xem thêm [Bảo mật, AI giọng nói và thanh toán](SECURITY_AI_PAYMENT.md) để cấu hình và trình bày các chức năng mới.
+
 ```text
 ecommerce/
   backend/                Express API, MongoDB models, business routes

@@ -11,7 +11,7 @@
     margin-bottom: 1.5rem;
 }
 
-.profile-page .page-header h2 {
+.profile-page .page-header h1 {
     margin-bottom: 0.35rem;
     font-size: clamp(1.8rem, 3vw, 2.4rem);
 }
@@ -43,6 +43,7 @@
 .avatar-editor {
     display: grid;
     justify-items: center;
+    margin-inline: 0;
     margin-bottom: 1rem;
 }
 
@@ -113,7 +114,13 @@
 
 .profile-page .bio-info {
     margin-top: auto;
+    margin-bottom: 0;
     padding-top: 1.5rem;
+}
+
+.profile-page .bio-row dt,
+.profile-page .bio-row dd {
+    margin: 0;
 }
 
 .profile-page .bio-row {
@@ -212,6 +219,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     margin-top: 1.15rem;
+}
+
+.security-current-password {
+    grid-column: 1 / -1;
 }
 
 .profile-form-actions {

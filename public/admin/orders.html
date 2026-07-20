@@ -3,12 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị trạng thái xử lý, thanh toán và vận chuyển đơn hàng TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/orders.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Quản lý đơn hàng - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260715-2">
     <style>
         .order-product-item {
             font-size: 0.85rem;
@@ -28,8 +31,8 @@
 </head>
 
 <body class="admin-page">
-    <nav>
-        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
+        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
         <ul id="main-navbar">
             <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
             <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
@@ -40,42 +43,42 @@
             <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
-    </nav>
+    </nav></header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Quản lý đơn hàng</h2>
+        <header class="page-header reveal">
+            <h1>Quản lý đơn hàng</h1>
             <p>Kiểm tra, cập nhật trạng thái xử lý và vận chuyển đơn hàng.</p>
-        </div>
+        </header>
 
         <div class="stats-grid reveal">
-            <div class="stat-card glass-card">
+            <article class="stat-card glass-card">
                 <div class="stat-icon">ALL</div>
                 <div class="stat-value" id="statTotal">0</div>
                 <div class="stat-label">Tổng đơn</div>
-            </div>
-            <div class="stat-card glass-card">
+            </article>
+            <article class="stat-card glass-card">
                 <div class="stat-icon" style="color:var(--warning)">NEW</div>
                 <div class="stat-value" id="statPending" style="color:var(--warning)">0</div>
                 <div class="stat-label">Chờ xử lý</div>
-            </div>
-            <div class="stat-card glass-card">
+            </article>
+            <article class="stat-card glass-card">
                 <div class="stat-icon" style="color:var(--info)">RUN</div>
                 <div class="stat-value" id="statProcessing" style="color:var(--info)">0</div>
                 <div class="stat-label">Đang xử lý</div>
-            </div>
-            <div class="stat-card glass-card">
+            </article>
+            <article class="stat-card glass-card">
                 <div class="stat-icon" style="color:var(--primary-light)">SHIP</div>
                 <div class="stat-value" id="statShipping" style="color:var(--primary-light)">0</div>
                 <div class="stat-label">Đang giao</div>
-            </div>
-            <div class="stat-card glass-card">
+            </article>
+            <article class="stat-card glass-card">
                 <div class="stat-icon" style="color:var(--success)">DONE</div>
                 <div class="stat-value" id="statCompleted" style="color:var(--success)">0</div>
                 <div class="stat-label">Hoàn tất</div>
-            </div>
+            </article>
         </div>
 
         <section class="table-section glass-card reveal">
@@ -102,7 +105,7 @@
     </main>
 
     <script src="../assets/js/orders.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 
 </html>

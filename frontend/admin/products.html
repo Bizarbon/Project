@@ -3,17 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị sản phẩm, thông số kỹ thuật, giá bán và tồn kho TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/products.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Quản lý sản phẩm - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260715-2">
 </head>
 
 <body class="admin-page">
-    <nav>
-        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
+        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
         <ul id="main-navbar">
             <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
             <li><a href="products.html?v=techecommerce-20260709-2" class="active">Sản phẩm</a></li>
@@ -24,16 +27,16 @@
             <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
-    </nav>
+    </nav></header>
 
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Quản lý sản phẩm</h2>
+        <header class="page-header reveal">
+            <h1>Quản lý sản phẩm</h1>
             <p>Quản lý tồn kho, thông số kỹ thuật, giá bán và danh mục sản phẩm công nghệ.</p>
-        </div>
+        </header>
 
         <section class="form-section glass-card reveal">
             <h2><span id="formTitle">Thêm sản phẩm mới</span></h2>
@@ -41,87 +44,95 @@
                 <input type="hidden" id="productId">
 
                 <div class="form-group">
-                    <label>Tên sản phẩm</label>
+                    <label for="name">Tên sản phẩm</label>
                     <input type="text" id="name" placeholder="Nhập tên sản phẩm..." required>
                 </div>
                 <div class="form-group">
-                    <label>SKU / Mã hàng</label>
+                    <label for="sku">SKU / Mã hàng</label>
                     <input type="text" id="sku" placeholder="VD: IP15PM-256-BLK">
                 </div>
                 <div class="form-group">
-                    <label>Thương hiệu</label>
+                    <label for="brand">Thương hiệu</label>
                     <input type="text" id="brand" placeholder="VD: Apple, Samsung, Dell...">
                 </div>
                 <div class="form-group">
-                    <label>Giá bán (VNĐ)</label>
+                    <label for="price">Giá bán (VNĐ)</label>
                     <input type="number" id="price" placeholder="Nhập giá..." required>
                 </div>
                 <div class="form-group">
-                    <label>Giá niêm yết / Giá gạch (VNĐ)</label>
+                    <label for="compareAtPrice">Giá niêm yết / Giá gạch (VNĐ)</label>
                     <input type="number" id="compareAtPrice" placeholder="VD: 32990000">
                 </div>
                 <div class="form-group">
-                    <label>Danh mục</label>
+                    <label for="category">Danh mục</label>
                     <input type="text" id="category" placeholder="VD: Điện thoại, Laptop..." required>
                 </div>
                 <div class="form-group">
-                    <label>Số lượng tồn kho</label>
+                    <label for="stock">Số lượng tồn kho</label>
                     <input type="number" id="stock" placeholder="Nhập số lượng..." required>
                 </div>
                 <div class="form-group full-width">
-                    <label>Mô tả chi tiết</label>
+                    <label for="description">Mô tả chi tiết</label>
                     <textarea id="description" placeholder="Nhập mô tả sản phẩm..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Nhà cung cấp</label>
+                    <label for="supplier">Nhà cung cấp</label>
                     <select id="supplier">
                         <option value="">-- Chọn nhà cung cấp --</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Tồn kho tối thiểu (cảnh báo)</label>
+                    <label for="minStock">Tồn kho tối thiểu (cảnh báo)</label>
                     <input type="number" id="minStock" placeholder="VD: 5" min="0" value="5">
                 </div>
                 <div class="form-group">
-                    <label>Chính sách bảo hành</label>
+                    <label for="warranty">Chính sách bảo hành</label>
                     <input type="text" id="warranty" placeholder="VD: 12 tháng, bao test 7 ngày..." value="Không bảo hành">
                 </div>
                 <div class="form-group">
-                    <label>Đánh giá / lượt đánh giá</label>
+                    <label for="ratingReview">Đánh giá / lượt đánh giá</label>
                     <input type="text" id="ratingReview" placeholder="VD: 4.8/126">
                 </div>
                 <div class="form-group">
-                    <label>Đã bán</label>
+                    <label for="soldCount">Đã bán</label>
                     <input type="number" id="soldCount" placeholder="VD: 250" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Nổi bật</label>
+                    <label for="featured">Nổi bật</label>
                     <select id="featured">
                         <option value="false">Không</option>
                         <option value="true">Có</option>
                     </select>
                 </div>
                 <div class="form-group full-width">
-                    <label>URL hình ảnh sản phẩm</label>
+                    <label for="image">URL hình ảnh sản phẩm</label>
                     <input type="text" id="image" placeholder="https://...">
                 </div>
                 <div class="form-group full-width">
-                    <label>Tags tìm kiếm</label>
+                    <label for="tags">Tags tìm kiếm</label>
                     <input type="text" id="tags" placeholder="VD: flagship, gaming, văn phòng, sinh viên">
                 </div>
-                <div class="form-group full-width">
-                    <label>Thông số kỹ thuật</label>
+                <fieldset class="form-group full-width">
+                    <legend>Thông số kỹ thuật</legend>
                     <div class="spec-grid">
+                        <label class="sr-only" for="specCpu">CPU hoặc chip</label>
                         <input type="text" id="specCpu" placeholder="CPU / Chip">
+                        <label class="sr-only" for="specRam">RAM</label>
                         <input type="text" id="specRam" placeholder="RAM">
+                        <label class="sr-only" for="specStorage">Bộ nhớ hoặc SSD</label>
                         <input type="text" id="specStorage" placeholder="Bộ nhớ / SSD">
+                        <label class="sr-only" for="specScreen">Màn hình</label>
                         <input type="text" id="specScreen" placeholder="Màn hình">
+                        <label class="sr-only" for="specCamera">Camera</label>
                         <input type="text" id="specCamera" placeholder="Camera">
+                        <label class="sr-only" for="specBattery">Pin</label>
                         <input type="text" id="specBattery" placeholder="Pin">
+                        <label class="sr-only" for="specOs">Hệ điều hành</label>
                         <input type="text" id="specOs" placeholder="Hệ điều hành">
+                        <label class="sr-only" for="specGpu">GPU</label>
                         <input type="text" id="specGpu" placeholder="GPU">
                     </div>
-                </div>
+                </fieldset>
                 <div class="form-actions">
                     <button type="submit" class="btn-primary">Lưu sản phẩm</button>
                     <button type="button" class="btn-secondary" onclick="resetForm()">Hủy bỏ</button>
@@ -130,13 +141,16 @@
         </section>
 
         <div class="filter-bar reveal admin-filter-bar">
+            <label class="sr-only" for="adminProductSearch">Tìm sản phẩm</label>
             <input id="adminProductSearch" type="search" placeholder="Tìm sản phẩm...">
+            <label class="sr-only" for="adminStockFilter">Lọc theo tồn kho</label>
             <select id="adminStockFilter">
                 <option value="">Tất cả tồn kho</option>
                 <option value="low">Sắp hết hàng</option>
                 <option value="out">Hết hàng</option>
                 <option value="in">Còn hàng</option>
             </select>
+            <label class="sr-only" for="adminSortProducts">Sắp xếp sản phẩm</label>
             <select id="adminSortProducts">
                 <option value="">Mặc định</option>
                 <option value="price_asc">Giá tăng dần</option>
@@ -173,7 +187,7 @@
     </main>
 
     <script src="../assets/js/products.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 
 </html>

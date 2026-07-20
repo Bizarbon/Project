@@ -3,12 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Phân tích doanh thu, chi phí và lợi nhuận của TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/finance.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Phân tích tài chính - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260715-2">
     <style>
         .finance-summary {
             display: grid;
@@ -137,8 +140,8 @@
 </head>
 
 <body class="admin-page">
-    <nav>
-        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
+        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
         <ul id="main-navbar">
             <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
             <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
@@ -149,49 +152,49 @@
             <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
-    </nav>
+    </nav></header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Phân tích tài chính</h2>
+        <header class="page-header reveal">
+            <h1>Phân tích tài chính</h1>
             <p>Theo dõi doanh thu, chi phí và hiệu quả vận hành cửa hàng.</p>
-        </div>
+        </header>
 
-        <div class="filter-bar reveal">
+        <form class="filter-bar reveal" aria-label="Lọc dữ liệu tài chính" onsubmit="event.preventDefault(); applyFilter();">
             <div class="form-group" style="flex-direction:row; align-items:center; gap:0.5rem; margin-bottom:0;">
-                <label style="margin-bottom:0;">Từ:</label>
+                <label for="filterFrom" style="margin-bottom:0;">Từ:</label>
                 <input type="date" id="filterFrom" style="width:160px;">
             </div>
             <div class="form-group" style="flex-direction:row; align-items:center; gap:0.5rem; margin-bottom:0;">
-                <label style="margin-bottom:0;">Đến:</label>
+                <label for="filterTo" style="margin-bottom:0;">Đến:</label>
                 <input type="date" id="filterTo" style="width:160px;">
             </div>
-            <button class="btn-primary" onclick="applyFilter()">Lọc dữ liệu</button>
-            <button class="btn-secondary" onclick="clearFilter()">Reset</button>
-        </div>
+            <button type="submit" class="btn-primary">Lọc dữ liệu</button>
+            <button type="button" class="btn-secondary" onclick="clearFilter()">Đặt lại</button>
+        </form>
 
-        <div class="finance-summary reveal">
-            <div class="finance-card revenue glass-card">
+        <section class="finance-summary reveal" aria-label="Tổng hợp tài chính">
+            <article class="finance-card revenue glass-card">
                 <div class="fc-icon">REVENUE</div>
                 <div class="fc-value" id="fcRevenue">0 đ</div>
                 <div class="fc-label">Doanh thu</div>
                 <div class="fc-sub" id="fcOrderCount">(0 đơn hoàn thành)</div>
-            </div>
-            <div class="finance-card expense glass-card">
+            </article>
+            <article class="finance-card expense glass-card">
                 <div class="fc-icon">EXPENSE</div>
                 <div class="fc-value" id="fcExpense">0 đ</div>
                 <div class="fc-label">Tổng chi phí</div>
                 <div class="fc-sub">Ads, đóng gói, phí vận hành...</div>
-            </div>
-            <div class="finance-card profit glass-card">
+            </article>
+            <article class="finance-card profit glass-card">
                 <div class="fc-icon">PROFIT</div>
                 <div class="fc-value" id="fcProfit">0 đ</div>
                 <div class="fc-label">Lợi nhuận ròng</div>
                 <div class="fc-sub">Doanh thu trừ chi phí</div>
-            </div>
-        </div>
+            </article>
+        </section>
 
         <section class="chart-section glass-card reveal">
             <h3>So sánh thu chi</h3>
@@ -223,7 +226,7 @@
             <h2>Ghi nhận chi phí mới</h2>
             <form id="expenseForm">
                 <div class="form-group">
-                    <label>Loại chi phí</label>
+                    <label for="eType">Loại chi phí</label>
                     <select id="eType" required>
                         <option value="ads">Quảng cáo</option>
                         <option value="packaging">Bao bì đóng gói</option>
@@ -234,15 +237,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Số tiền (VNĐ)</label>
+                    <label for="eAmount">Số tiền (VNĐ)</label>
                     <input type="number" id="eAmount" placeholder="VD: 500000" min="0" required>
                 </div>
                 <div class="form-group">
-                    <label>Ngày phát sinh</label>
+                    <label for="eDate">Ngày phát sinh</label>
                     <input type="date" id="eDate">
                 </div>
                 <div class="form-group full-width">
-                    <label>Mô tả chi tiết</label>
+                    <label for="eDescription">Mô tả chi tiết</label>
                     <input type="text" id="eDescription" placeholder="VD: Chạy ads Facebook tháng 4...">
                 </div>
                 <div class="form-actions">
@@ -273,7 +276,7 @@
     </main>
 
     <script src="../assets/js/finance.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 
 </html>

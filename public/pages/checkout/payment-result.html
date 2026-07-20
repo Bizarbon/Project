@@ -3,10 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Kiểm tra kết quả thanh toán đơn hàng TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/checkout/payment-result.html">
     <title>Kết quả thanh toán - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
     <style>
         .result-card {
             max-width: 620px;
@@ -29,7 +32,7 @@
 
 <body>
     <nav>
-        <h1 onclick="window.location.href='../../index.html'">TechEcommerce</h1>
+        <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
         <ul id="main-navbar">
             <li><a href="../../index.html">Cửa hàng</a></li>
             <li><a href="../account/orders.html">Đơn hàng</a></li>
@@ -42,7 +45,7 @@
     <main class="container">
         <section class="result-card">
             <div class="result-icon" id="resultIcon">...</div>
-            <h2 id="resultTitle">Đang kiểm tra thanh toán</h2>
+            <h1 id="resultTitle">Đang kiểm tra thanh toán</h1>
             <p id="resultMessage">Vui lòng chờ trong giây lát.</p>
             <div class="result-actions">
                 <a href="../account/orders.html" class="btn btn-primary">Xem đơn hàng</a>

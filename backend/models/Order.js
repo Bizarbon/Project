@@ -75,6 +75,28 @@ const orderSchema = new mongoose.Schema({
         enum: ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'returned', 'boom'],
         default: 'pending'
     },
+    statusHistory: [{
+        status: {
+            type: String,
+            enum: ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'returned', 'boom'],
+            required: true
+        },
+        title: { type: String, default: '' },
+        description: { type: String, default: '' },
+        occurredAt: { type: Date, default: Date.now }
+    }],
+    inspectionNote: {
+        type: String,
+        default: ''
+    },
+    estimatedDeliveryAt: {
+        type: Date,
+        default: null
+    },
+    deliveredAt: {
+        type: Date,
+        default: null
+    },
     paymentMethod: {
         type: String,
         enum: ['cod', 'bank_transfer', 'vnpay', 'momo', 'installment', 'ShipCOD', 'Thanh toán trước', 'Trả góp'],

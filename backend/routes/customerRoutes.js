@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Customer = require('../models/Customer');
 const Product = require('../models/Product');
+const bcrypt = require('bcryptjs');
 const { protect, admin } = require('../middleware/auth');
 
 function canAccessCustomer(req, id) {
@@ -121,7 +122,12 @@ router.post('/', protect, admin, async (req, res) => {
         const customerData = pickCustomerPayload(req.body, true);
         if (!customerData.name) return res.status(400).json({ message: 'Tên khách hàng là bắt buộc!' });
         if (!customerData.username) customerData.username = customerData.phone || `cust_${Date.now().toString().slice(-6)}`;
-        if (!customerData.password) customerData.password = '123456';
+        if (!customerData.password) {
+            return res.status(400).json({ message: 'Mật khẩu ban đầu là bắt buộc.' });
+        }
+        if (String(customerData.password).length < 8 || !/[a-z]/.test(customerData.password) || !/[A-Z]/.test(customerData.password) || !/\d/.test(customerData.password)) {
+            return res.status(400).json({ message: 'Mật khẩu cần ít nhất 8 ký tự, có chữ hoa, chữ thường và chữ số.' });
+        }
 
         await assertUniqueCustomerFields(customerData);
         const newCustomer = await new Customer(customerData).save();
@@ -142,6 +148,17 @@ router.put('/:id', protect, async (req, res) => {
         if (!customer) return res.status(404).json({ message: 'Customer not found' });
 
         const payload = pickCustomerPayload(req.body, req.user.isAdmin);
+        const changesOwnPassword = Boolean(payload.password) && String(req.user._id) === String(customer._id);
+        if (payload.password) {
+            if (String(payload.password).length < 8 || !/[a-z]/.test(payload.password) || !/[A-Z]/.test(payload.password) || !/\d/.test(payload.password)) {
+                return res.status(400).json({ message: 'Mật khẩu mới cần ít nhất 8 ký tự, có chữ hoa, chữ thường và chữ số.' });
+            }
+            if (changesOwnPassword) {
+                const currentPassword = String(req.body.currentPassword || '');
+                const passwordMatches = currentPassword && await bcrypt.compare(currentPassword, customer.password);
+                if (!passwordMatches) return res.status(400).json({ message: 'Mật khẩu hiện tại không chính xác.' });
+            }
+        }
         await assertUniqueCustomerFields(payload, req.params.id);
 
         Object.keys(payload).forEach(key => {
@@ -151,6 +168,7 @@ router.put('/:id', protect, async (req, res) => {
         const updated = await customer.save();
         const safeCustomer = updated.toObject();
         delete safeCustomer.password;
+        safeCustomer.sessionInvalidated = changesOwnPassword;
         res.json(safeCustomer);
     } catch (error) {
         res.status(error.statusCode || 400).json({ message: error.message });

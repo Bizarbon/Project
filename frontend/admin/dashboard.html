@@ -3,12 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Tổng quan vận hành, doanh thu, đơn hàng và tồn kho TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/dashboard.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Tổng quan quản trị - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260715-2">
     <style>
         .dashboard-grid {
             display: grid;
@@ -31,8 +34,8 @@
 </head>
 
 <body class="admin-page">
-    <nav>
-        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
+        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
         <ul id="main-navbar">
             <li><a href="dashboard.html?v=techecommerce-20260709-2" class="active">Tổng quan</a></li>
             <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
@@ -43,31 +46,31 @@
             <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
-    </nav>
+    </nav></header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Tổng quan vận hành</h2>
+        <header class="page-header reveal">
+            <h1>Tổng quan vận hành</h1>
             <p>Doanh thu, đơn hàng, khách hàng và cảnh báo tồn kho</p>
             <p id="dashboardError" style="color:var(--danger);"></p>
-        </div>
+        </header>
 
-        <section class="stats-grid reveal">
-            <div class="stat-card"><div class="stat-icon">REV</div><div class="stat-value" id="dbRevenue">0 </div><div class="stat-label">Doanh thu tháng</div></div>
-            <div class="stat-card"><div class="stat-icon">DAY</div><div class="stat-value" id="dbToday">0 </div><div class="stat-label">Doanh thu hôm nay</div></div>
-            <div class="stat-card"><div class="stat-icon">PFT</div><div class="stat-value" id="dbProfit">0 </div><div class="stat-label">Lợi nhuận</div></div>
-            <div class="stat-card"><div class="stat-icon">ORD</div><div class="stat-value" id="dbOrders">0</div><div class="stat-label">Tổng đơn</div></div>
-            <div class="stat-card"><div class="stat-icon">PND</div><div class="stat-value" id="dbPending">0</div><div class="stat-label">Đơn chờ xử lý</div></div>
-            <div class="stat-card"><div class="stat-icon">SHP</div><div class="stat-value" id="dbShipping">0</div><div class="stat-label">Đang giao</div></div>
-            <div class="stat-card"><div class="stat-icon">SKU</div><div class="stat-value" id="dbProducts">0</div><div class="stat-label">Sản phẩm</div></div>
-            <div class="stat-card"><div class="stat-icon">USR</div><div class="stat-value" id="dbCustomers">0</div><div class="stat-label">Khách hàng</div></div>
-            <div class="stat-card"><div class="stat-icon">NEW</div><div class="stat-value" id="dbNewCustomers">0</div><div class="stat-label">Khách mới tháng này</div></div>
+        <section class="stats-grid dashboard-stats reveal" aria-label="Chỉ số vận hành">
+            <article class="stat-card"><span class="stat-icon">REV</span><strong class="stat-value" id="dbRevenue">0 </strong><span class="stat-label">Doanh thu tháng</span></article>
+            <article class="stat-card"><span class="stat-icon">DAY</span><strong class="stat-value" id="dbToday">0 </strong><span class="stat-label">Doanh thu hôm nay</span></article>
+            <article class="stat-card"><span class="stat-icon">PFT</span><strong class="stat-value" id="dbProfit">0 </strong><span class="stat-label">Lợi nhuận</span></article>
+            <article class="stat-card"><span class="stat-icon">ORD</span><strong class="stat-value" id="dbOrders">0</strong><span class="stat-label">Tổng đơn</span></article>
+            <article class="stat-card"><span class="stat-icon">PND</span><strong class="stat-value" id="dbPending">0</strong><span class="stat-label">Đơn chờ xử lý</span></article>
+            <article class="stat-card"><span class="stat-icon">SHP</span><strong class="stat-value" id="dbShipping">0</strong><span class="stat-label">Đang giao</span></article>
+            <article class="stat-card"><span class="stat-icon">SKU</span><strong class="stat-value" id="dbProducts">0</strong><span class="stat-label">Sản phẩm</span></article>
+            <article class="stat-card"><span class="stat-icon">USR</span><strong class="stat-value" id="dbCustomers">0</strong><span class="stat-label">Khách hàng</span></article>
+            <article class="stat-card"><span class="stat-icon">NEW</span><strong class="stat-value" id="dbNewCustomers">0</strong><span class="stat-label">Khách mới tháng này</span></article>
         </section>
 
         <section class="dashboard-grid">
-            <div class="table-section glass-card reveal">
+            <section class="table-section glass-card reveal">
                 <h2>Đơn gần đây</h2>
                 <div class="table-wrapper">
                     <table>
@@ -77,16 +80,16 @@
                         <tbody id="recentOrders"></tbody>
                     </table>
                 </div>
-            </div>
-            <div class="table-section glass-card reveal">
+            </section>
+            <section class="table-section glass-card reveal">
                 <h2>Cảnh báo tồn kho</h2>
                 <div id="lowStockList"></div>
-            </div>
+            </section>
         </section>
     </main>
 
     <script src="../assets/js/dashboard.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 
 </html>

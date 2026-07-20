@@ -1,0 +1,106 @@
+.register-page-main {
+    padding-block: clamp(1.75rem, 4vw, 3.5rem);
+}
+
+.register-layout {
+    grid-template-columns: minmax(0, 0.95fr) minmax(480px, 1.05fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.register-visual {
+    min-height: 590px;
+}
+
+.register-visual img {
+    object-position: center;
+}
+
+.register-page .auth-container {
+    max-width: 600px;
+}
+
+.register-page .auth-card {
+    padding: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.register-page .form-grid {
+    gap: 0 1rem;
+}
+
+.register-page .form-group {
+    min-width: 0;
+    margin-bottom: 1.45rem;
+}
+
+.register-page .form-group.full {
+    grid-column: 1 / -1;
+}
+
+.register-page .field-hint {
+    display: block;
+    margin: 0.45rem 0 0 0.25rem;
+    color: var(--neo-muted);
+    font-size: 0.78rem;
+}
+
+.register-page .register-submit-row {
+    margin-bottom: 0;
+}
+
+.register-page .auth-switch {
+    margin-top: 1.35rem;
+}
+
+.register-success {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
+.register-success-mark {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--success);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.register-success h2,
+.register-success p {
+    margin: 0;
+}
+
+.register-success p {
+    color: var(--neo-muted);
+}
+
+.register-success .btn-auth {
+    max-width: 280px;
+    text-decoration: none;
+}
+
+@media (max-width: 960px) {
+    .register-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .register-visual {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 620px) {
+    .register-page .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .register-page .form-group.full {
+        grid-column: 1;
+    }
+}

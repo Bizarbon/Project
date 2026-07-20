@@ -1,10 +1,18 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
-const Customer = require('../models/Customer');
 const Order = require('../models/Order');
-const Product = require('../models/Product');
+const { optionalAuth } = require('../middleware/auth');
+const { recommendProducts } = require('../utils/recommendations');
+
+const chatLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 40,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { message: 'Bạn đã gửi quá nhiều tin nhắn. Vui lòng thử lại sau ít phút.' }
+});
 
 const STATUS_LABELS = {
     pending: 'chờ xác nhận',
@@ -69,7 +77,7 @@ function inferCategory(text) {
         ['điện thoại', ['dien thoai', 'smartphone', 'iphone', 'android', 'chup anh']],
         ['phụ kiện', ['phu kien', 'tai nghe', 'chuot', 'ban phim', 'sac', 'cap', 'op lung']],
         ['tablet', ['tablet', 'may tinh bang', 'ipad']],
-        ['đồng hồ', ['dong ho', 'smartwatch']]
+        ['đồng hồ thông minh', ['dong ho', 'smartwatch']]
     ];
 
     const found = categories.find(([, keywords]) => keywords.some(keyword => text.includes(keyword)));
@@ -77,37 +85,17 @@ function inferCategory(text) {
 }
 
 function buildProductFilter(text) {
-    const filter = { active: { $ne: false } };
     const budget = extractBudget(text);
     const category = inferCategory(text);
 
-    if (budget) filter.price = { $lte: budget };
-    if (category) filter.category = { $regex: category, $options: 'i' };
-    if (text.includes('con hang') || text.includes('san co') || text.includes('mua duoc')) filter.stock = { $gt: 0 };
-
     const brands = ['apple', 'samsung', 'xiaomi', 'oppo', 'asus', 'acer', 'dell', 'hp', 'lenovo', 'msi', 'sony', 'lg'];
     const brand = brands.find(item => text.includes(item));
-    if (brand) filter.brand = { $regex: brand, $options: 'i' };
 
-    return { filter, budget, category, brand };
-}
-
-async function currentUser(req) {
-    const authHeader = req.headers.authorization || '';
-    const [scheme, token] = authHeader.split(' ');
-
-    if (scheme !== 'Bearer' || !token) return null;
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        return Customer.findById(decoded.id).select('-password');
-    } catch (error) {
-        return null;
-    }
+    return { budget, category, brand };
 }
 
 async function answerOrderQuestion(req, message) {
-    const user = await currentUser(req);
+    const user = req.user;
     const orderId = (message.match(/#?\b(\d{1,8})\b/) || [])[1];
 
     if (!user) {
@@ -143,13 +131,27 @@ async function answerOrderQuestion(req, message) {
     };
 }
 
-async function answerProductQuestion(message) {
+async function answerProductQuestion(message, user) {
     const text = normalizeText(message);
-    const { filter, budget, category, brand } = buildProductFilter(text);
+    const { budget, category, brand } = buildProductFilter(text);
 
-    const products = await Product.find(filter)
-        .sort({ stock: -1, rating: -1, soldCount: -1, price: 1 })
-        .limit(5);
+    let products = await recommendProducts({
+        user,
+        limit: 5,
+        category,
+        maxPrice: budget,
+        search: message
+    });
+
+    let relaxed = false;
+    if (!products.length && budget) {
+        products = await recommendProducts({ user, limit: 5, category, search: message });
+        relaxed = products.length > 0;
+    }
+    if (!products.length && category) {
+        products = await recommendProducts({ user, limit: 5, search: message });
+        relaxed = products.length > 0;
+    }
 
     if (!products.length) {
         return {
@@ -164,13 +166,16 @@ async function answerProductQuestion(message) {
         brand ? `thương hiệu ${brand}` : ''
     ].filter(Boolean).join(', ');
 
-    const intro = context
+    const intro = relaxed
+        ? `Hiện chưa có sản phẩm khớp hoàn toàn với ${context}. Đây là các lựa chọn gần nhất để bạn tham khảo:`
+        : context
         ? `Theo nhu cầu ${context}, mình gợi ý các sản phẩm này:`
         : 'Mình gợi ý một số sản phẩm nổi bật trong cửa hàng:';
 
     return {
         reply: `${intro}\n${products.map(productLine).join('\n')}\nBạn có thể bấm vào sản phẩm trên trang để xem ảnh, cấu hình, đánh giá và thêm vào giỏ hàng.`,
-        suggestions: ['So sánh sản phẩm', 'Tư vấn theo ngân sách khác', 'Chính sách bảo hành']
+        suggestions: ['So sánh sản phẩm', 'Tư vấn theo ngân sách khác', 'Chính sách bảo hành'],
+        products
     };
 }
 
@@ -196,7 +201,7 @@ function answerPolicyQuestion(message) {
     return '';
 }
 
-router.post('/', async (req, res) => {
+router.post('/', chatLimiter, optionalAuth, async (req, res) => {
     try {
         const message = String(req.body.message || '').trim();
         if (!message) return res.status(400).json({ message: 'Vui lòng nhập nội dung cần tư vấn.' });
@@ -213,7 +218,7 @@ router.post('/', async (req, res) => {
             });
         }
 
-        return res.json(await answerProductQuestion(message));
+        return res.json(await answerProductQuestion(message, req.user));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Chatbot đang bận một chút. Bạn thử lại sau nhé.' });

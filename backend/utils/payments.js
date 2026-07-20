@@ -127,14 +127,14 @@ function paymentProviderStatus(provider) {
     if (!config) return null;
 
     const missingKeys = missingProviderKeys(provider);
-    if (missingKeys.length && isMockMode()) {
+    if (isMockMode()) {
         return {
             provider,
             label: config.label,
             configured: true,
             mode: 'mock',
             missingKeys,
-            message: `${config.label} dang chay che do mo phong.`
+            message: `${config.label} đang chạy chế độ mô phỏng an toàn.`
         };
     }
 
@@ -207,7 +207,7 @@ function createMockPayment(order, provider) {
 }
 
 function shouldUseMockProvider(provider) {
-    return isMockMode() && missingProviderKeys(provider).length > 0;
+    return isMockMode();
 }
 
 function sanitizeVnpayOrderInfo(value) {
@@ -228,6 +228,13 @@ function createVnpayPayment(order, req) {
         return { paymentUrl: payment.paymentUrl, txnRef: payment.mockRef };
     }
 
+    const amount = Math.round(Number(order.totalAmount || 0));
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+        const error = new Error('Số tiền thanh toán VNPay không hợp lệ.');
+        error.statusCode = 400;
+        throw error;
+    }
+
     const now = new Date();
     const expire = new Date(now.getTime() + 15 * 60 * 1000);
     const txnRef = `${order._id}-${Date.now()}`;
@@ -235,7 +242,7 @@ function createVnpayPayment(order, req) {
         vnp_Version: '2.1.0',
         vnp_Command: 'pay',
         vnp_TmnCode: envValue('VNPAY_TMN_CODE'),
-        vnp_Amount: Math.round(Number(order.totalAmount || 0) * 100),
+        vnp_Amount: amount * 100,
         vnp_CreateDate: formatDate(now),
         vnp_CurrCode: 'VND',
         vnp_IpAddr: getClientIp(req),
@@ -263,7 +270,11 @@ function verifyVnpayParams(query) {
     const signedQuery = toQueryString(params);
     const expected = signHmac('sha512', envValue('VNPAY_HASH_SECRET'), signedQuery);
 
-    return Boolean(secureHash) && expected.toLowerCase() === String(secureHash).toLowerCase();
+    const received = String(secureHash || '').toLowerCase();
+    const merchantMatches = String(query.vnp_TmnCode || '') === envValue('VNPAY_TMN_CODE');
+    if (!merchantMatches || received.length !== expected.length) return false;
+
+    return crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(received, 'utf8'));
 }
 
 function momoRawSignature(fields) {

@@ -3,17 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị mã giảm giá và chương trình khuyến mãi TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/coupons.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Quản lý mã giảm giá - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260715-2">
 </head>
 
 <body class="admin-page">
-    <nav>
-        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
+        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
         <ul id="main-navbar">
             <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
             <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
@@ -24,53 +27,53 @@
             <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
-    </nav>
+    </nav></header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Quản lý mã giảm giá</h2>
+        <header class="page-header reveal">
+            <h1>Quản lý mã giảm giá</h1>
             <p>Quản lý mã ưu đãi, điều kiện áp dụng và thời hạn khuyến mãi.</p>
-        </div>
+        </header>
 
         <section class="form-section glass-card reveal">
             <h2><span id="couponFormTitle">Thêm mã giảm giá</span></h2>
             <form id="couponForm">
                 <input type="hidden" id="couponId">
                 <div class="form-group">
-                    <label>Mã giảm giá</label>
+                    <label for="code">Mã giảm giá</label>
                     <input id="code" type="text" placeholder="VD: TECH10" required>
                 </div>
                 <div class="form-group">
-                    <label>Tên chương trình</label>
+                    <label for="name">Tên chương trình</label>
                     <input id="name" type="text" placeholder="VD: Giảm 10% đồ công nghệ" required>
                 </div>
                 <div class="form-group">
-                    <label>Loại giảm</label>
+                    <label for="type">Loại giảm</label>
                     <select id="type">
                         <option value="percent">Phần trăm</option>
                         <option value="fixed">Số tiền cố định</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Giá trị</label>
+                    <label for="value">Giá trị</label>
                     <input id="value" type="number" min="1" placeholder="10 hoặc 500000" required>
                 </div>
                 <div class="form-group">
-                    <label>Đơn tối thiểu</label>
+                    <label for="minOrderValue">Đơn tối thiểu</label>
                     <input id="minOrderValue" type="number" min="0" value="0">
                 </div>
                 <div class="form-group">
-                    <label>Giảm tối đa</label>
+                    <label for="maxDiscount">Giảm tối đa</label>
                     <input id="maxDiscount" type="number" min="0" value="0">
                 </div>
                 <div class="form-group">
-                    <label>Giới hạn lượt dùng</label>
+                    <label for="usageLimit">Giới hạn lượt dùng</label>
                     <input id="usageLimit" type="number" min="0" value="0">
                 </div>
                 <div class="form-group">
-                    <label>Trạng thái</label>
+                    <label for="active">Trạng thái</label>
                     <select id="active">
                         <option value="true">Đang bật</option>
                         <option value="false">Tạm tắt</option>
@@ -105,7 +108,7 @@
     </main>
 
     <script src="../assets/js/coupons.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 
 </html>

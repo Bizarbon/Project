@@ -27,7 +27,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css`;
+        link.href = `${root}assets/css/chatbox.css?v=layout-20260715-1`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }
@@ -55,10 +55,14 @@
                             <span>Tư vấn sản phẩm và hỗ trợ đơn hàng</span>
                         </div>
                     </div>
-                    <button class="ai-chat-close" type="button" aria-label="Đóng chat">×</button>
+                    <div class="ai-chat-header-actions">
+                        <button class="ai-chat-voice" type="button" aria-label="Bật đọc câu trả lời" aria-pressed="false" title="Đọc câu trả lời bằng giọng nói">🔊</button>
+                        <button class="ai-chat-close" type="button" aria-label="Đóng chat">×</button>
+                    </div>
                 </header>
                 <div class="ai-chat-body" id="aiChatBody"></div>
                 <form class="ai-chat-form" id="aiChatForm">
+                    <button class="ai-chat-mic" type="button" aria-label="Nhập bằng giọng nói" title="Nhập bằng giọng nói">🎙</button>
                     <input class="ai-chat-input" id="aiChatInput" type="text" placeholder="Nhập nhu cầu mua hàng..." autocomplete="off">
                     <button class="ai-chat-send" type="submit" aria-label="Gửi tin nhắn">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -104,6 +108,28 @@
         body.scrollTop = body.scrollHeight;
     }
 
+    function renderChatProducts(body, products) {
+        const old = body.querySelector('.ai-chat-products');
+        if (old) old.remove();
+        if (!Array.isArray(products) || !products.length) return;
+
+        const list = document.createElement('section');
+        list.className = 'ai-chat-products';
+        list.setAttribute('aria-label', 'Sản phẩm chatbot gợi ý');
+        list.innerHTML = products.slice(0, 3).map(product => `
+            <a class="ai-chat-product" href="${root}pages/catalog/product.html?id=${encodeURIComponent(product._id)}">
+                <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}">
+                <span>
+                    <strong>${escapeHTML(product.name)}</strong>
+                    <small>${escapeHTML(product.recommendation?.reason || product.category || '')}</small>
+                    <b>${Number(product.price || 0).toLocaleString('vi-VN')} đ</b>
+                </span>
+            </a>
+        `).join('');
+        body.appendChild(list);
+        body.scrollTop = body.scrollHeight;
+    }
+
     async function askAssistant(message) {
         const token = localStorage.getItem('token');
         const headers = { 'Content-Type': 'application/json' };
@@ -126,6 +152,71 @@
         const form = chat.querySelector('#aiChatForm');
         const input = chat.querySelector('#aiChatInput');
         const sendButton = chat.querySelector('.ai-chat-send');
+        const micButton = chat.querySelector('.ai-chat-mic');
+        const voiceButton = chat.querySelector('.ai-chat-voice');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+        let recognizedText = '';
+        let voiceEnabled = localStorage.getItem('chatVoiceEnabled') === 'true';
+
+        const updateVoiceButton = () => {
+            voiceButton.classList.toggle('active', voiceEnabled);
+            voiceButton.setAttribute('aria-pressed', String(voiceEnabled));
+            voiceButton.setAttribute('aria-label', voiceEnabled ? 'Tắt đọc câu trả lời' : 'Bật đọc câu trả lời');
+        };
+
+        const speak = text => {
+            if (!voiceEnabled || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(String(text || '').replace(/^[-•]\s*/gm, ''));
+            utterance.lang = 'vi-VN';
+            utterance.rate = 1;
+            const voices = window.speechSynthesis.getVoices();
+            utterance.voice = voices.find(voice => voice.lang?.toLowerCase().startsWith('vi')) || null;
+            window.speechSynthesis.speak(utterance);
+        };
+
+        updateVoiceButton();
+        voiceButton.addEventListener('click', () => {
+            voiceEnabled = !voiceEnabled;
+            localStorage.setItem('chatVoiceEnabled', String(voiceEnabled));
+            if (!voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+            updateVoiceButton();
+        });
+
+        if (recognition) {
+            recognition.lang = 'vi-VN';
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.onstart = () => {
+                recognizedText = '';
+                micButton.classList.add('listening');
+                micButton.setAttribute('aria-label', 'Đang nghe, bấm để dừng');
+                input.placeholder = 'Đang nghe tiếng Việt...';
+            };
+            recognition.onresult = event => {
+                recognizedText = Array.from(event.results).map(result => result[0].transcript).join(' ').trim();
+                input.value = recognizedText;
+            };
+            recognition.onerror = event => {
+                if (!['no-speech', 'aborted'].includes(event.error)) {
+                    appendMessage(body, 'ai', 'Không nhận được giọng nói. Bạn hãy cấp quyền micro và thử lại.');
+                }
+            };
+            recognition.onend = () => {
+                micButton.classList.remove('listening');
+                micButton.setAttribute('aria-label', 'Nhập bằng giọng nói');
+                input.placeholder = 'Nhập nhu cầu mua hàng...';
+                if (recognizedText) send(recognizedText);
+            };
+            micButton.addEventListener('click', () => {
+                if (micButton.classList.contains('listening')) recognition.stop();
+                else recognition.start();
+            });
+        } else {
+            micButton.disabled = true;
+            micButton.title = 'Trình duyệt này chưa hỗ trợ nhận dạng giọng nói';
+        }
 
         const send = async (value) => {
             const message = String(value || input.value || '').trim();
@@ -139,8 +230,11 @@
             try {
                 const data = await askAssistant(message);
                 typing.remove();
-                appendMessage(body, 'ai', data.reply || 'Mình chưa có câu trả lời phù hợp.');
+                const reply = data.reply || 'Mình chưa có câu trả lời phù hợp.';
+                appendMessage(body, 'ai', reply);
+                renderChatProducts(body, data.products);
                 renderSuggestions(body, data.suggestions, send);
+                speak(reply);
             } catch (error) {
                 typing.remove();
                 appendMessage(body, 'ai', error.message || 'Có lỗi xảy ra, bạn thử lại giúp mình nhé.');
@@ -157,6 +251,8 @@
 
         chat.querySelector('.ai-chat-close').addEventListener('click', () => {
             chat.classList.remove('open');
+            if (recognition && micButton.classList.contains('listening')) recognition.abort();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         });
 
         form.addEventListener('submit', event => {

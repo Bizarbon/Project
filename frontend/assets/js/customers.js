@@ -70,6 +70,12 @@ if (customerForm) {
             phone: document.getElementById('phone').value.trim(),
             address: document.getElementById('address').value.trim()
         };
+        const password = document.getElementById('password').value;
+        if (!id && !password) {
+            showToast('Vui lòng nhập mật khẩu ban đầu cho khách hàng.', 'error');
+            return;
+        }
+        if (password) data.password = password;
 
         try {
             const method = id ? 'PUT' : 'POST';

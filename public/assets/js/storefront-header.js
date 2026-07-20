@@ -14,7 +14,7 @@
 
     const categoryLinks = categories.map(([value, label, icon]) => {
         const active = currentCategory === value || (!currentCategory && value === 'all' && /index\.html$|\/$/.test(window.location.pathname));
-        return `<a href="${root}index.html?category=${encodeURIComponent(value)}#catalogStart"${active ? ' class="active" aria-current="page"' : ''}><img src="${root}assets/icons/${icon}" alt="">${label}</a>`;
+        return `<li><a href="${root}index.html?category=${encodeURIComponent(value)}#catalogStart"${active ? ' class="active" aria-current="page"' : ''}><img src="${root}assets/icons/${icon}" alt="">${label}</a></li>`;
     }).join('');
 
     const location = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
@@ -29,7 +29,7 @@
 
     const headerHTML = `
         <header class="storefront-header account-storefront-header">
-            <div class="header-main">
+            <section class="header-main" aria-label="Thanh công cụ mua sắm">
                 <div class="header-shell header-main-inner">
                     <a class="storefront-logo" href="${root}index.html" aria-label="TechEcommerce - Trang chủ">
                         <span class="storefront-logo-mark">TE</span>
@@ -41,8 +41,8 @@
                         <input id="sharedStorefrontSearch" name="search" type="search" value="${escapeHTML(currentSearch)}" placeholder="Bạn đang tìm sản phẩm gì?">
                         <button type="submit">Tìm kiếm</button>
                     </form>
-                    <div class="header-actions">
-                        <div id="nav-auth-section"></div>
+                    <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
+                        <span id="nav-auth-section"></span>
                         <a class="header-action-btn" href="${root}index.html?openCart=1" aria-label="Mở giỏ hàng">
                             <span class="header-action-icon" aria-hidden="true">🛒</span>
                             <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
@@ -52,11 +52,11 @@
                             <span class="header-action-icon" aria-hidden="true">⌖</span>
                             <span class="header-action-copy"><small>Khu vực</small><strong data-shopping-location-label>${escapeHTML(location)}</strong></span>
                         </a>
-                    </div>
+                    </nav>
                 </div>
-            </div>
+            </section>
             <nav class="header-categories" aria-label="Danh mục sản phẩm">
-                <div class="header-shell header-category-list">${categoryLinks}</div>
+                <ul class="header-shell header-category-list">${categoryLinks}</ul>
             </nav>
         </header>`;
 

@@ -3,16 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Xem giá, cấu hình, tồn kho, bảo hành và đánh giá sản phẩm công nghệ tại TechEcommerce.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/catalog/product.html">
     <title>Chi tiết sản phẩm - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
     <style>
         .detail-grid {
             display: grid;
             grid-template-columns: minmax(280px, 1.1fr) minmax(280px, 0.9fr);
             gap: 2rem;
             align-items: start;
+        }
+        .detail-media {
+            margin: 0;
         }
         .detail-media img {
             width: 100%;
@@ -70,7 +76,8 @@
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.65rem;
         }
-        .detail-meta span { color: var(--text-secondary); }
+        .detail-meta dt { font-weight: 700; }
+        .detail-meta dd { color: var(--text-secondary); margin: 0; }
         .detail-section {
             margin-top: 1.25rem;
             padding-top: 1.1rem;
@@ -145,7 +152,7 @@
 
 <body>
     <nav>
-        <h1 onclick="window.location.href='../../index.html'">TechEcommerce</h1>
+        <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
         <ul id="main-navbar">
             <li><a href="../../index.html">Cửa hàng</a></li>
             <li><a href="../account/orders.html">Đơn hàng</a></li>
@@ -159,10 +166,10 @@
     <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Chi tiết sản phẩm</h2>
+        <header class="page-header reveal">
+            <h1 id="productPageTitle">Chi tiết sản phẩm</h1>
             <p>Thông tin sản phẩm, bảo hành và tồn kho hiện tại.</p>
-        </div>
+        </header>
         <section id="productDetail" class="detail-grid reveal">
             <div class="empty-state">Đang tải sản phẩm...</div>
         </section>
@@ -170,6 +177,7 @@
             <h2>Đánh giá sản phẩm</h2>
             <div id="reviewSummary" style="color:var(--text-secondary);margin-bottom:1rem;"></div>
             <form id="reviewForm" style="display:none;grid-template-columns:120px 1fr;gap:.8rem;margin-bottom:1rem;">
+                <label class="sr-only" for="reviewRating">Số sao đánh giá</label>
                 <select id="reviewRating">
                     <option value="5">5 sao</option>
                     <option value="4">4 sao</option>
@@ -177,7 +185,9 @@
                     <option value="2">2 sao</option>
                     <option value="1">1 sao</option>
                 </select>
+                <label class="sr-only" for="reviewTitle">Tiêu đề đánh giá</label>
                 <input id="reviewTitle" type="text" placeholder="Tiêu đề ngắn cho đánh giá">
+                <label class="sr-only" for="reviewComment">Nội dung đánh giá</label>
                 <textarea id="reviewComment" class="full-width" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm"></textarea>
                 <div class="form-actions full-width">
                     <button type="submit" class="btn-primary">Gửi đánh giá</button>

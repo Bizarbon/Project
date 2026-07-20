@@ -31,6 +31,47 @@ const PAYMENT_MAP = {
     installment: 'installment'
 };
 
+const STATUS_HISTORY_CONTENT = {
+    pending: {
+        title: 'Đã tiếp nhận đơn hàng',
+        description: 'Đơn hàng đã được ghi nhận và đang chờ cửa hàng xác nhận.'
+    },
+    processing: {
+        title: 'Đang kiểm hàng và đóng gói',
+        description: 'Sản phẩm đang được kiểm tra ngoại quan, phụ kiện và niêm phong trước khi giao.'
+    },
+    shipping: {
+        title: 'Đã bàn giao đơn vị vận chuyển',
+        description: 'Đơn hàng đang trên đường đến địa chỉ nhận hàng.'
+    },
+    completed: {
+        title: 'Giao hàng thành công',
+        description: 'Người nhận đã nhận hàng. Bạn có thể kiểm tra sản phẩm và gửi đánh giá.'
+    },
+    cancelled: {
+        title: 'Đơn hàng đã hủy',
+        description: 'Đơn hàng không tiếp tục được xử lý.'
+    },
+    returned: {
+        title: 'Đang hoàn hoặc đổi trả',
+        description: 'Yêu cầu hoàn hoặc đổi trả đang được cửa hàng tiếp nhận.'
+    },
+    boom: {
+        title: 'Giao hàng không thành công',
+        description: 'Đơn hàng không thể giao đến người nhận.'
+    }
+};
+
+function statusHistoryEntry(status, description = '') {
+    const content = STATUS_HISTORY_CONTENT[status] || { title: status, description: '' };
+    return {
+        status,
+        title: content.title,
+        description: String(description || content.description).trim(),
+        occurredAt: new Date()
+    };
+}
+
 function normalizePaymentMethod(value) {
     return PAYMENT_MAP[value] || 'cod';
 }
@@ -180,7 +221,8 @@ router.post('/', protect, async (req, res) => {
                 shippingFee,
                 note: req.body.note || '',
                 paymentMetadata: checkoutOrigin ? { checkoutOrigin } : {},
-                status: 'pending'
+                status: 'pending',
+                statusHistory: [statusHistoryEntry('pending')]
             }).save();
         } catch (saveError) {
             await rollbackStock(productsWithNames);
@@ -244,6 +286,8 @@ router.post('/:id/cancel', protect, async (req, res) => {
 
         await restoreOrderStock(order);
         order.status = 'cancelled';
+        order.statusHistory = order.statusHistory || [];
+        order.statusHistory.push(statusHistoryEntry('cancelled'));
         if (order.paymentStatus === 'pending') order.paymentStatus = 'failed';
         await order.save();
         res.json(order);
@@ -265,11 +309,17 @@ router.put('/:id', protect, admin, async (req, res) => {
                 await reReserveOrderStock(order);
             }
             order.status = req.body.status;
+            order.statusHistory = order.statusHistory || [];
+            order.statusHistory.push(statusHistoryEntry(req.body.status, req.body.statusNote));
+            if (req.body.status === 'completed') order.deliveredAt = new Date();
         }
 
-        ['trackingNumber', 'shippingUnit', 'note', 'recipientName', 'recipientPhone', 'shippingAddress'].forEach(field => {
+        ['trackingNumber', 'shippingUnit', 'note', 'inspectionNote', 'recipientName', 'recipientPhone', 'shippingAddress'].forEach(field => {
             if (req.body[field] !== undefined) order[field] = req.body[field];
         });
+        if (req.body.estimatedDeliveryAt !== undefined) {
+            order.estimatedDeliveryAt = req.body.estimatedDeliveryAt || null;
+        }
         if (req.body.shippingFee !== undefined) order.shippingFee = Math.max(Number(req.body.shippingFee) || 0, 0);
 
         await order.save();

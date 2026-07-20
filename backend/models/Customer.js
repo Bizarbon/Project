@@ -43,6 +43,28 @@ const customerSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    loginAttempts: {
+        type: Number,
+        default: 0,
+        select: false
+    },
+    lockUntil: {
+        type: Date,
+        default: null,
+        select: false
+    },
+    lastLoginAt: {
+        type: Date,
+        default: null
+    },
+    passwordChangedAt: {
+        type: Date,
+        default: null
+    },
+    tokenVersion: {
+        type: Number,
+        default: 0
+    },
     wishlist: [{
         type: Number,
         ref: 'Product'
@@ -56,6 +78,10 @@ customerSchema.pre('save', async function() {
         if (this.password) {
             const salt = await bcrypt.genSalt(12);
             this.password = await bcrypt.hash(this.password, salt);
+            if (!this.isNew) {
+                this.passwordChangedAt = new Date();
+                this.tokenVersion = Number(this.tokenVersion || 0) + 1;
+            }
         }
     }
     

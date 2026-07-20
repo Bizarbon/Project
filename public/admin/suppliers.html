@@ -3,12 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị đối tác cung ứng và chính sách bảo hành TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/suppliers.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Quản lý nhà cung cấp - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260709-2">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-fluid-20260712-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260715-2">
     <style>
         .policy-badge {
             display: inline-block;
@@ -87,8 +90,8 @@
 </head>
 
 <body class="admin-page">
-    <nav>
-        <h1 onclick="window.location.href='../index.html'">TechEcommerce Admin</h1>
+    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
+        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
         <ul id="main-navbar">
             <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
             <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
@@ -99,41 +102,41 @@
             <li><a href="suppliers.html?v=techecommerce-20260709-2" class="active">Nhà cung cấp</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
-    </nav>
+    </nav></header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Quản lý nhà cung cấp</h2>
+        <header class="page-header reveal">
+            <h1>Quản lý nhà cung cấp</h1>
             <p>Quản lý đối tác cung ứng, bảo hành và nguồn hàng.</p>
-        </div>
+        </header>
 
         <section class="form-section glass-card reveal">
             <h2 id="formTitle">Thêm nhà cung cấp mới</h2>
             <form id="supplierForm">
                 <div class="form-group">
-                    <label>Tên nhà cung cấp</label>
+                    <label for="sName">Tên nhà cung cấp</label>
                     <input type="text" id="sName" placeholder="VD: Công ty TNHH ABC" required>
                 </div>
                 <div class="form-group">
-                    <label>Số điện thoại</label>
+                    <label for="sPhone">Số điện thoại</label>
                     <input type="tel" id="sPhone" placeholder="0901 234 567">
                 </div>
                 <div class="form-group">
-                    <label>Email liên hệ</label>
+                    <label for="sEmail">Email liên hệ</label>
                     <input type="email" id="sEmail" placeholder="supplier@email.com">
                 </div>
                 <div class="form-group">
-                    <label>Thời gian giao hàng (ngày)</label>
+                    <label for="sDelivery">Thời gian giao hàng (ngày)</label>
                     <input type="number" id="sDelivery" placeholder="3" min="0" value="3">
                 </div>
                 <div class="form-group full-width">
-                    <label>Địa điểm kho/văn phòng</label>
+                    <label for="sAddress">Địa điểm kho/văn phòng</label>
                     <input type="text" id="sAddress" placeholder="Số nhà, đường, quận, thành phố...">
                 </div>
                 <div class="form-group">
-                    <label>Chính sách bảo hành/đổi trả</label>
+                    <label for="sPolicy">Chính sách bảo hành/đổi trả</label>
                     <select id="sPolicy">
                         <option value="7_days">Đổi trả 7 ngày</option>
                         <option value="15_days">Đổi trả 15 ngày</option>
@@ -143,7 +146,7 @@
                     </select>
                 </div>
                 <div class="form-group full-width">
-                    <label>Ghi chú quan trọng</label>
+                    <label for="sNotes">Ghi chú quan trọng</label>
                     <textarea id="sNotes" placeholder="Nhập lưu ý đặc biệt, ưu đãi, chiết khấu..."></textarea>
                 </div>
                 <div class="form-actions">
@@ -162,7 +165,7 @@
     </main>
 
     <script src="../assets/js/suppliers.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 
 </html>

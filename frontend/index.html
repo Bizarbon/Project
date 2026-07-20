@@ -2,10 +2,19 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Mua điện thoại, laptop, tablet, tai nghe, đồng hồ thông minh và phụ kiện chính hãng tại TechEcommerce." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:site_name" content="TechEcommerce" />
+    <meta property="og:title" content="TechEcommerce - Cửa hàng công nghệ" />
+    <meta property="og:description" content="Khám phá sản phẩm công nghệ chính hãng, so sánh cấu hình và mua sắm trực tuyến thuận tiện." />
+    <meta property="og:url" content="https://techecommerce-shop.vercel.app/" />
     <title>TechEcommerce - Cửa hàng công nghệ</title>
     <link rel="stylesheet" href="assets/css/style.css?v=cart-flash-20260709-1" />
-    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=address-tools-20260712-1" />
+    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=site-layout-20260715-2" />
     <style>
       .cart-drawer[aria-hidden='true'] {
         transform: translateX(calc(100% + 96px)) !important;
@@ -237,15 +246,15 @@
 
   <body>
     <header class="storefront-header">
-      <div class="header-promotion">
+      <aside class="header-promotion" aria-label="Chương trình ưu đãi">
         <div class="header-shell promotion-inner">
           <span class="promotion-label">Ưu đãi sinh viên</span>
           <strong>Giảm đến 3 triệu khi mua MacBook và iPad</strong>
           <button type="button" data-header-category="Laptop">Xem ưu đãi</button>
         </div>
-      </div>
+      </aside>
 
-      <div class="header-main">
+      <section class="header-main" aria-label="Thanh công cụ mua sắm">
         <div class="header-shell header-main-inner">
           <a class="storefront-logo" href="index.html" aria-label="TechEcommerce - Trang chủ">
             <span class="storefront-logo-mark">TE</span>
@@ -259,8 +268,8 @@
             <button type="submit">Tìm kiếm</button>
           </form>
 
-          <div class="header-actions">
-            <div id="nav-auth-section"><!-- Auth section injected by auth.js --></div>
+          <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
+            <span id="nav-auth-section"><!-- Auth section injected by auth.js --></span>
 
             <button class="header-action-btn header-cart-btn" id="headerCartButton" type="button" onclick="toggleCartDrawer()" aria-label="Mở giỏ hàng">
               <span class="header-action-icon" aria-hidden="true">🛒</span>
@@ -268,31 +277,31 @@
               <span class="header-cart-badge" id="headerCartBadge" hidden>0</span>
             </button>
 
-            <div class="header-location">
+            <span class="header-location">
               <button class="header-action-btn header-location-toggle" id="headerLocationToggle" type="button" aria-expanded="false" aria-controls="addressModal">
                 <span class="header-action-icon" aria-hidden="true">⌖</span>
                 <span class="header-action-copy"><small>Khu vực</small><strong id="headerLocationLabel">Hồ Chí Minh</strong></span>
                 <span aria-hidden="true">›</span>
               </button>
-            </div>
-          </div>
+            </span>
+          </nav>
         </div>
-      </div>
+      </section>
 
-      <div class="header-categories" role="navigation" aria-label="Danh mục sản phẩm">
-        <div class="header-shell header-category-list">
-          <button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản phẩm</button>
-          <button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện thoại</button>
-          <button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg" alt="" />Laptop</button>
-          <button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg" alt="" />Tablet</button>
-          <button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai nghe</button>
-          <button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg" alt="" />Đồng hồ thông minh</button>
-          <button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ kiện</button>
-        </div>
-      </div>
+      <nav class="header-categories" aria-label="Danh mục sản phẩm">
+        <ul class="header-shell header-category-list">
+          <li><button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản phẩm</button></li>
+          <li><button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện thoại</button></li>
+          <li><button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg" alt="" />Laptop</button></li>
+          <li><button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg" alt="" />Tablet</button></li>
+          <li><button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai nghe</button></li>
+          <li><button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg" alt="" />Đồng hồ thông minh</button></li>
+          <li><button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ kiện</button></li>
+        </ul>
+      </nav>
     </header>
 
-    <div class="address-modal" id="addressModal" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle" aria-hidden="true">
+    <aside class="address-modal" id="addressModal" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle" aria-hidden="true" inert>
       <div class="address-modal-backdrop" data-address-close></div>
       <section class="address-dialog">
         <header class="address-dialog-header">
@@ -340,7 +349,7 @@
           <button type="button" class="address-back" id="addressBackButton">‹ Nhập bằng gợi ý địa chỉ</button>
         </div>
       </section>
-    </div>
+    </aside>
 
     <script src="assets/js/animations.js"></script>
     <script src="assets/js/auth.js?v=account-ui-20260711-1"></script>
@@ -374,6 +383,7 @@
             class="hero-slide"
             style="--hero-image: url('assets/images/banner-laptop.jpg')"
             aria-hidden="true"
+            inert
           >
             <div class="hero-slide-content">
               <span class="hero-eyebrow">Laptop cho mọi nhu cầu</span>
@@ -391,6 +401,7 @@
             class="hero-slide"
             style="--hero-image: url('assets/images/banner-watch.jpg')"
             aria-hidden="true"
+            inert
           >
             <div class="hero-slide-content">
               <span class="hero-eyebrow">Thiết bị thông minh</span>
@@ -474,14 +485,18 @@
       </section>
 
       <div class="flex-layout">
-        <section class="main-content">
-          <div class="shop-toolbar reveal">
+        <section class="main-content" id="catalogStart" aria-label="Danh sách và bộ lọc sản phẩm">
+          <fieldset class="shop-toolbar" id="catalogFilters">
+            <legend class="sr-only">Bộ lọc sản phẩm</legend>
+            <label class="sr-only" for="searchInput">Tìm sản phẩm hoặc danh mục</label>
+            <label class="sr-only" for="minPrice">Giá thấp nhất</label>
             <input
               data-product-filter
               id="searchInput"
               type="search"
               placeholder="Tìm sản phẩm, danh mục..."
             />
+            <label class="sr-only" for="maxPrice">Giá cao nhất</label>
             <input
               data-product-filter
               id="minPrice"
@@ -496,9 +511,11 @@
               min="0"
               placeholder="Giá đến"
             />
+            <label class="sr-only" for="brandFilter">Lọc theo thương hiệu</label>
             <select data-product-filter id="brandFilter">
               <option value="all">Tất cả thương hiệu</option>
             </select>
+            <label class="sr-only" for="sortProducts">Sắp xếp sản phẩm</label>
             <select data-product-filter id="sortProducts">
               <option value="">Sắp xếp mặc định</option>
               <option value="newest">Mới nhất</option>
@@ -518,29 +535,27 @@
               />
               Còn hàng
             </label>
-          </div>
-          <div class="catalog-heading" id="catalogStart">
-            <div>
-              <span class="catalog-eyebrow">Danh mục sản phẩm</span>
-              <h2 id="catalogTitle">Tất cả sản phẩm</h2>
-            </div>
-            <div id="resultCount">0 sản phẩm</div>
-          </div>
-          <div
-            class="category-nav reveal"
-            id="categoryNav"
-            role="group"
-            aria-label="Lọc theo danh mục"
-          ></div>
-          <div id="productSections" class="reveal"></div>
+          </fieldset>
+          <div id="productSections"></div>
+
+          <section class="recommendation-section" id="productRecommendations" aria-labelledby="recommendationTitle" hidden>
+            <header class="recommendation-heading">
+              <div>
+                <span class="catalog-eyebrow">Gợi ý thông minh</span>
+                <h2 id="recommendationTitle">Có thể bạn sẽ thích</h2>
+              </div>
+              <p id="recommendationDescription">Sản phẩm được chọn theo mức độ nổi bật và nhu cầu mua sắm.</p>
+            </header>
+            <div class="product-grid recommendation-grid" id="recommendationGrid"></div>
+          </section>
         </section>
 
-        <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+        <aside class="cart-drawer" id="cartDrawer" aria-labelledby="cartDrawerTitle" aria-hidden="true" inert>
           <section class="cart-section reveal glass-card">
             <div class="cart-drawer-header">
               <div>
                 <span class="cart-eyebrow">Đơn hàng của bạn</span>
-                <h2>Giỏ hàng</h2>
+                <h2 id="cartDrawerTitle">Giỏ hàng</h2>
               </div>
               <button
                 type="button"
@@ -551,14 +566,12 @@
                 ×
               </button>
             </div>
-            <h2>🛒 Giỏ hàng</h2>
-
             <div
               id="customerSelectionGroup"
               class="form-group"
               style="display: none"
             >
-              <label>Chọn khách hàng</label>
+              <label for="customerSelect">Chọn khách hàng</label>
               <select id="customerSelect" class="customer-select"></select>
             </div>
 
@@ -595,7 +608,7 @@
 
             <div class="checkout-panel" id="checkoutPanel">
               <div class="form-group">
-                <label>Người nhận</label>
+                <label for="recipientName">Người nhận</label>
                 <input
                   id="recipientName"
                   type="text"
@@ -603,7 +616,7 @@
                 />
               </div>
               <div class="form-group">
-                <label>Số điện thoại</label>
+                <label for="recipientPhone">Số điện thoại</label>
                 <input
                   id="recipientPhone"
                   type="tel"
@@ -611,7 +624,7 @@
                 />
               </div>
               <div class="form-group">
-                <label>Địa chỉ giao hàng</label>
+                <label for="shippingAddress">Địa chỉ giao hàng</label>
                 <input
                   id="shippingAddress"
                   type="text"
@@ -619,11 +632,11 @@
                 />
               </div>
               <div class="form-group">
-                <label>Phí vận chuyển</label>
+                <label for="shippingFee">Phí vận chuyển</label>
                 <input id="shippingFee" type="number" min="0" value="30000" />
               </div>
               <div class="form-group">
-                <label>Mã giảm giá</label>
+                <label for="couponCode">Mã giảm giá</label>
                 <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem">
                   <input id="couponCode" type="text" placeholder="VD: TECH10" />
                   <button type="button" class="btn-secondary" onclick="applyCoupon()">Áp dụng</button>
@@ -634,7 +647,7 @@
                 ></div>
               </div>
               <div class="form-group">
-                <label>Phương thức thanh toán</label>
+                <label for="paymentMethod">Phương thức thanh toán</label>
                 <select id="paymentMethod">
                   <option value="cod">Thanh toán khi nhận hàng (COD)</option>
                   <option value="bank_transfer">Chuyển khoản thủ công</option>
@@ -659,13 +672,14 @@
                 Nội dung: TECHECOMMERCE + mã đơn sau khi đặt.
               </div>
               <div class="form-group">
-                <label>Ghi chú</label>
+                <label for="orderNote">Ghi chú</label>
                 <textarea
                   id="orderNote"
                   placeholder="Lưu ý giao hàng, thời gian nhận..."
                 ></textarea>
               </div>
               <button
+                type="button"
                 class="btn-checkout"
                 id="checkoutBtn"
                 onclick="createOrder()"
@@ -726,7 +740,7 @@
               placeholder="Email của bạn..."
               id="newsletterEmail"
             />
-            <button onclick="subscribeNewsletter()">Đăng ký</button>
+            <button type="button" onclick="subscribeNewsletter()">Đăng ký</button>
           </div>
         </div>
       </div>

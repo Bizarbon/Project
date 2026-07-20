@@ -4,9 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Theo dõi trạng thái xử lý, thanh toán và vận chuyển đơn hàng TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/account/orders.html">
     <title>Đơn hàng của tôi - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
     <style>
         .orders-shell { display: grid; gap: 1rem; }
         .order-card {
@@ -46,14 +52,14 @@
             gap: 0.45rem;
             margin-bottom: 1rem;
         }
-        .order-products-list div,
+        .order-products-list li,
         .order-meta-grid div {
             display: flex;
             justify-content: space-between;
             gap: 1rem;
         }
         .order-products-list span,
-        .order-meta-grid span {
+        .order-meta-grid dd {
             color: var(--text-secondary);
             text-align: right;
         }
@@ -62,26 +68,31 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 0.7rem 1.5rem;
         }
+        .order-products-list { list-style: none; padding: 0; }
+        .order-meta-grid dd { margin: 0; }
         .money { color: var(--primary) !important; font-weight: 800; }
         .order-actions {
             margin-top: 1.2rem;
             display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
             justify-content: flex-end;
         }
+        .order-tracking-link { text-decoration: none; }
         @media (max-width: 700px) {
             .order-head { flex-direction: column; }
             .order-meta-grid { grid-template-columns: 1fr; }
-            .order-products-list div,
+            .order-products-list li,
             .order-meta-grid div { flex-direction: column; gap: 0.2rem; }
             .order-products-list span,
-            .order-meta-grid span { text-align: left; }
+            .order-meta-grid dd { text-align: left; }
         }
     </style>
 </head>
 
 <body>
     <nav>
-        <h1 onclick="window.location.href='../../index.html'">TechEcommerce</h1>
+        <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
         <ul id="main-navbar">
             <li><a href="../../index.html">Cửa hàng</a></li>
             <li><a href="orders.html" class="active">Đơn hàng</a></li>
@@ -95,23 +106,23 @@
     <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
 
     <main class="container fade-in">
-        <div class="page-header reveal">
-            <h2>Đơn hàng của tôi</h2>
+        <header class="page-header reveal">
+            <h1>Đơn hàng của tôi</h1>
             <p>Theo dõi trạng thái xử lý, thanh toán và vận chuyển.</p>
-        </div>
-        <div class="stats-grid reveal" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-            <div class="stat-card">
+        </header>
+        <section class="stats-grid reveal" aria-label="Thống kê đơn hàng" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <article class="stat-card">
                 <div class="stat-icon">ORD</div>
                 <div class="stat-value" id="orderCount">0</div>
                 <div class="stat-label">Tổng đơn</div>
-            </div>
-        </div>
-        <section id="ordersList" class="orders-shell reveal">
+            </article>
+        </section>
+        <section id="ordersList" class="orders-shell reveal" aria-label="Danh sách đơn hàng">
             <div class="empty-state">Đang tải đơn hàng...</div>
         </section>
     </main>
 
-    <script src="../../assets/js/my-orders.js"></script>
+    <script src="../../assets/js/my-orders.js?v=order-flow-20260720-1"></script>
     <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
     <script src="../../assets/js/chatbox.js"></script>
 </body>

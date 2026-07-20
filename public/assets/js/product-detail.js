@@ -161,13 +161,42 @@ function renderProduct() {
     const gallery = [product.image, ...(product.images || [])].filter(Boolean);
     const uniqueGallery = [...new Set(gallery)];
 
-    document.title = `${product.name} - TechStore`;
+    document.title = `${product.name} - TechEcommerce`;
+    document.getElementById('productPageTitle').textContent = product.name;
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.href = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(product._id)}`;
+    document.querySelector('script[data-product-schema]')?.remove();
+    const productSchema = document.createElement('script');
+    productSchema.type = 'application/ld+json';
+    productSchema.dataset.productSchema = 'true';
+    productSchema.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: product.name,
+        image: uniqueGallery,
+        description: product.description || undefined,
+        sku: product.sku || undefined,
+        brand: product.brand ? { '@type': 'Brand', name: product.brand } : undefined,
+        offers: {
+            '@type': 'Offer',
+            priceCurrency: 'VND',
+            price: Number(product.price) || 0,
+            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            url: window.location.href
+        },
+        aggregateRating: product.rating ? {
+            '@type': 'AggregateRating',
+            ratingValue: Number(product.rating),
+            reviewCount: Number(product.reviewCount) || reviews.length || 1
+        } : undefined
+    });
+    document.head.appendChild(productSchema);
     document.getElementById('productDetail').innerHTML = `
-        <div class="detail-media">
+        <figure class="detail-media">
             <img id="mainProductImage" src="${escapeHTML(uniqueGallery[0] || product.image)}" alt="${escapeHTML(product.name)}" onerror="this.src='https://via.placeholder.com/700x460?text=No+Image'">
-            ${uniqueGallery.length > 1 ? `<div class="detail-thumbs">${uniqueGallery.map(src => `<button type="button" onclick="document.getElementById('mainProductImage').src='${escapeHTML(src)}'"><img src="${escapeHTML(src)}" alt=""></button>`).join('')}</div>` : ''}
-        </div>
-        <div class="detail-info">
+            ${uniqueGallery.length > 1 ? `<nav class="detail-thumbs" aria-label="Ảnh sản phẩm">${uniqueGallery.map((src, index) => `<button type="button" onclick="document.getElementById('mainProductImage').src='${escapeHTML(src)}'" aria-label="Xem ảnh ${index + 1}"><img src="${escapeHTML(src)}" alt=""></button>`).join('')}</nav>` : ''}
+        </figure>
+        <article class="detail-info">
             <span class="category-badge">${escapeHTML(product.category)}</span>
             ${product.featured ? '<span class="category-badge" style="margin-left:.4rem;background:rgba(245,158,11,.16);color:var(--warning)">Nổi bật</span>' : ''}
             <h2>${escapeHTML(product.name)}</h2>
@@ -178,14 +207,14 @@ function renderProduct() {
             <p class="detail-price">${fmt(product.price)}</p>
             ${discount ? `<p class="compare-price" style="font-size:1rem;margin-top:-.7rem;">${fmt(product.compareAtPrice)} • Tiết kiệm ${discount}%</p>` : ''}
             <p class="detail-desc">${escapeHTML(product.description || 'Chưa có mô tả chi tiết.')}</p>
-            <div class="detail-meta">
-                <div><strong>Thương hiệu</strong><span>${escapeHTML(product.brand || 'Đang cập nhật')}</span></div>
-                <div><strong>Ngày đăng bán</strong><span>${formatDate(product.createdAt)}</span></div>
-                <div><strong>Tồn kho</strong><span>${product.stock}</span></div>
-                <div><strong>Bảo hành</strong><span>${escapeHTML(product.warranty || 'Không bảo hành')}</span></div>
-                <div><strong>Nhà cung cấp</strong><span>${escapeHTML(product.supplier?.name || 'Đang cập nhật')}</span></div>
-            </div>
-            <div class="detail-section">
+            <dl class="detail-meta">
+                <div><dt>Thương hiệu</dt><dd>${escapeHTML(product.brand || 'Đang cập nhật')}</dd></div>
+                <div><dt>Ngày đăng bán</dt><dd><time datetime="${escapeHTML(product.createdAt || '')}">${formatDate(product.createdAt)}</time></dd></div>
+                <div><dt>Tồn kho</dt><dd>${product.stock}</dd></div>
+                <div><dt>Bảo hành</dt><dd>${escapeHTML(product.warranty || 'Không bảo hành')}</dd></div>
+                <div><dt>Nhà cung cấp</dt><dd>${escapeHTML(product.supplier?.name || 'Đang cập nhật')}</dd></div>
+            </dl>
+            <section class="detail-section">
                 <h3>Thông số kỹ thuật</h3>
                 <div class="spec-grid">
                     ${specs.map(([label, value]) => `
@@ -195,27 +224,28 @@ function renderProduct() {
                         </div>
                     `).join('')}
                 </div>
-            </div>
-            <div class="detail-section">
+            </section>
+            <section class="detail-section">
                 <h3>Gợi ý sử dụng</h3>
                 <ul class="detail-list">
                     ${ideas.map(item => `<li>${escapeHTML(item)}</li>`).join('')}
                 </ul>
-            </div>
-            <div class="detail-section">
+            </section>
+            <section class="detail-section">
                 <h3>Cam kết TechStore</h3>
                 <ul class="detail-list">
                     <li>Kiểm tra tồn kho ở backend trước khi tạo đơn.</li>
                     <li>Hỗ trợ COD, chuyển khoản, MoMo và VNPay sandbox/mock.</li>
                     <li>Thông tin giá, tồn kho và bảo hành được quản lý từ trang admin.</li>
                 </ul>
-            </div>
+            </section>
             <div class="detail-actions">
+                <label class="sr-only" for="detailQty">Số lượng</label>
                 <input id="detailQty" type="number" min="1" max="${product.stock}" value="1" ${product.stock <= 0 ? 'disabled' : ''}>
                 <button class="btn-primary" onclick="addToCart('${product._id}')" ${product.stock <= 0 ? 'disabled' : ''}>Thêm vào giỏ</button>
                 <button class="btn-secondary" onclick="toggleWishlist('${product._id}').catch(err => showToast(err.message, 'error'))">${liked ? '♥ Đã thích' : '♡ Yêu thích'}</button>
             </div>
-        </div>
+        </article>
     `;
 
     document.getElementById('relatedProducts').innerHTML = relatedProducts.map(p => `

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Theo dõi quá trình kiểm hàng, giao hàng và đánh giá đơn hàng TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Quá trình giao hàng - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=order-flow-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/order-tracking.css?v=order-flow-20260720-1">
+</head>
+
+<body>
+    <nav aria-label="Điều hướng tài khoản">
+        <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
+        <ul id="main-navbar">
+            <li><a href="../../index.html">Cửa hàng</a></li>
+            <li><a href="orders.html" class="active">Đơn hàng</a></li>
+            <li><a href="profile.html">Hồ sơ</a></li>
+            <li class="admin-only"><a href="../../admin/dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../../assets/js/animations.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+
+    <main class="container tracking-page fade-in">
+        <nav class="tracking-breadcrumb" aria-label="Đường dẫn">
+            <a href="orders.html">Đơn hàng của tôi</a>
+            <span aria-hidden="true">/</span>
+            <span>Quá trình giao hàng</span>
+        </nav>
+
+        <header class="page-header tracking-heading reveal">
+            <div>
+                <p class="tracking-eyebrow">THEO DÕI ĐƠN HÀNG</p>
+                <h1 id="trackingTitle">Quá trình giao hàng</h1>
+                <p id="trackingSubtitle">Đang tải thông tin đơn hàng...</p>
+            </div>
+            <a class="tracking-back" href="orders.html">Quay lại danh sách</a>
+        </header>
+
+        <nav class="tracking-section-nav reveal" aria-label="Nội dung đơn hàng">
+            <a href="#journey">Hành trình</a>
+            <a href="#inspection">Kiểm hàng</a>
+            <a href="#products">Sản phẩm</a>
+            <a href="#review">Đánh giá</a>
+        </nav>
+
+        <section id="trackingContent" aria-live="polite">
+            <p class="empty-state">Đang tải quá trình giao hàng...</p>
+        </section>
+    </main>
+
+    <script src="../../assets/js/order-tracking.js?v=order-flow-20260720-1"></script>
+    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../../assets/js/chatbox.js"></script>
+</body>
+
+</html>

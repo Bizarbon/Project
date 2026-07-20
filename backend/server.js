@@ -2,6 +2,8 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 const productRoutes = require('./routes/productRoutes');
@@ -22,12 +24,44 @@ const PORT = process.env.PORT || 5000;
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const IS_VERCEL = Boolean(process.env.VERCEL);
 
+function validateSecurityConfig() {
+    if (!process.env.JWT_SECRET || String(process.env.JWT_SECRET).length < 32) {
+        const message = 'JWT_SECRET phải có ít nhất 32 ký tự.';
+        if (process.env.NODE_ENV === 'production') throw new Error(message);
+        console.warn(`Security warning: ${message}`);
+    }
+}
+
+validateSecurityConfig();
+
 app.disable('x-powered-by');
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+const allowedOrigins = new Set([
+    process.env.APP_BASE_URL,
+    process.env.FRONTEND_BASE_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '',
+    'http://localhost:5000',
+    'http://localhost:5500',
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:5500'
+].filter(Boolean).map(value => String(value).replace(/\/$/, '')));
+
+app.use(helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false
+}));
+app.use(cors((req, callback) => {
+    const origin = String(req.get('origin') || '').replace(/\/$/, '');
+    const forwardedProto = String(req.get('x-forwarded-proto') || '').split(',')[0].trim();
+    const protocol = forwardedProto || req.protocol;
+    const requestOrigin = `${protocol}://${req.get('host')}`.replace(/\/$/, '');
+    const permitted = !origin || origin === requestOrigin || allowedOrigins.has(origin);
+    callback(null, { origin: permitted, credentials: false });
+}));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
 
 app.use((req, res, next) => {
     if (process.env.NODE_ENV !== 'production' || req.path.startsWith('/api')) {
@@ -35,6 +69,15 @@ app.use((req, res, next) => {
     }
     next();
 });
+
+app.use('/api', rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 500,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    skip: req => req.path === '/health' || req.path.includes('/payments/vnpay/ipn') || req.path.includes('/payments/momo/ipn'),
+    message: { message: 'Hệ thống nhận quá nhiều yêu cầu. Vui lòng thử lại sau.' }
+}));
 
 app.use('/api', async (req, res, next) => {
     try {

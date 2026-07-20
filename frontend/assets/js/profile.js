@@ -179,9 +179,16 @@ if (profileForm) {
 
         const newPass = document.getElementById('pPassword').value;
         const confirmPass = document.getElementById('pPasswordConfirm').value;
+        const currentPass = document.getElementById('pCurrentPassword').value;
         if (newPass !== confirmPass) return showToast('Mật khẩu xác nhận chưa khớp.', 'error');
-        if (newPass && newPass.length < 6) return showToast('Mật khẩu mới phải có ít nhất 6 ký tự.', 'error');
-        if (newPass) payload.password = newPass;
+        if (newPass && (newPass.length < 8 || !/[a-z]/.test(newPass) || !/[A-Z]/.test(newPass) || !/\d/.test(newPass))) {
+            return showToast('Mật khẩu mới cần ít nhất 8 ký tự, có chữ hoa, chữ thường và chữ số.', 'error');
+        }
+        if (newPass && !currentPass) return showToast('Vui lòng nhập mật khẩu hiện tại.', 'error');
+        if (newPass) {
+            payload.password = newPass;
+            payload.currentPassword = currentPass;
+        }
 
         try {
             const res = await fetch(`${EP}/${user.id}`, {
@@ -194,6 +201,12 @@ if (profileForm) {
             if (!res.ok) throw new Error(data.message);
 
             showToast('Cập nhật hồ sơ thành công!');
+
+            if (data.sessionInvalidated) {
+                showToast('Đổi mật khẩu thành công. Vui lòng đăng nhập lại.');
+                setTimeout(() => auth.logout(), 900);
+                return;
+            }
             
             // Update local storage name if it changed
             user.name = payload.name;
@@ -203,6 +216,7 @@ if (profileForm) {
             syncLocalShoppingAddress(user.address);
             document.getElementById('pPassword').value = '';
             document.getElementById('pPasswordConfirm').value = '';
+            document.getElementById('pCurrentPassword').value = '';
             
             // Reload UI
             loadProfile();

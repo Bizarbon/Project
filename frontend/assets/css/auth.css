@@ -146,13 +146,19 @@ body {
     transform: scale(1.1);
 }
 
-.brand-logo h2 {
+.brand-logo h2,
+.brand-logo strong {
     font-size: 2.2rem;
     font-weight: 800;
     background: linear-gradient(135deg, #fff 30%, var(--primary-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -1px;
+}
+
+.brand-logo a {
+    color: inherit;
+    text-decoration: none;
 }
 
 .auth-header {

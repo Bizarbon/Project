@@ -74,7 +74,7 @@ async function loadMyOrders() {
 function orderCard(order) {
     return `
         <article class="order-card glass-card">
-            <div class="order-head">
+            <header class="order-head">
                 <div>
                     <h3>#${String(order._id).padStart(4, '0')}</h3>
                     <p>${formatDate(order.orderDate || order.createdAt)}</p>
@@ -83,24 +83,25 @@ function orderCard(order) {
                     <span class="status-badge status-${order.status}">${statusLabels[order.status] || order.status}</span>
                     <span class="pay-badge pay-${order.paymentStatus}">${paymentLabels[order.paymentStatus] || order.paymentStatus}</span>
                 </div>
-            </div>
-            <div class="order-products-list">
+            </header>
+            <ul class="order-products-list">
                 ${(order.products || []).map(item => `
-                    <div>
+                    <li>
                         <span>${escapeHTML(item.product?.name || item.productName || 'Sản phẩm')}</span>
                         <strong>× ${item.quantity}</strong>
-                    </div>
+                    </li>
                 `).join('')}
-            </div>
-            <div class="order-meta-grid">
-                <div><strong>Người nhận</strong><span>${escapeHTML(order.recipientName || order.customerName || '')}</span></div>
-                <div><strong>SĐT</strong><span>${escapeHTML(order.recipientPhone || order.customerPhone || '')}</span></div>
-                <div><strong>Địa chỉ</strong><span>${escapeHTML(order.shippingAddress || '')}</span></div>
-                <div><strong>Thanh toán</strong><span>${methodLabels[order.paymentMethod] || order.paymentMethod}</span></div>
-                <div><strong>Vận chuyển</strong><span>${order.trackingNumber ? `${escapeHTML(order.shippingUnit || '')} - ${escapeHTML(order.trackingNumber)}` : 'Chưa có mã vận đơn'}</span></div>
-                <div><strong>Tổng tiền</strong><span class="money">${fmt(order.totalAmount)}</span></div>
-            </div>
+            </ul>
+            <dl class="order-meta-grid">
+                <div><dt>Người nhận</dt><dd>${escapeHTML(order.recipientName || order.customerName || '')}</dd></div>
+                <div><dt>SĐT</dt><dd>${escapeHTML(order.recipientPhone || order.customerPhone || '')}</dd></div>
+                <div><dt>Địa chỉ</dt><dd>${escapeHTML(order.shippingAddress || '')}</dd></div>
+                <div><dt>Thanh toán</dt><dd>${methodLabels[order.paymentMethod] || order.paymentMethod}</dd></div>
+                <div><dt>Vận chuyển</dt><dd>${order.trackingNumber ? `${escapeHTML(order.shippingUnit || '')} - ${escapeHTML(order.trackingNumber)}` : 'Chưa có mã vận đơn'}</dd></div>
+                <div><dt>Tổng tiền</dt><dd class="money">${fmt(order.totalAmount)}</dd></div>
+            </dl>
             <div class="order-actions">
+                <a class="btn-primary order-tracking-link" href="order-detail.html?id=${encodeURIComponent(order._id)}">Xem quá trình giao hàng</a>
                 ${order.status === 'pending' ? `<button class="btn-delete" onclick="cancelOrder('${order._id}')">Hủy đơn</button>` : ''}
             </div>
         </article>

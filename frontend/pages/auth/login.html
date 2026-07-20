@@ -3,11 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Đăng nhập TechEcommerce để quản lý đơn hàng, hồ sơ và sản phẩm yêu thích.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/auth/login.html">
     <title>Đăng nhập - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css?v=auth-shell-20260720-1">
     <link rel="stylesheet" href="../../assets/css/auth.css?v=account-ui-20260711-1">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=account-ui-20260711-1">
-    <link rel="stylesheet" href="../../assets/css/login-page.css?v=account-ui-20260711-1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=auth-shell-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/login-page.css?v=auth-shell-20260720-1">
 </head>
 
 <body class="login-page">
@@ -38,49 +42,49 @@
                 </div>
             </div>
         </div>
-        <div class="header-categories" role="navigation" aria-label="Danh mục sản phẩm">
-            <div class="header-shell header-category-list">
-                <a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a>
-                <a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a>
-                <a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a>
-                <a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a>
-                <a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a>
-                <a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a>
-                <a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a>
-            </div>
-        </div>
+        <nav class="header-categories" aria-label="Danh mục sản phẩm">
+            <ul class="header-shell header-category-list">
+                <li><a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a></li>
+                <li><a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a></li>
+                <li><a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a></li>
+                <li><a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a></li>
+                <li><a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a></li>
+                <li><a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a></li>
+                <li><a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a></li>
+            </ul>
+        </nav>
     </header>
 
     <main class="login-page-main">
         <div class="login-layout">
-            <section class="login-visual" aria-label="Mua sắm công nghệ tại TechEcommerce">
+            <aside class="login-visual" aria-label="Mua sắm công nghệ tại TechEcommerce">
                 <img src="../../assets/images/banner-phone.jpg" alt="Điện thoại công nghệ cao">
-                <div class="login-visual-copy">
+                <section class="login-visual-copy">
                     <span>Mua sắm công nghệ dễ dàng</span>
-                    <h1>Một tài khoản, mọi đơn hàng</h1>
+                    <h2>Một tài khoản, mọi đơn hàng</h2>
                     <p>Theo dõi giao hàng, lưu sản phẩm yêu thích và nhận ưu đãi dành riêng cho thành viên.</p>
-                </div>
-            </section>
+                </section>
+            </aside>
 
             <section class="login-form-panel">
               <div class="auth-container">
-                <div class="auth-card">
-            <div class="auth-header">
+                <article class="auth-card">
+            <header class="auth-header">
                 <span class="auth-eyebrow">Tài khoản TechEcommerce</span>
                 <h1>Đăng nhập</h1>
                 <p>Đăng nhập để tiếp tục mua sắm và quản lý đơn hàng.</p>
-            </div>
+            </header>
 
             <form id="loginForm">
                 <div class="form-group">
                     <input type="text" id="identifier" class="input-field" placeholder=" " required
                         autocomplete="username">
-                    <label class="form-label">Tài khoản, Email hoặc SĐT</label>
+                    <label class="form-label" for="identifier">Tài khoản, Email hoặc SĐT</label>
                 </div>
                 <div class="form-group">
                     <input type="password" id="password" class="input-field" placeholder=" " required
                         autocomplete="current-password">
-                    <label class="form-label">Mật khẩu</label>
+                    <label class="form-label" for="password">Mật khẩu</label>
                 </div>
 
                 <button type="submit" class="btn-auth" id="submitBtn">
@@ -88,25 +92,26 @@
                 </button>
             </form>
 
-            <div class="auth-switch">
+            <p class="auth-switch">
                 Chưa có tài khoản? <a href="register.html">Tham gia ngay</a>
-            </div>
-                </div>
+            </p>
+                </article>
                 <a href="../../index.html" class="back-link">‹ Quay lại cửa hàng</a>
               </div>
             </section>
         </div>
     </main>
 
-    <footer class="login-footer">
-        <div><strong>Hỗ trợ khách hàng</strong><a href="../legal/faq.html">Câu hỏi thường gặp</a><a href="../legal/shipping.html">Chính sách vận chuyển</a></div>
-        <div><strong>Về TechEcommerce</strong><a href="../../index.html">Cửa hàng công nghệ</a><a href="../legal/terms.html">Điều khoản sử dụng</a></div>
-        <div><strong>Chăm sóc khách hàng</strong><span>Hotline: 1900 6868</span><span>Thứ Hai - Chủ Nhật, 8:00 - 21:30</span></div>
-        <div><strong>Mua hàng an tâm</strong><span>Sản phẩm chính hãng</span><span>Bảo hành minh bạch</span></div>
+    <footer class="login-footer site-footer" hidden>
+        <nav aria-label="Hỗ trợ khách hàng"><strong>Hỗ trợ khách hàng</strong><a href="../legal/faq.html">Câu hỏi thường gặp</a><a href="../legal/shipping.html">Chính sách vận chuyển</a></nav>
+        <nav aria-label="Về TechEcommerce"><strong>Về TechEcommerce</strong><a href="../../index.html">Cửa hàng công nghệ</a><a href="../legal/terms.html">Điều khoản sử dụng</a></nav>
+        <address><strong>Chăm sóc khách hàng</strong><a href="tel:19006868">Hotline: 1900 6868</a><span>Thứ Hai - Chủ Nhật, 8:00 - 21:30</span></address>
+        <section aria-label="Cam kết mua hàng"><strong>Mua hàng an tâm</strong><span>Sản phẩm chính hãng</span><span>Bảo hành minh bạch</span></section>
     </footer>
 
     <!-- Scripts -->
     <script src="../../assets/js/auth.js?v=account-ui-20260711-1"></script>
+    <script src="../../assets/js/footer.js?v=auth-shell-20260720-1"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const locationLabel = document.getElementById('loginLocationLabel');

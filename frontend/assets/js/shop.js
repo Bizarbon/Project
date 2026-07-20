@@ -154,6 +154,31 @@ async function loadPaymentProviders() {
     }
 }
 
+async function loadRecommendations() {
+    const section = document.getElementById('productRecommendations');
+    const grid = document.getElementById('recommendationGrid');
+    if (!section || !grid) return;
+
+    try {
+        const response = await fetch(`${API_URL}/products/recommendations?limit=4`, {
+            headers: auth.getHeaders()
+        });
+        const data = await response.json();
+        if (!response.ok || !Array.isArray(data.products) || !data.products.length) return;
+
+        document.getElementById('recommendationTitle').textContent = data.personalized
+            ? 'Gợi ý dành riêng cho bạn'
+            : 'Sản phẩm đáng quan tâm';
+        document.getElementById('recommendationDescription').textContent = data.personalized
+            ? 'Xếp hạng từ đơn hàng, sản phẩm yêu thích và xu hướng mua sắm của bạn.'
+            : 'Xếp hạng theo đánh giá, lượt mua và tình trạng còn hàng.';
+        grid.innerHTML = data.products.map(productCard).join('');
+        section.hidden = false;
+    } catch (error) {
+        console.error('Recommendation error:', error);
+    }
+}
+
 async function loadWishlist() {
     if (auth.isLoggedIn()) {
         try {
@@ -329,6 +354,7 @@ function setupPromoCarousel() {
             const isActive = slideIndex === activeSlide;
             slide.classList.toggle('is-active', isActive);
             slide.setAttribute('aria-hidden', String(!isActive));
+            slide.toggleAttribute('inert', !isActive);
         });
         dots.forEach((dot, dotIndex) => {
             const isActive = dotIndex === activeSlide;
@@ -643,6 +669,7 @@ function setupAddressSelector() {
         lastFocusedElement = document.activeElement;
         modal.classList.add('show');
         modal.setAttribute('aria-hidden', 'false');
+        modal.removeAttribute('inert');
         locationToggle.setAttribute('aria-expanded', 'true');
         document.body.classList.add('address-modal-open');
         showEntryView();
@@ -655,6 +682,7 @@ function setupAddressSelector() {
         hideSuggestions();
         modal.classList.remove('show');
         modal.setAttribute('aria-hidden', 'true');
+        modal.setAttribute('inert', '');
         locationToggle.setAttribute('aria-expanded', 'false');
         document.body.classList.remove('address-modal-open');
         lastFocusedElement?.focus();
@@ -794,16 +822,16 @@ function clearCompare() {
 function ensureCompareUI() {
     if (!document.getElementById('compareBar')) {
         document.body.insertAdjacentHTML('beforeend', `
-            <div class="compare-bar" id="compareBar" aria-live="polite"></div>
-            <div class="compare-modal" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
-                <div class="compare-dialog">
-                    <div class="compare-header">
-                        <h3 id="compareTitle">So sánh sản phẩm</h3>
+            <aside class="compare-bar" id="compareBar" aria-live="polite"></aside>
+            <aside class="compare-modal" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+                <section class="compare-dialog">
+                    <header class="compare-header">
+                        <h2 id="compareTitle">So sánh sản phẩm</h2>
                         <button type="button" class="compare-close btn-secondary" onclick="closeCompareModal()" aria-label="Đóng">×</button>
-                    </div>
+                    </header>
                     <div class="compare-table-wrap" id="compareTableWrap"></div>
-                </div>
-            </div>
+                </section>
+            </aside>
         `);
         document.getElementById('compareModal').addEventListener('click', event => {
             if (event.target.id === 'compareModal') closeCompareModal();
@@ -922,7 +950,8 @@ function renderProducts() {
     const sections = document.getElementById('productSections');
     if (!sections) return;
     const products = filteredProducts();
-    document.getElementById('resultCount').textContent = `${products.length} sản phẩm`;
+    const resultCount = document.getElementById('resultCount');
+    if (resultCount) resultCount.textContent = `${products.length} sản phẩm`;
     const catalogTitle = document.getElementById('catalogTitle');
     if (catalogTitle) {
         catalogTitle.textContent = activeCategory === 'all'
@@ -944,13 +973,13 @@ function renderProducts() {
 
     sections.innerHTML = Object.entries(grouped).map(([category, items]) => `
         <section class="category-section">
-            <div class="category-header">
+            <header class="category-header">
                 <h3>${escapeHTML(categoryLabels[category] || category)}</h3>
                 <span class="category-count">${items.length} sản phẩm</span>
-            </div>
-            <div class="product-grid">
+            </header>
+            <section class="product-grid" aria-label="Sản phẩm ${escapeHTML(categoryLabels[category] || category)}">
                 ${items.map(productCard).join('')}
-            </div>
+            </section>
         </section>
     `).join('');
     renderCompareBar();
@@ -971,11 +1000,12 @@ function productCard(p) {
             <a href="pages/catalog/product.html?id=${p._id}" class="product-link" onclick="event.stopPropagation()">
                 <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" onerror="this.src='https://via.placeholder.com/400x220?text=No+Image'">
             </a>
-            <div class="card-body">
+            <section class="card-body">
                 <span class="category-badge">${escapeHTML(p.category)}</span>
                 <div class="product-brand">${escapeHTML(p.brand || 'TechStore Select')} ${p.sku ? `<span>${escapeHTML(p.sku)}</span>` : ''}</div>
                 <h3 title="${escapeHTML(p.name)}"><a href="pages/catalog/product.html?id=${p._id}" onclick="event.stopPropagation()">${escapeHTML(p.name)}</a></h3>
                 <p class="product-desc">${escapeHTML(p.description || '')}</p>
+                ${p.recommendation?.reason ? `<p class="recommendation-reason">${escapeHTML(p.recommendation.reason)}</p>` : ''}
                 ${specLine ? `<p class="product-spec-line">${escapeHTML(specLine)}</p>` : ''}
                 ${p.rating ? `<p class="product-rating">★ ${Number(p.rating).toFixed(1)} <span>(${p.reviewCount || 0})</span>${p.soldCount ? ` <span>- đã bán ${p.soldCount}</span>` : ''}</p>` : ''}
                 <p class="price">${fmt(p.price)}</p>
@@ -985,7 +1015,7 @@ function productCard(p) {
                     <button class="btn-add-cart" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); addToCart('${p._id}')">${p.stock <= 0 ? 'Hết hàng' : 'Thêm giỏ'}</button>
                     <button class="btn-compare ${compared ? 'active' : ''}" type="button" onclick="event.stopPropagation(); toggleCompare('${p._id}')">${compared ? 'Đã chọn' : 'So sánh'}</button>
                 </div>
-            </div>
+            </section>
         </article>
     `;
 }
@@ -1024,13 +1054,17 @@ function updateCartBadge() {
 
 function openCartDrawer() {
     document.body.classList.add('cart-open');
-    document.getElementById('cartDrawer')?.setAttribute('aria-hidden', 'false');
+    const drawer = document.getElementById('cartDrawer');
+    drawer?.setAttribute('aria-hidden', 'false');
+    drawer?.removeAttribute('inert');
     document.getElementById('cartOverlay')?.setAttribute('aria-hidden', 'false');
 }
 
 function closeCartDrawer() {
     document.body.classList.remove('cart-open');
-    document.getElementById('cartDrawer')?.setAttribute('aria-hidden', 'true');
+    const drawer = document.getElementById('cartDrawer');
+    drawer?.setAttribute('aria-hidden', 'true');
+    drawer?.setAttribute('inert', '');
     document.getElementById('cartOverlay')?.setAttribute('aria-hidden', 'true');
 }
 
@@ -1153,7 +1187,7 @@ function renderCart() {
     setCart(cart.map(item => ({ productId: item.productId, quantity: item.quantity })));
 
     if (!cart.length) {
-        cartDiv.innerHTML = '<div class="cart-empty">Giỏ hàng trống</div>';
+        cartDiv.innerHTML = '<p class="cart-empty">Giỏ hàng trống</p>';
         if (cartTotal) cartTotal.style.display = 'none';
         document.getElementById('checkoutPanel').style.display = 'none';
         document.getElementById('guestCheckoutGate').style.display = 'none';
@@ -1164,7 +1198,7 @@ function renderCart() {
     cartDiv.innerHTML = cart.map(item => {
         subtotal += item.product.price * item.quantity;
         return `
-            <div class="cart-item">
+            <article class="cart-item">
                 <div>
                     <div class="cart-item-name">${escapeHTML(item.product.name)}</div>
                     <div class="cart-item-price">${fmt(item.product.price)} - ${item.quantity}</div>
@@ -1175,7 +1209,7 @@ function renderCart() {
                     <button onclick="changeQty('${item.productId}', 1)">+</button>
                     <button class="btn-remove" onclick="removeItem('${item.productId}')">Xóa</button>
                 </div>
-            </div>
+            </article>
         `;
     }).join('');
 
@@ -1351,6 +1385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadPaymentProviders();
     await loadProductMeta();
     await loadProducts();
+    await loadRecommendations();
     await loadProfileForCheckout();
     applySavedAddressToCheckout();
     await loadCustomers();

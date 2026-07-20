@@ -4,84 +4,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Tạo tài khoản TechEcommerce để mua sắm và theo dõi đơn hàng công nghệ.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/auth/register.html">
     <title>Đăng ký - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/auth.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=auth-shell-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/auth.css?v=register-ui-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=auth-shell-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/login-page.css?v=auth-shell-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/register-page.css?v=register-ui-20260720-1">
 </head>
 
-<body>
-    <!-- Animated Background -->
-    <div class="bg-visuals">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-
-    <div class="auth-container" style="max-width: 800px;">
-        <!-- Logo -->
-        <div class="brand-logo" onclick="window.location.href='../../index.html'">
-            <h2>🛒 TechEcommerce</h2>
-        </div>
-
-        <!-- Card -->
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Tham gia ngay ✨</h1>
-                <p>Khám phá thế giới công nghệ đỉnh cao</p>
+<body class="login-page register-page">
+    <header class="storefront-header account-storefront-header">
+        <section class="header-main">
+            <div class="header-shell header-main-inner">
+                <a class="storefront-logo" href="../../index.html" aria-label="TechEcommerce - Trang chủ">
+                    <span class="storefront-logo-mark">TE</span>
+                    <span class="storefront-logo-text">TechEcommerce</span>
+                </a>
+                <form class="header-search" action="../../index.html" method="get" role="search">
+                    <label class="sr-only" for="registerHeaderSearch">Tìm kiếm sản phẩm</label>
+                    <span class="header-search-icon" aria-hidden="true">⌕</span>
+                    <input id="registerHeaderSearch" name="search" type="search" placeholder="Bạn đang tìm sản phẩm gì?">
+                    <button type="submit">Tìm kiếm</button>
+                </form>
+                <nav class="header-actions" aria-label="Tài khoản và mua hàng">
+                    <div id="nav-auth-section"></div>
+                    <a class="header-action-btn" href="../../index.html?openCart=1">
+                        <span class="header-action-icon" aria-hidden="true">🛒</span>
+                        <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
+                        <span class="header-cart-badge" id="registerCartBadge" hidden>0</span>
+                    </a>
+                    <a class="header-action-btn" href="../../index.html#catalogStart">
+                        <span class="header-action-icon" aria-hidden="true">⌖</span>
+                        <span class="header-action-copy"><small>Khu vực</small><strong id="registerLocationLabel">Hồ Chí Minh</strong></span>
+                    </a>
+                </nav>
             </div>
+        </section>
+        <nav class="header-categories" aria-label="Danh mục sản phẩm">
+            <ul class="header-shell header-category-list">
+                <li><a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a></li>
+                <li><a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a></li>
+                <li><a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a></li>
+                <li><a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a></li>
+                <li><a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a></li>
+                <li><a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a></li>
+                <li><a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a></li>
+            </ul>
+        </nav>
+    </header>
 
-            <form id="registerForm" class="form-grid">
-                <div class="form-group">
-                    <input type="text" id="name" class="input-field" placeholder=" " required>
-                    <label class="form-label">Họ và tên</label>
-                </div>
-                <div class="form-group">
-                    <input type="tel" id="phone" class="input-field" placeholder=" " required>
-                    <label class="form-label">Số điện thoại</label>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="email" class="input-field" placeholder=" ">
-                    <label class="form-label">Email (Không bắt buộc)</label>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="username" class="input-field" placeholder=" " required autocomplete="username">
-                    <label class="form-label">Tên đăng nhập</label>
-                </div>
-                <div class="form-group full">
-                    <input type="password" id="password" class="input-field" placeholder=" " required minlength="6" autocomplete="new-password">
-                    <label class="form-label">Mật khẩu (Ít nhất 6 ký tự)</label>
-                </div>
+    <main class="login-page-main register-page-main">
+        <section class="login-layout register-layout" aria-labelledby="registerTitle">
+            <aside class="login-visual register-visual" aria-label="Quyền lợi thành viên TechEcommerce">
+                <img src="../../assets/images/banner-laptop.jpg" alt="Laptop và thiết bị công nghệ tại TechEcommerce">
+                <section class="login-visual-copy">
+                    <span>Thành viên TechEcommerce</span>
+                    <h2>Mua sắm thuận tiện hơn</h2>
+                    <p>Theo dõi giao hàng, lưu thông tin nhận hàng và nhận gợi ý sản phẩm phù hợp với nhu cầu của bạn.</p>
+                </section>
+            </aside>
 
-                <div class="form-group full">
-                    <button type="submit" class="btn-auth" id="submitBtn">Tạo tài khoản ngay</button>
+            <section class="login-form-panel register-form-panel" aria-label="Biểu mẫu đăng ký">
+                <div class="auth-container">
+                    <article class="auth-card">
+                        <header class="auth-header">
+                            <span class="auth-eyebrow">Tài khoản TechEcommerce</span>
+                            <h1 id="registerTitle">Tạo tài khoản</h1>
+                            <p>Đăng ký để mua hàng, theo dõi vận chuyển và đánh giá sản phẩm.</p>
+                        </header>
+
+                        <form id="registerForm" class="form-grid">
+                            <div class="form-group">
+                                <input type="text" id="name" class="input-field" placeholder=" " required autocomplete="name" maxlength="80">
+                                <label class="form-label" for="name">Họ và tên</label>
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" id="phone" class="input-field" placeholder=" " required autocomplete="tel" inputmode="tel">
+                                <label class="form-label" for="phone">Số điện thoại</label>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="email" class="input-field" placeholder=" " autocomplete="email">
+                                <label class="form-label" for="email">Email (không bắt buộc)</label>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" id="username" class="input-field" placeholder=" " required autocomplete="username" minlength="3" maxlength="30" pattern="[a-zA-Z0-9_]{3,30}">
+                                <label class="form-label" for="username">Tên đăng nhập</label>
+                            </div>
+                            <div class="form-group full">
+                                <input type="password" id="password" class="input-field" placeholder=" " required minlength="8" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" autocomplete="new-password">
+                                <label class="form-label" for="password">Mật khẩu có chữ hoa, chữ thường và số</label>
+                                <small class="field-hint">Từ 8 đến 72 ký tự.</small>
+                            </div>
+                            <div class="form-group full register-submit-row">
+                                <button type="submit" class="btn-auth" id="submitBtn">Tạo tài khoản ngay</button>
+                            </div>
+                        </form>
+
+                        <p class="auth-switch">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+                    </article>
+                    <a href="../../index.html" class="back-link">‹ Quay lại cửa hàng</a>
                 </div>
-            </form>
+            </section>
+        </section>
+    </main>
 
-            <div class="auth-switch">
-                Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a>
-            </div>
-        </div>
+    <footer class="login-footer site-footer" hidden>
+        <nav aria-label="Hỗ trợ khách hàng"><strong>Hỗ trợ khách hàng</strong><a href="../legal/faq.html">Câu hỏi thường gặp</a><a href="../legal/shipping.html">Chính sách vận chuyển</a></nav>
+        <nav aria-label="Về TechEcommerce"><strong>Về TechEcommerce</strong><a href="../../index.html">Cửa hàng công nghệ</a><a href="../legal/terms.html">Điều khoản sử dụng</a></nav>
+        <address><strong>Chăm sóc khách hàng</strong><a href="tel:19006868">Hotline: 1900 6868</a><span>Thứ Hai - Chủ Nhật, 8:00 - 21:30</span></address>
+        <section aria-label="Cam kết mua hàng"><strong>Mua hàng an tâm</strong><span>Sản phẩm chính hãng</span><span>Bảo hành minh bạch</span></section>
+    </footer>
 
-        <!-- Back to Home -->
-        <a href="../../index.html" class="back-link">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                style="width: 20px; height: 20px; margin-right: 0.6rem;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Quay lại trang chủ
-        </a>
-    </div>
-
-    <!-- Scripts -->
-    <script src="../../assets/js/auth.js"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
-    <script src="../../assets/js/fish.js"></script>
+    <script src="../../assets/js/auth.js?v=register-ui-20260720-1"></script>
+    <script src="../../assets/js/footer.js?v=auth-shell-20260720-1"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const locationLabel = document.getElementById('registerLocationLabel');
+            const savedAddress = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
+            if (locationLabel) locationLabel.textContent = savedAddress;
+
+            const cartBadge = document.getElementById('registerCartBadge');
+            try {
+                const cart = JSON.parse(localStorage.getItem(auth.getCartStorageKey()) || '[]');
+                const count = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+                if (cartBadge && count > 0) {
+                    cartBadge.textContent = count;
+                    cartBadge.hidden = false;
+                }
+            } catch (error) {
+                if (cartBadge) cartBadge.hidden = true;
+            }
+        });
+
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
-            toast.innerHTML = (type === 'success' ? '✨ ' : '❌ ') + `<span>${message}</span>`;
+            toast.textContent = `${type === 'success' ? 'Thành công: ' : 'Lỗi: '}${message}`;
             document.body.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 100);
             setTimeout(() => {
@@ -90,54 +154,46 @@
             }, 3000);
         }
 
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const username = document.getElementById('username').value.trim();
-            const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
+        document.getElementById('registerForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const button = document.getElementById('submitBtn');
+            const payload = {
+                username: document.getElementById('username').value.trim(),
+                name: document.getElementById('name').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value
+            };
 
-            btn.disabled = true;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<div class="loader"></div> <span>Đang xử lý...</span>';
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.innerHTML = '<span class="loader" aria-hidden="true"></span><span>Đang tạo tài khoản...</span>';
 
             try {
-                const res = await fetch(`${API_URL}/auth/register`, {
+                const response = await fetch(`${API_URL}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, name, phone, email, password })
+                    body: JSON.stringify(payload)
                 });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Không thể đăng ký tài khoản.');
 
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.message || 'Lỗi đăng ký');
-
-                showToast('Chào mừng! Đăng ký thành công.');
-
-                const authCard = document.querySelector('.auth-card');
-                authCard.innerHTML = `
-                    <div style="text-align: center; padding: 2rem 0;">
-                        <div style="font-size: 4rem; margin-bottom: 2rem; animation: bounce 2s infinite;">🎉</div>
-                        <h2 style="color: white; margin-bottom: 1rem; font-size: 2rem;">Chúc mừng bạn!</h2>
-                        <p style="color: #94a3b8; margin-bottom: 3rem;">Tài khoản đã sẵn sàng. Hãy bắt đầu mua sắm ngay.</p>
-                        <a href="login.html" class="btn-auth" style="text-decoration: none;">Đăng nhập ngay</a>
-                    </div>
+                showToast('Tài khoản đã được tạo. Bạn có thể đăng nhập ngay.');
+                document.querySelector('.auth-card').innerHTML = `
+                    <section class="register-success" aria-live="polite">
+                        <span class="register-success-mark" aria-hidden="true">✓</span>
+                        <h2>Đăng ký thành công</h2>
+                        <p>Tài khoản của bạn đã sẵn sàng để mua sắm và theo dõi đơn hàng.</p>
+                        <a href="login.html" class="btn-auth">Đăng nhập ngay</a>
+                    </section>
                 `;
-            } catch (err) {
-                showToast(err.message, 'error');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
+            } catch (error) {
+                showToast(error.message, 'error');
+                button.disabled = false;
+                button.textContent = originalText;
             }
         });
     </script>
-    <style>
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
-        }
-    </style>
 </body>
 
 </html>

@@ -225,7 +225,10 @@
     background: var(--neo-panel-solid);
 }
 
-.login-footer > div {
+.login-footer > div,
+.login-footer > nav,
+.login-footer > address,
+.login-footer > section {
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
@@ -243,6 +246,11 @@
 
 .login-footer a:hover {
     color: var(--neo-primary);
+}
+
+.login-page .site-footer {
+    width: 100%;
+    margin-top: 0;
 }
 
 @media (max-width: 900px) {

@@ -71,6 +71,10 @@ function isFinalPaymentStatus(order) {
     return ['paid', 'failed', 'refunded'].includes(order?.paymentStatus);
 }
 
+function isSettledPayment(order) {
+    return ['paid', 'refunded'].includes(order?.paymentStatus);
+}
+
 function escapeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
@@ -157,7 +161,7 @@ router.get('/mock/:provider', async (req, res) => {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${providerName} Sandbox - ShopMini</title>
+  <title>${providerName} Sandbox - TechEcommerce</title>
   <style>
     body{margin:0;min-height:100vh;display:grid;place-items:center;font-family:Arial,sans-serif;background:#f3f6fb;color:#172033}
     .box{width:min(92vw,460px);background:white;border-radius:14px;padding:28px;box-shadow:0 20px 60px rgba(15,23,42,.16);text-align:center}
@@ -170,7 +174,7 @@ router.get('/mock/:provider', async (req, res) => {
 <body>
   <main class="box">
     <div class="brand">${providerName} Sandbox</div>
-    <div class="muted">Trang mô phỏng thanh toán local cho ShopMini</div>
+    <div class="muted">Trang mô phỏng thanh toán phục vụ kiểm thử TechEcommerce</div>
     <div class="meta">
       <div><strong>Đơn hàng:</strong> #${escapeHTML(order._id)}</div>
       <div><strong>Khách hàng:</strong> ${escapeHTML(order.recipientName || order.customerName)}</div>
@@ -249,15 +253,18 @@ router.get('/vnpay/return', async (req, res) => {
         }
 
         if (success) {
-            if (order.paymentStatus !== 'paid') {
-                await markPaid(order, 'vnpay', query.vnp_TransactionNo, { vnpayReturn: query });
-            }
-            return redirectResult(res, order, 'vnpay', 'success', 'Thanh toan VNPay thanh cong.');
+            const confirmed = order.paymentStatus === 'paid';
+            return redirectResult(
+                res,
+                order,
+                'vnpay',
+                'success',
+                confirmed
+                    ? 'Thanh toan VNPay thanh cong.'
+                    : 'VNPay da tiep nhan giao dich. He thong dang cho IPN xac nhan.'
+            );
         }
 
-        if (!isFinalPaymentStatus(order)) {
-            await markFailed(order, 'vnpay', { vnpayReturn: query });
-        }
         return redirectResult(
             res,
             order,
@@ -282,7 +289,7 @@ router.get('/vnpay/ipn', async (req, res) => {
         if (!order) return res.json({ RspCode: '01', Message: 'Order not found' });
         if (!verifyVnpayParams(query)) return res.json({ RspCode: '97', Message: 'Invalid signature' });
         if (!amountMatches(order, query.vnp_Amount, 100)) return res.json({ RspCode: '04', Message: 'Invalid amount' });
-        if (isFinalPaymentStatus(order)) return res.json({ RspCode: '02', Message: 'Order already confirmed' });
+        if (isSettledPayment(order)) return res.json({ RspCode: '02', Message: 'Order already confirmed' });
 
         if (query.vnp_ResponseCode === '00' && query.vnp_TransactionStatus === '00') {
             await markPaid(order, 'vnpay', query.vnp_TransactionNo, { vnpayIpn: query });
