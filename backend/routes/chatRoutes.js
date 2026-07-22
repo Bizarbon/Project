@@ -73,15 +73,114 @@ function extractBudget(text) {
 
 function inferCategory(text) {
     const categories = [
-        ['laptop', ['laptop', 'may tinh', 'hoc tap', 'van phong', 'gaming', 'do hoa', 'lap trinh']],
-        ['điện thoại', ['dien thoai', 'smartphone', 'iphone', 'android', 'chup anh']],
-        ['phụ kiện', ['phu kien', 'tai nghe', 'chuot', 'ban phim', 'sac', 'cap', 'op lung']],
-        ['tablet', ['tablet', 'may tinh bang', 'ipad']],
-        ['đồng hồ thông minh', ['dong ho', 'smartwatch']]
+        ['Laptop', ['laptop', 'may tinh xach tay', 'macbook', 'notebook']],
+        ['điện thoại', ['dien thoai', 'smartphone', 'iphone', 'android']],
+        ['Tai nghe', ['tai nghe', 'airpods', 'headphone', 'earbuds']],
+        ['Phụ kiện', ['phu kien', 'chuot', 'ban phim', 'sac', 'cap', 'op lung']],
+        ['Tablet', ['tablet', 'may tinh bang', 'ipad']],
+        ['Đồng hồ thông minh', ['dong ho thong minh', 'smartwatch', 'apple watch']]
     ];
 
     const found = categories.find(([, keywords]) => keywords.some(keyword => text.includes(keyword)));
     return found ? found[0] : '';
+}
+
+function extractUseCase(text) {
+    const cases = [
+        ['lập trình', ['lap trinh', 'code', 'hoc it', 'cong nghe thong tin', 'developer']],
+        ['học tập', ['hoc tap', 'di hoc', 'hoc sinh', 'sinh vien']],
+        ['văn phòng', ['van phong', 'word', 'excel', 'hop online', 'lam viec']],
+        ['chơi game', ['choi game', 'gaming', 'game nang', 'fps']],
+        ['thiết kế và đồ họa', ['do hoa', 'thiet ke', 'photoshop', 'illustrator', '3d']],
+        ['chụp ảnh và quay video', ['chup anh', 'quay video', 'camera', 'tiktok', 'vlog']],
+        ['giải trí', ['xem phim', 'nghe nhac', 'giai tri', 'mang xa hoi']],
+        ['thể thao và sức khỏe', ['the thao', 'suc khoe', 'chay bo', 'tap luyen']]
+    ];
+    return cases.find(([, keywords]) => keywords.some(keyword => text.includes(keyword)))?.[0] || '';
+}
+
+function extractUserProfile(text) {
+    const profiles = [
+        ['học sinh/sinh viên', ['hoc sinh', 'sinh vien', 'di hoc']],
+        ['nhân viên văn phòng', ['nhan vien', 'van phong', 'ke toan']],
+        ['người làm sáng tạo', ['designer', 'thiet ke', 'sang tao', 'content creator', 'vlog']],
+        ['người chơi game', ['gamer', 'choi game', 'gaming']],
+        ['người lớn tuổi', ['nguoi lon tuoi', 'bo me', 'ong ba']],
+        ['trẻ em', ['tre em', 'cho be', 'con toi']]
+    ];
+    return profiles.find(([, keywords]) => keywords.some(keyword => text.includes(keyword)))?.[0] || '';
+}
+
+function extractPriority(text) {
+    const priorities = [
+        ['độ bền và bảo hành', ['do ben', 'ben', 'lau dai', 'bao hanh', 'chong nuoc', 'chac chan']],
+        ['pin lâu', ['pin trau', 'pin lau', 'dung lau', 'thoi luong pin']],
+        ['hiệu năng', ['hieu nang', 'manh', 'toc do', 'muot', 'cau hinh']],
+        ['camera', ['camera', 'chup anh', 'quay video']],
+        ['nhẹ và dễ mang theo', ['mong nhe', 'nhe', 'de mang', 'di chuyen']],
+        ['màn hình', ['man hinh', 'hien thi', 'mau sac', 'kich thuoc lon']],
+        ['cân bằng', ['khong quan trong', 'can bang', 'deu duoc', 'tu van giup']]
+    ];
+    return priorities.find(([, keywords]) => keywords.some(keyword => text.includes(keyword)))?.[0] || '';
+}
+
+function safeConsultationContext(value) {
+    const source = value && typeof value === 'object' ? value : {};
+    const keep = key => String(source[key] || '').trim().slice(0, 100);
+    return {
+        intent: source.intent === 'product_consultation' ? source.intent : '',
+        category: keep('category'),
+        budget: Math.max(Number(source.budget) || 0, 0),
+        budgetFlexible: Boolean(source.budgetFlexible),
+        brand: keep('brand'),
+        useCase: keep('useCase'),
+        userProfile: keep('userProfile'),
+        priority: keep('priority'),
+        awaitingConfirmation: Boolean(source.awaitingConfirmation)
+    };
+}
+
+function mergeConsultationNeeds(message, previousContext) {
+    const text = normalizeText(message);
+    const context = safeConsultationContext(previousContext);
+    const filter = buildProductFilter(text);
+    const flexibleBudget = ['khong gioi han', 'ngan sach linh hoat', 'gia nao cung duoc', 'chua co ngan sach'].some(item => text.includes(item));
+    const reset = ['tu van lai', 'bat dau lai', 'xoa nhu cau', 'doi san pham khac'].some(item => text.includes(item));
+    const merged = reset ? safeConsultationContext({}) : context;
+    const result = {
+        ...merged,
+        intent: 'product_consultation',
+        category: filter.category || merged.category,
+        budget: filter.budget || (flexibleBudget ? 0 : merged.budget),
+        budgetFlexible: flexibleBudget || (filter.budget ? false : merged.budgetFlexible),
+        brand: filter.brand || merged.brand,
+        useCase: extractUseCase(text) || merged.useCase,
+        userProfile: extractUserProfile(text) || merged.userProfile,
+        priority: extractPriority(text) || merged.priority
+    };
+    if (text.includes('doi ngan sach')) {
+        result.budget = 0;
+        result.budgetFlexible = false;
+        result.awaitingConfirmation = false;
+    }
+    if (text.includes('doi nhu cau')) {
+        result.useCase = '';
+        result.userProfile = '';
+        result.priority = '';
+        result.awaitingConfirmation = false;
+    }
+    return result;
+}
+
+function consultationSummary(context) {
+    return [
+        `sản phẩm ${context.category}`,
+        context.budget ? `ngân sách tối đa ${money(context.budget)}` : 'ngân sách linh hoạt',
+        context.userProfile ? `người dùng: ${context.userProfile}` : '',
+        context.useCase ? `mục đích: ${context.useCase}` : '',
+        context.priority ? `ưu tiên: ${context.priority}` : '',
+        context.brand ? `thương hiệu: ${context.brand}` : ''
+    ].filter(Boolean).join(' · ');
 }
 
 function buildProductFilter(text) {
@@ -131,32 +230,78 @@ async function answerOrderQuestion(req, message) {
     };
 }
 
-async function answerProductQuestion(message, user) {
+async function answerProductQuestion(message, user, previousContext) {
     const text = normalizeText(message);
-    const { budget, category, brand } = buildProductFilter(text);
+    const consultation = mergeConsultationNeeds(message, previousContext);
+    const confirms = ['dung', 'dung roi', 'xac nhan', 'ok', 'dong y', 'hay goi y', 'tu van di']
+        .some(item => text === item || text.includes(item));
+
+    if (!consultation.category) {
+        return {
+            reply: 'Bạn đang cần sản phẩm nào hoặc quan tâm nhóm nào của cửa hàng? Mình có thể tư vấn laptop, điện thoại, tablet, tai nghe, đồng hồ thông minh hoặc phụ kiện.',
+            suggestions: ['Laptop', 'Điện thoại', 'Tablet', 'Tai nghe'],
+            context: consultation
+        };
+    }
+    if (!consultation.budget && !consultation.budgetFlexible) {
+        return {
+            reply: `Bạn dự kiến chi tối đa bao nhiêu cho ${consultation.category}? Bạn có thể nói “khoảng 15 triệu”, “10–20 triệu” hoặc “ngân sách linh hoạt”.`,
+            suggestions: ['Khoảng 10 triệu', 'Khoảng 15 triệu', 'Khoảng 25 triệu', 'Ngân sách linh hoạt'],
+            context: consultation
+        };
+    }
+    if (!consultation.userProfile || !consultation.useCase) {
+        return {
+            reply: `Ai sẽ dùng ${consultation.category} này và công việc chính là gì? Ví dụ: sinh viên học IT, nhân viên văn phòng, người chơi game hoặc người làm thiết kế.`,
+            suggestions: ['Sinh viên học IT', 'Nhân viên văn phòng', 'Chơi game', 'Thiết kế đồ họa'],
+            context: consultation
+        };
+    }
+    if (!consultation.priority) {
+        return {
+            reply: 'Bạn ưu tiên điều gì nhất: độ bền và bảo hành, pin lâu, hiệu năng, camera, màn hình hay thiết bị nhẹ dễ mang theo?',
+            suggestions: ['Độ bền và bảo hành', 'Pin lâu', 'Hiệu năng', 'Cân bằng các yếu tố'],
+            context: consultation
+        };
+    }
+    if (!consultation.awaitingConfirmation || !confirms) {
+        consultation.awaitingConfirmation = true;
+        return {
+            reply: `Mình xác nhận nhu cầu của bạn: ${consultationSummary(consultation)}. Thông tin này đã đúng chưa?`,
+            suggestions: ['Đúng, hãy gợi ý', 'Đổi ngân sách', 'Đổi nhu cầu sử dụng', 'Tư vấn lại từ đầu'],
+            context: consultation
+        };
+    }
+
+    consultation.awaitingConfirmation = false;
+    const { budget, category, brand } = consultation;
+    const searchDescription = [message, consultation.useCase, consultation.userProfile, consultation.priority, brand]
+        .filter(Boolean).join(' ');
 
     let products = await recommendProducts({
         user,
         limit: 5,
         category,
         maxPrice: budget,
-        search: message
+        search: searchDescription,
+        requirements: consultation
     });
 
     let relaxed = false;
     if (!products.length && budget) {
-        products = await recommendProducts({ user, limit: 5, category, search: message });
+        products = await recommendProducts({ user, limit: 5, category, search: searchDescription, requirements: consultation });
         relaxed = products.length > 0;
     }
     if (!products.length && category) {
-        products = await recommendProducts({ user, limit: 5, search: message });
+        products = await recommendProducts({ user, limit: 5, search: searchDescription, requirements: consultation });
         relaxed = products.length > 0;
     }
 
     if (!products.length) {
         return {
-            reply: 'Mình chưa tìm thấy sản phẩm khớp hoàn toàn với nhu cầu đó. Bạn có thể nói rõ hơn về ngân sách, loại sản phẩm, thương hiệu hoặc nhu cầu như học tập, gaming, chụp ảnh, văn phòng.',
-            suggestions: ['Laptop dưới 15 triệu', 'Điện thoại pin trâu', 'Phụ kiện còn hàng']
+            reply: 'Kho hiện chưa có sản phẩm khớp đủ các điều kiện vừa xác nhận. Bạn có thể đổi ngân sách hoặc ưu tiên để mình tìm lại.',
+            suggestions: ['Đổi ngân sách', 'Đổi loại sản phẩm', 'Tư vấn lại từ đầu'],
+            context: consultation
         };
     }
 
@@ -173,9 +318,10 @@ async function answerProductQuestion(message, user) {
         : 'Mình gợi ý một số sản phẩm nổi bật trong cửa hàng:';
 
     return {
-        reply: `${intro}\n${products.map(productLine).join('\n')}\nBạn có thể bấm vào sản phẩm trên trang để xem ảnh, cấu hình, đánh giá và thêm vào giỏ hàng.`,
+        reply: `${intro}\n${products.map(productLine).join('\n')}\nMình chỉ dùng giá, tồn kho và thông số đang có trong cửa hàng. Bạn muốn so sánh hai lựa chọn nào?`,
         suggestions: ['So sánh sản phẩm', 'Tư vấn theo ngân sách khác', 'Chính sách bảo hành'],
-        products
+        products,
+        context: consultation
     };
 }
 
@@ -209,16 +355,18 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const text = normalizeText(message);
         const asksOrder = ['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau'].some(keyword => text.includes(keyword));
         const policyAnswer = answerPolicyQuestion(message);
+        const activeConsultation = req.body.context?.intent === 'product_consultation';
+        const explicitlyAsksPolicy = ['chinh sach', 'quy dinh', 'dieu kien bao hanh', 'doi tra'].some(keyword => text.includes(keyword));
 
         if (asksOrder) return res.json(await answerOrderQuestion(req, message));
-        if (policyAnswer) {
+        if (policyAnswer && (!activeConsultation || explicitlyAsksPolicy)) {
             return res.json({
                 reply: policyAnswer,
                 suggestions: ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Sản phẩm còn hàng']
             });
         }
 
-        return res.json(await answerProductQuestion(message, req.user));
+        return res.json(await answerProductQuestion(message, req.user, req.body.context));
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'Chatbot đang bận một chút. Bạn thử lại sau nhé.' });

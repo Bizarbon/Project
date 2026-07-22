@@ -1,0 +1,367 @@
+/* Hallmark · pre-emit critique: P5 H4 E5 S5 R5 V4
+ * Hallmark · genre: modern-minimal · macrostructure: Split Studio · theme: Cobalt
+ * audience: retail shoppers · use: transparent checkout cost · tone: utilitarian
+ * contrast: pass (40–41) · nav/footer: preserved · honest: pass (46) · tokens: pass (48)
+ */
+@import url('./checkout-tokens.css');
+
+html,
+body {
+  overflow-x: clip;
+}
+
+.delivery-address {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.delivery-address legend {
+  margin-block-end: var(--space-checkout-sm);
+  color: var(--color-checkout-ink);
+  font-family: var(--font-checkout-display);
+  font-size: var(--text-checkout-md);
+  font-weight: 700;
+}
+
+.delivery-address-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-checkout-sm);
+}
+
+.delivery-address label {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-checkout-2xs);
+  color: var(--color-checkout-ink);
+  font-weight: 600;
+}
+
+.delivery-address-detail {
+  margin-block-start: var(--space-checkout-sm);
+}
+
+.delivery-address select,
+.delivery-address textarea {
+  width: 100%;
+  min-height: 2.75rem;
+  box-sizing: border-box;
+  padding-inline: var(--space-checkout-sm);
+  border: var(--rule-checkout);
+  border-radius: var(--radius-checkout-sm);
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  color: var(--color-checkout-ink);
+  background: var(--color-checkout-paper);
+  font: inherit;
+}
+
+.delivery-address textarea {
+  min-height: 5.5rem;
+  padding-block: var(--space-checkout-sm);
+  resize: vertical;
+}
+
+.delivery-address select:focus-visible,
+.delivery-address textarea:focus-visible {
+  outline-color: var(--color-checkout-focus);
+}
+
+.delivery-address select:active,
+.delivery-address textarea:active {
+  background: var(--color-checkout-surface);
+}
+
+.delivery-address select:disabled,
+.delivery-address textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  background: var(--color-checkout-surface);
+}
+
+.delivery-address-help {
+  min-height: 1lh;
+  margin: var(--space-checkout-2xs) 0 0;
+  color: var(--color-checkout-muted);
+  font-size: var(--text-checkout-sm);
+  line-height: 1.5;
+}
+
+.delivery-address-preview {
+  display: grid;
+  gap: var(--space-checkout-2xs);
+  margin-block-start: var(--space-checkout-sm);
+  padding-block-start: var(--space-checkout-sm);
+  border-block-start: var(--rule-checkout);
+  color: var(--color-checkout-ink);
+  font-style: normal;
+}
+
+.delivery-address-preview span {
+  color: var(--color-checkout-muted);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.delivery-address[data-state='loading'] select {
+  cursor: progress;
+}
+
+.delivery-address[data-state='error'] select,
+.delivery-address[data-state='error'] textarea,
+.delivery-address select[aria-invalid='true'],
+.delivery-address textarea[aria-invalid='true'] {
+  border-color: var(--color-checkout-error);
+}
+
+.delivery-address[data-state='error'] .delivery-address-help {
+  color: var(--color-checkout-error);
+}
+
+.delivery-address[data-state='success'] .delivery-address-preview strong {
+  color: var(--color-checkout-success);
+}
+
+.shipping-quote {
+  display: grid;
+  gap: var(--space-checkout-2xs);
+  padding: var(--space-checkout-sm);
+  border: var(--rule-checkout);
+  border-radius: var(--radius-checkout-sm);
+  color: var(--color-checkout-ink);
+  background: var(--color-checkout-surface);
+}
+
+.shipping-quote[data-state='loading'] {
+  cursor: progress;
+}
+
+.shipping-quote[data-state='error'] {
+  border-color: var(--color-checkout-error);
+}
+
+.shipping-quote[data-state='success'] output {
+  color: var(--color-checkout-success);
+}
+
+.shipping-quote output,
+.installment-table td,
+.installment-summary output {
+  font-family: var(--font-checkout-data);
+  font-variant-numeric: tabular-nums;
+}
+
+.shipping-quote output {
+  font-size: var(--text-checkout-md);
+  font-weight: 700;
+}
+
+.shipping-quote small,
+.installment-caption,
+.installment-policy-note {
+  color: var(--color-checkout-muted);
+  font-size: var(--text-checkout-sm);
+  line-height: 1.5;
+}
+
+.installment-options {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.installment-options legend {
+  margin-block-end: var(--space-checkout-sm);
+  color: var(--color-checkout-ink);
+  font-family: var(--font-checkout-display);
+  font-size: var(--text-checkout-md);
+  font-weight: 700;
+}
+
+.installment-table-wrap {
+  overflow-x: auto;
+  border: var(--rule-checkout);
+  border-radius: var(--radius-checkout-md);
+}
+
+.installment-table {
+  width: 100%;
+  min-width: 25rem;
+  border-collapse: collapse;
+  color: var(--color-checkout-ink);
+  background: var(--color-checkout-paper);
+}
+
+.installment-table th,
+.installment-table td {
+  padding: var(--space-checkout-sm);
+  border-block-end: var(--rule-checkout);
+  text-align: end;
+}
+
+.installment-table th:first-child,
+.installment-table td:first-child {
+  text-align: start;
+}
+
+.installment-table tbody tr:last-child td {
+  border-block-end: 0;
+}
+
+.installment-plan-label {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--space-checkout-xs);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.installment-plan-label input {
+  inline-size: 1rem;
+  block-size: 1rem;
+  accent-color: var(--color-checkout-accent);
+}
+
+.installment-plan-label:focus-within {
+  outline: 2px solid var(--color-checkout-focus);
+  outline-offset: 2px;
+}
+
+.installment-plan-label:active {
+  color: var(--color-checkout-accent);
+}
+
+.installment-plan-label input:disabled + span {
+  color: var(--color-checkout-muted);
+  cursor: not-allowed;
+}
+
+.installment-table tr:has(input:checked) {
+  color: var(--color-checkout-ink);
+  background: var(--color-checkout-surface-strong);
+}
+
+.installment-loading,
+.installment-error {
+  min-height: 1.5rem;
+  margin: var(--space-checkout-sm) 0 0;
+}
+
+.installment-error {
+  color: var(--color-checkout-error);
+}
+
+.installment-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-checkout-sm);
+  margin-block-start: var(--space-checkout-md);
+}
+
+.installment-summary p {
+  display: grid;
+  gap: var(--space-checkout-2xs);
+  margin: 0;
+  padding: var(--space-checkout-sm);
+  border-block-start: var(--rule-checkout);
+}
+
+.installment-summary output {
+  color: var(--color-checkout-accent);
+  font-size: var(--text-checkout-md);
+  font-weight: 700;
+}
+
+.checkout-panel select:disabled,
+.checkout-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .delivery-address select:hover,
+  .delivery-address textarea:hover {
+    background: var(--color-checkout-surface);
+  }
+
+  .installment-table tbody tr:hover {
+    background: var(--color-checkout-surface);
+  }
+}
+
+@media (min-width: 40rem) {
+  .delivery-address-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 25.875rem) {
+  .installment-table-wrap {
+    border: 0;
+    overflow: visible;
+  }
+
+  .installment-table,
+  .installment-table tbody,
+  .installment-table tr,
+  .installment-table td {
+    display: block;
+    min-width: 0;
+  }
+
+  .installment-table thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: clip;
+    clip-path: inset(50%);
+  }
+
+  .installment-table tr {
+    margin-block-end: var(--space-checkout-sm);
+    padding: var(--space-checkout-sm);
+    border: var(--rule-checkout);
+    border-radius: var(--radius-checkout-md);
+  }
+
+  .installment-table td {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-checkout-sm);
+    padding: var(--space-checkout-xs) 0;
+    text-align: end;
+  }
+
+  .installment-table td::before {
+    content: attr(data-label);
+    color: var(--color-checkout-muted);
+    font-family: var(--font-checkout-body);
+    text-align: start;
+  }
+
+  .installment-table td:first-child {
+    display: block;
+  }
+
+  .installment-table td:first-child::before {
+    content: none;
+  }
+
+  .installment-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checkout-panel *,
+  .checkout-panel *::before,
+  .checkout-panel *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

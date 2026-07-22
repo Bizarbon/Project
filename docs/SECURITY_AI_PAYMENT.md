@@ -87,3 +87,84 @@ Luồng xử lý:
 3. Bật biểu tượng micro, đọc câu hỏi và xem chatbot trả lời bằng giọng nói.
 4. Thêm sản phẩm vào giỏ, tạo đơn và chọn VNPay ở chế độ mock hoặc sandbox.
 5. Mở hồ sơ, đổi mật khẩu và chứng minh token cũ không còn hiệu lực.
+
+## 6. QR thanh toán và email đơn hàng
+
+Sau khi tạo đơn bằng VNPay, MoMo, chuyển khoản hoặc trả góp, frontend mở trang
+`/pages/checkout/payment.html?orderId=...`. Trang này chỉ lấy thông tin thanh
+toán của đơn thuộc đúng tài khoản đang đăng nhập hoặc token bảo mật của đơn
+khách vãng lai, sau đó thăm dò trạng thái thanh toán từ backend.
+
+- Khách vãng lai chỉ dùng chuyển khoản ngân hàng, VNPay hoặc MoMo. COD và trả góp bị chặn ở cả
+  frontend lẫn backend.
+- Token khách là giá trị ngẫu nhiên; MongoDB chỉ lưu hash. Biết mã số đơn không
+  đủ để xem địa chỉ, QR hoặc trạng thái đơn của người khác.
+- Mã thanh toán trực tuyến hết hạn sau 15 phút. Backend tự hủy đơn chưa thanh
+  toán và hoàn số lượng sản phẩm về kho.
+
+- VNPay/MoMo: QR chứa URL do cổng thanh toán tạo. Backend chỉ đánh dấu đã thanh
+  toán sau khi chữ ký, số tiền và trạng thái callback/IPN hợp lệ.
+- Chuyển khoản thủ công: hiển thị số tài khoản, chủ tài khoản, số tiền và nội
+  dung `TECHxxxxxx`. Quản trị viên đối soát và xác nhận đơn. Nếu sau này dùng
+  dịch vụ đối soát, dịch vụ có thể gọi
+  `POST /api/payments/bank/webhook` với dữ liệu
+  `reference`, `amount`, `transactionId`, `status` và header
+  `x-bank-webhook-secret` để tự xác nhận.
+- Trả góp: mặc định dùng chế độ tiếp nhận hồ sơ nội bộ cho khách đã đăng nhập.
+  Khi có hợp đồng đối tác tài chính, cấu hình URL thật để chuyển sang cổng đối tác.
+
+Các biến chuyển khoản/trả góp cần cấu hình trên Vercel:
+
+```env
+BANK_ACCOUNT_NO=SO_TAI_KHOAN_THAT
+BANK_ACCOUNT_NAME=TEN_CHU_TAI_KHOAN_KHONG_DAU
+BANK_NAME=TEN_NGAN_HANG
+# QR tĩnh hoặc payload QR là tùy chọn, không bắt buộc với chuyển khoản thủ công.
+BANK_QR_IMAGE_URL=
+BANK_QR_PAYLOAD=
+BANK_WEBHOOK_SECRET=CHUOI_BI_MAT_NGAU_NHIEN
+PAYMENT_QR_EXPIRES_MINUTES=15
+INSTALLMENT_MODE=internal_review
+INSTALLMENT_TERMS=3,6,9,12
+INSTALLMENT_DOWN_PAYMENT_PERCENT=30
+INSTALLMENT_ANNUAL_RATE_PERCENT=0
+INSTALLMENT_PAYMENT_URL=https://doi-tac.example/pay?order={orderId}&amount={amount}&ref={reference}
+```
+
+`INSTALLMENT_PAYMENT_URL` chỉ là mẫu cấu hình; các biến `{orderId}`, `{amount}` và
+`{reference}` được thay bằng dữ liệu đơn. Production phải dùng URL/API thật do
+đối tác tài chính cung cấp, không dùng tên miền ví dụ.
+
+Email dùng SMTP và không được ghi mật khẩu vào Git. Với Gmail cá nhân, bật xác
+minh hai bước rồi tạo App Password riêng cho website:
+
+```env
+EMAIL_ENABLED=true
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=banphan272004@gmail.com
+SMTP_PASS=APP_PASSWORD_16_KY_TU
+EMAIL_FROM_NAME=TechEcommerce
+EMAIL_FROM=banphan272004@gmail.com
+ORDER_NOTIFICATION_EMAIL=banphan272004@gmail.com
+```
+
+Khi nhận đơn, hệ thống gửi thông báo cho cửa hàng và thư xác nhận/cảm ơn cho
+khách có email. Khi callback thanh toán hợp lệ hoặc admin xác nhận tiền, khách
+nhận thêm email xác nhận thanh toán. Lỗi gửi email được ghi log nhưng không làm
+mất đơn hàng đã tạo.
+
+## 7. Phí vận chuyển và mã vận đơn
+
+Khi khách chọn Tỉnh/Thành, backend tự đề xuất phí theo khu vực và tự tính lại
+phí khi tạo đơn; giá gửi từ trình duyệt không được tin cậy. Các mức mặc định là
+30.000đ nội thành TP.HCM, 35.000đ khu vực lân cận, 40.000đ miền Nam, 45.000đ
+miền Trung/Tây Nguyên và 50.000đ miền Bắc. Có thể thay đổi bằng các biến
+`SHIPPING_FEE_*` trong `.env`.
+
+Khi chưa nối API hãng vận chuyển, hệ thống tạo mã giao vận nội bộ theo cú pháp
+`TECH-YYYYMMDD-XXXXXX` để cửa hàng và khách cùng đối chiếu. Mã này được ghi rõ
+là mã TechEcommerce, không phải mã GHN. Khi cấu hình GHN, backend thay bằng mã
+`order_code` do GHN trả về. Adapter GHN cần `GHN_TOKEN`, `GHN_SHOP_ID`, loại
+dịch vụ, khối lượng/kích thước mặc định cùng mã địa bàn GHN.

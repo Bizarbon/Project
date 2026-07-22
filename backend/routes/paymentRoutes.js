@@ -1,7 +1,10 @@
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const Order = require('../models/Order');
-const { restoreOrderStock } = require('../utils/orderStock');
+const { restoreOrderStock, reReserveOrderStock } = require('../utils/orderStock');
+const { notifyPaymentConfirmed } = require('../utils/email');
+const { quoteInstallments } = require('../utils/installments');
 const {
     getPaymentProvidersStatus,
     mockPaymentToken,
@@ -98,6 +101,18 @@ function verifyMockPaymentRequest(provider, orderId, ref, token) {
 async function markPaid(order, provider, transactionId, metadata = {}) {
     if (!order) return null;
 
+    if (order.stockRestored) {
+        try {
+            await reReserveOrderStock(order);
+        } catch (error) {
+            order.paymentMetadata = {
+                ...(order.paymentMetadata || {}),
+                paymentReconciliationRequired: true,
+                reconciliationReason: error.message
+            };
+        }
+    }
+
     order.paymentStatus = 'paid';
     order.paymentProvider = provider || order.paymentProvider || 'manual';
     order.paymentTransactionId = transactionId ? String(transactionId) : order.paymentTransactionId;
@@ -107,8 +122,26 @@ async function markPaid(order, provider, transactionId, metadata = {}) {
         ...metadata
     };
 
+    if (order.status === 'pending' || (order.status === 'cancelled' && !order.stockRestored)) {
+        order.status = 'processing';
+        order.statusHistory = order.statusHistory || [];
+        order.statusHistory.push({
+            status: 'processing',
+            title: 'Thanh toán đã được xác nhận',
+            description: `Cổng ${provider || order.paymentProvider} đã xác nhận giao dịch. Đơn hàng chuyển sang kiểm hàng và đóng gói.`,
+            occurredAt: new Date()
+        });
+    }
+
     await order.save();
+    await notifyPaymentConfirmed(order);
     return order;
+}
+
+function secretMatches(actual, expected) {
+    const left = Buffer.from(String(actual || ''));
+    const right = Buffer.from(String(expected || ''));
+    return left.length > 0 && left.length === right.length && crypto.timingSafeEqual(left, right);
 }
 
 async function markFailed(order, provider, metadata = {}) {
@@ -134,6 +167,46 @@ async function markFailed(order, provider, metadata = {}) {
 
 router.get('/providers', (req, res) => {
     res.json({ providers: getPaymentProvidersStatus() });
+});
+
+router.post('/installment/quote', (req, res) => {
+    try {
+        return res.json(quoteInstallments(req.body.amount));
+    } catch (error) {
+        return res.status(error.statusCode || 400).json({ message: error.message });
+    }
+});
+
+// Generic bank reconciliation webhook. Map the bank provider payload to
+// { reference, amount, transactionId, status } and send the shared secret header.
+router.post('/bank/webhook', async (req, res) => {
+    try {
+        const expectedSecret = String(process.env.BANK_WEBHOOK_SECRET || '').trim();
+        if (!expectedSecret) return res.status(503).json({ message: 'BANK_WEBHOOK_SECRET chưa được cấu hình.' });
+        if (!secretMatches(req.get('x-bank-webhook-secret'), expectedSecret)) {
+            return res.status(401).json({ message: 'Chữ ký webhook ngân hàng không hợp lệ.' });
+        }
+
+        const reference = String(req.body.reference || req.body.content || '').trim().toUpperCase();
+        const match = reference.match(/^TECH0*(\d+)$/);
+        if (!match) return res.status(400).json({ message: 'Nội dung chuyển khoản không chứa mã đơn hợp lệ.' });
+        const order = await Order.findById(Number(match[1]));
+        if (!order || order.paymentMethod !== 'bank_transfer') {
+            return res.status(404).json({ message: 'Không tìm thấy đơn chuyển khoản tương ứng.' });
+        }
+        if (!amountMatches(order, req.body.amount)) {
+            return res.status(400).json({ message: 'Số tiền giao dịch không khớp tổng đơn hàng.' });
+        }
+        const success = ['paid', 'success', 'successful', 'completed'].includes(String(req.body.status || '').toLowerCase());
+        if (!success) return res.status(202).json({ received: true, confirmed: false });
+
+        await markPaid(order, 'bank_transfer', req.body.transactionId || req.body.id, {
+            bankWebhookReceivedAt: new Date().toISOString()
+        });
+        return res.json({ received: true, confirmed: true, orderId: order._id });
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
 });
 
 router.get('/mock/:provider', async (req, res) => {

@@ -6,7 +6,18 @@ const orderSchema = new mongoose.Schema({
     customer: {
         type: Number,
         ref: 'Customer',
-        required: true
+        default: null
+    },
+    guestEmail: {
+        type: String,
+        lowercase: true,
+        trim: true,
+        default: ''
+    },
+    guestAccessTokenHash: {
+        type: String,
+        default: '',
+        select: false
     },
     customerName: {
         type: String,
@@ -25,6 +36,22 @@ const orderSchema = new mongoose.Schema({
         default: ''
     },
     shippingAddress: {
+        type: String,
+        default: ''
+    },
+    shippingProvinceCode: {
+        type: String,
+        default: ''
+    },
+    shippingProvince: {
+        type: String,
+        default: ''
+    },
+    shippingWardCode: {
+        type: String,
+        default: ''
+    },
+    shippingWard: {
         type: String,
         default: ''
     },
@@ -128,9 +155,25 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    paymentExpiresAt: {
+        type: Date,
+        default: null
+    },
     paymentMetadata: {
         type: mongoose.Schema.Types.Mixed,
         default: {}
+    },
+    adminOrderEmailSentAt: {
+        type: Date,
+        default: null
+    },
+    customerOrderEmailSentAt: {
+        type: Date,
+        default: null
+    },
+    paymentConfirmationEmailSentAt: {
+        type: Date,
+        default: null
     },
     trackingNumber: {
         type: String,
@@ -145,6 +188,15 @@ const orderSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
+    shippingQuoteSource: {
+        type: String,
+        enum: ['', 'store_estimate', 'carrier'],
+        default: ''
+    },
+    shippingMetadata: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
     note: {
         type: String,
         default: ''
@@ -158,7 +210,13 @@ const orderSchema = new mongoose.Schema({
         default: Date.now
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+        transform: (_doc, value) => {
+            delete value.guestAccessTokenHash;
+            return value;
+        }
+    }
 });
 
 orderSchema.pre('save', async function() {

@@ -151,6 +151,28 @@ function paymentProviderStatus(provider) {
 }
 
 function getPaymentProvidersStatus() {
+    const bankDemo = envValue('BANK_TRANSFER_DEMO').toLowerCase() === 'true';
+    const bankMissing = [];
+    if (!envValue('BANK_ACCOUNT_NO')) bankMissing.push('BANK_ACCOUNT_NO');
+    if (!envValue('BANK_ACCOUNT_NAME')) bankMissing.push('BANK_ACCOUNT_NAME');
+    if (!envValue('BANK_NAME')) bankMissing.push('BANK_NAME');
+    const installmentMode = envValue('INSTALLMENT_MODE') || 'internal_review';
+    const installmentConfigured = installmentMode === 'internal_review' || Boolean(envValue('INSTALLMENT_PAYMENT_URL'));
+    const installmentMissing = installmentConfigured ? [] : ['INSTALLMENT_PAYMENT_URL'];
+
+    const bankStatus = {
+        provider: 'bank_transfer',
+        label: 'Chuyển khoản thủ công',
+        configured: bankMissing.length === 0,
+        mode: bankDemo ? 'manual_demo' : 'manual',
+        missingKeys: bankMissing,
+        message: bankMissing.length
+            ? `Chuyển khoản thủ công chưa được cấu hình. Thiếu: ${bankMissing.join(', ')}`
+            : bankDemo
+            ? 'Chuyển khoản thủ công đang dùng thông tin demo, không chuyển tiền thật.'
+            : 'Thông tin chuyển khoản thủ công đã sẵn sàng.'
+    };
+
     return {
         cod: {
             provider: 'cod',
@@ -159,19 +181,18 @@ function getPaymentProvidersStatus() {
             missingKeys: [],
             message: 'COD luon kha dung.'
         },
-        bank_transfer: {
-            provider: 'bank_transfer',
-            label: 'Chuyen khoan',
-            configured: true,
-            missingKeys: [],
-            message: 'Chuyen khoan thu cong luon kha dung.'
-        },
+        bank_transfer: bankStatus,
         installment: {
             provider: 'installment',
-            label: 'Tra gop',
-            configured: true,
-            missingKeys: [],
-            message: 'Tra gop luon kha dung.'
+            label: 'Trả góp',
+            configured: installmentConfigured,
+            mode: installmentMode,
+            missingKeys: installmentMissing,
+            message: installmentMissing.length
+                ? 'Trả góp chưa có URL thanh toán từ đối tác tài chính.'
+                : installmentMode === 'internal_review'
+                ? 'Trả góp đang ở chế độ tiếp nhận hồ sơ và chờ quản trị viên duyệt.'
+                : 'Cổng trả góp đã sẵn sàng.'
         },
         vnpay: paymentProviderStatus('vnpay'),
         momo: paymentProviderStatus('momo')
@@ -179,7 +200,7 @@ function getPaymentProvidersStatus() {
 }
 
 function ensurePaymentConfigured(provider) {
-    const status = paymentProviderStatus(provider);
+    const status = getPaymentProvidersStatus()[provider];
     if (status && !status.configured) {
         const error = new Error(status.message);
         error.statusCode = 503;

@@ -59,7 +59,7 @@
     }
 
     function createSession() {
-        return { id: `chat_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, title: 'Cuộc trò chuyện mới', updatedAt: new Date().toISOString(), messages: [] };
+        return { id: `chat_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, title: 'Cuộc trò chuyện mới', updatedAt: new Date().toISOString(), messages: [], context: {} };
     }
 
     function saveCurrentSession() {
@@ -153,7 +153,7 @@
         const response = await fetch(`${apiUrl}/chat`, {
             method: 'POST',
             headers: assistantAuth.getHeaders(),
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ message, context: currentSession.context || {} })
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.message || 'AI chưa thể phản hồi lúc này.');
@@ -180,6 +180,7 @@
         sendButton.disabled = true;
         try {
             const data = await requestAssistant(message);
+            if (data.context && typeof data.context === 'object') currentSession.context = data.context;
             pending.remove();
             const reply = data.reply || 'Mình chưa tìm được câu trả lời phù hợp.';
             appendMessage('assistant', reply, data.products || [], data.suggestions || []);
@@ -318,16 +319,43 @@
     const voiceInputButton = document.getElementById('voiceInputButton');
     if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
+        let recognizedText = '';
+        let silenceTimer = null;
         recognition.lang = 'vi-VN';
+        recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.onstart = () => voiceInputButton.classList.add('listening');
-        recognition.onresult = event => {
-            input.value = Array.from(event.results).map(result => result[0].transcript).join(' ');
-            resizeInput();
+        recognition.onstart = () => {
+            recognizedText = '';
+            voiceInputButton.classList.add('listening');
+            voiceInputButton.setAttribute('aria-label', 'Đang nghe, bấm để dừng');
         };
-        recognition.onend = () => voiceInputButton.classList.remove('listening');
+        recognition.onresult = event => {
+            const finalParts = [];
+            const interimParts = [];
+            Array.from(event.results).forEach(result => {
+                (result.isFinal ? finalParts : interimParts).push(result[0].transcript);
+            });
+            recognizedText = [...finalParts, ...interimParts].join(' ').trim();
+            input.value = recognizedText;
+            resizeInput();
+            window.clearTimeout(silenceTimer);
+            silenceTimer = window.setTimeout(() => recognition.stop(), 1200);
+        };
+        recognition.onspeechend = () => {
+            window.clearTimeout(silenceTimer);
+            silenceTimer = window.setTimeout(() => recognition.stop(), 1200);
+        };
+        recognition.onend = () => {
+            window.clearTimeout(silenceTimer);
+            voiceInputButton.classList.remove('listening');
+            voiceInputButton.setAttribute('aria-label', 'Nhập bằng giọng nói');
+            if (recognizedText) sendMessage(recognizedText);
+        };
         recognition.onerror = () => voiceInputButton.classList.remove('listening');
-        voiceInputButton.addEventListener('click', () => recognition.start());
+        voiceInputButton.addEventListener('click', () => {
+            if (voiceInputButton.classList.contains('listening')) recognition.stop();
+            else recognition.start();
+        });
     } else {
         voiceInputButton.disabled = true;
         voiceInputButton.title = 'Trình duyệt chưa hỗ trợ nhận dạng giọng nói';

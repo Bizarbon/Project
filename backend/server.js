@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
+const { expireOverduePayments } = require('./utils/paymentExpiry');
 
 const productRoutes = require('./routes/productRoutes');
 const customerRoutes = require('./routes/customerRoutes');
@@ -18,12 +19,14 @@ const couponRoutes = require('./routes/couponRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const locationRoutes = require('./routes/locationRoutes');
+const shippingRoutes = require('./routes/shippingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const FRONTEND_DIR = path.resolve(__dirname, '../frontend');
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
 const IS_VERCEL = Boolean(process.env.VERCEL);
+let lastPaymentExpirySweep = 0;
 
 function validateSecurityConfig() {
     if (!process.env.JWT_SECRET || String(process.env.JWT_SECRET).length < 32) {
@@ -76,13 +79,20 @@ app.use('/api', rateLimit({
     limit: 500,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
-    skip: req => req.path === '/health' || req.path.includes('/payments/vnpay/ipn') || req.path.includes('/payments/momo/ipn'),
+    skip: req => req.path === '/health'
+        || req.path.includes('/payments/vnpay/ipn')
+        || req.path.includes('/payments/momo/ipn')
+        || req.path.includes('/payments/bank/webhook'),
     message: { message: 'Hệ thống nhận quá nhiều yêu cầu. Vui lòng thử lại sau.' }
 }));
 
 app.use('/api', async (req, res, next) => {
     try {
         await connectDB();
+        if (Date.now() - lastPaymentExpirySweep > 60000) {
+            lastPaymentExpirySweep = Date.now();
+            expireOverduePayments().catch(error => console.error('Payment expiry sweep error:', error.message));
+        }
         next();
     } catch (error) {
         console.error('MongoDB connection error:', error.message);
@@ -111,6 +121,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/locations', locationRoutes);
+app.use('/api/shipping', shippingRoutes);
 
 app.use('/api', (req, res) => {
     res.status(404).json({ message: 'API endpoint không tồn tại.' });
@@ -150,6 +161,10 @@ app.use((error, req, res, next) => {
 
 async function startServer() {
     await connectDB();
+    const expiryTimer = setInterval(() => {
+        expireOverduePayments().catch(error => console.error('Payment expiry sweep error:', error.message));
+    }, 60000);
+    expiryTimer.unref();
     app.listen(PORT, '0.0.0.0', () => {
         console.log(`TechEcommerce running at http://0.0.0.0:${PORT}`);
     });
