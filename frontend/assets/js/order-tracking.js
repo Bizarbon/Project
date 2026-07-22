@@ -224,7 +224,7 @@ function renderOrder(order) {
                     <div><dt>Người nhận</dt><dd>${escapeHTML(order.recipientName || order.customerName || '')}</dd></div>
                     <div><dt>Số điện thoại</dt><dd>${escapeHTML(order.recipientPhone || order.customerPhone || '')}</dd></div>
                     <div><dt>Địa chỉ</dt><dd>${escapeHTML(order.shippingAddress || '')}</dd></div>
-                    <div><dt>Mã vận đơn</dt><dd>${escapeHTML(order.trackingNumber || 'Chưa có')}</dd></div>
+                    <div><dt>Mã vận đơn</dt><dd>${escapeHTML(order.trackingNumber || 'Chờ đơn vị vận chuyển tiếp nhận')}</dd></div>
                     <div><dt>Thanh toán</dt><dd>${escapeHTML(ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod || '')}</dd></div>
                     <div><dt>Trạng thái tiền</dt><dd>${escapeHTML(ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus || '')}</dd></div>
                     <div><dt>Tổng cộng</dt><dd><strong>${orderMoney(order.totalAmount)}</strong></dd></div>

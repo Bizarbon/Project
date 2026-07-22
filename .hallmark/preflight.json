@@ -1,0 +1,9 @@
+{
+  "scannedAt": "2026-07-22",
+  "framework": "vanilla-html-css-javascript",
+  "fontStack": ["Montserrat", "Inter", "JetBrains Mono"],
+  "palette": "Neo Circuit blue tokens in frontend/assets/css/neo-circuit.css",
+  "motion": "motion-cut; no animation library",
+  "spacing": "existing mixed scale; checkout additions use a 4pt scale",
+  "preserve": ["font stack", "Neo Circuit palette", "storefront navigation", "dark mode"]
+}

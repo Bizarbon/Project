@@ -98,10 +98,14 @@ async function loadOrders() {
                     </select>
                 </td>
                 <td style="font-size:0.8rem;">
-                    <div style="font-weight:600;color:var(--primary);cursor:pointer;" onclick="updateTracking('${order._id}', '${escapeHTML(order.trackingNumber || '')}', '${escapeHTML(order.shippingUnit || '')}')">
-                        ${order.trackingNumber ? escapeHTML(order.trackingNumber) : 'Nhập mã vận đơn'}
+                    <button type="button" class="tracking-action" onclick="updateTracking('${order._id}', '${escapeHTML(order.trackingNumber || '')}', '${escapeHTML(order.shippingUnit || '')}')">
+                        ${order.trackingNumber ? escapeHTML(order.trackingNumber) : 'Chờ hãng vận chuyển'}
+                    </button>
+                    <div style="color:var(--text-muted);margin-top:0.2rem;max-width:220px;">
+                        ${order.shippingUnit
+                            ? escapeHTML(order.shippingUnit)
+                            : escapeHTML(order.shippingMetadata?.shipment?.message || 'Tự tạo sau khi cấu hình API đơn vị vận chuyển.')}
                     </div>
-                    <div style="color:var(--text-muted);margin-top:0.2rem;">${order.shippingUnit ? escapeHTML(order.shippingUnit) : ''}</div>
                 </td>
                 <td style="font-size:0.8rem;color:var(--text-secondary);">${formatDate(order.orderDate || order.createdAt)}</td>
                 <td><button class="btn-delete" onclick="deleteOrder('${order._id}')">Xóa</button></td>
@@ -161,7 +165,7 @@ async function markPaymentPaid(id) {
 }
 
 async function updateTracking(id, currentTracking, currentUnit) {
-    const trackingNumber = prompt('Nhập mã vận đơn:', currentTracking);
+    const trackingNumber = prompt('Nhập mã vận đơn do hãng vận chuyển cấp:', currentTracking);
     if (trackingNumber === null) return;
     const shippingUnit = prompt('Nhập đơn vị giao hàng (VD: GHTK, SPX):', currentUnit || 'GHTK');
     if (shippingUnit === null) return;

@@ -20,6 +20,10 @@ const DELIVERY_DATA_URL = 'assets/data/vietnam-administrative-2025.json?v=202607
 let deliveryAreas = [];
 let deliveryAreasState = 'idle';
 let deliveryAreasPromise = null;
+let currentShippingQuote = null;
+let currentInstallmentQuote = null;
+let installmentQuoteTimer = null;
+let checkoutAddressInitialized = false;
 
 function normalizeAddressSearch(value = '') {
     return String(value)
@@ -100,6 +104,10 @@ function renderPaymentMethodHint() {
     if (!hint || !select) return;
 
     const selected = paymentProviders[select.value];
+    if (!auth.isLoggedIn() && ['cod', 'installment'].includes(select.value)) {
+        hint.textContent = 'Phương thức này chỉ dành cho khách hàng đã đăng nhập.';
+        return;
+    }
     if (selected && selected.configured === false) {
         hint.textContent = selected.message || `${selected.label || select.value} chua san sang.`;
         return;
@@ -125,9 +133,13 @@ function applyPaymentProviderAvailability(providers) {
         const provider = paymentProviders[option.value];
         if (!option.dataset.baseLabel) option.dataset.baseLabel = option.textContent;
 
-        if (provider && provider.configured === false) {
+        const guestRestricted = !auth.isLoggedIn() && ['cod', 'installment'].includes(option.value);
+        if (guestRestricted) {
             option.disabled = true;
-            option.textContent = `${option.dataset.baseLabel} (chua cau hinh)`;
+            option.textContent = `${option.dataset.baseLabel} (cần đăng nhập)`;
+        } else if (provider && provider.configured === false) {
+            option.disabled = true;
+            option.textContent = `${option.dataset.baseLabel} (chưa cấu hình)`;
         } else {
             option.disabled = false;
             option.textContent = option.dataset.baseLabel;
@@ -438,10 +450,128 @@ function getSavedShoppingAddress() {
     }
 }
 
-function applySavedAddressToCheckout() {
+function checkoutAddressValue() {
+    const provinceSelect = document.getElementById('checkoutProvince');
+    const wardSelect = document.getElementById('checkoutWard');
+    const detailInput = document.getElementById('shippingAddressDetail');
+    const provinceOption = provinceSelect?.selectedOptions?.[0];
+    const wardOption = wardSelect?.selectedOptions?.[0];
+    const detail = detailInput?.value.trim() || '';
+    const province = provinceOption?.dataset.name || '';
+    const ward = wardOption?.dataset.name || '';
+    return {
+        provinceCode: provinceSelect?.value || '',
+        province,
+        wardCode: wardSelect?.value || '',
+        ward,
+        detail,
+        label: province.replace(/^(Thành phố|Tỉnh)\s+/u, '') || 'Địa chỉ giao hàng',
+        fullAddress: [detail, ward, province].filter(Boolean).join(', ')
+    };
+}
+
+function checkoutAddressDetail(savedAddress) {
+    const ward = normalizeAddressSearch(savedAddress?.ward || '');
+    const province = normalizeAddressSearch(savedAddress?.province || '');
+    return String(savedAddress?.fullAddress || '')
+        .split(',')
+        .map(part => part.trim())
+        .filter(part => {
+            const normalized = normalizeAddressSearch(part);
+            return normalized && normalized !== ward && normalized !== province;
+        })
+        .join(', ');
+}
+
+function setCheckoutAddressState(state, message = '') {
+    const fieldset = document.getElementById('deliveryAddressFieldset');
+    const helper = document.getElementById('shippingAddressHelp');
+    if (!fieldset || !helper) return;
+    fieldset.dataset.state = state;
+    if (message) helper.textContent = message;
+}
+
+function populateCheckoutWards(provinceCode, selectedWardCode = '') {
+    const wardSelect = document.getElementById('checkoutWard');
+    const province = deliveryAreas.find(item => String(item.code) === String(provinceCode));
+    if (!wardSelect) return;
+    wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>' + (province?.wards || []).map(ward =>
+        `<option value="${escapeHTML(ward.code)}" data-name="${escapeHTML(ward.name)}" ${String(ward.code) === String(selectedWardCode) ? 'selected' : ''}>${escapeHTML(ward.name)}</option>`
+    ).join('');
+    wardSelect.disabled = !province;
+}
+
+function updateCheckoutAddress({ persist = true, refreshQuote = true } = {}) {
+    const address = checkoutAddressValue();
+    const hiddenInput = document.getElementById('shippingAddress');
+    const preview = document.getElementById('shippingAddressPreview');
+    if (hiddenInput) hiddenInput.value = address.fullAddress;
+    if (preview) preview.textContent = address.fullAddress || 'Chưa đủ thông tin địa chỉ.';
+
+    const fieldValues = {
+        checkoutProvince: address.provinceCode,
+        checkoutWard: address.wardCode,
+        shippingAddressDetail: address.detail
+    };
+    const complete = Object.values(fieldValues).every(Boolean);
+    Object.entries(fieldValues).forEach(([id, value]) => {
+        const field = document.getElementById(id);
+        if (!field) return;
+        if (value) field.removeAttribute('aria-invalid');
+    });
+    setCheckoutAddressState(
+        complete ? 'success' : 'default',
+        complete
+            ? 'Địa chỉ đã đủ Tỉnh/Thành, Phường/Xã và thông tin số nhà/đường.'
+            : 'Ghi rõ số nhà, tên đường, tòa nhà hoặc chỉ dẫn; sau đó chọn đủ khu vực giao hàng.'
+    );
+
+    if (persist && (address.provinceCode || address.wardCode || address.detail)) {
+        localStorage.setItem('shoppingAddress', JSON.stringify(address));
+        if (address.label) localStorage.setItem('shoppingLocation', address.label);
+    }
+    if (refreshQuote) refreshShippingQuote(address);
+    return address;
+}
+
+async function applySavedAddressToCheckout() {
+    const provinceSelect = document.getElementById('checkoutProvince');
+    const detailInput = document.getElementById('shippingAddressDetail');
+    if (!provinceSelect || !detailInput) return;
     const savedAddress = getSavedShoppingAddress();
-    const shippingAddress = document.getElementById('shippingAddress');
-    if (savedAddress?.fullAddress && shippingAddress) shippingAddress.value = savedAddress.fullAddress;
+    setCheckoutAddressState('loading', 'Đang tải danh mục Tỉnh/Thành và Phường/Xã…');
+    try {
+        await loadDeliveryAreas();
+        provinceSelect.innerHTML = '<option value="">Chọn Tỉnh/Thành</option>' + deliveryAreas.map(province =>
+            `<option value="${escapeHTML(province.code)}" data-name="${escapeHTML(province.name)}" ${String(province.code) === String(savedAddress?.provinceCode || '') ? 'selected' : ''}>${escapeHTML(province.name)}</option>`
+        ).join('');
+        populateCheckoutWards(savedAddress?.provinceCode || '', savedAddress?.wardCode || '');
+        detailInput.value = checkoutAddressDetail(savedAddress)
+            || (!savedAddress?.provinceCode ? String(savedAddress?.fullAddress || detailInput.value || '') : '');
+        updateCheckoutAddress({ persist: false, refreshQuote: false });
+    } catch (error) {
+        setCheckoutAddressState('error', 'Không tải được danh mục địa chỉ. Hãy tải lại trang rồi thử lại.');
+    }
+}
+
+async function setupCheckoutAddressSelector() {
+    if (checkoutAddressInitialized) return applySavedAddressToCheckout();
+    checkoutAddressInitialized = true;
+    const provinceSelect = document.getElementById('checkoutProvince');
+    const wardSelect = document.getElementById('checkoutWard');
+    const detailInput = document.getElementById('shippingAddressDetail');
+    if (!provinceSelect || !wardSelect || !detailInput) return;
+    provinceSelect.addEventListener('change', () => {
+        populateCheckoutWards(provinceSelect.value);
+        updateCheckoutAddress();
+    });
+    wardSelect.addEventListener('change', () => updateCheckoutAddress());
+    detailInput.addEventListener('input', () => {
+        currentShippingQuote = null;
+        updateCheckoutAddress({ refreshQuote: false });
+    });
+    detailInput.addEventListener('blur', () => updateCheckoutAddress());
+    await applySavedAddressToCheckout();
 }
 
 function setupAddressSelector() {
@@ -487,7 +617,7 @@ function setupAddressSelector() {
         localStorage.setItem('shoppingAddress', JSON.stringify(address));
         localStorage.setItem('shoppingLocation', address.label);
         locationLabel.textContent = address.label;
-        applySavedAddressToCheckout();
+        window.dispatchEvent(new CustomEvent('shopping-address-change', { detail: address }));
 
         if (auth.isLoggedIn()) {
             const user = auth.getUser();
@@ -1224,8 +1354,9 @@ function renderCart() {
         document.getElementById('cartDiscount').textContent = `-${fmt(discountAmount)}`;
     }
     cartTotal.style.display = 'block';
-    document.getElementById('checkoutPanel').style.display = auth.isLoggedIn() ? 'block' : 'none';
+    document.getElementById('checkoutPanel').style.display = 'block';
     document.getElementById('guestCheckoutGate').style.display = auth.isLoggedIn() ? 'none' : 'grid';
+    scheduleInstallmentQuote();
 }
 
 async function loadStats() {
@@ -1250,8 +1381,9 @@ async function loadProfileForCheckout() {
         if (!res.ok) return;
         const data = await res.json();
         document.getElementById('recipientName').value = data.name || '';
+        document.getElementById('guestEmail').value = data.email || '';
         document.getElementById('recipientPhone').value = data.phone || '';
-        document.getElementById('shippingAddress').value = data.address || '';
+        if (!getSavedShoppingAddress()) document.getElementById('shippingAddressDetail').value = data.address || '';
     } catch (e) {}
 }
 
@@ -1269,35 +1401,160 @@ async function loadCustomers() {
             if (!opt) return;
             document.getElementById('recipientName').value = opt.dataset.name || '';
             document.getElementById('recipientPhone').value = opt.dataset.phone || '';
-            document.getElementById('shippingAddress').value = opt.dataset.address || '';
+            document.getElementById('checkoutProvince').value = '';
+            populateCheckoutWards('');
+            document.getElementById('shippingAddressDetail').value = opt.dataset.address || '';
+            updateCheckoutAddress({ persist: false });
         });
     } catch (e) {}
+}
+
+function checkoutAmount() {
+    const cart = getCart();
+    const subtotal = cart.reduce((total, item) => {
+        const product = allProducts.find(candidate => String(candidate._id) === String(item.productId));
+        return total + Number(product?.price || 0) * Number(item.quantity || 0);
+    }, 0);
+    const discount = Math.min(Number(appliedCoupon?.discountAmount) || 0, subtotal);
+    return Math.max(subtotal - discount, 0) + Number(currentShippingQuote?.fee || 0);
+}
+
+async function refreshShippingQuote(address = checkoutAddressValue()) {
+    const output = document.getElementById('shippingFeeDisplay');
+    const hint = document.getElementById('shippingFeeHint');
+    const feeInput = document.getElementById('shippingFee');
+    const quoteBox = output?.closest('.shipping-quote');
+    if (!output || !hint || !feeInput) return;
+
+    const shippingAddress = address?.fullAddress || document.getElementById('shippingAddress')?.value.trim() || '';
+    if (!address?.provinceCode) {
+        currentShippingQuote = null;
+        feeInput.value = 0;
+        output.textContent = 'Chưa có báo giá';
+        hint.textContent = 'Chọn Tỉnh/Thành để hệ thống đề xuất phí giao hàng.';
+        if (quoteBox) quoteBox.dataset.state = 'default';
+        renderCart();
+        return;
+    }
+    if (quoteBox) quoteBox.dataset.state = 'loading';
+    output.textContent = 'Đang tính phí…';
+    hint.textContent = 'Đang xác định khu vực giao hàng.';
+    try {
+        const response = await fetch(`${API_URL}/shipping/quote`, {
+            method: 'POST',
+            headers: auth.getHeaders(),
+            body: JSON.stringify({
+                provinceCode: address?.provinceCode || '',
+                wardCode: address?.wardCode || '',
+                address: shippingAddress
+            })
+        });
+        const quote = await response.json();
+        if (!response.ok) throw new Error(quote.message || 'Không tính được phí vận chuyển.');
+        currentShippingQuote = quote;
+        feeInput.value = quote.fee;
+        output.textContent = fmt(quote.fee);
+        hint.textContent = `${quote.serviceLabel} · ${quote.zoneLabel}. ${quote.message}`;
+        if (quoteBox) quoteBox.dataset.state = 'success';
+        renderCart();
+    } catch (error) {
+        currentShippingQuote = null;
+        feeInput.value = 0;
+        output.textContent = 'Chưa có báo giá';
+        hint.textContent = error.message;
+        if (quoteBox) quoteBox.dataset.state = 'error';
+        renderCart();
+    }
+}
+
+function renderSelectedInstallmentPlan() {
+    const selected = document.querySelector('input[name="installmentTerm"]:checked');
+    const plan = currentInstallmentQuote?.plans?.find(item => item.term === Number(selected?.value));
+    document.getElementById('selectedDownPayment').textContent = plan ? fmt(plan.downPayment) : '—';
+    document.getElementById('selectedMonthlyPayment').textContent = plan ? fmt(plan.monthlyPayment) : '—';
+}
+
+function renderInstallmentQuote(quote) {
+    currentInstallmentQuote = quote;
+    const rows = document.getElementById('installmentPlanRows');
+    const previousTerm = Number(document.querySelector('input[name="installmentTerm"]:checked')?.value);
+    rows.innerHTML = quote.plans.map((plan, index) => `
+        <tr>
+          <td data-label="Kỳ hạn">
+            <label class="installment-plan-label">
+              <input type="radio" name="installmentTerm" value="${plan.term}" ${plan.term === previousTerm || (!previousTerm && index === 0) ? 'checked' : ''}>
+              <span>${plan.term} tháng</span>
+            </label>
+          </td>
+          <td data-label="Trả trước">${fmt(plan.downPayment)}</td>
+          <td data-label="Mỗi tháng">${fmt(plan.monthlyPayment)}</td>
+          <td data-label="Tổng lãi">${fmt(plan.totalInterest)}</td>
+        </tr>`).join('');
+    document.getElementById('installmentCaption').textContent =
+        `${quote.policy.policyName}: trả trước ${quote.policy.downPaymentPercent}%, lãi suất năm ${quote.policy.annualRatePercent}%.`;
+    document.getElementById('installmentLoading').textContent = '';
+    document.getElementById('installmentError').textContent = '';
+    rows.querySelectorAll('input[name="installmentTerm"]').forEach(input => {
+        input.addEventListener('change', renderSelectedInstallmentPlan);
+    });
+    renderSelectedInstallmentPlan();
+}
+
+async function refreshInstallmentQuote() {
+    const options = document.getElementById('installmentOptions');
+    if (!options || options.hidden) return;
+    const amount = checkoutAmount();
+    if (!amount || !currentShippingQuote) {
+        document.getElementById('installmentPlanRows').innerHTML = '';
+        document.getElementById('installmentError').textContent = 'Chọn địa chỉ giao hàng để tính đủ khoản trả trước và số tiền mỗi tháng.';
+        return;
+    }
+    document.getElementById('installmentLoading').textContent = 'Đang tính phương án trả góp…';
+    try {
+        const response = await fetch(`${API_URL}/payments/installment/quote`, {
+            method: 'POST', headers: auth.getHeaders(), body: JSON.stringify({ amount })
+        });
+        const quote = await response.json();
+        if (!response.ok) throw new Error(quote.message || 'Không tính được phương án trả góp.');
+        renderInstallmentQuote(quote);
+    } catch (error) {
+        currentInstallmentQuote = null;
+        document.getElementById('installmentLoading').textContent = '';
+        document.getElementById('installmentError').textContent = error.message;
+    }
+}
+
+function scheduleInstallmentQuote() {
+    window.clearTimeout(installmentQuoteTimer);
+    installmentQuoteTimer = window.setTimeout(refreshInstallmentQuote, 180);
 }
 
 function updatePaymentInfo() {
     const method = document.getElementById('paymentMethod').value;
     const bank = document.getElementById('bankTransferInfo');
     bank.style.display = method === 'bank_transfer' ? 'block' : 'none';
+    document.getElementById('installmentOptions').hidden = method !== 'installment';
+    if (method === 'installment') scheduleInstallmentQuote();
     renderPaymentMethodHint();
 }
 
 async function createOrder() {
-    if (!auth.isLoggedIn()) {
-        showToast('Vui lòng đăng nhập để đặt hàng!', 'error');
-        setTimeout(goToLoginForCheckout, 700);
-        return;
-    }
-
     const cart = getCart();
     if (!cart.length) return showToast('Giỏ hàng trống!', 'error');
 
+    const checkoutAddress = checkoutAddressValue();
     const payload = {
         products: cart.map(item => ({ product: item.productId, quantity: item.quantity })),
         paymentMethod: document.getElementById('paymentMethod').value,
-        shippingFee: Number(document.getElementById('shippingFee').value || 0),
+        shippingProvinceCode: checkoutAddress.provinceCode,
+        shippingProvince: checkoutAddress.province,
+        shippingWardCode: checkoutAddress.wardCode,
+        shippingWard: checkoutAddress.ward,
         recipientName: document.getElementById('recipientName').value.trim(),
         recipientPhone: document.getElementById('recipientPhone').value.trim(),
-        shippingAddress: document.getElementById('shippingAddress').value.trim(),
+        shippingAddress: checkoutAddress.fullAddress,
+        guestEmail: document.getElementById('guestEmail').value.trim(),
+        installmentTerm: Number(document.querySelector('input[name="installmentTerm"]:checked')?.value || 0),
         note: document.getElementById('orderNote').value.trim(),
         couponCode: appliedCoupon?.code || document.getElementById('couponCode')?.value.trim() || ''
     };
@@ -1307,8 +1564,33 @@ async function createOrder() {
         return showToast(selectedProvider.message || 'Cổng thanh toán này chưa sẵn sàng.', 'error');
     }
 
-    if (!payload.recipientName || !payload.recipientPhone || !payload.shippingAddress) {
+    if (!payload.recipientName || !payload.recipientPhone) {
         return showToast('Vui lòng nhập đầy đủ thông tin nhận hàng!', 'error');
+    }
+    if (!checkoutAddress.provinceCode || !checkoutAddress.wardCode || !checkoutAddress.detail) {
+        const missingFields = [
+            ['checkoutProvince', checkoutAddress.provinceCode],
+            ['checkoutWard', checkoutAddress.wardCode],
+            ['shippingAddressDetail', checkoutAddress.detail]
+        ];
+        missingFields.forEach(([id, value]) => {
+            const field = document.getElementById(id);
+            if (field && !value) field.setAttribute('aria-invalid', 'true');
+        });
+        setCheckoutAddressState('error', 'Địa chỉ chưa đủ. Chọn Tỉnh/Thành, Phường/Xã và ghi rõ số nhà hoặc tên đường.');
+        return showToast('Vui lòng nhập đầy đủ địa chỉ giao hàng.', 'error');
+    }
+    if (!currentShippingQuote) {
+        return showToast('Vui lòng chọn Tỉnh/Thành để hệ thống tính phí vận chuyển.', 'error');
+    }
+    if (payload.paymentMethod === 'installment' && !payload.installmentTerm) {
+        return showToast('Vui lòng chọn kỳ hạn trả góp.', 'error');
+    }
+    if (!auth.isLoggedIn() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.guestEmail)) {
+        return showToast('Vui lòng nhập email hợp lệ để nhận xác nhận đơn hàng!', 'error');
+    }
+    if (!auth.isLoggedIn() && !['bank_transfer', 'vnpay', 'momo'].includes(payload.paymentMethod)) {
+        return showToast('Khách chưa đăng nhập chỉ dùng được chuyển khoản thủ công, VNPay hoặc MoMo.', 'error');
     }
 
     const btn = document.getElementById('checkoutBtn');
@@ -1326,13 +1608,20 @@ async function createOrder() {
 
         setCart([]);
         appliedCoupon = null;
+        if (data.guestAccessToken && data.order?._id) {
+            localStorage.setItem(`guestOrderToken:${data.order._id}`, data.guestAccessToken);
+        }
+        if (data.checkoutUrl) {
+            window.location.href = data.checkoutUrl;
+            return;
+        }
         if (data.paymentUrl) {
             window.location.href = data.paymentUrl;
             return;
         }
 
         const message = payload.paymentMethod === 'bank_transfer'
-            ? 'Đã tạo đơn. Vui lòng chuyển khoản và chờ xác nhận!'
+            ? 'Đã tạo đơn. Vui lòng chuyển khoản đúng nội dung và chờ cửa hàng xác nhận!'
             : 'Đặt hàng thành công!';
         showToast(message);
         await loadProducts();
@@ -1373,8 +1662,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape') closeCartDrawer();
     });
-    document.getElementById('shippingFee')?.addEventListener('input', renderCart);
     document.getElementById('paymentMethod')?.addEventListener('change', updatePaymentInfo);
+    window.addEventListener('shopping-address-change', async () => {
+        await applySavedAddressToCheckout();
+        refreshShippingQuote(checkoutAddressValue());
+    });
 
     document.getElementById('customerSelectionGroup').style.display = auth.isAdmin() ? 'block' : 'none';
     if (!auth.isAdmin()) {
@@ -1387,7 +1679,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadProducts();
     await loadRecommendations();
     await loadProfileForCheckout();
-    applySavedAddressToCheckout();
+    await setupCheckoutAddressSelector();
+    await refreshShippingQuote(checkoutAddressValue());
     await loadCustomers();
     updatePaymentInfo();
     if (pageParams.get('openCart') === '1' || (auth.isLoggedIn() && localStorage.getItem('checkoutAfterLogin') === 'true')) {

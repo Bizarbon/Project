@@ -97,7 +97,7 @@ function orderCard(order) {
                 <div><dt>SĐT</dt><dd>${escapeHTML(order.recipientPhone || order.customerPhone || '')}</dd></div>
                 <div><dt>Địa chỉ</dt><dd>${escapeHTML(order.shippingAddress || '')}</dd></div>
                 <div><dt>Thanh toán</dt><dd>${methodLabels[order.paymentMethod] || order.paymentMethod}</dd></div>
-                <div><dt>Vận chuyển</dt><dd>${order.trackingNumber ? `${escapeHTML(order.shippingUnit || '')} - ${escapeHTML(order.trackingNumber)}` : 'Chưa có mã vận đơn'}</dd></div>
+                <div><dt>Vận chuyển</dt><dd>${order.trackingNumber ? `${escapeHTML(order.shippingUnit || '')} - ${escapeHTML(order.trackingNumber)}` : 'Chờ đơn vị vận chuyển tiếp nhận'}</dd></div>
                 <div><dt>Tổng tiền</dt><dd class="money">${fmt(order.totalAmount)}</dd></div>
             </dl>
             <div class="order-actions">

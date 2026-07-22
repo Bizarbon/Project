@@ -48,7 +48,7 @@
             <h1 id="resultTitle">Đang kiểm tra thanh toán</h1>
             <p id="resultMessage">Vui lòng chờ trong giây lát.</p>
             <div class="result-actions">
-                <a href="../account/orders.html" class="btn btn-primary">Xem đơn hàng</a>
+                <a id="resultOrderLink" href="../account/orders.html" class="btn btn-primary">Xem đơn hàng</a>
                 <a href="../../index.html" class="btn btn-secondary">Tiếp tục mua sắm</a>
             </div>
         </section>
@@ -60,14 +60,54 @@
         const provider = params.get('provider') || 'cổng thanh toán';
         const orderId = params.get('orderId');
         const message = params.get('message') || '';
-        const success = status === 'success';
+        const resultIcon = document.getElementById('resultIcon');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultOrderLink = document.getElementById('resultOrderLink');
 
-        document.getElementById('resultIcon').textContent = success ? 'OK' : '!';
-        document.getElementById('resultTitle').textContent = success
-            ? `Thanh toán ${provider.toUpperCase()} thành công`
-            : `Thanh toán ${provider.toUpperCase()} chưa hoàn tất`;
-        document.getElementById('resultMessage').textContent =
-            `${message}${orderId ? ` Mã đơn #${orderId}.` : ''}`;
+        if (orderId && /^\d+$/.test(orderId)) {
+            resultOrderLink.href = auth.isLoggedIn()
+                ? `../account/order-detail.html?id=${encodeURIComponent(orderId)}`
+                : `payment.html?orderId=${encodeURIComponent(orderId)}`;
+        }
+
+        function renderGatewayResult(paymentStatus) {
+            const confirmed = paymentStatus === 'paid';
+            const failed = paymentStatus === 'failed';
+            resultIcon.textContent = confirmed ? 'OK' : failed ? '!' : '…';
+            resultTitle.textContent = confirmed
+                ? `Thanh toán ${provider.toUpperCase()} thành công`
+                : failed
+                ? `Thanh toán ${provider.toUpperCase()} không thành công`
+                : 'Đang chờ cổng thanh toán xác nhận';
+            resultMessage.textContent = confirmed
+                ? `Đơn hàng #${orderId} đã được xác nhận thanh toán và chuyển sang xử lý.`
+                : `${message || 'Kết quả đã được tiếp nhận.'}${orderId ? ` Mã đơn #${orderId}.` : ''}`;
+        }
+
+        async function verifyPaymentResult() {
+            if (!orderId) {
+                renderGatewayResult(status === 'failed' ? 'failed' : 'pending');
+                return;
+            }
+            try {
+                const headers = auth.getHeaders();
+                const guestToken = localStorage.getItem(`guestOrderToken:${orderId}`) || '';
+                if (!auth.isLoggedIn() && guestToken) headers['x-guest-order-token'] = guestToken;
+                if (!auth.isLoggedIn() && !guestToken) {
+                    renderGatewayResult(status === 'failed' ? 'failed' : 'pending');
+                    return;
+                }
+                const response = await fetch(`${API_URL}/orders/${orderId}`, { headers });
+                const order = await response.json();
+                if (!response.ok) throw new Error(order.message || 'Không kiểm tra được đơn hàng.');
+                renderGatewayResult(order.paymentStatus);
+            } catch (error) {
+                renderGatewayResult(status === 'failed' ? 'failed' : 'pending');
+            }
+        }
+
+        verifyPaymentResult();
     </script>
     <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
     <script src="../../assets/js/chatbox.js"></script>

@@ -72,6 +72,10 @@ async function buildPreferenceProfile(user) {
 }
 
 function recommendationReason(product, signals) {
+    if (signals.requirementMatch) return signals.requirementReason;
+    if (signals.priorityRequested && signals.overBudget) return `Vượt ngân sách; cần xác minh ${signals.priorityLabel}`;
+    if (signals.priorityRequested) return `Lựa chọn gần nhất; cần xác minh ${signals.priorityLabel}`;
+    if (signals.overBudget) return 'Lựa chọn gần nhất nhưng vượt ngân sách';
     if (signals.referenceCategory) return `Tương tự ${signals.referenceCategory}`;
     if (signals.preferredCategory) return `Phù hợp sở thích ${product.category}`;
     if (signals.preferredBrand) return `Thương hiệu bạn quan tâm`;
@@ -88,7 +92,8 @@ async function recommendProducts({
     category = '',
     maxPrice = 0,
     referenceProductId = null,
-    search = ''
+    search = '',
+    requirements = null
 } = {}) {
     const safeLimit = Math.min(Math.max(Number(limit) || 6, 1), 12);
     const priceLimit = Math.max(Number(maxPrice) || 0, 0);
@@ -109,12 +114,28 @@ async function recommendProducts({
             const categoryKey = normalizeText(product.category);
             const brandKey = normalizeText(product.brand);
             const words = productWords(product);
+            const priority = normalizeText(requirements?.priority || '');
+            const warrantyAvailable = Boolean(product.warranty && normalizeText(product.warranty) !== 'khong bao hanh');
+            const requirementChecks = [
+                { match: priority.includes('do ben') && warrantyAvailable, reason: `Có thông tin bảo hành ${product.warranty}` },
+                { match: priority.includes('pin') && Boolean(product.specs?.battery), reason: `Có thông tin pin: ${product.specs?.battery}` },
+                { match: priority.includes('hieu nang') && Boolean(product.specs?.cpu || product.specs?.ram || product.specs?.gpu), reason: 'Có cấu hình hiệu năng để đối chiếu' },
+                { match: priority.includes('camera') && Boolean(product.specs?.camera), reason: `Có thông tin camera: ${product.specs?.camera}` },
+                { match: priority.includes('man hinh') && Boolean(product.specs?.screen), reason: `Có thông tin màn hình: ${product.specs?.screen}` },
+                { match: priority.includes('nhe') && Boolean(product.specs?.weight), reason: `Có thông tin khối lượng: ${product.specs?.weight}` }
+            ];
+            const requirement = requirementChecks.find(item => item.match);
             const signals = {
                 preferredCategory: preferences.categoryWeights.has(categoryKey),
                 preferredBrand: preferences.brandWeights.has(brandKey),
                 referenceCategory: referenceProduct && normalizeText(referenceProduct.category) === categoryKey,
                 budgetMatch: Boolean(priceLimit && product.price <= priceLimit),
-                searchMatch: searchTerms.length > 0 && searchTerms.some(term => words.includes(term))
+                searchMatch: searchTerms.length > 0 && searchTerms.some(term => words.includes(term)),
+                requirementMatch: Boolean(requirement),
+                requirementReason: requirement?.reason || '',
+                priorityRequested: Boolean(priority && !requirement),
+                priorityLabel: String(requirements?.priority || 'ưu tiên đã chọn'),
+                overBudget: Boolean(Number(requirements?.budget || priceLimit) && product.price > Number(requirements?.budget || priceLimit))
             };
 
             let score = Number(product.rating || 0) * 1.6;
@@ -127,6 +148,7 @@ async function recommendProducts({
             score += referenceProduct && normalizeText(referenceProduct.brand) === brandKey ? 4 : 0;
             score += signals.searchMatch ? 7 : 0;
             score += signals.budgetMatch ? 2 : 0;
+            score += signals.requirementMatch ? 4 : 0;
             score -= preferences.purchasedIds.has(Number(product._id)) ? 1.5 : 0;
 
             const result = product.toObject();

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Xem hướng dẫn thanh toán và theo dõi trạng thái đơn hàng TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/checkout/payment.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <title>Thanh toán đơn hàng - TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
+    <link rel="stylesheet" href="../../assets/css/payment.css?v=payment-qr-20260722-1">
+</head>
+<body>
+    <header class="payment-fallback-header">
+        <a href="../../index.html" aria-label="TechEcommerce - Trang chủ">TechEcommerce</a>
+    </header>
+    <script src="../../assets/js/auth.js?v=payment-qr-20260722-1"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+
+    <main class="payment-page">
+        <header class="payment-heading">
+            <p>Thanh toán an toàn</p>
+            <h1 id="paymentTitle">Đang tải thông tin thanh toán</h1>
+            <span id="paymentStatus" class="payment-status" role="status">Vui lòng chờ trong giây lát.</span>
+        </header>
+
+        <section id="paymentContent" class="payment-layout" aria-live="polite" hidden>
+            <article class="payment-order-card" aria-labelledby="orderSummaryTitle">
+                <h2 id="orderSummaryTitle">Thông tin đơn hàng</h2>
+                <dl class="payment-summary">
+                    <div><dt>Mã đơn</dt><dd id="paymentOrderId">—</dd></div>
+                    <div><dt>Phương thức</dt><dd id="paymentProvider">—</dd></div>
+                    <div><dt>Số tiền</dt><dd id="paymentAmount" class="payment-amount">—</dd></div>
+                    <div><dt>Nội dung</dt><dd><code id="paymentReference">—</code> <button id="copyReference" type="button" class="payment-copy">Sao chép</button></dd></div>
+                    <div id="trackingRow" hidden><dt>Mã vận đơn</dt><dd><strong id="trackingNumber">—</strong> <span id="shippingUnit"></span></dd></div>
+                </dl>
+                <p class="payment-expiry">Mã thanh toán còn hiệu lực: <strong id="paymentCountdown">--:--</strong></p>
+            </article>
+
+            <article class="payment-qr-card" id="paymentMethodCard" aria-labelledby="qrTitle">
+                <h2 id="qrTitle">Hướng dẫn thanh toán</h2>
+                <figure id="qrFigure" class="payment-qr-figure">
+                    <img id="paymentQr" src="" alt="Mã QR thanh toán đơn hàng" width="360" height="360">
+                    <figcaption id="paymentInstructions">Mở ứng dụng thanh toán và quét mã QR.</figcaption>
+                </figure>
+                <section id="bankDetails" class="payment-bank" aria-labelledby="bankDetailsTitle" hidden>
+                    <header class="payment-bank-heading">
+                        <h3 id="bankDetailsTitle">Thông tin chuyển khoản</h3>
+                    </header>
+                    <dl>
+                        <div><dt>Ngân hàng</dt><dd id="bankName">—</dd></div>
+                        <div>
+                            <dt>Số tài khoản</dt>
+                            <dd><code id="bankAccountNo">—</code> <button id="copyBankAccount" type="button" class="payment-copy">Sao chép</button></dd>
+                        </div>
+                        <div><dt>Chủ tài khoản</dt><dd id="bankAccountName">—</dd></div>
+                        <div><dt>Số tiền</dt><dd id="paymentBankAmount" class="payment-bank-value">—</dd></div>
+                        <div>
+                            <dt>Nội dung</dt>
+                            <dd><code id="paymentBankReference">—</code> <button id="copyBankReference" type="button" class="payment-copy">Sao chép</button></dd>
+                        </div>
+                    </dl>
+                </section>
+                <p id="qrUnavailable" class="payment-warning" hidden>Thông tin QR chưa được cấu hình. Vui lòng liên hệ cửa hàng hoặc chọn phương thức khác.</p>
+                <section class="payment-installment" id="paymentInstallment" aria-labelledby="paymentInstallmentTitle" hidden>
+                    <h3 id="paymentInstallmentTitle">Chi tiết phương án</h3>
+                    <dl>
+                        <div><dt>Kỳ hạn</dt><dd id="paymentInstallmentTerm">—</dd></div>
+                        <div><dt>Trả trước</dt><dd id="paymentInstallmentDown">—</dd></div>
+                        <div><dt>Mỗi tháng</dt><dd id="paymentInstallmentMonthly">—</dd></div>
+                        <div><dt>Tổng lãi dự tính</dt><dd id="paymentInstallmentInterest">—</dd></div>
+                    </dl>
+                </section>
+                <nav class="payment-actions" aria-label="Thao tác thanh toán">
+                    <a id="openPaymentUrl" class="btn btn-primary" href="#" rel="noopener" hidden>Mở ứng dụng thanh toán</a>
+                    <a id="viewOrder" class="btn btn-secondary" href="../account/orders.html">Xem đơn hàng</a>
+                    <a class="payment-back" href="../../index.html">Tiếp tục mua sắm</a>
+                </nav>
+                <p class="payment-security-note">TechEcommerce không yêu cầu bạn cung cấp mật khẩu, mã OTP hoặc thông tin đăng nhập ngân hàng.</p>
+            </article>
+        </section>
+
+        <section id="paymentError" class="payment-error" role="alert" hidden>
+            <h2>Không tải được thanh toán</h2>
+            <p id="paymentErrorMessage">Vui lòng thử lại hoặc xem đơn hàng của bạn.</p>
+            <a class="btn btn-primary" href="../account/orders.html">Về danh sách đơn hàng</a>
+        </section>
+    </main>
+
+    <script src="../../assets/js/payment.js?v=payment-qr-20260722-1"></script>
+    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../../assets/js/chatbox.js"></script>
+</body>
+</html>

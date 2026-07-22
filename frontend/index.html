@@ -15,6 +15,7 @@
     <title>TechEcommerce - Cửa hàng công nghệ</title>
     <link rel="stylesheet" href="assets/css/style.css?v=cart-flash-20260709-1" />
     <link rel="stylesheet" href="assets/css/neo-circuit.css?v=site-layout-20260715-2" />
+    <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-cost-20260722-1" />
     <style>
       .cart-drawer[aria-hidden='true'] {
         transform: translateX(calc(100% + 96px)) !important;
@@ -600,19 +601,28 @@
               </div>
             </div>
 
-            <div class="guest-checkout-gate" id="guestCheckoutGate">
-              <strong>Đăng nhập để tiếp tục thanh toán</strong>
-              <p>Sản phẩm trong giỏ của bạn vẫn được giữ nguyên.</p>
-              <button type="button" class="btn-primary" onclick="goToLoginForCheckout()">Đăng nhập để thanh toán</button>
-            </div>
+            <section class="guest-checkout-gate" id="guestCheckoutGate" aria-labelledby="guestCheckoutTitle">
+              <strong id="guestCheckoutTitle">Bạn đang mua hàng không cần đăng nhập</strong>
+              <p>Khách vãng lai dùng được chuyển khoản ngân hàng, VNPay và MoMo. Đăng nhập nếu muốn chọn COD hoặc trả góp.</p>
+              <button type="button" class="btn-secondary" onclick="goToLoginForCheckout()">Đăng nhập (không bắt buộc)</button>
+            </section>
 
-            <div class="checkout-panel" id="checkoutPanel">
+            <section class="checkout-panel" id="checkoutPanel" aria-label="Thông tin thanh toán">
               <div class="form-group">
                 <label for="recipientName">Người nhận</label>
                 <input
                   id="recipientName"
                   type="text"
                   placeholder="Họ tên người nhận"
+                />
+              </div>
+              <div class="form-group">
+                <label for="guestEmail">Email nhận xác nhận đơn hàng</label>
+                <input
+                  id="guestEmail"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="tenkhachhang@gmail.com"
                 />
               </div>
               <div class="form-group">
@@ -623,17 +633,40 @@
                   placeholder="09xxxxxxxx"
                 />
               </div>
+              <fieldset class="delivery-address" id="deliveryAddressFieldset">
+                <legend>Địa chỉ giao hàng</legend>
+                <section class="delivery-address-grid" aria-label="Chọn khu vực giao hàng">
+                  <label for="checkoutProvince">
+                    <span>Tỉnh/Thành</span>
+                    <select id="checkoutProvince" aria-required="true">
+                      <option value="">Chọn Tỉnh/Thành</option>
+                    </select>
+                  </label>
+                  <label for="checkoutWard">
+                    <span>Phường/Xã/Đặc khu</span>
+                    <select id="checkoutWard" aria-required="true" disabled>
+                      <option value="">Chọn Phường/Xã</option>
+                    </select>
+                  </label>
+                </section>
+                <label class="delivery-address-detail" for="shippingAddressDetail">
+                  <span>Số nhà và tên đường</span>
+                  <textarea id="shippingAddressDetail" rows="2" aria-required="true" aria-describedby="shippingAddressHelp" placeholder="Ví dụ: 25 Nguyễn Huệ, tầng 3, căn 3A"></textarea>
+                </label>
+                <p class="delivery-address-help" id="shippingAddressHelp">Ghi rõ số nhà, tên đường, tòa nhà hoặc chỉ dẫn dễ nhận biết. Hệ thống sẽ ghép với Phường/Xã và Tỉnh/Thành bạn đã chọn.</p>
+                <address class="delivery-address-preview" aria-live="polite">
+                  <strong>Địa chỉ sẽ giao đến</strong>
+                  <span id="shippingAddressPreview">Chưa đủ thông tin địa chỉ.</span>
+                </address>
+                <input id="shippingAddress" type="hidden" value="" />
+              </fieldset>
               <div class="form-group">
-                <label for="shippingAddress">Địa chỉ giao hàng</label>
-                <input
-                  id="shippingAddress"
-                  type="text"
-                  placeholder="Số nhà, đường, quận/huyện..."
-                />
-              </div>
-              <div class="form-group">
-                <label for="shippingFee">Phí vận chuyển</label>
-                <input id="shippingFee" type="number" min="0" value="30000" />
+                <label for="shippingFeeDisplay">Phí vận chuyển đề xuất</label>
+                <section class="shipping-quote" aria-live="polite" aria-atomic="true">
+                  <output id="shippingFeeDisplay" for="shippingAddress">Chọn Tỉnh/Thành để tính phí</output>
+                  <small id="shippingFeeHint">Phí sẽ được backend xác định theo khu vực giao hàng.</small>
+                </section>
+                <input id="shippingFee" type="hidden" value="0" />
               </div>
               <div class="form-group">
                 <label for="couponCode">Mã giảm giá</label>
@@ -651,8 +684,8 @@
                 <select id="paymentMethod">
                   <option value="cod">Thanh toán khi nhận hàng (COD)</option>
                   <option value="bank_transfer">Chuyển khoản thủ công</option>
-                  <option value="vnpay">VNPay Sandbox</option>
-                  <option value="momo">MoMo Sandbox</option>
+                  <option value="vnpay">VNPay</option>
+                  <option value="momo">MoMo</option>
                   <option value="installment">Trả góp</option>
                 </select>
                 <div
@@ -665,12 +698,38 @@
                   "
                 ></div>
               </div>
-              <div class="bank-box" id="bankTransferInfo">
+              <aside class="bank-box" id="bankTransferInfo" aria-label="Thông tin chuyển khoản thủ công">
                 <strong>Thông tin chuyển khoản</strong><br />
                 Ngân hàng: MB Bank<br />
-                STK: 123456789 - TECHECOMMERCE<br />
-                Nội dung: TECHECOMMERCE + mã đơn sau khi đặt.
-              </div>
+                Chủ tài khoản: TECHECOMMERCE<br />
+                Số tài khoản, QR, số tiền và nội dung <strong>TECH + mã đơn</strong> sẽ xuất hiện sau khi đặt hàng.
+              </aside>
+              <fieldset class="installment-options" id="installmentOptions" hidden>
+                <legend>Dự tính khoản trả góp</legend>
+                <figure class="installment-table-wrap">
+                  <table class="installment-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Kỳ hạn</th>
+                        <th scope="col">Trả trước</th>
+                        <th scope="col">Mỗi tháng</th>
+                        <th scope="col">Tổng lãi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="installmentPlanRows"></tbody>
+                  </table>
+                  <figcaption class="installment-caption" id="installmentCaption">
+                    Đang tính dựa trên tổng giỏ hàng và phí vận chuyển.
+                  </figcaption>
+                </figure>
+                <p class="installment-loading" id="installmentLoading" aria-live="polite"></p>
+                <p class="installment-error" id="installmentError" role="alert"></p>
+                <section class="installment-summary" aria-label="Phương án trả góp đã chọn">
+                  <p><span>Cần trả trước</span><output id="selectedDownPayment">—</output></p>
+                  <p><span>Khoản trả mỗi tháng</span><output id="selectedMonthlyPayment">—</output></p>
+                </section>
+                <p class="installment-policy-note">Đây là dự tính theo chính sách nội bộ; hồ sơ chỉ có hiệu lực sau khi cửa hàng thẩm định và xác nhận.</p>
+              </fieldset>
               <div class="form-group">
                 <label for="orderNote">Ghi chú</label>
                 <textarea
@@ -686,7 +745,7 @@
               >
                 Đặt hàng
               </button>
-            </div>
+            </section>
           </section>
         </aside>
       </div>

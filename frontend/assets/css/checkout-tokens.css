@@ -1,0 +1,51 @@
+/* Hallmark · tokens: TechEcommerce checkout · theme: Cobalt */
+:root {
+  --color-checkout-paper: oklch(98% 0.008 250);
+  --color-checkout-surface: oklch(96% 0.012 250);
+  --color-checkout-surface-strong: oklch(92% 0.02 250);
+  --color-checkout-rule: oklch(84% 0.025 250);
+  --color-checkout-muted: oklch(46% 0.035 250);
+  --color-checkout-ink: oklch(24% 0.04 250);
+  --color-checkout-accent: oklch(48% 0.18 250);
+  --color-checkout-accent-ink: oklch(98% 0.008 250);
+  --color-checkout-focus: oklch(45% 0.2 250);
+  --color-checkout-error: oklch(54% 0.2 28);
+  --color-checkout-success: oklch(48% 0.14 155);
+  --font-checkout-display: var(--font-heading);
+  --font-checkout-body: var(--font-body);
+  --font-checkout-data: var(--font-mono);
+  --space-checkout-2xs: 0.25rem;
+  --space-checkout-xs: 0.5rem;
+  --space-checkout-sm: 0.75rem;
+  --space-checkout-md: 1rem;
+  --space-checkout-lg: 1.5rem;
+  --space-checkout-xl: 2.5rem;
+  --space-checkout-2xl: 3rem;
+  --space-checkout-3xl: 5rem;
+  --space-checkout-edge: 5vw;
+  --text-checkout-sm: 0.875rem;
+  --text-checkout-base: 1rem;
+  --text-checkout-md: 1.25rem;
+  --text-checkout-lg: 1.5625rem;
+  --ease-checkout-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-checkout-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-checkout-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-checkout-micro: 120ms;
+  --dur-checkout-short: 220ms;
+  --dur-checkout-long: 420ms;
+  --rule-checkout: 1px solid var(--color-checkout-rule);
+  --radius-checkout-sm: 0.5rem;
+  --radius-checkout-md: 0.75rem;
+}
+
+html[data-theme='dark'] {
+  --color-checkout-paper: oklch(18% 0.025 250);
+  --color-checkout-surface: oklch(22% 0.03 250);
+  --color-checkout-surface-strong: oklch(28% 0.035 250);
+  --color-checkout-rule: oklch(40% 0.04 250);
+  --color-checkout-muted: oklch(76% 0.025 250);
+  --color-checkout-ink: oklch(94% 0.015 250);
+  --color-checkout-accent: oklch(70% 0.15 250);
+  --color-checkout-accent-ink: oklch(18% 0.025 250);
+  --color-checkout-focus: oklch(76% 0.16 250);
+}
