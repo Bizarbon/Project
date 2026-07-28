@@ -62,6 +62,20 @@ function orderUrl(order) {
     return `${base.replace(/\/$/, '')}${path}`;
 }
 
+function appBaseUrl() {
+    const vercelHost = envValue('VERCEL_PROJECT_PRODUCTION_URL') || envValue('VERCEL_URL');
+    const vercelBase = vercelHost
+        ? (/^https?:\/\//i.test(vercelHost) ? vercelHost : `https://${vercelHost}`)
+        : '';
+    return (
+        envValue('FRONTEND_BASE_URL')
+        || envValue('APP_BASE_URL')
+        || vercelBase
+        || envValue('RENDER_EXTERNAL_URL')
+        || 'http://localhost:5000'
+    ).replace(/\/$/, '');
+}
+
 function productRows(order) {
     return (order.products || []).map(item => `
         <tr>
@@ -183,8 +197,49 @@ async function notifyPaymentConfirmed(order) {
     }
 }
 
+async function sendPasswordResetEmail(customer, token) {
+    const resetUrl = `${appBaseUrl()}/pages/auth/reset-password.html?token=${encodeURIComponent(token)}`;
+    return sendMessage({
+        to: customer.email,
+        subject: 'Đặt lại mật khẩu TechEcommerce',
+        html: `<!doctype html>
+        <html lang="vi"><body style="margin:0;background:#f4f7fb;font-family:Arial,sans-serif;color:#10233f">
+          <main style="max-width:640px;margin:0 auto;padding:28px 16px">
+            <section style="background:#fff;border:1px solid #dbe5f0;border-radius:14px;padding:28px">
+              <p style="margin:0 0 8px;color:#1672d4;font-weight:700">TechEcommerce</p>
+              <h1 style="margin:0 0 16px;font-size:24px">Đặt lại mật khẩu</h1>
+              <p style="line-height:1.6">Xin chào ${escapeHTML(customer.name)}, chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn.</p>
+              <p style="margin:24px 0"><a href="${escapeHTML(resetUrl)}" style="display:inline-block;background:#1672d4;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px">Tạo mật khẩu mới</a></p>
+              <p style="line-height:1.6">Liên kết có hiệu lực trong 15 phút và chỉ sử dụng được một lần. Nếu bạn không yêu cầu thay đổi, hãy bỏ qua email này.</p>
+              <p style="line-height:1.6;color:#52677d">Vì lý do bảo mật, TechEcommerce không bao giờ yêu cầu bạn gửi lại mật khẩu qua email.</p>
+            </section>
+          </main>
+        </body></html>`
+    });
+}
+
+async function sendPasswordChangedEmail(customer) {
+    return sendMessage({
+        to: customer.email,
+        subject: 'Mật khẩu TechEcommerce đã được thay đổi',
+        html: `<!doctype html>
+        <html lang="vi"><body style="margin:0;background:#f4f7fb;font-family:Arial,sans-serif;color:#10233f">
+          <main style="max-width:640px;margin:0 auto;padding:28px 16px">
+            <section style="background:#fff;border:1px solid #dbe5f0;border-radius:14px;padding:28px">
+              <p style="margin:0 0 8px;color:#1672d4;font-weight:700">TechEcommerce</p>
+              <h1 style="margin:0 0 16px;font-size:24px">Mật khẩu đã được cập nhật</h1>
+              <p style="line-height:1.6">Xin chào ${escapeHTML(customer.name)}, mật khẩu tài khoản của bạn vừa được thay đổi thành công.</p>
+              <p style="line-height:1.6">Nếu bạn không thực hiện thay đổi này, hãy liên hệ cửa hàng ngay để được hỗ trợ bảo vệ tài khoản.</p>
+            </section>
+          </main>
+        </body></html>`
+    });
+}
+
 module.exports = {
     emailEnabled,
     notifyOrderCreated,
-    notifyPaymentConfirmed
+    notifyPaymentConfirmed,
+    sendPasswordResetEmail,
+    sendPasswordChangedEmail
 };

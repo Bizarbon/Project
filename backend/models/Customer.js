@@ -28,7 +28,8 @@ const customerSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: false
+        required: false,
+        trim: true
     },
     address: {
         type: String,
@@ -66,6 +67,16 @@ const customerSchema = new mongoose.Schema({
     passwordChangedAt: {
         type: Date,
         default: null
+    },
+    resetPasswordToken: {
+        type: String,
+        default: null,
+        select: false
+    },
+    resetPasswordExpiresAt: {
+        type: Date,
+        default: null,
+        select: false
     },
     tokenVersion: {
         type: Number,

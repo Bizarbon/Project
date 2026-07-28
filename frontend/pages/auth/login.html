@@ -3,18 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Đăng nhập TechEcommerce để quản lý đơn hàng, hồ sơ và sản phẩm yêu thích.">
     <meta name="robots" content="noindex, nofollow">
+    <meta property="og:title" content="Đăng nhập - TechEcommerce">
+    <meta property="og:description" content="Quản lý đơn hàng, sản phẩm yêu thích và hồ sơ TechEcommerce.">
+    <meta property="og:type" content="website">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/auth/login.html">
     <title>Đăng nhập - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css?v=auth-shell-20260720-1">
     <link rel="stylesheet" href="../../assets/css/auth.css?v=account-ui-20260711-1">
     <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=auth-shell-20260720-1">
     <link rel="stylesheet" href="../../assets/css/login-page.css?v=login-layout-20260722-1">
+    <link rel="stylesheet" href="../../assets/css/auth-flow.css?v=auth-flow-20260728-3">
 </head>
 
-<body class="login-page">
+<body class="login-page" data-auth-page="login">
     <header class="storefront-header account-storefront-header">
         <div class="header-main">
             <div class="header-shell header-main-inner">
@@ -33,11 +37,11 @@
                     <a class="header-action-btn" href="../../index.html?openCart=1">
                         <span class="header-action-icon" aria-hidden="true">🛒</span>
                         <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
-                        <span class="header-cart-badge" id="loginCartBadge" hidden>0</span>
+                        <span class="header-cart-badge" data-auth-cart-badge hidden>0</span>
                     </a>
                     <a class="header-action-btn" href="../../index.html#catalogStart">
                         <span class="header-action-icon" aria-hidden="true">⌖</span>
-                        <span class="header-action-copy"><small>Khu vực</small><strong id="loginLocationLabel">Hồ Chí Minh</strong></span>
+                        <span class="header-action-copy"><small>Khu vực</small><strong data-auth-location>Hồ Chí Minh</strong></span>
                     </a>
                 </div>
             </div>
@@ -55,123 +59,88 @@
         </nav>
     </header>
 
-    <main class="login-page-main">
-        <div class="login-layout">
-            <aside class="login-visual" aria-label="Mua sắm công nghệ tại TechEcommerce">
-                <img src="../../assets/images/banner-phone.jpg" alt="Điện thoại công nghệ cao">
-                <section class="login-visual-copy">
-                    <span>Mua sắm công nghệ dễ dàng</span>
-                    <h2>Một tài khoản, mọi đơn hàng</h2>
-                    <p>Theo dõi giao hàng, lưu sản phẩm yêu thích và nhận ưu đãi dành riêng cho thành viên.</p>
+    <main class="auth-page-main">
+        <section class="auth-experience" aria-labelledby="loginTitle">
+            <figure class="auth-visual auth-visual--login">
+                <img src="../../assets/images/banner-phone.jpg" width="1800" height="2695"
+                    alt="Điện thoại cao cấp trên nền tối" fetchpriority="high">
+                <ul class="auth-product-gallery" aria-hidden="true">
+                    <li class="auth-product-shot auth-product-shot--one">
+                        <img src="../../assets/images/banner-laptop.jpg" width="1800" height="1200" alt="" loading="lazy">
+                    </li>
+                    <li class="auth-product-shot auth-product-shot--two">
+                        <img src="../../assets/images/banner-watch.jpg" width="1800" height="2250" alt="" loading="lazy">
+                    </li>
+                    <li class="auth-product-shot auth-product-shot--three">
+                        <img src="../../assets/images/ipad.jpg" width="320" height="180" alt="" loading="lazy">
+                    </li>
+                </ul>
+                <aside class="auth-route-map" aria-label="Hành trình mua sắm của thành viên">
+                    <svg viewBox="0 0 320 120" role="img" aria-label="Từ tìm sản phẩm đến theo dõi giao hàng">
+                        <path d="M12 94 C72 16 150 116 210 48 S286 24 308 58"></path>
+                    </svg>
+                    <ol class="auth-route-nodes">
+                        <li style="--auth-node-index: 0">Tìm sản phẩm</li>
+                        <li style="--auth-node-index: 1">Đặt hàng</li>
+                        <li style="--auth-node-index: 2">Theo dõi giao hàng</li>
+                    </ol>
+                </aside>
+                <figcaption>
+                    <span class="auth-visual-label">Tài khoản TechEcommerce</span>
+                    <h2>Một nơi cho mọi đơn hàng</h2>
+                    <p>Lưu sản phẩm, kiểm tra thanh toán và theo dõi hành trình giao hàng trên cùng một tài khoản.</p>
+                </figcaption>
+            </figure>
+
+            <section class="auth-form-panel" aria-label="Biểu mẫu đăng nhập">
+                <section id="authFormContent">
+                    <header class="auth-heading">
+                        <h1 id="loginTitle">Đăng nhập</h1>
+                        <p>Dùng tên đăng nhập, email hoặc số điện thoại đã đăng ký.</p>
+                    </header>
+
+                    <form id="loginForm" class="auth-form">
+                        <div class="auth-field">
+                            <label for="identifier">Tài khoản, email hoặc số điện thoại</label>
+                            <div class="auth-input-wrap">
+                                <input type="text" id="identifier" required autocomplete="username"
+                                    aria-describedby="identifierHelp">
+                            </div>
+                            <p class="auth-field-help" id="identifierHelp">Thông tin dùng khi bạn tạo tài khoản.</p>
+                        </div>
+
+                        <div class="auth-field">
+                            <label for="loginPassword">Mật khẩu</label>
+                            <div class="auth-input-wrap">
+                                <input type="password" id="loginPassword" required autocomplete="current-password"
+                                    aria-describedby="loginPasswordHelp">
+                                <button class="auth-password-toggle" type="button"
+                                    data-password-toggle="loginPassword" aria-label="Hiện mật khẩu">Hiện</button>
+                            </div>
+                            <p class="auth-field-help" id="loginPasswordHelp">Mật khẩu phân biệt chữ hoa và chữ thường.</p>
+                        </div>
+
+                        <nav class="auth-form-meta" aria-label="Hỗ trợ tài khoản">
+                            <a class="auth-text-link" href="forgot-password.html">Quên mật khẩu?</a>
+                        </nav>
+
+                        <button type="submit" class="auth-primary-action" id="submitBtn">Đăng nhập</button>
+                        <p class="auth-form-status" id="authFormStatus" role="status" aria-live="polite"></p>
+                    </form>
+
+                    <p class="auth-switch">Chưa có tài khoản? <a class="auth-text-link" href="register.html">Tạo tài khoản</a></p>
+                    <p class="auth-security-note">TechEcommerce không yêu cầu mật khẩu hoặc mã OTP qua cuộc gọi và tin nhắn.</p>
                 </section>
-            </aside>
-
-            <section class="login-form-panel">
-              <div class="auth-container">
-                <article class="auth-card">
-            <header class="auth-header">
-                <span class="auth-eyebrow">Tài khoản TechEcommerce</span>
-                <h1>Đăng nhập</h1>
-                <p>Đăng nhập để tiếp tục mua sắm và quản lý đơn hàng.</p>
-            </header>
-
-            <form id="loginForm">
-                <div class="form-group">
-                    <input type="text" id="identifier" class="input-field" placeholder=" " required
-                        autocomplete="username">
-                    <label class="form-label" for="identifier">Tài khoản, Email hoặc SĐT</label>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="password" class="input-field" placeholder=" " required
-                        autocomplete="current-password">
-                    <label class="form-label" for="password">Mật khẩu</label>
-                </div>
-
-                <button type="submit" class="btn-auth" id="submitBtn">
-                    <span>Đăng nhập ngay</span>
-                </button>
-            </form>
-
-            <p class="auth-switch">
-                Chưa có tài khoản? <a href="register.html">Tham gia ngay</a>
-            </p>
-                </article>
-                <a href="../../index.html" class="back-link">‹ Quay lại cửa hàng</a>
-              </div>
+                <a href="../../index.html" class="auth-back-link">Quay lại cửa hàng</a>
             </section>
-        </div>
+        </section>
     </main>
 
     <footer id="site-footer"></footer>
 
-    <!-- Scripts -->
     <script src="../../assets/js/auth.js?v=account-ui-20260711-1"></script>
     <script src="../../assets/js/footer.js?v=auth-shell-20260720-1"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const locationLabel = document.getElementById('loginLocationLabel');
-            const savedAddress = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
-            if (locationLabel) locationLabel.textContent = savedAddress;
-
-            const cartBadge = document.getElementById('loginCartBadge');
-            try {
-                const cart = JSON.parse(localStorage.getItem(auth.getCartStorageKey()) || '[]');
-                const count = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-                if (cartBadge && count > 0) {
-                    cartBadge.textContent = count;
-                    cartBadge.hidden = false;
-                }
-            } catch (error) {}
-        });
-
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = (type === 'success' ? '✨ ' : '❌ ') + `<span>${message}</span>`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 600);
-            }, 3000);
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const identifier = document.getElementById('identifier').value;
-            const password = document.getElementById('password').value;
-            const btn = document.getElementById('submitBtn');
-
-            btn.disabled = true;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<div class="loader"></div> <span>Đang xác thực...</span>';
-
-            try {
-                // API_URL is defined in auth.js
-                const res = await fetch(`${API_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ identifier, password })
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) throw new Error(data.message || 'Lỗi đăng nhập');
-
-                showToast('Đăng nhập thành công! Đang chuyển hướng...');
-                auth.saveAuth(data.token, data.user);
-
-                setTimeout(() => {
-                    window.location.href = data.user.isAdmin ? '../../admin/products.html' : '../../index.html';
-                }, 1000);
-
-            } catch (err) {
-                showToast(err.message, 'error');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        });
-    </script>
+    <script src="../../assets/js/auth-flow.js?v=auth-flow-20260728-2"></script>
 </body>
 
 </html>

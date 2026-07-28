@@ -3,12 +3,15 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Tạo tài khoản TechEcommerce để mua sắm và theo dõi đơn hàng công nghệ.">
     <meta name="robots" content="noindex, nofollow">
+    <meta property="og:title" content="Đăng ký - TechEcommerce">
+    <meta property="og:description" content="Tạo tài khoản để lưu sản phẩm và theo dõi đơn hàng TechEcommerce.">
+    <meta property="og:type" content="website">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/auth/register.html">
     <title>Đăng ký - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css?v=auth-shell-20260720-1">
@@ -16,9 +19,10 @@
     <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=auth-shell-20260720-1">
     <link rel="stylesheet" href="../../assets/css/login-page.css?v=auth-shell-20260720-1">
     <link rel="stylesheet" href="../../assets/css/register-page.css?v=register-ui-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/auth-flow.css?v=auth-flow-20260728-3">
 </head>
 
-<body class="login-page register-page">
+<body class="login-page register-page" data-auth-page="register">
     <header class="storefront-header account-storefront-header">
         <section class="header-main">
             <div class="header-shell header-main-inner">
@@ -37,11 +41,11 @@
                     <a class="header-action-btn" href="../../index.html?openCart=1">
                         <span class="header-action-icon" aria-hidden="true">🛒</span>
                         <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
-                        <span class="header-cart-badge" id="registerCartBadge" hidden>0</span>
+                        <span class="header-cart-badge" data-auth-cart-badge hidden>0</span>
                     </a>
                     <a class="header-action-btn" href="../../index.html#catalogStart">
                         <span class="header-action-icon" aria-hidden="true">⌖</span>
-                        <span class="header-action-copy"><small>Khu vực</small><strong id="registerLocationLabel">Hồ Chí Minh</strong></span>
+                        <span class="header-action-copy"><small>Khu vực</small><strong data-auth-location>Hồ Chí Minh</strong></span>
                     </a>
                 </nav>
             </div>
@@ -59,57 +63,122 @@
         </nav>
     </header>
 
-    <main class="login-page-main register-page-main">
-        <section class="login-layout register-layout" aria-labelledby="registerTitle">
-            <aside class="login-visual register-visual" aria-label="Quyền lợi thành viên TechEcommerce">
-                <img src="../../assets/images/banner-laptop.jpg" alt="Laptop và thiết bị công nghệ tại TechEcommerce">
-                <section class="login-visual-copy">
-                    <span>Thành viên TechEcommerce</span>
-                    <h2>Mua sắm thuận tiện hơn</h2>
-                    <p>Theo dõi giao hàng, lưu thông tin nhận hàng và nhận gợi ý sản phẩm phù hợp với nhu cầu của bạn.</p>
+    <main class="auth-page-main">
+        <section class="auth-experience auth-experience--register" aria-labelledby="registerTitle">
+            <figure class="auth-visual auth-visual--register">
+                <img src="../../assets/images/banner-laptop.jpg" width="1800" height="1200"
+                    alt="Laptop và điện thoại cao cấp tại TechEcommerce" fetchpriority="high">
+                <ul class="auth-product-gallery" aria-hidden="true">
+                    <li class="auth-product-shot auth-product-shot--one">
+                        <img src="../../assets/images/banner-phone.jpg" width="1800" height="2695" alt="" loading="lazy">
+                    </li>
+                    <li class="auth-product-shot auth-product-shot--two">
+                        <img src="../../assets/images/banner-watch.jpg" width="1800" height="2250" alt="" loading="lazy">
+                    </li>
+                    <li class="auth-product-shot auth-product-shot--three">
+                        <img src="../../assets/images/laptop.jpg" width="241" height="180" alt="" loading="lazy">
+                    </li>
+                </ul>
+                <aside class="auth-route-map" aria-label="Quyền lợi của tài khoản thành viên">
+                    <svg viewBox="0 0 320 120" role="img" aria-label="Từ lưu sản phẩm đến quản lý đơn hàng">
+                        <path d="M10 68 C76 12 126 108 188 54 S276 30 310 88"></path>
+                    </svg>
+                    <ol class="auth-route-nodes">
+                        <li style="--auth-node-index: 0">Lưu sản phẩm</li>
+                        <li style="--auth-node-index: 1">Nhận tư vấn</li>
+                        <li style="--auth-node-index: 2">Quản lý đơn hàng</li>
+                    </ol>
+                </aside>
+                <figcaption>
+                    <span class="auth-visual-label">Thành viên TechEcommerce</span>
+                    <h2>Thông tin mua sắm luôn sẵn sàng</h2>
+                    <p>Tài khoản giúp bạn lưu địa chỉ, kiểm tra lịch sử mua hàng và nhận tư vấn theo nhu cầu thực tế.</p>
+                </figcaption>
+            </figure>
+
+            <section class="auth-form-panel" aria-label="Biểu mẫu tạo tài khoản">
+                <section id="authFormContent">
+                    <header class="auth-heading">
+                        <h1 id="registerTitle">Tạo tài khoản</h1>
+                        <p>Email là bắt buộc để bạn có thể khôi phục mật khẩu khi cần.</p>
+                    </header>
+
+                    <form id="registerForm" class="auth-form">
+                        <div class="auth-form-grid auth-form-grid--two">
+                            <div class="auth-field">
+                                <label for="name">Họ và tên</label>
+                                <div class="auth-input-wrap">
+                                    <input type="text" id="name" required autocomplete="name" minlength="2"
+                                        maxlength="80" aria-describedby="nameHelp">
+                                </div>
+                                <p class="auth-field-help" id="nameHelp">Tên dùng trên đơn hàng và hồ sơ.</p>
+                            </div>
+
+                            <div class="auth-field">
+                                <label for="phone">Số điện thoại</label>
+                                <div class="auth-input-wrap">
+                                    <input type="tel" id="phone" required autocomplete="tel" inputmode="tel"
+                                        pattern="(?:\+84|0)\d{9,10}" aria-describedby="phoneHelp">
+                                </div>
+                                <p class="auth-field-help" id="phoneHelp">Dùng để xác nhận và giao hàng.</p>
+                            </div>
+
+                            <div class="auth-field">
+                                <label for="email">Địa chỉ email</label>
+                                <div class="auth-input-wrap">
+                                    <input type="email" id="email" required autocomplete="email"
+                                        aria-describedby="emailHelp">
+                                </div>
+                                <p class="auth-field-help" id="emailHelp">Nhận thông báo đơn và đặt lại mật khẩu.</p>
+                            </div>
+
+                            <div class="auth-field">
+                                <label for="username">Tên đăng nhập</label>
+                                <div class="auth-input-wrap">
+                                    <input type="text" id="username" required autocomplete="username" minlength="3"
+                                        maxlength="30" pattern="[a-zA-Z0-9_]{3,30}" aria-describedby="usernameHelp">
+                                </div>
+                                <p class="auth-field-help" id="usernameHelp">Dùng chữ, số hoặc dấu gạch dưới.</p>
+                            </div>
+
+                            <div class="auth-field auth-field--full">
+                                <label for="registerPassword">Mật khẩu</label>
+                                <div class="auth-input-wrap">
+                                    <input type="password" id="registerPassword" required minlength="8" maxlength="72"
+                                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" autocomplete="new-password"
+                                        aria-describedby="registerPasswordHelp">
+                                    <button class="auth-password-toggle" type="button"
+                                        data-password-toggle="registerPassword" aria-label="Hiện mật khẩu">Hiện</button>
+                                </div>
+                                <p class="auth-field-help" id="registerPasswordHelp">Cần có chữ hoa, chữ thường và chữ số.</p>
+                            </div>
+
+                            <div class="auth-field auth-field--full">
+                                <label for="confirmPassword">Nhập lại mật khẩu</label>
+                                <div class="auth-input-wrap">
+                                    <input type="password" id="confirmPassword" required minlength="8" maxlength="72"
+                                        autocomplete="new-password" aria-describedby="confirmPasswordHelp">
+                                    <button class="auth-password-toggle" type="button"
+                                        data-password-toggle="confirmPassword" aria-label="Hiện mật khẩu">Hiện</button>
+                                </div>
+                                <p class="auth-field-help" id="confirmPasswordHelp">Hai mật khẩu cần trùng khớp.</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="auth-primary-action" id="submitBtn">Tạo tài khoản</button>
+                        <p class="auth-form-status" id="authFormStatus" role="status" aria-live="polite"></p>
+                    </form>
+
+                    <p class="auth-switch">Đã có tài khoản? <a class="auth-text-link" href="login.html">Đăng nhập</a></p>
                 </section>
-            </aside>
 
-            <section class="login-form-panel register-form-panel" aria-label="Biểu mẫu đăng ký">
-                <div class="auth-container">
-                    <article class="auth-card">
-                        <header class="auth-header">
-                            <span class="auth-eyebrow">Tài khoản TechEcommerce</span>
-                            <h1 id="registerTitle">Tạo tài khoản</h1>
-                            <p>Đăng ký để mua hàng, theo dõi vận chuyển và đánh giá sản phẩm.</p>
-                        </header>
-
-                        <form id="registerForm" class="form-grid">
-                            <div class="form-group">
-                                <input type="text" id="name" class="input-field" placeholder=" " required autocomplete="name" maxlength="80">
-                                <label class="form-label" for="name">Họ và tên</label>
-                            </div>
-                            <div class="form-group">
-                                <input type="tel" id="phone" class="input-field" placeholder=" " required autocomplete="tel" inputmode="tel">
-                                <label class="form-label" for="phone">Số điện thoại</label>
-                            </div>
-                            <div class="form-group">
-                                <input type="email" id="email" class="input-field" placeholder=" " autocomplete="email">
-                                <label class="form-label" for="email">Email (không bắt buộc)</label>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" id="username" class="input-field" placeholder=" " required autocomplete="username" minlength="3" maxlength="30" pattern="[a-zA-Z0-9_]{3,30}">
-                                <label class="form-label" for="username">Tên đăng nhập</label>
-                            </div>
-                            <div class="form-group full">
-                                <input type="password" id="password" class="input-field" placeholder=" " required minlength="8" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" autocomplete="new-password">
-                                <label class="form-label" for="password">Mật khẩu có chữ hoa, chữ thường và số</label>
-                                <small class="field-hint">Từ 8 đến 72 ký tự.</small>
-                            </div>
-                            <div class="form-group full register-submit-row">
-                                <button type="submit" class="btn-auth" id="submitBtn">Tạo tài khoản ngay</button>
-                            </div>
-                        </form>
-
-                        <p class="auth-switch">Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
-                    </article>
-                    <a href="../../index.html" class="back-link">‹ Quay lại cửa hàng</a>
-                </div>
+                <section class="auth-success-panel" id="authSuccessPanel" tabindex="-1" aria-live="polite" hidden>
+                    <span class="auth-success-mark" aria-hidden="true">✓</span>
+                    <h2>Tài khoản đã sẵn sàng</h2>
+                    <p>Bạn có thể đăng nhập để tiếp tục mua sắm.</p>
+                    <a class="auth-primary-action" href="login.html">Đăng nhập ngay</a>
+                </section>
+                <a href="../../index.html" class="auth-back-link">Quay lại cửa hàng</a>
             </section>
         </section>
     </main>
@@ -118,78 +187,7 @@
 
     <script src="../../assets/js/auth.js?v=register-ui-20260720-1"></script>
     <script src="../../assets/js/footer.js?v=auth-shell-20260720-1"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const locationLabel = document.getElementById('registerLocationLabel');
-            const savedAddress = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
-            if (locationLabel) locationLabel.textContent = savedAddress;
-
-            const cartBadge = document.getElementById('registerCartBadge');
-            try {
-                const cart = JSON.parse(localStorage.getItem(auth.getCartStorageKey()) || '[]');
-                const count = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
-                if (cartBadge && count > 0) {
-                    cartBadge.textContent = count;
-                    cartBadge.hidden = false;
-                }
-            } catch (error) {
-                if (cartBadge) cartBadge.hidden = true;
-            }
-        });
-
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = `${type === 'success' ? 'Thành công: ' : 'Lỗi: '}${message}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 600);
-            }, 3000);
-        }
-
-        document.getElementById('registerForm').addEventListener('submit', async event => {
-            event.preventDefault();
-            const button = document.getElementById('submitBtn');
-            const payload = {
-                username: document.getElementById('username').value.trim(),
-                name: document.getElementById('name').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                password: document.getElementById('password').value
-            };
-            if (!payload.email) delete payload.email;
-
-            button.disabled = true;
-            const originalText = button.textContent;
-            button.innerHTML = '<span class="loader" aria-hidden="true"></span><span>Đang tạo tài khoản...</span>';
-
-            try {
-                const response = await fetch(`${API_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Không thể đăng ký tài khoản.');
-
-                showToast('Tài khoản đã được tạo. Bạn có thể đăng nhập ngay.');
-                document.querySelector('.auth-card').innerHTML = `
-                    <section class="register-success" aria-live="polite">
-                        <span class="register-success-mark" aria-hidden="true">✓</span>
-                        <h2>Đăng ký thành công</h2>
-                        <p>Tài khoản của bạn đã sẵn sàng để mua sắm và theo dõi đơn hàng.</p>
-                        <a href="login.html" class="btn-auth">Đăng nhập ngay</a>
-                    </section>
-                `;
-            } catch (error) {
-                showToast(error.message, 'error');
-                button.disabled = false;
-                button.textContent = originalText;
-            }
-        });
-    </script>
+    <script src="../../assets/js/auth-flow.js?v=auth-flow-20260728-2"></script>
 </body>
 
 </html>
