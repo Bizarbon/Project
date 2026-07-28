@@ -15,7 +15,8 @@ const {
     phoneVariants
 } = require('../utils/phone');
 const {
-    smsEnabled,
+    demoSmsEnabled,
+    passwordResetOtpEnabled,
     sendPasswordResetOtp,
     verifyPasswordResetOtp,
     safeSmsError
@@ -210,7 +211,7 @@ router.post('/forgot-password', passwordResetLimiter, [
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg });
-        if (!smsEnabled()) {
+        if (!passwordResetOtpEnabled()) {
             return res.status(503).json({
                 message: 'Dịch vụ gửi mã xác nhận qua SMS chưa được cấu hình. Vui lòng liên hệ cửa hàng.'
             });
@@ -222,9 +223,10 @@ router.post('/forgot-password', passwordResetLimiter, [
         }).limit(2);
         const customer = matchingCustomers.length === 1 ? matchingCustomers[0] : null;
 
+        let otpDelivery = null;
         if (customer) {
             try {
-                await sendPasswordResetOtp(normalizedPhone.e164);
+                otpDelivery = await sendPasswordResetOtp(normalizedPhone.e164);
             } catch (error) {
                 console.error('Password reset SMS error:', error?.response?.data?.code || error.message);
                 return res.status(error?.code === 'SMS_NOT_CONFIGURED' ? 503 : 502).json({
@@ -238,10 +240,19 @@ router.post('/forgot-password', passwordResetLimiter, [
             console.warn(`Password reset skipped: duplicate phone belongs to multiple accounts (${normalizedPhone.local}).`);
         }
 
+        if (!otpDelivery && demoSmsEnabled()) {
+            otpDelivery = await sendPasswordResetOtp(normalizedPhone.e164);
+        }
+
         return res.json({
-            message: genericMessage,
+            message: otpDelivery?.provider === 'demo'
+                ? 'Chế độ thử nghiệm: dùng mã OTP hiển thị bên dưới.'
+                : genericMessage,
             expiresInSeconds: 600,
-            retryAfterSeconds: 30
+            retryAfterSeconds: 30,
+            ...(otpDelivery?.developmentOtp
+                ? { developmentOtp: otpDelivery.developmentOtp }
+                : {})
         });
     } catch (error) {
         console.error('Forgot password error:', error.message);
@@ -262,7 +273,7 @@ router.post('/verify-reset-otp', otpVerifyLimiter, [
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg });
-        if (!smsEnabled()) {
+        if (!passwordResetOtpEnabled()) {
             return res.status(503).json({
                 message: 'Dịch vụ gửi mã xác nhận qua SMS chưa được cấu hình. Vui lòng liên hệ cửa hàng.'
             });

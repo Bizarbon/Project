@@ -285,7 +285,9 @@
                 const data = await request('/auth/forgot-password', {
                     phone: recoveryPhone
                 });
-                otpDestination.textContent = `Mã xác nhận đã được gửi tới ${recoveryPhone}.`;
+                otpDestination.textContent = data.developmentOtp
+                    ? `Chế độ thử nghiệm — mã OTP: ${data.developmentOtp}`
+                    : `Mã xác nhận đã được gửi tới ${recoveryPhone}.`;
                 showStep('verify');
                 setStatus(data.message, 'success');
                 startResendTimer(data.retryAfterSeconds);

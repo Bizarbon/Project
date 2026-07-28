@@ -1,6 +1,9 @@
 const axios = require('axios');
+const crypto = require('crypto');
 
 const TWILIO_VERIFY_BASE_URL = 'https://verify.twilio.com/v2';
+const DEMO_OTP_TTL_MS = 10 * 60 * 1000;
+const demoVerifications = new Map();
 
 function envValue(name) {
     return String(process.env[name] || '').trim();
@@ -36,6 +39,19 @@ function smsEnabled() {
         && Boolean(twilioCredentials());
 }
 
+function demoSmsEnabled() {
+    if (String(process.env.NODE_ENV || '').toLowerCase() === 'production') return false;
+
+    const configured = envValue('SMS_DEMO_MODE').toLowerCase();
+    if (configured) return configured === 'true';
+
+    return !smsEnabled();
+}
+
+function passwordResetOtpEnabled() {
+    return smsEnabled() || demoSmsEnabled();
+}
+
 function verifyEndpoint(resource) {
     const serviceSid = encodeURIComponent(envValue('TWILIO_VERIFY_SERVICE_SID'));
     return `${TWILIO_VERIFY_BASE_URL}/Services/${serviceSid}/${resource}`;
@@ -66,6 +82,19 @@ async function postVerify(resource, payload) {
 }
 
 async function sendPasswordResetOtp(phone) {
+    if (demoSmsEnabled() && !smsEnabled()) {
+        const code = String(crypto.randomInt(100000, 1000000));
+        demoVerifications.set(phone, {
+            code,
+            expiresAt: Date.now() + DEMO_OTP_TTL_MS
+        });
+        return {
+            status: 'pending',
+            provider: 'demo',
+            developmentOtp: code
+        };
+    }
+
     const payload = {
         To: phone,
         Channel: 'sms'
@@ -81,6 +110,20 @@ async function sendPasswordResetOtp(phone) {
 }
 
 async function verifyPasswordResetOtp(phone, code) {
+    if (demoSmsEnabled() && !smsEnabled()) {
+        const verification = demoVerifications.get(phone);
+        const approved = Boolean(
+            verification
+            && verification.expiresAt > Date.now()
+            && verification.code === String(code).trim()
+        );
+
+        if (approved || !verification || verification.expiresAt <= Date.now()) {
+            demoVerifications.delete(phone);
+        }
+        return approved;
+    }
+
     const verification = await postVerify('VerificationCheck', {
         To: phone,
         Code: code
@@ -113,6 +156,8 @@ function safeSmsError(error) {
 
 module.exports = {
     smsEnabled,
+    demoSmsEnabled,
+    passwordResetOtpEnabled,
     sendPasswordResetOtp,
     verifyPasswordResetOtp,
     safeSmsError
