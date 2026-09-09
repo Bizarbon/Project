@@ -13,7 +13,8 @@ const categoryLabels = {
     Tablet: 'Tablet',
     'Tai nghe': 'Tai nghe',
     'Đồng hồ thông minh': 'Đồng hồ thông minh',
-    'Phụ kiện': 'Phụ kiện'
+    'Phụ kiện': 'Phụ kiện',
+    'Máy chơi game': 'Máy chơi game'
 };
 
 const DELIVERY_DATA_URL = 'assets/data/vietnam-administrative-2025.json?v=20260712-1';

@@ -159,4 +159,33 @@
     document.getElementById('footerBackToTop')?.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // Floating Zalo button - positioned horizontally beside AI chat
+    if (!document.getElementById('zaloFloatingBtn')) {
+        const zaloBtn = document.createElement('a');
+        zaloBtn.id = 'zaloFloatingBtn';
+        zaloBtn.className = 'zalo-floating-btn rhythmic-pulse-shake-zalo';
+        zaloBtn.href = 'https://zalo.me/0842331606';
+        zaloBtn.target = '_blank';
+        zaloBtn.rel = 'noopener noreferrer';
+        zaloBtn.setAttribute('aria-label', 'Tư vấn trực tiếp qua Zalo: 0842331606');
+        zaloBtn.title = 'Chat Zalo với cửa hàng (0842331606)';
+        zaloBtn.innerHTML = `
+            <svg viewBox="0 0 48 48" width="34" height="34" fill="none" aria-hidden="true">
+                <path d="M24 4C12.95 4 4 12.51 4 23c0 4.88 1.9 9.35 5.16 12.75L7.4 42.1c-.24.87.62 1.63 1.45 1.28l8.36-3.57C20.08 40.54 22 41 24 41c11.05 0 20-8.51 20-19S35.05 4 24 4z" fill="#0068FF"/>
+                <path d="M13.5 27.5l4.8-6.5h-4.6v-2h6.6v1.8l-4.8 6.5h4.8v2h-6.8v-1.8zm9-8.5h2.2v10.3h-2.2V19zm5.5 0h2.2v8.3h4v2H28V19zm8 5.2c0-3 2.1-5.4 5-5.4s5 2.4 5 5.4c0 3-2.1 5.4-5 5.4s-5-2.4-5-5.4zm7.8 0c0-1.9-1.2-3.4-2.8-3.4s-2.8 1.5-2.8 3.4 1.2 3.4 2.8 3.4 2.8-1.5 2.8-3.4z" fill="#fff"/>
+            </svg>
+        `;
+        document.body.appendChild(zaloBtn);
+    }
+
+    // Attach pulse-shake effect to AI chat toggle
+    function attachAiShake() {
+        const aiToggle = document.querySelector('.ai-chat-toggle');
+        if (aiToggle && !aiToggle.classList.contains('rhythmic-pulse-shake-ai')) {
+            aiToggle.classList.add('rhythmic-pulse-shake-ai');
+        }
+    }
+    attachAiShake();
+    setTimeout(attachAiShake, 1000);
 })();

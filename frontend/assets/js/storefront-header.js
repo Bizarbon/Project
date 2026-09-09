@@ -9,7 +9,8 @@
         ['Tablet', 'Tablet', 'tablet.svg'],
         ['Tai nghe', 'Tai nghe', 'headphones.svg'],
         ['Đồng hồ thông minh', 'Đồng hồ thông minh', 'watch.svg'],
-        ['Phụ kiện', 'Phụ kiện', 'cable.svg']
+        ['Phụ kiện', 'Phụ kiện', 'cable.svg'],
+        ['Máy chơi game', 'Máy chơi game', 'gaming.svg']
     ];
 
     const categoryLinks = categories.map(([value, label, icon]) => {
