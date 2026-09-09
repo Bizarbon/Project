@@ -46,6 +46,9 @@ try {
     npm --prefix backend run seed:features
     if ($LASTEXITCODE -ne 0) { throw 'Seed ma giam gia va danh gia that bai.' }
 
+    npm run seed:gaming
+    if ($LASTEXITCODE -ne 0) { throw 'Seed san pham may choi game that bai.' }
+
     Write-Host 'Seed production thanh cong.' -ForegroundColor Green
 }
 finally {

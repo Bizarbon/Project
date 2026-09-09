@@ -14,7 +14,8 @@ const PRODUCT_CATEGORIES = new Set([
     'Tablet',
     'Tai nghe',
     'Đồng hồ thông minh',
-    'Phụ kiện'
+    'Phụ kiện',
+    'Máy chơi game'
 ]);
 
 const catalogProducts = [

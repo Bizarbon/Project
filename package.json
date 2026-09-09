@@ -9,6 +9,7 @@
     "dev": "npm --prefix backend run dev",
     "seed": "npm --prefix backend run seed",
     "seed:admin": "npm --prefix backend run seed:admin",
+    "seed:gaming": "npm --prefix backend run seed:gaming",
     "seed:production": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/seed-production.ps1"
   },
   "engines": {

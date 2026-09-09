@@ -306,6 +306,7 @@ async function loadProducts() {
 }
 
 function renderCategoryNav() {
+    updateHeaderCategoryState();
     const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
     const nav = document.getElementById('categoryNav');
     if (!nav) return;
@@ -325,7 +326,6 @@ function renderCategoryNav() {
     nav.querySelectorAll('[data-category]').forEach(button => {
         button.addEventListener('click', () => setCategory(button.dataset.category));
     });
-    updateHeaderCategoryState();
 }
 
 function updateHeaderCategoryState() {
@@ -342,6 +342,7 @@ function setCategory(category, options = {}) {
     if (category === 'all') url.searchParams.delete('category');
     else url.searchParams.set('category', category);
     window.history.replaceState({}, '', url);
+    updateHeaderCategoryState();
     renderCategoryNav();
     renderProducts();
 
