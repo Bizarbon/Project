@@ -456,11 +456,15 @@ async function seedGaming() {
     console.log(`Total "Máy chơi game" products in DB: ${total}`);
 }
 
-seedGaming()
-    .catch(err => {
-        console.error('Seed error:', err);
-        process.exitCode = 1;
-    })
-    .finally(async () => {
-        await mongoose.disconnect();
-    });
+if (require.main === module) {
+    seedGaming()
+        .catch(err => {
+            console.error('Seed error:', err);
+            process.exitCode = 1;
+        })
+        .finally(async () => {
+            await mongoose.disconnect();
+        });
+}
+
+module.exports = { seedGaming, gamingProducts };
