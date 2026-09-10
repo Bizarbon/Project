@@ -11,6 +11,7 @@
     function setButtonLoading(button, loading, idleLabel, loadingLabel) {
         if (!button) return;
         button.disabled = loading;
+        button.setAttribute('aria-busy', String(loading));
         button.dataset.state = loading ? 'loading' : 'default';
         button.textContent = loading ? loadingLabel : idleLabel;
     }
@@ -55,27 +56,32 @@
     }
 
     function initializeTouchedValidation() {
+        function fieldMessage(input) {
+            if (input.validity.valueMissing) return 'Vui lòng nhập thông tin này.';
+            if (['confirmPassword', 'confirmNewPassword'].includes(input.id)) {
+                const original = document.getElementById('registerPassword') || document.getElementById('newPassword') || document.getElementById('resetPassword');
+                if (original && input.value !== original.value) return 'Mật khẩu nhập lại chưa trùng khớp.';
+            }
+            if (['registerPassword', 'newPassword', 'resetPassword'].includes(input.id)) return validatePassword(input);
+            if (input.validity.typeMismatch) return 'Email chưa đúng định dạng, ví dụ: ban@email.com.';
+            if (!input.checkValidity()) {
+                if (input.id === 'username') return 'Dùng 3–30 chữ, số hoặc dấu gạch dưới, không có dấu cách.';
+                if (input.type === 'tel') return 'Nhập số điện thoại hợp lệ, bắt đầu bằng 0 hoặc +84.';
+                if (input.id === 'name') return 'Họ và tên cần từ 2 đến 80 ký tự.';
+                return 'Thông tin chưa hợp lệ. Vui lòng kiểm tra lại.';
+            }
+            return '';
+        }
         document.querySelectorAll('.auth-field input').forEach(input => {
             const help = document.getElementById(input.getAttribute('aria-describedby'));
             if (help) help.dataset.defaultText = help.textContent;
             input.addEventListener('blur', () => {
-                let message = '';
-                if (!input.checkValidity()) {
-                    message = input.validity.typeMismatch
-                        ? 'Địa chỉ email chưa đúng định dạng.'
-                        : 'Thông tin này chưa hợp lệ. Hãy kiểm tra lại.';
-                }
-                if (input.type === 'password' && input.id !== 'loginPassword') {
-                    message = validatePassword(input);
-                }
-                setFieldError(input, message);
+                setFieldError(input, fieldMessage(input));
             });
+            input.addEventListener('invalid', () => setFieldError(input, fieldMessage(input)));
             input.addEventListener('input', () => {
                 if (input.getAttribute('aria-invalid') !== 'true') return;
-                const message = input.type === 'password' && input.id !== 'loginPassword'
-                    ? validatePassword(input)
-                    : (input.checkValidity() ? '' : 'Thông tin này chưa hợp lệ. Hãy kiểm tra lại.');
-                setFieldError(input, message);
+                setFieldError(input, fieldMessage(input));
             });
         });
     }
@@ -115,11 +121,16 @@
     }
 
     async function request(path, payload) {
-        const response = await fetch(`${window.API_URL}${path}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        let response;
+        try {
+            response = await fetch(`${window.API_URL}${path}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch (error) {
+            throw new Error('Chưa thể kết nối. Vui lòng kiểm tra mạng và thử lại.');
+        }
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.message || 'Máy chủ chưa thể xử lý yêu cầu.');
         return data;

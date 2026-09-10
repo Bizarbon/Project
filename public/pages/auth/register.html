@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Tạo tài khoản TechEcommerce để mua sắm và theo dõi đơn hàng công nghệ.">
     <meta name="robots" content="noindex, nofollow">
     <meta property="og:title" content="Đăng ký - TechEcommerce">
@@ -14,93 +14,40 @@
     <meta property="og:type" content="website">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/auth/register.html">
     <title>Đăng ký - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css?v=auth-shell-20260720-1">
-    <link rel="stylesheet" href="../../assets/css/auth.css?v=register-ui-20260720-1">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=auth-shell-20260720-1">
-    <link rel="stylesheet" href="../../assets/css/login-page.css?v=auth-shell-20260720-1">
-    <link rel="stylesheet" href="../../assets/css/register-page.css?v=register-ui-20260720-1">
-    <link rel="stylesheet" href="../../assets/css/auth-flow.css?v=auth-flow-20260728-3">
+    <meta property="og:url" content="https://techecommerce-shop.vercel.app/pages/auth/register.html">
+    <link rel="stylesheet" href="../../assets/css/auth-refined.css?v=20260910-5">
 </head>
 
 <body class="login-page register-page" data-auth-page="register">
-    <header class="storefront-header account-storefront-header">
-        <section class="header-main">
-            <div class="header-shell header-main-inner">
-                <a class="storefront-logo" href="../../index.html" aria-label="TechEcommerce - Trang chủ">
-                    <span class="storefront-logo-mark">TE</span>
-                    <span class="storefront-logo-text">TechEcommerce</span>
-                </a>
-                <form class="header-search" action="../../index.html" method="get" role="search">
-                    <label class="sr-only" for="registerHeaderSearch">Tìm kiếm sản phẩm</label>
-                    <span class="header-search-icon" aria-hidden="true">⌕</span>
-                    <input id="registerHeaderSearch" name="search" type="search" placeholder="Bạn đang tìm sản phẩm gì?">
-                    <button type="submit">Tìm kiếm</button>
-                </form>
-                <nav class="header-actions" aria-label="Tài khoản và mua hàng">
-                    <div id="nav-auth-section"></div>
-                    <a class="header-action-btn" href="../../index.html?openCart=1">
-                        <span class="header-action-icon" aria-hidden="true">🛒</span>
-                        <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
-                        <span class="header-cart-badge" data-auth-cart-badge hidden>0</span>
-                    </a>
-                    <a class="header-action-btn" href="../../index.html#catalogStart">
-                        <span class="header-action-icon" aria-hidden="true">⌖</span>
-                        <span class="header-action-copy"><small>Khu vực</small><strong data-auth-location>Hồ Chí Minh</strong></span>
-                    </a>
-                </nav>
-            </div>
-        </section>
-        <nav class="header-categories" aria-label="Danh mục sản phẩm">
-            <ul class="header-shell header-category-list">
-                <li><a href="../../index.html"><img src="../../assets/icons/grid-3x3.svg" alt="">Tất cả sản phẩm</a></li>
-                <li><a href="../../index.html?category=Điện+thoại"><img src="../../assets/icons/smartphone.svg" alt="">Điện thoại</a></li>
-                <li><a href="../../index.html?category=Laptop"><img src="../../assets/icons/laptop.svg" alt="">Laptop</a></li>
-                <li><a href="../../index.html?category=Tablet"><img src="../../assets/icons/tablet.svg" alt="">Tablet</a></li>
-                <li><a href="../../index.html?category=Tai+nghe"><img src="../../assets/icons/headphones.svg" alt="">Tai nghe</a></li>
-                <li><a href="../../index.html?category=Đồng+hồ+thông+minh"><img src="../../assets/icons/watch.svg" alt="">Đồng hồ thông minh</a></li>
-                <li><a href="../../index.html?category=Phụ+kiện"><img src="../../assets/icons/cable.svg" alt="">Phụ kiện</a></li>
-            </ul>
-        </nav>
+    <a class="skip-link" href="#authFormContent">Đến biểu mẫu</a>
+    <header class="account-header">
+        <a class="account-brand" href="../../index.html" aria-label="TechEcommerce - Trang chủ"><span class="account-monogram" aria-hidden="true">te.</span>TechEcommerce</a>
+        <a class="account-home" href="../../index.html"><span aria-hidden="true">←</span> Về cửa hàng</a>
     </header>
 
     <main class="auth-page-main">
         <section class="auth-experience auth-experience--register" aria-labelledby="registerTitle">
-            <figure class="auth-visual auth-visual--register">
-                <img src="../../assets/images/banner-laptop.jpg" width="1800" height="1200"
-                    alt="Laptop và điện thoại cao cấp tại TechEcommerce" fetchpriority="high">
-                <ul class="auth-product-gallery" aria-hidden="true">
-                    <li class="auth-product-shot auth-product-shot--one">
-                        <img src="../../assets/images/banner-phone.jpg" width="1800" height="2695" alt="" loading="lazy">
-                    </li>
-                    <li class="auth-product-shot auth-product-shot--two">
-                        <img src="../../assets/images/banner-watch.jpg" width="1800" height="2250" alt="" loading="lazy">
-                    </li>
-                    <li class="auth-product-shot auth-product-shot--three">
-                        <img src="../../assets/images/laptop.jpg" width="241" height="180" alt="" loading="lazy">
-                    </li>
+            <aside class="account-story" aria-label="Tài khoản TechEcommerce">
+                <p class="account-story-brand"><span aria-hidden="true"></span> TechEcommerce ID</p>
+                <h2>Bắt đầu từ<br>một kết nối.</h2>
+                <p class="account-story-description">Tạo không gian mua sắm riêng để lưu sản phẩm, theo dõi đơn hàng và quản lý thông tin thuận tiện.</p>
+                <figure class="account-product-visual">
+                    <img src="../../assets/images/auth-ecosystem-3d.png" width="1152" height="1536" alt="Minh họa 3D hệ sinh thái thiết bị công nghệ gồm laptop, điện thoại, tablet, tai nghe và đồng hồ" fetchpriority="high">
+                    <figcaption>Tài khoản của bạn, trải nghiệm của bạn.</figcaption>
+                </figure>
+                <ul class="account-benefits">
+                    <li><span aria-hidden="true">01</span> Theo dõi đơn hàng</li>
+                    <li><span aria-hidden="true">02</span> Lưu sản phẩm yêu thích</li>
+                    <li><span aria-hidden="true">03</span> Quản lý thông tin mua sắm</li>
                 </ul>
-                <aside class="auth-route-map" aria-label="Quyền lợi của tài khoản thành viên">
-                    <svg viewBox="0 0 320 120" role="img" aria-label="Từ lưu sản phẩm đến quản lý đơn hàng">
-                        <path d="M10 68 C76 12 126 108 188 54 S276 30 310 88"></path>
-                    </svg>
-                    <ol class="auth-route-nodes">
-                        <li style="--auth-node-index: 0">Lưu sản phẩm</li>
-                        <li style="--auth-node-index: 1">Nhận tư vấn</li>
-                        <li style="--auth-node-index: 2">Quản lý đơn hàng</li>
-                    </ol>
-                </aside>
-                <figcaption>
-                    <span class="auth-visual-label">Thành viên TechEcommerce</span>
-                    <h2>Thông tin mua sắm luôn sẵn sàng</h2>
-                    <p>Tài khoản giúp bạn lưu địa chỉ, kiểm tra lịch sử mua hàng và nhận tư vấn theo nhu cầu thực tế.</p>
-                </figcaption>
-            </figure>
+                <p class="account-story-footnote"><span aria-hidden="true"></span> Kết nối an toàn đến TechEcommerce</p>
+            </aside>
 
             <section class="auth-form-panel" aria-label="Biểu mẫu tạo tài khoản">
                 <section id="authFormContent">
                     <header class="auth-heading">
                         <h1 id="registerTitle">Tạo tài khoản</h1>
-                        <p>Email là bắt buộc để bạn có thể khôi phục mật khẩu khi cần.</p>
+                        <p>Bắt đầu trải nghiệm mua sắm của riêng bạn.</p>
                     </header>
 
                     <form id="registerForm" class="auth-form">
@@ -108,7 +55,7 @@
                             <div class="auth-field">
                                 <label for="name">Họ và tên</label>
                                 <div class="auth-input-wrap">
-                                    <input type="text" id="name" required autocomplete="name" minlength="2"
+                                    <input type="text" id="name" name="name" required autocomplete="name" minlength="2"
                                         maxlength="80" aria-describedby="nameHelp">
                                 </div>
                                 <p class="auth-field-help" id="nameHelp">Tên dùng trên đơn hàng và hồ sơ.</p>
@@ -117,7 +64,7 @@
                             <div class="auth-field">
                                 <label for="phone">Số điện thoại</label>
                                 <div class="auth-input-wrap">
-                                    <input type="tel" id="phone" required autocomplete="tel" inputmode="tel"
+                                    <input type="tel" id="phone" name="phone" required autocomplete="tel" inputmode="tel"
                                         pattern="(?:\+84|0)\d{9,10}" aria-describedby="phoneHelp">
                                 </div>
                                 <p class="auth-field-help" id="phoneHelp">Dùng để xác nhận và giao hàng.</p>
@@ -126,16 +73,16 @@
                             <div class="auth-field">
                                 <label for="email">Địa chỉ email</label>
                                 <div class="auth-input-wrap">
-                                    <input type="email" id="email" required autocomplete="email"
+                                    <input type="email" id="email" autocapitalize="none" spellcheck="false" name="email" required autocomplete="email"
                                         aria-describedby="emailHelp">
                                 </div>
-                                <p class="auth-field-help" id="emailHelp">Nhận thông báo đơn và đặt lại mật khẩu.</p>
+                                <p class="auth-field-help" id="emailHelp">Dùng để liên hệ về tài khoản và đơn hàng.</p>
                             </div>
 
                             <div class="auth-field">
                                 <label for="username">Tên đăng nhập</label>
                                 <div class="auth-input-wrap">
-                                    <input type="text" id="username" required autocomplete="username" minlength="3"
+                                    <input type="text" id="username" autocapitalize="none" spellcheck="false" name="username" required autocomplete="username" minlength="3"
                                         maxlength="30" pattern="[a-zA-Z0-9_]{3,30}" aria-describedby="usernameHelp">
                                 </div>
                                 <p class="auth-field-help" id="usernameHelp">Dùng chữ, số hoặc dấu gạch dưới.</p>
@@ -144,19 +91,19 @@
                             <div class="auth-field auth-field--full">
                                 <label for="registerPassword">Mật khẩu</label>
                                 <div class="auth-input-wrap">
-                                    <input type="password" id="registerPassword" required minlength="8" maxlength="72"
+                                    <input type="password" id="registerPassword" name="registerPassword" required minlength="8" maxlength="72"
                                         pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" autocomplete="new-password"
                                         aria-describedby="registerPasswordHelp">
                                     <button class="auth-password-toggle" type="button"
                                         data-password-toggle="registerPassword" aria-label="Hiện mật khẩu">Hiện</button>
                                 </div>
-                                <p class="auth-field-help" id="registerPasswordHelp">Cần có chữ hoa, chữ thường và chữ số.</p>
+                                <p class="auth-field-help" id="registerPasswordHelp">8–72 ký tự, có chữ hoa, chữ thường và chữ số.</p>
                             </div>
 
                             <div class="auth-field auth-field--full">
                                 <label for="confirmPassword">Nhập lại mật khẩu</label>
                                 <div class="auth-input-wrap">
-                                    <input type="password" id="confirmPassword" required minlength="8" maxlength="72"
+                                    <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" maxlength="72"
                                         autocomplete="new-password" aria-describedby="confirmPasswordHelp">
                                     <button class="auth-password-toggle" type="button"
                                         data-password-toggle="confirmPassword" aria-label="Hiện mật khẩu">Hiện</button>
@@ -178,16 +125,22 @@
                     <p>Bạn có thể đăng nhập để tiếp tục mua sắm.</p>
                     <a class="auth-primary-action" href="login.html">Đăng nhập ngay</a>
                 </section>
-                <a href="../../index.html" class="auth-back-link">Quay lại cửa hàng</a>
+
             </section>
         </section>
     </main>
 
-    <footer id="site-footer"></footer>
+    <footer class="account-footer">
+        <p>© TechEcommerce</p>
+        <nav aria-label="Chính sách và trợ giúp">
+            <a href="../legal/privacy.html">Bảo mật</a>
+            <a href="../legal/terms.html">Điều khoản</a>
+            <a href="../legal/faq.html">Trợ giúp</a>
+        </nav>
+    </footer>
 
     <script src="../../assets/js/auth.js?v=register-ui-20260720-1"></script>
-    <script src="../../assets/js/footer.js?v=auth-shell-20260720-1"></script>
-    <script src="../../assets/js/auth-flow.js?v=auth-flow-20260728-2"></script>
+    <script src="../../assets/js/auth-flow.js?v=20260910-1"></script>
 </body>
 
 </html>
