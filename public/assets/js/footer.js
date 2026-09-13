@@ -44,66 +44,22 @@
 
     const storefrontFooterHTML = `
         <footer class="site-footer">
-            <section class="footer-top" aria-label="Thông tin TechEcommerce">
-                <section class="footer-brand footer-col" aria-labelledby="footerBrandTitle">
+            <section class="footer-top footer-primary" aria-labelledby="footerBrandTitle">
+                <header class="footer-brand footer-col">
                     <h2 class="footer-logo" id="footerBrandTitle">TechEcommerce</h2>
-                    <p>Nền tảng mua sắm công nghệ dành cho điện thoại, laptop, phụ kiện và thiết bị thông minh. Hỗ trợ tư vấn AI, đặt hàng, thanh toán và theo dõi đơn nhanh chóng.</p>
-                    <nav class="footer-social" aria-label="Mạng xã hội TechEcommerce">
-                        <a class="social-btn" href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">${icon('facebook')}</a>
-                        <a class="social-btn" href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">${icon('instagram')}</a>
-                        <a class="social-btn" href="https://www.tiktok.com/" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok">${icon('tiktok')}</a>
-                        <a class="social-btn" href="https://zalo.me/" target="_blank" rel="noopener" aria-label="Zalo" title="Zalo">${icon('zalo')}</a>
-                    </nav>
-                    <section class="footer-trust-row" aria-label="Thanh toán và chứng nhận">
-                        <div class="payment-badges" aria-label="Phương thức thanh toán">
-                            <span class="payment-badge"><b class="payment-mark">COD</b><span>Thanh toán khi nhận</span></span>
-                            <span class="payment-badge"><b class="payment-mark">M</b><span>MoMo</span></span>
-                            <span class="payment-badge"><b class="payment-mark">V</b><span>VNPay</span></span>
-                            <span class="payment-badge"><b class="payment-mark">VISA</b><span>Visa</span></span>
-                            <span class="payment-badge"><b class="payment-mark">MC</b><span>Mastercard</span></span>
-                        </div>
-                        <span class="commerce-trust">${icon('shield')} Đã đăng ký Bộ Công Thương</span>
-                    </section>
-                </section>
-
-                <nav class="footer-col" aria-labelledby="footerFunctionsTitle">
-                    <h2 id="footerFunctionsTitle">Chức năng</h2>
+                    <p>Cửa hàng trực tuyến dành cho điện thoại, laptop, phụ kiện và thiết bị thông minh.</p>
+                </header>
+                <nav class="footer-directory" aria-label="Danh mục và chính sách">
                     <ul>
                         <li><a href="${root}index.html">Cửa hàng</a></li>
                         <li><a href="${root}pages/account/orders.html">Đơn hàng của tôi</a></li>
-                        <li><a href="${root}pages/account/profile.html">Hồ sơ cá nhân</a></li>
+                        <li><a href="${root}pages/legal/faq.html">Hỗ trợ mua hàng</a></li>
+                        <li><a href="${root}pages/legal/shipping.html">Vận chuyển</a></li>
+                        <li><a href="${root}pages/legal/warranty.html">Bảo hành</a></li>
+                        <li><a href="${root}pages/legal/return-policy.html">Đổi trả</a></li>
                         ${adminLinks}
                     </ul>
                 </nav>
-
-                <nav class="footer-col" aria-labelledby="footerSupportTitle">
-                    <h2 id="footerSupportTitle">Hỗ trợ</h2>
-                    <ul>
-                        <li><a href="${root}pages/legal/faq.html">Câu hỏi thường gặp</a></li>
-                        <li><a href="${root}pages/legal/shipping.html">Chính sách vận chuyển</a></li>
-                        <li><a href="${root}pages/legal/warranty.html">Bảo hành sản phẩm</a></li>
-                        <li><a href="${root}pages/legal/return-policy.html">Đổi trả</a></li>
-                        <li><a href="${root}pages/legal/terms.html">Điều khoản sử dụng</a></li>
-                        <li><a href="${root}pages/legal/privacy.html">Chính sách bảo mật</a></li>
-                    </ul>
-                </nav>
-
-                <section class="footer-col footer-newsletter" aria-labelledby="footerContactTitle">
-                    <h2 id="footerContactTitle">Liên hệ</h2>
-                    <address class="footer-contact-list">
-                        <p><span class="contact-icon">${icon('pin')}</span><a href="${root}index.html?openAddress=1">64 Nguyễn Văn Bảo, Gò Vấp, TP.HCM</a> <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=64+Nguyen+Van+Bao+Go+Vap+Ho+Chi+Minh" target="_blank" rel="noopener">(xem bản đồ)</a></p>
-                        <p><span class="contact-icon">${icon('phone')}</span><a href="tel:12345678">1234 5678 - 1824 5678</a></p>
-                        <p><span class="contact-icon">${icon('clock')}</span><span>8:00 - 22:00 mỗi ngày</span></p>
-                        <p><span class="contact-icon">${icon('mail')}</span><a href="mailto:vuphilong@techecommerce.vn">vuphilong@techecommerce.vn</a></p>
-                    </address>
-                    <p class="newsletter-offer">Giảm 10% đơn đầu tiên khi đăng ký nhận tin</p>
-                    <form class="newsletter-form" id="footerNewsletterForm" novalidate>
-                        <label class="sr-only" for="footerNewsletterEmail">Email nhận ưu đãi</label>
-                        <input id="footerNewsletterEmail" name="email" type="email" placeholder="Email của bạn..." autocomplete="email" required>
-                        <button type="submit">Đăng ký</button>
-                    </form>
-                    <small class="newsletter-status" id="footerNewsletterStatus" role="status" aria-live="polite"></small>
-                </section>
             </section>
             <hr class="footer-divider">
             <section class="footer-bottom" aria-label="Thông tin pháp lý">
@@ -126,66 +82,7 @@
     if (footerPlaceholder) footerPlaceholder.outerHTML = footerHTML;
     else document.body.insertAdjacentHTML('beforeend', footerHTML);
 
-    const newsletterForm = document.getElementById('footerNewsletterForm');
-    const newsletterInput = document.getElementById('footerNewsletterEmail');
-    const newsletterStatus = document.getElementById('footerNewsletterStatus');
-    newsletterForm?.addEventListener('submit', event => {
-        event.preventDefault();
-        const email = newsletterInput.value.trim().toLocaleLowerCase('vi');
-        const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-        newsletterStatus.className = 'newsletter-status';
-        if (!isValidEmail) {
-            newsletterStatus.textContent = 'Vui lòng nhập email hợp lệ.';
-            newsletterStatus.classList.add('is-error');
-            newsletterInput.focus();
-            return;
-        }
-
-        let subscriptions = [];
-        try {
-            subscriptions = JSON.parse(localStorage.getItem('newsletterSubscriptions') || '[]');
-            if (!Array.isArray(subscriptions)) subscriptions = [];
-        } catch (error) {
-            subscriptions = [];
-        }
-        if (!subscriptions.includes(email)) subscriptions.push(email);
-        localStorage.setItem('newsletterSubscriptions', JSON.stringify(subscriptions));
-        newsletterStatus.textContent = 'Đăng ký nhận ưu đãi thành công.';
-        newsletterStatus.classList.add('is-success');
-        newsletterForm.reset();
-    });
-
     document.getElementById('footerBackToTop')?.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
-    // Floating Zalo button - positioned horizontally beside AI chat
-    if (!document.getElementById('zaloFloatingBtn')) {
-        const zaloBtn = document.createElement('a');
-        zaloBtn.id = 'zaloFloatingBtn';
-        zaloBtn.className = 'zalo-floating-btn rhythmic-pulse-shake-zalo';
-        zaloBtn.href = 'https://zalo.me/0842331606';
-        zaloBtn.target = '_blank';
-        zaloBtn.rel = 'noopener noreferrer';
-        zaloBtn.setAttribute('aria-label', 'Chat Zalo trực tiếp: 0842331606');
-        zaloBtn.title = 'Chat Zalo với cửa hàng qua số 0842331606';
-        zaloBtn.innerHTML = `
-            <svg viewBox="0 0 100 100" width="38" height="38" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                <path d="M50 10C27.9 10 10 26.2 10 46.2c0 10.7 5.1 20.3 13.3 26.9-.5 4.4-2.5 11-5.4 14.4-.7.9.2 2 1.3 1.7 8.1-3.1 15-6.8 18.9-8.8 3.5.8 7.3 1.2 11.9 1.2 22.1 0 40-16.2 40-36.2S72.1 10 50 10z" fill="#0068FF"/>
-                <text x="50" y="55" fill="#ffffff" font-family="'Inter', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="25" font-weight="900" text-anchor="middle" letter-spacing="-0.5px">Zalo</text>
-            </svg>
-        `;
-        document.body.appendChild(zaloBtn);
-    }
-
-    // Attach pulse-shake effect to AI chat toggle
-    function attachAiShake() {
-        const aiToggle = document.querySelector('.ai-chat-toggle');
-        if (aiToggle && !aiToggle.classList.contains('rhythmic-pulse-shake-ai')) {
-            aiToggle.classList.add('rhythmic-pulse-shake-ai');
-        }
-    }
-    attachAiShake();
-    setTimeout(attachAiShake, 1000);
 })();

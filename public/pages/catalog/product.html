@@ -6,7 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Xem giá, cấu hình, tồn kho, bảo hành và đánh giá sản phẩm công nghệ tại TechEcommerce.">
     <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f6fbff">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/catalog/product.html">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:locale" content="vi_VN">
     <title>Chi tiết sản phẩm - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
@@ -17,6 +22,9 @@
             gap: 2rem;
             align-items: start;
         }
+        .product-breadcrumb { min-height: 44px; padding: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.55rem; background: transparent; border: 0; }
+        .product-breadcrumb a { color: var(--text-secondary); }
+        .product-breadcrumb span { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .detail-media {
             margin: 0;
         }
@@ -151,7 +159,7 @@
 </head>
 
 <body>
-    <nav>
+    <nav aria-label="Điều hướng chính">
         <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
         <ul id="main-navbar">
             <li><a href="../../index.html">Cửa hàng</a></li>
@@ -161,11 +169,16 @@
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
     </nav>
-    <script src="../../assets/js/animations.js"></script>
-    <script src="../../assets/js/auth.js?v=storefront-commerce-20260711-2"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script defer src="../../assets/js/animations.js"></script>
+    <script defer src="../../assets/js/auth.js?v=google-quality-20260911-1"></script>
+    <script defer src="../../assets/js/storefront-header.js?v=google-quality-20260911-1"></script>
 
     <main class="container fade-in">
+        <nav class="product-breadcrumb" aria-label="Đường dẫn trang">
+            <a href="../../index.html">Cửa hàng</a>
+            <span aria-hidden="true">›</span>
+            <span id="productBreadcrumbName" aria-current="page">Chi tiết sản phẩm</span>
+        </nav>
         <header class="page-header reveal">
             <h1 id="productPageTitle">Chi tiết sản phẩm</h1>
             <p>Thông tin sản phẩm, bảo hành và tồn kho hiện tại.</p>
@@ -202,9 +215,9 @@
         </section>
     </main>
 
-    <script src="../../assets/js/product-detail.js?v=storefront-commerce-20260711-2"></script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="../../assets/js/chatbox.js"></script>
+    <script defer src="../../assets/js/product-detail.js?v=google-quality-20260912-1"></script>
+    <script defer src="../../assets/js/footer.js?v=google-quality-20260912-1"></script>
+    <script defer src="../../assets/js/chatbox.js"></script>
 </body>
 
 </html>

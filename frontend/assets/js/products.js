@@ -110,7 +110,7 @@ function renderProductTable() {
                 <td>
                     <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}"
                          style="width:50px;height:50px;object-fit:cover;border-radius:8px;border:1px solid var(--border);"
-                         onerror="this.src='https://via.placeholder.com/50?text=N/A'">
+                         onerror="this.onerror=null;this.src='/assets/images/product-placeholder.svg'">
                 </td>
                 <td>
                     <strong>${escapeHTML(product.name)}</strong>

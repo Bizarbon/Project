@@ -44,12 +44,12 @@
                     </form>
                     <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
                         <span id="nav-auth-section"></span>
-                        <a class="header-action-btn" href="${root}index.html?openCart=1" aria-label="Mở giỏ hàng">
+                        <a class="header-action-btn" href="${root}index.html?openCart=1" aria-label="🛒 Giỏ hàng${cartCount ? `, ${cartCount} sản phẩm` : ''}">
                             <span class="header-action-icon" aria-hidden="true">🛒</span>
                             <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
-                            <span class="header-cart-badge"${cartCount ? '' : ' hidden'}>${cartCount}</span>
+                            <span class="header-cart-badge" aria-hidden="true"${cartCount ? '' : ' hidden'}>${cartCount}</span>
                         </a>
-                        <a class="header-action-btn" href="${root}index.html?openAddress=1" aria-label="Chọn khu vực giao hàng">
+                        <a class="header-action-btn" href="${root}index.html?openAddress=1" aria-label="Khu vực: ${escapeHTML(location)}">
                             <span class="header-action-icon" aria-hidden="true">⌖</span>
                             <span class="header-action-copy"><small>Khu vực</small><strong data-shopping-location-label>${escapeHTML(location)}</strong></span>
                         </a>

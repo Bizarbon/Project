@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /pages/account/
+Disallow: /pages/auth/
+Disallow: /pages/checkout/
+
+Sitemap: https://techecommerce-shop.vercel.app/sitemap.xml

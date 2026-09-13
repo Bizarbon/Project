@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const { expireOverduePayments } = require('./utils/paymentExpiry');
+const Product = require('./models/Product');
 
 const productRoutes = require('./routes/productRoutes');
 const customerRoutes = require('./routes/customerRoutes');
@@ -107,6 +108,47 @@ app.get('/api/health', (req, res) => {
         environment: process.env.NODE_ENV || 'development',
         uptime: Math.round(process.uptime())
     });
+});
+
+app.get('/api/sitemap', async (req, res, next) => {
+    try {
+        const configuredBaseUrl = process.env.APP_BASE_URL
+            || process.env.FRONTEND_BASE_URL
+            || 'https://techecommerce-shop.vercel.app';
+        const baseUrl = String(configuredBaseUrl).replace(/\/$/, '');
+        const staticPages = [
+            '/',
+            '/pages/legal/faq.html',
+            '/pages/legal/privacy.html',
+            '/pages/legal/return-policy.html',
+            '/pages/legal/shipping.html',
+            '/pages/legal/terms.html',
+            '/pages/legal/warranty.html',
+            '/pages/legal/cookie.html'
+        ];
+        const products = await Product.find({ active: { $ne: false } })
+            .select('_id updatedAt')
+            .sort({ _id: 1 })
+            .lean();
+        const today = new Date().toISOString().slice(0, 10);
+        const urls = [
+            ...staticPages.map(page => ({ loc: `${baseUrl}${page}`, lastmod: today })),
+            ...products.map(product => ({
+                loc: `${baseUrl}/pages/catalog/product.html?id=${encodeURIComponent(product._id)}`,
+                lastmod: new Date(product.updatedAt || Date.now()).toISOString().slice(0, 10)
+            }))
+        ];
+        const xml = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+            ...urls.map(url => `  <url><loc>${url.loc.replace(/&/g, '&amp;')}</loc><lastmod>${url.lastmod}</lastmod></url>`),
+            '</urlset>'
+        ].join('\n');
+        res.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+        res.type('application/xml').send(xml);
+    } catch (error) {
+        next(error);
+    }
 });
 
 app.use('/api/products', productRoutes);

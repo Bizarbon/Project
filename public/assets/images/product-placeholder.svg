@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-labelledby="title description">
+  <title id="title">Ảnh sản phẩm đang được cập nhật</title>
+  <desc id="description">Minh họa thiết bị công nghệ thay thế cho ảnh sản phẩm chưa sẵn sàng.</desc>
+  <rect width="800" height="450" fill="#edf5ff"/>
+  <rect x="246" y="84" width="308" height="206" rx="18" fill="#fff" stroke="#8bb8e8" stroke-width="8"/>
+  <path d="M194 334h412l-42 42H236z" fill="#d7e9fb" stroke="#8bb8e8" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="400" cy="187" r="42" fill="#2563eb" opacity=".16"/>
+  <path d="m379 187 15 15 29-34" fill="none" stroke="#2563eb" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

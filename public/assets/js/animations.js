@@ -1,25 +1,19 @@
-// Scroll Reveal Animation Logic
-function reveal() {
-    const reveals = document.querySelectorAll(".reveal");
-    for (let i = 0; i < reveals.length; i++) {
-        const windowHeight = window.innerHeight;
-        const elementTop = reveals[i].getBoundingClientRect().top;
-        const elementVisible = 150;
-        if (elementTop < windowHeight - elementVisible) {
-            reveals[i].classList.add("active");
-        }
-    }
-}
-
-// Initial reveal on load
 document.addEventListener("DOMContentLoaded", () => {
-    // Add scroll event listener
-    window.addEventListener("scroll", reveal);
-    
-    // Trigger once to show elements already in view
-    reveal();
+    const reveals = document.querySelectorAll('.reveal');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+        reveals.forEach(element => element.classList.add('active'));
+    } else {
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            });
+        }, { rootMargin: '0px 0px -80px', threshold: 0.01 });
+        reveals.forEach(element => observer.observe(element));
+    }
 
-    // Global Logo Click Handler (if needed via class)
     const logos = document.querySelectorAll('.nav-logo');
     logos.forEach(logo => {
         logo.style.cursor = 'pointer';

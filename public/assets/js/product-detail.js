@@ -3,6 +3,26 @@ let relatedProducts = [];
 let wishlistIds = new Set();
 let reviews = [];
 
+const optimizedDetailImages = new Set([
+    'assets/images/gaming/ps5.png',
+    'assets/images/gaming/nintendo-switch.png',
+    'assets/images/gaming/dualsense-controller.png',
+    'assets/images/gaming/ps4.png',
+    'assets/images/gaming/gaming-headset.png',
+    'assets/images/products/ps5-slim-standard.jpg',
+    'assets/images/products/nintendo-switch-oled.jpg',
+    'assets/images/products/steam-deck-oled.png',
+    'assets/images/products/asus-rog-ally-x.jpg',
+    'assets/images/products/meta-quest-3.jpg',
+    'assets/images/products/ps5-slim-digital.jpg',
+    'assets/images/products/ps4-pro.jpg',
+    'assets/images/products/nintendo-switch-lite.jpg',
+    'assets/images/products/dualsense-white.jpg',
+    'assets/images/products/dualsense-black.jpg',
+    'assets/images/products/joy-con-neon.jpg',
+    'assets/images/products/xbox-controller.jpg'
+]);
+
 function fmt(n) {
     return (Number(n) || 0).toLocaleString('vi-VN') + ' đ';
 }
@@ -10,6 +30,42 @@ function fmt(n) {
 function formatDate(value) {
     if (!value) return 'Đang cập nhật';
     return new Date(value).toLocaleDateString('vi-VN');
+}
+
+function absoluteProductUrl(value) {
+    if (!value) return `${window.location.origin}/assets/images/product-placeholder.svg`;
+    try {
+        return new URL(value, `${window.location.origin}/`).href;
+    } catch (error) {
+        return `${window.location.origin}/assets/images/product-placeholder.svg`;
+    }
+}
+
+function optimizedProductUrl(value) {
+    const absolute = absoluteProductUrl(value);
+    try {
+        const url = new URL(absolute);
+        const normalized = url.pathname.replace(/^\//, '');
+        if (url.origin === window.location.origin && optimizedDetailImages.has(normalized)) {
+            url.pathname = url.pathname.replace(/\.(?:png|jpe?g)$/i, '.webp');
+            return url.href;
+        }
+    } catch (error) {
+        return absolute;
+    }
+    return absolute;
+}
+
+function setMetaContent(selector, attribute, value) {
+    let meta = document.querySelector(selector);
+    if (!meta) {
+        meta = document.createElement('meta');
+        const match = selector.match(/meta\[(name|property)="([^"]+)"\]/);
+        if (!match) return;
+        meta.setAttribute(match[1], match[2]);
+        document.head.appendChild(meta);
+    }
+    meta.setAttribute(attribute, value);
 }
 
 function specEntries(p) {
@@ -160,41 +216,76 @@ function renderProduct() {
     const discount = product.compareAtPrice > product.price ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
     const gallery = [product.image, ...(product.images || [])].filter(Boolean);
     const uniqueGallery = [...new Set(gallery)];
+    const absoluteGallery = uniqueGallery.map(absoluteProductUrl);
+    const canonicalUrl = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(product._id)}`;
+    const productDescription = product.description || `Xem thông tin, giá bán và tình trạng tồn kho của ${product.name} tại TechEcommerce.`;
 
     document.title = `${product.name} - TechEcommerce`;
     document.getElementById('productPageTitle').textContent = product.name;
+    const breadcrumbName = document.getElementById('productBreadcrumbName');
+    if (breadcrumbName) breadcrumbName.textContent = product.name;
     const canonical = document.querySelector('link[rel="canonical"]');
-    if (canonical) canonical.href = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(product._id)}`;
+    if (canonical) canonical.href = canonicalUrl;
+    setMetaContent('meta[name="description"]', 'content', productDescription);
+    setMetaContent('meta[property="og:type"]', 'content', 'product');
+    setMetaContent('meta[property="og:title"]', 'content', `${product.name} - TechEcommerce`);
+    setMetaContent('meta[property="og:description"]', 'content', productDescription);
+    setMetaContent('meta[property="og:url"]', 'content', canonicalUrl);
+    setMetaContent('meta[property="og:image"]', 'content', absoluteGallery[0] || absoluteProductUrl(''));
+    setMetaContent('meta[name="twitter:card"]', 'content', 'summary_large_image');
     document.querySelector('script[data-product-schema]')?.remove();
     const productSchema = document.createElement('script');
     productSchema.type = 'application/ld+json';
     productSchema.dataset.productSchema = 'true';
     productSchema.textContent = JSON.stringify({
         '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: product.name,
-        image: uniqueGallery,
-        description: product.description || undefined,
-        sku: product.sku || undefined,
-        brand: product.brand ? { '@type': 'Brand', name: product.brand } : undefined,
-        offers: {
-            '@type': 'Offer',
-            priceCurrency: 'VND',
-            price: Number(product.price) || 0,
-            availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-            url: window.location.href
-        },
-        aggregateRating: product.rating ? {
-            '@type': 'AggregateRating',
-            ratingValue: Number(product.rating),
-            reviewCount: Number(product.reviewCount) || reviews.length || 1
-        } : undefined
+        '@graph': [{
+            '@type': 'Product',
+            '@id': `${canonicalUrl}#product`,
+            name: product.name,
+            image: absoluteGallery,
+            description: productDescription,
+            sku: product.sku || undefined,
+            brand: product.brand ? { '@type': 'Brand', name: product.brand } : undefined,
+            offers: {
+                '@type': 'Offer',
+                priceCurrency: 'VND',
+                price: Number(product.price) || 0,
+                itemCondition: 'https://schema.org/NewCondition',
+                availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                url: canonicalUrl,
+                seller: { '@type': 'Organization', name: 'TechEcommerce' }
+            },
+            aggregateRating: Number(product.rating) > 0 && (Number(product.reviewCount) > 0 || reviews.length > 0) ? {
+                '@type': 'AggregateRating',
+                ratingValue: Number(product.rating),
+                reviewCount: Number(product.reviewCount) || reviews.length
+            } : undefined
+        }, {
+            '@type': 'BreadcrumbList',
+            itemListElement: [{
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Cửa hàng',
+                item: `${window.location.origin}/`
+            }, {
+                '@type': 'ListItem',
+                position: 2,
+                name: product.category || 'Sản phẩm',
+                item: `${window.location.origin}/?category=${encodeURIComponent(product.category || '')}#catalogStart`
+            }, {
+                '@type': 'ListItem',
+                position: 3,
+                name: product.name,
+                item: canonicalUrl
+            }]
+        }]
     });
     document.head.appendChild(productSchema);
     document.getElementById('productDetail').innerHTML = `
         <figure class="detail-media">
-            <img id="mainProductImage" src="${escapeHTML(uniqueGallery[0] || product.image)}" alt="${escapeHTML(product.name)}" onerror="this.src='https://via.placeholder.com/700x460?text=No+Image'">
-            ${uniqueGallery.length > 1 ? `<nav class="detail-thumbs" aria-label="Ảnh sản phẩm">${uniqueGallery.map((src, index) => `<button type="button" onclick="document.getElementById('mainProductImage').src='${escapeHTML(src)}'" aria-label="Xem ảnh ${index + 1}"><img src="${escapeHTML(src)}" alt=""></button>`).join('')}</nav>` : ''}
+            <img id="mainProductImage" src="${escapeHTML(optimizedProductUrl(uniqueGallery[0]))}" width="800" height="600" fetchpriority="high" decoding="async" alt="${escapeHTML(product.name)}" onerror="this.onerror=null;this.src='/assets/images/product-placeholder.svg'">
+            ${absoluteGallery.length > 1 ? `<nav class="detail-thumbs" aria-label="Ảnh sản phẩm">${uniqueGallery.map((src, index) => `<button type="button" onclick="document.getElementById('mainProductImage').src='${escapeHTML(optimizedProductUrl(src))}'" aria-label="Xem ảnh ${index + 1} của ${escapeHTML(product.name)}"><img src="${escapeHTML(optimizedProductUrl(src))}" width="120" height="120" loading="lazy" decoding="async" alt=""></button>`).join('')}</nav>` : ''}
         </figure>
         <article class="detail-info">
             <span class="category-badge">${escapeHTML(product.category)}</span>
@@ -250,7 +341,7 @@ function renderProduct() {
 
     document.getElementById('relatedProducts').innerHTML = relatedProducts.map(p => `
         <a class="related-card" href="product.html?id=${p._id}">
-            <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" onerror="this.src='https://via.placeholder.com/240x160?text=No+Image'">
+            <img src="${escapeHTML(optimizedProductUrl(p.image))}" width="320" height="240" loading="lazy" decoding="async" alt="${escapeHTML(p.name)}" onerror="this.onerror=null;this.src='/assets/images/product-placeholder.svg'">
             <strong>${escapeHTML(p.name)}</strong>
             <small style="color:var(--text-muted)">${escapeHTML(p.brand || p.category || '')}</small>
             <span>${fmt(p.price)}</span>

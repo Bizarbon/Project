@@ -2,20 +2,57 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap&amp;subset=vietnamese" />
     <meta name="description" content="Mua điện thoại, laptop, tablet, tai nghe, đồng hồ thông minh và phụ kiện chính hãng tại TechEcommerce." />
     <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#f6fbff" />
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/assets/images/banner-phone-mobile.webp" as="image" type="image/webp" media="(max-width: 48rem)" fetchpriority="high" />
+    <link rel="preload" href="/assets/images/banner-phone.jpg" as="image" media="(min-width: 48.01rem)" fetchpriority="high" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />
     <meta property="og:site_name" content="TechEcommerce" />
     <meta property="og:title" content="TechEcommerce - Cửa hàng công nghệ" />
     <meta property="og:description" content="Khám phá sản phẩm công nghệ chính hãng, so sánh cấu hình và mua sắm trực tuyến thuận tiện." />
     <meta property="og:url" content="https://techecommerce-shop.vercel.app/" />
+    <meta property="og:image" content="https://techecommerce-shop.vercel.app/assets/images/banner-laptop.jpg" />
+    <meta property="og:image:alt" content="Laptop công nghệ tại TechEcommerce" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TechEcommerce - Cửa hàng công nghệ" />
+    <meta name="twitter:description" content="Khám phá sản phẩm công nghệ chính hãng, so sánh cấu hình và mua sắm trực tuyến thuận tiện." />
+    <meta name="twitter:image" content="https://techecommerce-shop.vercel.app/assets/images/banner-laptop.jpg" />
     <title>TechEcommerce - Cửa hàng công nghệ</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://techecommerce-shop.vercel.app/#organization",
+            "name": "TechEcommerce",
+            "url": "https://techecommerce-shop.vercel.app/",
+            "logo": "https://techecommerce-shop.vercel.app/favicon.svg"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://techecommerce-shop.vercel.app/#website",
+            "name": "TechEcommerce",
+            "url": "https://techecommerce-shop.vercel.app/",
+            "inLanguage": "vi-VN",
+            "publisher": { "@id": "https://techecommerce-shop.vercel.app/#organization" }
+          }
+        ]
+      }
+    </script>
     <link rel="stylesheet" href="assets/css/style.css?v=cart-flash-20260709-1" />
     <link rel="stylesheet" href="assets/css/neo-circuit.css?v=site-layout-20260715-2" />
     <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-cost-20260722-1" />
+    <link rel="stylesheet" href="assets/css/storefront-tokens.css?v=google-quality-20260912-1" />
+    <link rel="stylesheet" href="assets/css/storefront-polish.css?v=google-quality-20260912-1" />
     <style>
       .cart-drawer[aria-hidden='true'] {
         transform: translateX(calc(100% + 96px)) !important;
@@ -245,41 +282,32 @@
     </style>
   </head>
 
-  <body>
+  <body class="storefront-page">
     <header class="storefront-header">
-      <aside class="header-promotion" aria-label="Chương trình ưu đãi">
+      <aside class="header-promotion" aria-label="Thông tin mua sắm">
         <div class="header-shell promotion-marquee-shell">
-          <div class="promotion-marquee-track">
-            <div class="promotion-marquee-group">
-              <span class="promo-item"><span class="promo-tag promo-tag-hot">🔥 Flash Sale</span><strong>iPhone 16 Pro & Galaxy Z Fold6 giảm đến 15% hôm nay</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-edu">🎓 Ưu đãi sinh viên</span><strong>Giảm thêm 3 triệu khi mua MacBook & Laptop chính hãng</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-gaming">🎮 Máy chơi game</span><strong>PS5 Slim & Nintendo Switch OLED - Tặng ngay đĩa game đỉnh cao</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-ship">🚚 Freeship toàn quốc</span><strong>Giao hỏa tốc 2H - Miễn phí vận chuyển từ 500.000đ</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-installment">💳 Trả góp 0%</span><strong>0% lãi suất, duyệt hồ sơ online siêu tốc chỉ 5 phút</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-warranty">🛡️ Bảo hành 1:1</span><strong>Đổi mới 30 ngày nếu lỗi - Bảo hành chính hãng 12 tháng</strong></span>
-              <span class="promo-separator">•</span>
+          <section class="shopping-marquee" aria-label="Cập nhật mua sắm">
+            <div class="shopping-marquee-track" aria-live="off">
+              <ul class="shopping-marquee-list">
+                <li><strong>Khám phá công nghệ</strong><span>Điện thoại, laptop, gaming và phụ kiện</span></li>
+                <li><strong>Thông tin minh bạch</strong><span>Giá, tồn kho và thông số được trình bày rõ ràng</span></li>
+                <li><strong>Mua sắm thuận tiện</strong><span>Giao hàng toàn quốc và theo dõi đơn trực tuyến</span></li>
+              </ul>
+              <ul class="shopping-marquee-list" aria-hidden="true">
+                <li><strong>Khám phá công nghệ</strong><span>Điện thoại, laptop, gaming và phụ kiện</span></li>
+                <li><strong>Thông tin minh bạch</strong><span>Giá, tồn kho và thông số được trình bày rõ ràng</span></li>
+                <li><strong>Mua sắm thuận tiện</strong><span>Giao hàng toàn quốc và theo dõi đơn trực tuyến</span></li>
+              </ul>
             </div>
-            <div class="promotion-marquee-group" aria-hidden="true">
-              <span class="promo-item"><span class="promo-tag promo-tag-hot">🔥 Flash Sale</span><strong>iPhone 16 Pro & Galaxy Z Fold6 giảm đến 15% hôm nay</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-edu">🎓 Ưu đãi sinh viên</span><strong>Giảm thêm 3 triệu khi mua MacBook & Laptop chính hãng</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-gaming">🎮 Máy chơi game</span><strong>PS5 Slim & Nintendo Switch OLED - Tặng ngay đĩa game đỉnh cao</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-ship">🚚 Freeship toàn quốc</span><strong>Giao hỏa tốc 2H - Miễn phí vận chuyển từ 500.000đ</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-installment">💳 Trả góp 0%</span><strong>0% lãi suất, duyệt hồ sơ online siêu tốc chỉ 5 phút</strong></span>
-              <span class="promo-separator">•</span>
-              <span class="promo-item"><span class="promo-tag promo-tag-warranty">🛡️ Bảo hành 1:1</span><strong>Đổi mới 30 ngày nếu lỗi - Bảo hành chính hãng 12 tháng</strong></span>
-              <span class="promo-separator">•</span>
-            </div>
-          </div>
-          <button type="button" class="promotion-marquee-btn" data-header-category="all">Xem ưu đãi</button>
+          </section>
+          <button
+            class="promotion-motion-toggle"
+            type="button"
+            aria-label="Tạm dừng dòng thông tin"
+            aria-pressed="false"
+            onclick="const track=this.closest('.promotion-marquee-shell').querySelector('.shopping-marquee-track');const paused=this.getAttribute('aria-pressed')!=='true';this.setAttribute('aria-pressed',String(paused));this.setAttribute('aria-label',paused?'Tiếp tục dòng thông tin':'Tạm dừng dòng thông tin');track.classList.toggle('is-paused',paused);this.querySelector('[aria-hidden]').textContent=paused?'▶':'Ⅱ';"
+          ><span aria-hidden="true">Ⅱ</span></button>
+          <a class="promotion-policy-link" href="pages/legal/shipping.html"><span class="promotion-policy-full">Chính sách mua hàng</span><span class="promotion-policy-compact">Chính sách</span></a>
         </div>
       </aside>
 
@@ -300,14 +328,14 @@
           <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
             <span id="nav-auth-section"><!-- Auth section injected by auth.js --></span>
 
-            <button class="header-action-btn header-cart-btn" id="headerCartButton" type="button" onclick="toggleCartDrawer()" aria-label="Mở giỏ hàng">
+            <button class="header-action-btn header-cart-btn" id="headerCartButton" type="button" onclick="toggleCartDrawer()" aria-label="🛒 Giỏ hàng">
               <span class="header-action-icon" aria-hidden="true">🛒</span>
               <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
-              <span class="header-cart-badge" id="headerCartBadge" hidden>0</span>
+              <span class="header-cart-badge" id="headerCartBadge" aria-hidden="true" hidden>0</span>
             </button>
 
             <span class="header-location">
-              <button class="header-action-btn header-location-toggle" id="headerLocationToggle" type="button" aria-expanded="false" aria-controls="addressModal">
+              <button class="header-action-btn header-location-toggle" id="headerLocationToggle" type="button" aria-label="Khu vực: Hồ Chí Minh" aria-expanded="false" aria-controls="addressModal">
                 <span class="header-action-icon" aria-hidden="true">⌖</span>
                 <span class="header-action-copy"><small>Khu vực</small><strong id="headerLocationLabel">Hồ Chí Minh</strong></span>
                 <span aria-hidden="true">›</span>
@@ -381,12 +409,12 @@
       </section>
     </aside>
 
-    <script src="assets/js/animations.js"></script>
-    <script src="assets/js/auth.js?v=account-ui-20260711-1"></script>
+    <script defer src="assets/js/animations.js"></script>
+    <script defer src="assets/js/auth.js?v=google-quality-20260911-1"></script>
 
-    <main class="container fade-in">
+    <main class="container">
       <section
-        class="hero-carousel reveal"
+        class="hero-carousel"
         id="promoCarousel"
         aria-label="Ưu đãi nổi bật"
         aria-roledescription="carousel"
@@ -394,12 +422,12 @@
         <div class="hero-slides">
           <article
             class="hero-slide is-active"
-            style="--hero-image: url('assets/images/banner-phone.jpg')"
+            style="--hero-image: url('/assets/images/banner-phone.jpg'); --hero-image-mobile: url('/assets/images/banner-phone-mobile.webp')"
             aria-hidden="false"
           >
             <div class="hero-slide-content">
               <span class="hero-eyebrow">Điện thoại chính hãng</span>
-              <h2>Công nghệ mới trong tầm tay</h2>
+              <h1>Công nghệ mới trong tầm tay</h1>
               <p>
                 Khám phá các mẫu điện thoại nổi bật, cấu hình mạnh và chính sách
                 bảo hành rõ ràng.
@@ -411,7 +439,7 @@
           </article>
           <article
             class="hero-slide"
-            style="--hero-image: url('assets/images/banner-laptop.jpg')"
+            style="--hero-image: url('/assets/images/banner-laptop.jpg'); --hero-image-mobile: url('/assets/images/banner-laptop-mobile.webp')"
             aria-hidden="true"
             inert
           >
@@ -429,7 +457,7 @@
           </article>
           <article
             class="hero-slide"
-            style="--hero-image: url('assets/images/banner-watch.jpg')"
+            style="--hero-image: url('/assets/images/banner-watch.jpg'); --hero-image-mobile: url('/assets/images/banner-watch-mobile.webp')"
             aria-hidden="true"
             inert
           >
@@ -475,87 +503,40 @@
         </div>
       </section>
 
-      <section
-        class="stats-grid reveal"
-        id="adminStats"
-        style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr))"
-      >
-        <div class="stat-card admin-metric">
-          <div class="stat-icon">💵</div>
-          <div
-            class="stat-value"
-            id="statRevenue"
-            style="color: var(--success)"
-          >
-            0 đ
-          </div>
-          <div class="stat-label">Doanh thu</div>
-        </div>
-        <div class="stat-card admin-metric">
-          <div class="stat-icon">📈</div>
-          <div
-            class="stat-value"
-            id="statProfit"
-            style="color: var(--primary-light)"
-          >
-            0 đ
-          </div>
-          <div class="stat-label">Lợi nhuận</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon">📦</div>
-          <div class="stat-value" id="statProducts">0</div>
-          <div class="stat-label">Sản phẩm</div>
-        </div>
-        <div class="stat-card admin-metric">
-          <div class="stat-icon">👥</div>
-          <div class="stat-value" id="statCustomers">0</div>
-          <div class="stat-label">Khách hàng</div>
-        </div>
-      </section>
+      <nav class="shop-assurances" aria-label="Chính sách mua hàng">
+        <ul>
+          <li><a href="pages/legal/shipping.html"><strong>Giao hàng toàn quốc</strong><span>Tra cứu cách tính phí và thời gian giao</span></a></li>
+          <li><a href="pages/legal/return-policy.html"><strong>Đổi trả minh bạch</strong><span>Điều kiện và quy trình được công bố rõ</span></a></li>
+          <li><a href="pages/legal/warranty.html"><strong>Bảo hành rõ ràng</strong><span>Kiểm tra chính sách trước khi đặt mua</span></a></li>
+        </ul>
+      </nav>
 
-      <div class="flex-layout">
+      <section class="flex-layout" aria-label="Mua sắm và giỏ hàng">
         <section class="main-content" id="catalogStart" aria-label="Danh sách và bộ lọc sản phẩm">
+          <header class="catalog-heading">
+            <section>
+              <h2 id="catalogTitle">Tất cả sản phẩm</h2>
+              <p>Chọn theo nhu cầu, thương hiệu và mức giá phù hợp với bạn.</p>
+            </section>
+            <output id="resultCount" aria-live="polite">Đang tải sản phẩm…</output>
+          </header>
+          <nav class="category-nav" id="categoryNav" aria-label="Lọc nhanh theo danh mục"></nav>
           <fieldset class="shop-toolbar" id="catalogFilters">
             <legend class="sr-only">Bộ lọc sản phẩm</legend>
-            <label class="sr-only" for="searchInput">Tìm sản phẩm hoặc danh mục</label>
-            <label class="sr-only" for="minPrice">Giá thấp nhất</label>
-            <input
-              data-product-filter
-              id="searchInput"
-              type="search"
-              placeholder="Tìm sản phẩm, danh mục..."
-            />
-            <label class="sr-only" for="maxPrice">Giá cao nhất</label>
-            <input
-              data-product-filter
-              id="minPrice"
-              type="number"
-              min="0"
-              placeholder="Giá từ"
-            />
-            <input
-              data-product-filter
-              id="maxPrice"
-              type="number"
-              min="0"
-              placeholder="Giá đến"
-            />
-            <label class="sr-only" for="brandFilter">Lọc theo thương hiệu</label>
-            <select data-product-filter id="brandFilter">
-              <option value="all">Tất cả thương hiệu</option>
-            </select>
-            <label class="sr-only" for="sortProducts">Sắp xếp sản phẩm</label>
-            <select data-product-filter id="sortProducts">
-              <option value="">Sắp xếp mặc định</option>
-              <option value="newest">Mới nhất</option>
-              <option value="price_asc">Giá tăng dần</option>
-              <option value="price_desc">Giá giảm dần</option>
-              <option value="rating">Đánh giá cao</option>
-              <option value="best_seller">Bán chạy</option>
-              <option value="stock_desc">Tồn kho nhiều</option>
-              <option value="name">Tên A-Z</option>
-            </select>
+            <label class="filter-field filter-field-search"><span>Tìm kiếm</span><input data-product-filter id="searchInput" type="search" placeholder="Tên sản phẩm hoặc danh mục" /></label>
+            <label class="filter-field"><span>Giá từ</span><input data-product-filter id="minPrice" type="number" min="0" inputmode="numeric" placeholder="0 đ" /></label>
+            <label class="filter-field"><span>Giá đến</span><input data-product-filter id="maxPrice" type="number" min="0" inputmode="numeric" placeholder="Không giới hạn" /></label>
+            <label class="filter-field"><span>Thương hiệu</span><select data-product-filter id="brandFilter"><option value="all">Tất cả thương hiệu</option></select></label>
+            <label class="filter-field"><span>Sắp xếp</span><select data-product-filter id="sortProducts">
+                <option value="">Phù hợp nhất</option>
+                <option value="newest">Mới nhất</option>
+                <option value="price_asc">Giá tăng dần</option>
+                <option value="price_desc">Giá giảm dần</option>
+                <option value="rating">Đánh giá cao</option>
+                <option value="best_seller">Bán chạy</option>
+                <option value="stock_desc">Tồn kho nhiều</option>
+                <option value="name">Tên A–Z</option>
+              </select></label>
             <label class="stock-filter-toggle">
               <input
                 data-product-filter
@@ -566,7 +547,7 @@
               Còn hàng
             </label>
           </fieldset>
-          <div id="productSections"></div>
+          <section id="productSections" aria-busy="true"></section>
 
           <section class="recommendation-section" id="productRecommendations" aria-labelledby="recommendationTitle" hidden>
             <header class="recommendation-heading">
@@ -665,20 +646,20 @@
               <fieldset class="delivery-address" id="deliveryAddressFieldset">
                 <legend>Địa chỉ giao hàng</legend>
                 <section class="delivery-address-grid" aria-label="Chọn khu vực giao hàng">
-                  <label for="checkoutProvince">
+                  <label>
                     <span>Tỉnh/Thành</span>
                     <select id="checkoutProvince" aria-required="true">
                       <option value="">Chọn Tỉnh/Thành</option>
                     </select>
                   </label>
-                  <label for="checkoutWard">
+                  <label>
                     <span>Phường/Xã/Đặc khu</span>
                     <select id="checkoutWard" aria-required="true" disabled>
                       <option value="">Chọn Phường/Xã</option>
                     </select>
                   </label>
                 </section>
-                <label class="delivery-address-detail" for="shippingAddressDetail">
+                <label class="delivery-address-detail">
                   <span>Số nhà và tên đường</span>
                   <textarea id="shippingAddressDetail" rows="2" aria-required="true" aria-describedby="shippingAddressHelp" placeholder="Ví dụ: 25 Nguyễn Huệ, tầng 3, căn 3A"></textarea>
                 </label>
@@ -777,7 +758,7 @@
             </section>
           </section>
         </aside>
-      </div>
+      </section>
 
       <div
         class="cart-overlay"
@@ -789,8 +770,8 @@
 
     <footer id="site-footer"></footer>
 
-    <script src="assets/js/shop.js?v=navigation-sync-20260712-2"></script>
-    <script src="assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="assets/js/chatbox.js?v=ai-workspace-20260720-1"></script>
+    <script defer src="assets/js/shop.js?v=google-quality-20260912-1"></script>
+    <script defer src="assets/js/footer.js?v=google-quality-20260912-1"></script>
+    <script defer src="assets/js/chatbox.js?v=ai-workspace-20260720-1"></script>
   </body>
 </html>

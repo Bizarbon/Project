@@ -17,6 +17,35 @@ const categoryLabels = {
     'Máy chơi game': 'Máy chơi game'
 };
 
+const optimizedLocalImages = new Set([
+    'assets/images/gaming/ps5.png',
+    'assets/images/gaming/nintendo-switch.png',
+    'assets/images/gaming/dualsense-controller.png',
+    'assets/images/gaming/ps4.png',
+    'assets/images/gaming/gaming-headset.png',
+    'assets/images/products/ps5-slim-standard.jpg',
+    'assets/images/products/nintendo-switch-oled.jpg',
+    'assets/images/products/steam-deck-oled.png',
+    'assets/images/products/asus-rog-ally-x.jpg',
+    'assets/images/products/meta-quest-3.jpg',
+    'assets/images/products/ps5-slim-digital.jpg',
+    'assets/images/products/ps4-pro.jpg',
+    'assets/images/products/nintendo-switch-lite.jpg',
+    'assets/images/products/dualsense-white.jpg',
+    'assets/images/products/dualsense-black.jpg',
+    'assets/images/products/joy-con-neon.jpg',
+    'assets/images/products/xbox-controller.jpg'
+]);
+
+function productImageUrls(image = '') {
+    const original = String(image || '/assets/images/product-placeholder.svg');
+    const normalized = original.replace(/^\//, '');
+    const optimized = optimizedLocalImages.has(normalized)
+        ? `/${normalized.replace(/\.(?:png|jpe?g)$/i, '.webp')}`
+        : original;
+    return { original, optimized };
+}
+
 const DELIVERY_DATA_URL = 'assets/data/vietnam-administrative-2025.json?v=20260712-1';
 let deliveryAreas = [];
 let deliveryAreasState = 'idle';
@@ -185,7 +214,7 @@ async function loadRecommendations() {
         document.getElementById('recommendationDescription').textContent = data.personalized
             ? 'Xếp hạng từ đơn hàng, sản phẩm yêu thích và xu hướng mua sắm của bạn.'
             : 'Xếp hạng theo đánh giá, lượt mua và tình trạng còn hàng.';
-        grid.innerHTML = data.products.map(productCard).join('');
+        grid.innerHTML = data.products.map(item => productCard(item, 'h3')).join('');
         section.hidden = false;
     } catch (error) {
         console.error('Recommendation error:', error);
@@ -291,6 +320,8 @@ function renderBrandFilter() {
 }
 
 async function loadProducts() {
+    const sections = document.getElementById('productSections');
+    sections?.setAttribute('aria-busy', 'true');
     try {
         const res = await fetch(`${API_URL}/products`);
         allProducts = await res.json();
@@ -301,7 +332,12 @@ async function loadProducts() {
         if (auth.isAdmin()) loadStats();
     } catch (err) {
         console.error('Products error:', err);
+        if (sections) {
+            sections.innerHTML = '<section class="empty-state" role="status"><h3>Chưa tải được sản phẩm</h3><p>Vui lòng kiểm tra kết nối và tải lại trang.</p></section>';
+        }
         showToast('Lỗi kết nối server', 'error');
+    } finally {
+        sections?.setAttribute('aria-busy', 'false');
     }
 }
 
@@ -360,8 +396,6 @@ function setupPromoCarousel() {
     if (slides.length < 2) return;
 
     let activeSlide = 0;
-    let autoplayTimer;
-
     const showSlide = index => {
         activeSlide = (index + slides.length) % slides.length;
         slides.forEach((slide, slideIndex) => {
@@ -377,35 +411,20 @@ function setupPromoCarousel() {
         });
     };
 
-    const stopAutoplay = () => window.clearTimeout(autoplayTimer);
-    const startAutoplay = () => {
-        stopAutoplay();
-        if (document.hidden) return;
-        autoplayTimer = window.setTimeout(() => {
-            showSlide(activeSlide + 1);
-            startAutoplay();
-        }, 4200);
-    };
-
     carousel.querySelectorAll('[data-carousel-direction]').forEach(button => {
         button.addEventListener('click', () => {
             showSlide(activeSlide + (button.dataset.carouselDirection === 'next' ? 1 : -1));
-            startAutoplay();
         });
     });
     dots.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             showSlide(index);
-            startAutoplay();
         });
     });
     carousel.querySelectorAll('[data-carousel-category]').forEach(button => {
         button.addEventListener('click', () => setCategory(button.dataset.carouselCategory));
     });
-    document.addEventListener('visibilitychange', startAutoplay);
-
     showSlide(0);
-    startAutoplay();
 }
 
 function setupStorefrontHeader() {
@@ -606,6 +625,7 @@ function setupAddressSelector() {
 
     const savedAddress = getSavedShoppingAddress();
     locationLabel.textContent = savedAddress?.label || localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
+    locationToggle.setAttribute('aria-label', `Khu vực: ${locationLabel.textContent}`);
     if (savedAddress?.fullAddress) quickInput.value = savedAddress.fullAddress;
 
     const findProvinceByName = value => {
@@ -619,6 +639,7 @@ function setupAddressSelector() {
         localStorage.setItem('shoppingAddress', JSON.stringify(address));
         localStorage.setItem('shoppingLocation', address.label);
         locationLabel.textContent = address.label;
+        locationToggle.setAttribute('aria-label', `Khu vực: ${address.label}`);
         window.dispatchEvent(new CustomEvent('shopping-address-change', { detail: address }));
 
         if (auth.isLoggedIn()) {
@@ -1054,7 +1075,7 @@ function openCompareModal() {
                     ${selected.map(product => `
                         <th>
                             <div class="compare-product-head">
-                                <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" onerror="this.src='https://via.placeholder.com/320x220?text=No+Image'">
+                                <img src="${escapeHTML(product.image)}" width="320" height="220" loading="lazy" decoding="async" alt="${escapeHTML(product.name)}" onerror="this.onerror=null;this.src='/assets/images/product-placeholder.svg'">
                                 <strong>${escapeHTML(product.name)}</strong>
                             </div>
                         </th>
@@ -1092,7 +1113,8 @@ function renderProducts() {
     }
 
     if (!products.length) {
-        sections.innerHTML = '<div class="empty-state"><p>Không tìm thấy sản phẩm phù hợp</p></div>';
+        sections.innerHTML = '<section class="empty-state" role="status"><h3>Không tìm thấy sản phẩm phù hợp</h3><p>Hãy thử bỏ bớt bộ lọc hoặc tìm bằng tên ngắn hơn.</p></section>';
+        sections.setAttribute('aria-busy', 'false');
         renderCompareBar();
         return;
     }
@@ -1110,43 +1132,49 @@ function renderProducts() {
                 <span class="category-count">${items.length} sản phẩm</span>
             </header>
             <section class="product-grid" aria-label="Sản phẩm ${escapeHTML(categoryLabels[category] || category)}">
-                ${items.map(productCard).join('')}
+                ${items.map(item => productCard(item, 'h4')).join('')}
             </section>
         </section>
     `).join('');
+    sections.setAttribute('aria-busy', 'false');
     renderCompareBar();
 }
 
-function productCard(p) {
+function productCard(p, headingLevel = 'h4') {
     const liked = wishlistIds.has(Number(p._id));
     const compared = compareProducts.has(String(p._id));
-    const stockLabel = p.stock <= 0 ? 'Hết hàng' : `Kho: ${p.stock}`;
+    const stockLabel = p.stock <= 0
+        ? 'Tạm hết hàng'
+        : p.stock <= (p.minStock ?? 5) ? `Chỉ còn ${p.stock} sản phẩm` : 'Còn hàng';
     const specs = p.specs || {};
-    const specLine = [specs.cpu, specs.ram, specs.storage, specs.screen].filter(Boolean).slice(0, 3).join(' - ');
+    const specLine = [specs.cpu, specs.ram, specs.storage, specs.screen].filter(Boolean).slice(0, 3).join(' · ');
     const discount = p.compareAtPrice > p.price ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
+    const detailUrl = `pages/catalog/product.html?id=${encodeURIComponent(p._id)}`;
+    const imageUrls = productImageUrls(p.image);
+    const headingTag = headingLevel === 'h3' ? 'h3' : 'h4';
+    const ratingText = p.rating
+        ? `★ ${Number(p.rating).toFixed(1)} <span>(${Number(p.reviewCount) || 0} đánh giá${p.soldCount ? ` · Đã bán ${Number(p.soldCount)}` : ''})</span>`
+        : '<span>Chưa có đánh giá</span>';
     return `
-        <article class="product-card fade-in" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết ${escapeHTML(p.name)}">
-            <button class="wishlist-btn ${liked ? 'active' : ''}" title="Yêu thích" onclick="event.stopPropagation(); toggleWishlist('${p._id}').catch(err => showToast(err.message, 'error'))">${liked ? '♥' : '♡'}</button>
-            ${p.featured ? '<span class="product-ribbon">Nổi bật</span>' : ''}
-            ${discount ? `<span class="discount-ribbon">-${discount}%</span>` : ''}
-            <a href="pages/catalog/product.html?id=${p._id}" class="product-link" onclick="event.stopPropagation()">
-                <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" onerror="this.src='https://via.placeholder.com/400x220?text=No+Image'">
-            </a>
+        <article class="product-card">
+            <figure class="product-media">
+                <button class="wishlist-btn ${liked ? 'active' : ''}" type="button" aria-label="${liked ? 'Bỏ khỏi' : 'Thêm vào'} danh sách yêu thích: ${escapeHTML(p.name)}" title="Yêu thích" onclick="toggleWishlist('${p._id}').catch(err => showToast(err.message, 'error'))">${liked ? '♥' : '♡'}</button>
+                ${discount ? `<span class="discount-ribbon">Giảm ${discount}%</span>` : p.featured ? '<span class="product-ribbon">Nổi bật</span>' : ''}
+                <a href="${detailUrl}" class="product-link" aria-label="Xem chi tiết ${escapeHTML(p.name)}">
+                    <img src="${escapeHTML(imageUrls.optimized)}" data-original-src="${escapeHTML(imageUrls.original)}" width="400" height="400" loading="lazy" decoding="async" alt="${escapeHTML(p.name)}" onerror="const fallback=this.dataset.originalSrc;if(fallback&&this.src!==new URL(fallback,document.baseURI).href){this.src=fallback;this.dataset.originalSrc='/assets/images/product-placeholder.svg';}else{this.onerror=null;this.src='/assets/images/product-placeholder.svg';}">
+                </a>
+            </figure>
             <section class="card-body">
-                <span class="category-badge">${escapeHTML(p.category)}</span>
-                <div class="product-brand">${escapeHTML(p.brand || 'TechStore Select')} ${p.sku ? `<span>${escapeHTML(p.sku)}</span>` : ''}</div>
-                <h3 title="${escapeHTML(p.name)}"><a href="pages/catalog/product.html?id=${p._id}" onclick="event.stopPropagation()">${escapeHTML(p.name)}</a></h3>
-                <p class="product-desc">${escapeHTML(p.description || '')}</p>
-                ${p.recommendation?.reason ? `<p class="recommendation-reason">${escapeHTML(p.recommendation.reason)}</p>` : ''}
-                ${specLine ? `<p class="product-spec-line">${escapeHTML(specLine)}</p>` : ''}
-                ${p.rating ? `<p class="product-rating">★ ${Number(p.rating).toFixed(1)} <span>(${p.reviewCount || 0})</span>${p.soldCount ? ` <span>- đã bán ${p.soldCount}</span>` : ''}</p>` : ''}
-                <p class="price">${fmt(p.price)}</p>
-                ${p.compareAtPrice > p.price ? `<p class="compare-price">${fmt(p.compareAtPrice)}</p>` : ''}
+                <p class="product-kicker"><span>${escapeHTML(p.brand || 'TechEcommerce')}</span><span>${escapeHTML(p.category)}</span></p>
+                <${headingTag} title="${escapeHTML(p.name)}"><a href="${detailUrl}">${escapeHTML(p.name)}</a></${headingTag}>
+                <p class="product-spec-line">${escapeHTML(specLine || 'Xem chi tiết cấu hình và thông tin sản phẩm')}</p>
+                <p class="product-rating">${ratingText}</p>
+                <p class="product-price-row"><strong class="price">${fmt(p.price)}</strong>${p.compareAtPrice > p.price ? `<del class="compare-price">${fmt(p.compareAtPrice)}</del>` : ''}</p>
                 <p class="stock-info ${p.stock <= (p.minStock ?? 5) ? 'low-stock-text' : ''}">${stockLabel}</p>
-                <div class="product-actions">
-                    <button class="btn-add-cart" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); addToCart('${p._id}')">${p.stock <= 0 ? 'Hết hàng' : 'Thêm giỏ'}</button>
-                    <button class="btn-compare ${compared ? 'active' : ''}" type="button" onclick="event.stopPropagation(); toggleCompare('${p._id}')">${compared ? 'Đã chọn' : 'So sánh'}</button>
-                </div>
+                <footer class="product-actions">
+                    <button class="btn-add-cart" type="button" aria-label="${p.stock <= 0 ? 'Hết hàng' : 'Thêm vào giỏ'}: ${escapeHTML(p.name)}" ${p.stock <= 0 ? 'disabled' : ''} onclick="addToCart('${p._id}')">${p.stock <= 0 ? 'Hết hàng' : 'Thêm vào giỏ'}</button>
+                    <button class="btn-compare ${compared ? 'active' : ''}" type="button" aria-pressed="${compared}" aria-label="${compared ? 'Đã chọn' : 'So sánh'}: ${escapeHTML(p.name)}" onclick="toggleCompare('${p._id}')">${compared ? 'Đã chọn' : 'So sánh'}</button>
+                </footer>
             </section>
         </article>
     `;
@@ -1177,10 +1205,14 @@ function cartItemCount() {
 
 function updateCartBadge() {
     const headerBadge = document.getElementById('headerCartBadge');
+    const headerButton = document.getElementById('headerCartButton');
     const count = cartItemCount();
     if (headerBadge) {
         headerBadge.textContent = count;
         headerBadge.hidden = count < 1;
+    }
+    if (headerButton) {
+        headerButton.setAttribute('aria-label', count > 0 ? `🛒 Giỏ hàng, ${count} sản phẩm` : '🛒 Giỏ hàng');
     }
 }
 

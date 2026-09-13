@@ -1,5 +1,14 @@
 [
   {
+    "date": "2026-09-13",
+    "macrostructure": "Catalogue",
+    "theme": "Cobalt retail",
+    "enrichment": "none",
+    "brief": "Bright technical storefront with scan-first product cards and Google-ready discovery",
+    "nav": "preserved",
+    "footer": "preserved"
+  },
+  {
     "date": "2026-07-22",
     "macrostructure": "Split Studio",
     "theme": "Cobalt",

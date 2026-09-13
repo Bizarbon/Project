@@ -136,7 +136,7 @@ function updateThemeToggle() {
     const button = document.getElementById('themeToggle');
     if (!button) return;
     const isDark = document.documentElement.dataset.theme === 'dark';
-    button.textContent = isDark ? 'Light mode' : 'Dark mode';
+    button.textContent = isDark ? 'Giao diện sáng' : 'Giao diện tối';
     button.setAttribute('aria-label', isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối');
     button.title = isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối';
 }
@@ -194,7 +194,7 @@ function updateNavbar() {
     } else {
         authSection.innerHTML = isStorefrontHeader
             ? `
-                <a href="${base}pages/auth/login.html" class="header-account-link">
+                <a href="${base}pages/auth/login.html" class="header-account-link" aria-label="Tài khoản — Đăng nhập">
                     <span class="header-action-icon" aria-hidden="true">♙</span>
                     <span class="header-action-copy">
                         <small>Tài khoản</small>
