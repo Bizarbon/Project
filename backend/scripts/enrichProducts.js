@@ -1,6 +1,6 @@
 require('dotenv').config();
-const connectDB = require('../config/db');
-const Product = require('../models/Product');
+const connectDB = require('../src/config/db');
+const Product = require('../src/models/Product');
 
 const BRAND_RULES = [
     { test: /iphone|ipad|macbook|airpods|apple pencil|magic keyboard|apple watch/i, brand: 'Apple' },

@@ -1,9 +1,9 @@
 require('dotenv').config();
-const connectDB = require('../config/db');
-const Coupon = require('../models/Coupon');
-const Review = require('../models/Review');
-const Product = require('../models/Product');
-const Customer = require('../models/Customer');
+const connectDB = require('../src/config/db');
+const Coupon = require('../src/models/Coupon');
+const Review = require('../src/models/Review');
+const Product = require('../src/models/Product');
+const Customer = require('../src/models/Customer');
 
 async function refreshProductRating(productId) {
     const reviews = await Review.find({ product: productId, status: 'visible' });

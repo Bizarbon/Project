@@ -5,8 +5,8 @@ require('dotenv').config({
     path: path.resolve(__dirname, '../.env')
 });
 
-const connectDB = require('../config/db');
-const Product = require('../models/Product');
+const connectDB = require('../src/config/db');
+const Product = require('../src/models/Product');
 
 const gamingProducts = [
     {
@@ -423,7 +423,7 @@ async function seedGaming() {
     await connectDB();
     console.log('Connected to MongoDB. Seeding gaming products...');
 
-    const Counter = require('../models/Counter');
+    const Counter = require('../src/models/Counter');
     const highestProduct = await Product.findOne().sort({ _id: -1 }).select('_id');
     const maxId = highestProduct ? highestProduct._id : 0;
     await Counter.findByIdAndUpdate(

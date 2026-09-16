@@ -1,19 +1,46 @@
+# Dependencies
 node_modules/
+*/node_modules/
+
+# Environment variables
 .env
-.DS_Store
+.env.*
+.env.local
+!.env.example
+
+# Build and distribution
 dist/
 build/
+coverage/
+
+# Logs
 *.log
-.vscode/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# System & IDE files
+.DS_Store
+Thumbs.db
 .idea/
+.vscode/
 .gemini/
 .tools/
 .agents/
 .sixth/
+
+# Archives & binaries
 *.zip
 *.rar
+*.tar.gz
+
+# Python cache
 __pycache__/
 *.pyc
+
+# Temporary scratch & test files
 scratch_*
 test_*
+
+# Legacy duplicate directories
 Web/

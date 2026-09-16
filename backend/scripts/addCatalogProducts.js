@@ -5,8 +5,8 @@ require('dotenv').config({
     path: path.resolve(__dirname, '../.env')
 });
 
-const connectDB = require('../config/db');
-const Product = require('../models/Product');
+const connectDB = require('../src/config/db');
+const Product = require('../src/models/Product');
 
 const PRODUCT_CATEGORIES = new Set([
     'Điện thoại',

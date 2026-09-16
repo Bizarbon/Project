@@ -2,8 +2,8 @@ const path = require('path');
 const mongoose = require('mongoose');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-const connectDB = require('../config/db');
-const Product = require('../models/Product');
+const connectDB = require('../src/config/db');
+const Product = require('../src/models/Product');
 
 const uniformCatalog = [
     // ==========================================
@@ -754,7 +754,7 @@ const uniformCatalog = [
     }
 ];
 
-const Counter = require('../models/Counter');
+const Counter = require('../src/models/Counter');
 
 async function seed() {
     try {

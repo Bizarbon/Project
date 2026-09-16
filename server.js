@@ -1,5 +1,2 @@
-require('express');
-
-const app = require('./backend/server');
-
-module.exports = app;
+// Entrypoint bridge for Vercel Serverless Express hosting
+module.exports = require('./backend/src/app');
