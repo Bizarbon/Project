@@ -57,7 +57,7 @@ function signToken(customer) {
         },
         process.env.JWT_SECRET,
         {
-            expiresIn: process.env.JWT_EXPIRES_IN || '2h',
+            expiresIn: process.env.JWT_EXPIRES_IN || '7d',
             issuer: 'techecommerce-api',
             audience: 'techecommerce-web'
         }

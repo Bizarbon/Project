@@ -57,8 +57,35 @@ const auth = {
             return null;
         }
     },
-    isLoggedIn: () => !!localStorage.getItem('token'),
+    isTokenExpired: (token) => {
+        if (!token) return true;
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) return true;
+            const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            const payload = JSON.parse(jsonPayload);
+            if (!payload.exp) return false;
+            return payload.exp * 1000 <= Date.now();
+        } catch (e) {
+            return true;
+        }
+    },
+    clearSession: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+    },
+    isLoggedIn: () => {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        if (auth.isTokenExpired(token)) {
+            auth.clearSession();
+            return false;
+        }
+        return true;
+    },
     isAdmin: () => {
+        if (!auth.isLoggedIn()) return false;
         const user = auth.getUser();
         return Boolean(user && user.isAdmin);
     },
@@ -66,9 +93,14 @@ const auth = {
         ? cartStorageKeyForUser(auth.getUser())
         : 'cart:guest',
     logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        auth.clearSession();
         window.location.href = `${getAppBasePath()}index.html`;
+    },
+    logoutQuietly: () => {
+        auth.clearSession();
+        if (typeof updateNavbar === 'function') {
+            updateNavbar();
+        }
     },
     saveAuth: (token, user) => {
         const guestCart = readStoredCart('cart:guest');
@@ -82,7 +114,7 @@ const auth = {
         }
     },
     getHeaders: () => {
-        const token = localStorage.getItem('token');
+        const token = auth.isLoggedIn() ? localStorage.getItem('token') : null;
         return {
             'Content-Type': 'application/json',
             Authorization: token ? `Bearer ${token}` : ''
@@ -90,9 +122,8 @@ const auth = {
     },
     handleApiError: (res, data) => {
         const message = data?.message || '';
-        if (res.status === 401 && (message.includes('token') || message.includes('quyền'))) {
-            alert('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!');
-            auth.logout();
+        if (res.status === 401 && (message.includes('token') || message.includes('quyền') || message.includes('hết hạn'))) {
+            auth.logoutQuietly();
             return true;
         }
         return false;
@@ -124,6 +155,7 @@ window.getAppBasePath = getAppBasePath;
 function setTheme(theme) {
     const nextTheme = theme === 'dark' ? 'dark' : 'light';
     document.documentElement.dataset.theme = nextTheme;
+    document.documentElement.setAttribute('data-theme', nextTheme);
     localStorage.setItem('theme', nextTheme);
     updateThemeToggle();
 }

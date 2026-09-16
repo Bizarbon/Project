@@ -1,0 +1,236 @@
+[
+  {
+    "name": "iPhone 16 Pro Max 256GB",
+    "category": "Điện thoại",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-16-pro-max.png"
+  },
+  {
+    "name": "iPhone 16 Pro 128GB",
+    "category": "Điện thoại",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-16-pro.png"
+  },
+  {
+    "name": "iPhone 15 Pro Max 256GB",
+    "category": "Điện thoại",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-pro-max_3.png"
+  },
+  {
+    "name": "Samsung Galaxy S24 Ultra 256GB",
+    "category": "Điện thoại",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/2/s24-ultra-xam_2.png"
+  },
+  {
+    "name": "Samsung Galaxy Z Fold6 256GB",
+    "category": "Điện thoại",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-fold-6-xam-1.png"
+  },
+  {
+    "name": "Samsung Galaxy Z Flip6 256GB",
+    "category": "Điện thoại",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-flip-6-xanh-1.png"
+  },
+  {
+    "name": "Xiaomi 14 Ultra 512GB",
+    "category": "Điện thoại",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-14-ultra_1.png"
+  },
+  {
+    "name": "OPPO Find X7 Ultra 256GB",
+    "category": "Điện thoại",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo-find-x7-ultra.png"
+  },
+  {
+    "name": "MacBook Pro 14 M3 512GB",
+    "category": "Laptop",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook_pro_14_m3.png"
+  },
+  {
+    "name": "MacBook Air 13 M3 256GB",
+    "category": "Laptop",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook-air-m3-13-inch-midnight.png"
+  },
+  {
+    "name": "ASUS ROG Zephyrus G16 GU605",
+    "category": "Laptop",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop-asus-rog-zephyrus-g16-gu605mv-qr080w-thumb.png"
+  },
+  {
+    "name": "Dell XPS 13 Plus 9320",
+    "category": "Laptop",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/e/dell-xps-13-plus-9320.png"
+  },
+  {
+    "name": "Lenovo ThinkPad X1 Carbon Gen 11",
+    "category": "Laptop",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/h/thinkpad-x1-carbon-gen-11.png"
+  },
+  {
+    "name": "ASUS TUF Gaming A15 FA507",
+    "category": "Laptop",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop-asus-tuf-gaming-a15-fa507nv-lp061w.png"
+  },
+  {
+    "name": "iPad Pro 11 inch M4 Wi-Fi 256GB",
+    "category": "Tablet",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-pro-11-inch-m4.png"
+  },
+  {
+    "name": "iPad Air 11 inch M2 Wi-Fi 128GB",
+    "category": "Tablet",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-air-6-11-inch.png"
+  },
+  {
+    "name": "iPad Gen 10 10.9 inch Wi-Fi 64GB",
+    "category": "Tablet",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-10-9-inch-2022.png"
+  },
+  {
+    "name": "Samsung Galaxy Tab S9 Ultra 256GB",
+    "category": "Tablet",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-tab-s9-ultra.png"
+  },
+  {
+    "name": "Xiaomi Pad 6 128GB",
+    "category": "Tablet",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-pad-6.png"
+  },
+  {
+    "name": "Tai nghe Apple EarPods Lightning MWTY3ZA/A",
+    "category": "Tai nghe",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/p/apple-earpods-lightning.png"
+  },
+  {
+    "name": "Tai nghe không dây Apple AirPods Pro 2 USB-C",
+    "category": "Tai nghe",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/p/apple-airpods-pro-2-usb-c.png"
+  },
+  {
+    "name": "Tai nghe chụp tai Sony WH-1000XM5",
+    "category": "Tai nghe",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/o/sony-wh-1000xm5.png"
+  },
+  {
+    "name": "Tai nghe chụp tai Marshall Major IV",
+    "category": "Tai nghe",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/a/tai-nghe-marshall-major-4.png"
+  },
+  {
+    "name": "Tai nghe không dây Samsung Galaxy Buds3 Pro",
+    "category": "Tai nghe",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-buds-3-pro.png"
+  },
+  {
+    "name": "Đồng hồ thông minh Apple Watch Series 10 42mm",
+    "category": "Đồng hồ thông minh",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/p/apple-watch-series-10-nhom-42mm.png"
+  },
+  {
+    "name": "Đồng hồ thông minh Apple Watch Ultra 2 49mm",
+    "category": "Đồng hồ thông minh",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/a/p/apple-watch-ultra-2.png"
+  },
+  {
+    "name": "Đồng hồ thông minh Samsung Galaxy Watch 7 40mm",
+    "category": "Đồng hồ thông minh",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-watch-7.png"
+  },
+  {
+    "name": "Đồng hồ thể thao Garmin Forerunner 265",
+    "category": "Đồng hồ thông minh",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/a/garmin-forerunner-265.png"
+  },
+  {
+    "name": "Chuột Gaming Logitech G502 Hero",
+    "category": "Phụ kiện",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/c/h/chuot-choi-game-co-day-logitech-g502-hero.png"
+  },
+  {
+    "name": "Hub chuyển đổi Ugreen USB-C 5 IN 1 CM478 15495",
+    "category": "Phụ kiện",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/u/hub-chuyen-doi-ugreen-usb-c-5-in-1-cm478-15495.png"
+  },
+  {
+    "name": "Pin sạc dự phòng Anker A1695 25.000mAh 165W",
+    "category": "Phụ kiện",
+    "status": 200,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/p/i/pin-sac-du-phong-anker-prime-20000mah-200w-a1336.png"
+  },
+  {
+    "name": "DJI Osmo Pocket 3 Creator Combo",
+    "category": "Phụ kiện",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/j/dji-osmo-pocket-3-creator-combo.png"
+  },
+  {
+    "name": "Bút cảm ứng Apple Pencil Pro",
+    "category": "Phụ kiện",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/b/u/but-cam-ung-apple-pencil-pro.png"
+  },
+  {
+    "name": "Củ sạc nhanh Anker GaNPrime 65W 3 cổng A2668",
+    "category": "Phụ kiện",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/c/u/cu-sac-nhanh-anker-ganprime-65w.png"
+  },
+  {
+    "name": "Máy chơi game Nintendo Switch OLED Model White",
+    "category": "Máy chơi game",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-choi-game-nintendo-switch-oled.png"
+  },
+  {
+    "name": "Máy chơi game Sony PlayStation 5 (PS5) Slim Standard",
+    "category": "Máy chơi game",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/p/s/ps5-slim.png"
+  },
+  {
+    "name": "Tay cầm không dây Sony DualSense PS5 White",
+    "category": "Máy chơi game",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/a/tay-cam-choi-game-khong-day-sony-dualsense-ps5-trang.png"
+  },
+  {
+    "name": "Máy chơi game Nintendo Switch Lite Coral",
+    "category": "Máy chơi game",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/n/i/nintendo-switch-lite.png"
+  },
+  {
+    "name": "Tay cầm không dây Xbox Wireless Controller Robot White",
+    "category": "Máy chơi game",
+    "status": 404,
+    "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/a/tay-cam-xbox-series-x.png"
+  }
+]

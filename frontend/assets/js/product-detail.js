@@ -80,14 +80,36 @@ async function loadWishlist() {
 async function toggleWishlist(id) {
     const productId = Number(id);
     if (auth.isLoggedIn()) {
-        const res = await fetch(`${API_URL}/customers/me/wishlist`, {
-            method: 'PUT',
-            headers: auth.getHeaders(),
-            body: JSON.stringify({ productId, action: 'toggle' })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Không cập nhật được yêu thích');
-        wishlistIds = new Set(data.map(item => Number(item._id || item)));
+        try {
+            const res = await fetch(`${API_URL}/customers/me/wishlist`, {
+                method: 'PUT',
+                headers: auth.getHeaders(),
+                body: JSON.stringify({ productId, action: 'toggle' })
+            });
+            const data = await res.json();
+            if (res.status === 401) {
+                auth.logoutQuietly();
+                if (wishlistIds.has(productId)) wishlistIds.delete(productId);
+                else wishlistIds.add(productId);
+                localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
+                renderProduct();
+                showToast('Phiên làm việc đã hết hạn. Đã lưu yêu thích trên máy của bạn!', 'info');
+                return;
+            }
+            if (!res.ok) throw new Error(data.message || 'Không cập nhật được yêu thích');
+            wishlistIds = new Set(data.map(item => Number(item._id || item)));
+        } catch (err) {
+            if (err.message && (err.message.includes('token') || err.message.includes('quyền') || err.message.includes('hết hạn'))) {
+                auth.logoutQuietly();
+                if (wishlistIds.has(productId)) wishlistIds.delete(productId);
+                else wishlistIds.add(productId);
+                localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
+                renderProduct();
+                showToast('Phiên làm việc đã hết hạn. Đã lưu yêu thích trên máy của bạn!', 'info');
+                return;
+            }
+            throw err;
+        }
     } else {
         if (wishlistIds.has(productId)) wishlistIds.delete(productId);
         else wishlistIds.add(productId);

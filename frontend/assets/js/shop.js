@@ -201,6 +201,9 @@ async function loadWishlist() {
                 wishlistIds = new Set(data.map(item => Number(item._id || item)));
                 return;
             }
+            if (res.status === 401) {
+                auth.logoutQuietly();
+            }
         } catch (e) {
             console.error('Wishlist error:', e);
         }
@@ -212,14 +215,36 @@ async function loadWishlist() {
 async function toggleWishlist(id) {
     const productId = Number(id);
     if (auth.isLoggedIn()) {
-        const res = await fetch(`${API_URL}/customers/me/wishlist`, {
-            method: 'PUT',
-            headers: auth.getHeaders(),
-            body: JSON.stringify({ productId, action: 'toggle' })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Không cập nhật được yêu thích');
-        wishlistIds = new Set(data.map(item => Number(item._id || item)));
+        try {
+            const res = await fetch(`${API_URL}/customers/me/wishlist`, {
+                method: 'PUT',
+                headers: auth.getHeaders(),
+                body: JSON.stringify({ productId, action: 'toggle' })
+            });
+            const data = await res.json();
+            if (res.status === 401) {
+                auth.logoutQuietly();
+                if (wishlistIds.has(productId)) wishlistIds.delete(productId);
+                else wishlistIds.add(productId);
+                localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
+                renderProducts();
+                showToast('Phiên làm việc đã hết hạn. Đã lưu yêu thích trên máy của bạn!', 'info');
+                return;
+            }
+            if (!res.ok) throw new Error(data.message || 'Không cập nhật được yêu thích');
+            wishlistIds = new Set(data.map(item => Number(item._id || item)));
+        } catch (err) {
+            if (err.message && (err.message.includes('token') || err.message.includes('quyền') || err.message.includes('hết hạn'))) {
+                auth.logoutQuietly();
+                if (wishlistIds.has(productId)) wishlistIds.delete(productId);
+                else wishlistIds.add(productId);
+                localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
+                renderProducts();
+                showToast('Phiên làm việc đã hết hạn. Đã lưu yêu thích trên máy của bạn!', 'info');
+                return;
+            }
+            throw err;
+        }
     } else {
         if (wishlistIds.has(productId)) wishlistIds.delete(productId);
         else wishlistIds.add(productId);
@@ -306,7 +331,6 @@ async function loadProducts() {
 }
 
 function renderCategoryNav() {
-    updateHeaderCategoryState();
     const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
     const nav = document.getElementById('categoryNav');
     if (!nav) return;
@@ -326,6 +350,7 @@ function renderCategoryNav() {
     nav.querySelectorAll('[data-category]').forEach(button => {
         button.addEventListener('click', () => setCategory(button.dataset.category));
     });
+    updateHeaderCategoryState();
 }
 
 function updateHeaderCategoryState() {
@@ -342,7 +367,6 @@ function setCategory(category, options = {}) {
     if (category === 'all') url.searchParams.delete('category');
     else url.searchParams.set('category', category);
     window.history.replaceState({}, '', url);
-    updateHeaderCategoryState();
     renderCategoryNav();
     renderProducts();
 
@@ -914,7 +938,7 @@ function setupAddressSelector() {
         if (event.key === 'Escape' && modal.classList.contains('show')) closeAddressModal();
     });
 
-    loadDeliveryAreas().catch(() => {});
+    loadDeliveryAreas().catch(() => { });
 }
 
 function selectedCompareProducts() {
@@ -1117,6 +1141,10 @@ function renderProducts() {
     renderCompareBar();
 }
 
+function catalogImageSource(product) {
+    return product?.image || '';
+}
+
 function productCard(p) {
     const liked = wishlistIds.has(Number(p._id));
     const compared = compareProducts.has(String(p._id));
@@ -1127,10 +1155,11 @@ function productCard(p) {
     return `
         <article class="product-card fade-in" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết ${escapeHTML(p.name)}">
             <button class="wishlist-btn ${liked ? 'active' : ''}" title="Yêu thích" onclick="event.stopPropagation(); toggleWishlist('${p._id}').catch(err => showToast(err.message, 'error'))">${liked ? '♥' : '♡'}</button>
-            ${p.featured ? '<span class="product-ribbon">Nổi bật</span>' : ''}
-            ${discount ? `<span class="discount-ribbon">-${discount}%</span>` : ''}
+            ${discount ? `<span class="discount-ribbon">Giảm ${discount}%</span>` : (p.featured ? '<span class="product-ribbon">Nổi bật</span>' : '')}
             <a href="pages/catalog/product.html?id=${p._id}" class="product-link" onclick="event.stopPropagation()">
-                <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" onerror="this.src='https://via.placeholder.com/400x220?text=No+Image'">
+                <figure class="product-media">
+                    <img src="${escapeHTML(catalogImageSource(p))}" data-original-src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="if(this.dataset.originalSrc){this.src=this.dataset.originalSrc;delete this.dataset.originalSrc}else{this.src='https://via.placeholder.com/400x220?text=No+Image'}">
+                </figure>
             </a>
             <section class="card-body">
                 <span class="category-badge">${escapeHTML(p.category)}</span>
@@ -1386,7 +1415,7 @@ async function loadProfileForCheckout() {
         document.getElementById('guestEmail').value = data.email || '';
         document.getElementById('recipientPhone').value = data.phone || '';
         if (!getSavedShoppingAddress()) document.getElementById('shippingAddressDetail').value = data.address || '';
-    } catch (e) {}
+    } catch (e) { }
 }
 
 async function loadCustomers() {
@@ -1408,7 +1437,7 @@ async function loadCustomers() {
             document.getElementById('shippingAddressDetail').value = opt.dataset.address || '';
             updateCheckoutAddress({ persist: false });
         });
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function checkoutAmount() {

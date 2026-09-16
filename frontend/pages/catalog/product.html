@@ -3,8 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
-    <meta name="description" content="Xem giá, cấu hình, tồn kho, bảo hành và đánh giá sản phẩm công nghệ tại TechEcommerce.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description"
+        content="Xem giá, cấu hình, tồn kho, bảo hành và đánh giá sản phẩm công nghệ tại TechEcommerce.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/catalog/product.html">
     <title>Chi tiết sản phẩm - TechEcommerce</title>
@@ -17,9 +22,11 @@
             gap: 2rem;
             align-items: start;
         }
+
         .detail-media {
             margin: 0;
         }
+
         .detail-media img {
             width: 100%;
             aspect-ratio: 4 / 3;
@@ -28,12 +35,14 @@
             border-radius: var(--radius-lg);
             background: var(--bg-card);
         }
+
         .detail-thumbs {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
             gap: 0.6rem;
             margin-top: 0.8rem;
         }
+
         .detail-thumbs button {
             padding: 0;
             border: 1px solid var(--border);
@@ -41,34 +50,41 @@
             border-radius: var(--radius-sm);
             overflow: hidden;
         }
+
         .detail-thumbs img {
             border: 0;
             border-radius: 0;
             aspect-ratio: 1 / 1;
         }
+
         .detail-info {
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             padding: 2rem;
         }
+
         .detail-info h2 {
             font-size: 2rem;
             margin: 0.8rem 0;
         }
+
         .detail-price {
             font-size: 1.8rem;
             font-weight: 800;
             margin-bottom: 1rem;
         }
+
         .detail-desc {
             color: var(--text-secondary);
             margin-bottom: 1.5rem;
         }
+
         .detail-meta {
             display: grid;
             gap: 0.7rem;
             margin-bottom: 1.5rem;
         }
+
         .detail-meta div {
             display: flex;
             justify-content: space-between;
@@ -76,55 +92,72 @@
             border-bottom: 1px solid var(--border);
             padding-bottom: 0.65rem;
         }
-        .detail-meta dt { font-weight: 700; }
-        .detail-meta dd { color: var(--text-secondary); margin: 0; }
+
+        .detail-meta dt {
+            font-weight: 700;
+        }
+
+        .detail-meta dd {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
         .detail-section {
             margin-top: 1.25rem;
             padding-top: 1.1rem;
             border-top: 1px solid var(--border);
         }
+
         .detail-section h3 {
             font-size: 1rem;
             margin-bottom: 0.8rem;
         }
+
         .spec-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 0.75rem;
         }
+
         .spec-card {
             padding: 0.8rem;
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
             background: var(--bg-card);
         }
+
         .spec-card strong {
             display: block;
             font-size: 0.78rem;
             color: var(--text-muted);
             margin-bottom: 0.35rem;
         }
+
         .spec-card span {
             color: var(--text-primary);
             font-weight: 700;
         }
+
         .detail-list {
             display: grid;
             gap: 0.55rem;
             color: var(--text-secondary);
             padding-left: 1.1rem;
         }
+
         .detail-actions {
             display: grid;
             grid-template-columns: 90px 1fr 1fr;
             gap: 0.8rem;
         }
+
         .related-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
         }
+
         .related-card {
             display: grid;
             gap: 0.55rem;
@@ -135,17 +168,31 @@
             padding: 0.8rem;
             background: var(--bg-card);
         }
+
         .related-card img {
             width: 100%;
             aspect-ratio: 4 / 3;
             object-fit: cover;
             border-radius: var(--radius-sm);
         }
-        .related-card span { color: var(--primary); font-weight: 700; }
+
+        .related-card span {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
         @media (max-width: 900px) {
-            .detail-grid { grid-template-columns: 1fr; }
-            .detail-actions { grid-template-columns: 1fr; }
-            .spec-grid { grid-template-columns: 1fr; }
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .spec-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -188,7 +235,8 @@
                 <label class="sr-only" for="reviewTitle">Tiêu đề đánh giá</label>
                 <input id="reviewTitle" type="text" placeholder="Tiêu đề ngắn cho đánh giá">
                 <label class="sr-only" for="reviewComment">Nội dung đánh giá</label>
-                <textarea id="reviewComment" class="full-width" placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm"></textarea>
+                <textarea id="reviewComment" class="full-width"
+                    placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm"></textarea>
                 <div class="form-actions full-width">
                     <button type="submit" class="btn-primary">Gửi đánh giá</button>
                 </div>

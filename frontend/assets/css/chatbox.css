@@ -95,7 +95,7 @@
     min-width: 0;
 }
 
-.ai-chat-title > div {
+.ai-chat-title>div {
     min-width: 0;
 }
 
@@ -273,7 +273,9 @@
 }
 
 @keyframes ai-mic-pulse {
-    50% { box-shadow: 0 0 0 5px color-mix(in oklch, var(--color-chat-error) 20%, transparent); }
+    50% {
+        box-shadow: 0 0 0 5px color-mix(in oklch, var(--color-chat-error) 20%, transparent);
+    }
 }
 
 .ai-chat-products {
@@ -468,6 +470,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .ai-chat *,
     .ai-chat *::before,
     .ai-chat *::after {
@@ -480,9 +483,9 @@
 /* Floating Zalo & AI Chat pulse-shake effects */
 .zalo-floating-btn {
     position: fixed;
-    right: calc(var(--space-checkout-sm, 16px) + 68px);
-    bottom: var(--space-checkout-sm, 16px);
-    z-index: 2000;
+    right: var(--space-checkout-sm, 16px);
+    bottom: calc(var(--space-checkout-sm, 16px) + 68px);
+    z-index: 1999;
     width: 56px;
     height: 56px;
     border-radius: 50% !important;
@@ -498,8 +501,8 @@
 
 @media (min-width: 40rem) {
     .zalo-floating-btn {
-        right: calc(var(--space-checkout-lg, 24px) + 70px);
-        bottom: var(--space-checkout-lg, 24px);
+        right: var(--space-checkout-lg, 24px);
+        bottom: calc(var(--space-checkout-lg, 24px) + 70px);
     }
 }
 
@@ -522,23 +525,30 @@
 }
 
 @keyframes pulseShakeZalo {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1) rotate(0deg);
         box-shadow: 0 8px 24px rgba(0, 104, 255, 0.4);
     }
+
     6% {
         transform: scale(1.1) rotate(-8deg);
         box-shadow: 0 10px 28px rgba(0, 104, 255, 0.6);
     }
+
     10% {
         transform: scale(1.1) rotate(8deg);
     }
+
     14% {
         transform: scale(1.08) rotate(-5deg);
     }
+
     18% {
         transform: scale(1.05) rotate(5deg);
     }
+
     22% {
         transform: scale(1) rotate(0deg);
         box-shadow: 0 8px 24px rgba(0, 104, 255, 0.4);
@@ -546,23 +556,30 @@
 }
 
 @keyframes pulseShakeAi {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1) rotate(0deg);
         box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
     }
+
     6% {
         transform: scale(1.1) rotate(-8deg);
         box-shadow: 0 10px 28px rgba(0, 184, 217, 0.6);
     }
+
     10% {
         transform: scale(1.1) rotate(8deg);
     }
+
     14% {
         transform: scale(1.08) rotate(-5deg);
     }
+
     18% {
         transform: scale(1.05) rotate(5deg);
     }
+
     22% {
         transform: scale(1) rotate(0deg);
         box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
@@ -589,4 +606,3 @@ button.ai-chat-toggle,
     border-bottom-left-radius: 20px !important;
     border-bottom-right-radius: 20px !important;
 }
-

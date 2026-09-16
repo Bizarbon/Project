@@ -13,8 +13,8 @@
     <meta property="og:description" content="Khám phá sản phẩm công nghệ chính hãng, so sánh cấu hình và mua sắm trực tuyến thuận tiện." />
     <meta property="og:url" content="https://techecommerce-shop.vercel.app/" />
     <title>TechEcommerce - Cửa hàng công nghệ</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=cart-flash-20260709-1" />
-    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=site-layout-20260715-2" />
+    <link rel="stylesheet" href="assets/css/style.css?v=product-badge-20260914-1" />
+    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=product-badge-20260914-1" />
     <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-cost-20260722-1" />
     <style>
       .cart-drawer[aria-hidden='true'] {
@@ -382,7 +382,7 @@
     </aside>
 
     <script src="assets/js/animations.js"></script>
-    <script src="assets/js/auth.js?v=account-ui-20260711-1"></script>
+    <script src="assets/js/auth.js?v=auth-fix-20260914-1"></script>
 
     <main class="container fade-in">
       <section
@@ -391,62 +391,120 @@
         aria-label="Ưu đãi nổi bật"
         aria-roledescription="carousel"
       >
+        <div class="hero-bg-effects" aria-hidden="true">
+          <span class="hero-aurora-orb hero-aurora-1"></span>
+          <span class="hero-aurora-orb hero-aurora-2"></span>
+          <span class="hero-aurora-orb hero-aurora-3"></span>
+          <div class="hero-grid-pattern"></div>
+          <div class="hero-shimmer-sweep"></div>
+        </div>
         <div class="hero-slides">
           <article
             class="hero-slide is-active"
-            style="--hero-image: url('assets/images/banner-phone.jpg')"
             aria-hidden="false"
+            aria-label="Khuyến mãi điện thoại chính hãng"
           >
-            <div class="hero-slide-content">
-              <span class="hero-eyebrow">Điện thoại chính hãng</span>
-              <h2>Công nghệ mới trong tầm tay</h2>
-              <p>
-                Khám phá các mẫu điện thoại nổi bật, cấu hình mạnh và chính sách
-                bảo hành rõ ràng.
-              </p>
-              <button class="hero-cta" type="button" data-carousel-category="Điện thoại">
-                Xem điện thoại
-              </button>
+            <div class="hero-slide-grid">
+              <div class="hero-slide-content">
+                <p class="hero-badge-wrap">
+                  <span class="hero-badge-dot"></span>
+                  <span class="hero-eyebrow">Điện thoại chính hãng</span>
+                </p>
+                <h2>Đỉnh cao công nghệ <br><span class="hero-highlight">Bứt phá trải nghiệm</span></h2>
+                <p class="hero-desc">
+                  Trải nghiệm siêu phẩm smartphone dẫn đầu công nghệ, camera chuyên nghiệp cùng chính sách bảo hành 12 tháng chính hãng.
+                </p>
+                <ul class="hero-features" role="list">
+                  <li><span class="hero-feature-pill">⚡ Trả góp 0%</span></li>
+                  <li><span class="hero-feature-pill">🛡️ Bảo hành 12T</span></li>
+                  <li><span class="hero-feature-pill">🚀 Giao siêu tốc 2H</span></li>
+                </ul>
+                <button class="hero-cta" type="button" data-carousel-category="Điện thoại">
+                  Khám phá ngay
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <figure class="hero-slide-visual">
+                <div class="hero-visual-glow hero-glow-gold" aria-hidden="true"></div>
+                <img src="assets/images/products/hero-iphone-17-pro-max.png" alt="iPhone 17 Pro Max chính hãng" class="hero-visual-img" loading="eager" width="480" height="360">
+                <figcaption class="sr-only">iPhone 17 Pro Max chính hãng</figcaption>
+                <span class="hero-float-card hero-float-card-top" aria-hidden="true">🔥 Đặt trước ưu đãi</span>
+                <span class="hero-float-card hero-float-card-bottom" aria-hidden="true">⚡ Apple A19 Pro 2nm</span>
+              </figure>
             </div>
           </article>
           <article
             class="hero-slide"
-            style="--hero-image: url('assets/images/banner-laptop.jpg')"
             aria-hidden="true"
             inert
+            aria-label="Khuyến mãi laptop chính hãng"
           >
-            <div class="hero-slide-content">
-              <span class="hero-eyebrow">Laptop cho mọi nhu cầu</span>
-              <h2>Hiệu năng tốt cho học tập và công việc</h2>
-              <p>
-                Chọn laptop theo nhu cầu sử dụng, thương hiệu và mức giá phù hợp
-                với bạn.
-              </p>
-              <button class="hero-cta" type="button" data-carousel-category="Laptop">
-                Xem laptop
-              </button>
+            <div class="hero-slide-grid">
+              <div class="hero-slide-content">
+                <p class="hero-badge-wrap">
+                  <span class="hero-badge-dot"></span>
+                  <span class="hero-eyebrow">Laptop cho mọi nhu cầu</span>
+                </p>
+                <h2>Hiệu năng vượt trội <br><span class="hero-highlight">Học tập & Sáng tạo</span></h2>
+                <p class="hero-desc">
+                  Tuyển chọn laptop mỏng nhẹ, đồ họa mạnh mẽ và pin bền bỉ đến từ các thương hiệu hàng đầu: Apple MacBook, ASUS ROG, ThinkPad.
+                </p>
+                <ul class="hero-features" role="list">
+                  <li><span class="hero-feature-pill">⚡ Trả góp 0%</span></li>
+                  <li><span class="hero-feature-pill">🎁 Tặng balo & chuột</span></li>
+                  <li><span class="hero-feature-pill">🔄 Đổi mới 30 ngày</span></li>
+                </ul>
+                <button class="hero-cta" type="button" data-carousel-category="Laptop">
+                  Xem laptop
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <figure class="hero-slide-visual">
+                <div class="hero-visual-glow hero-glow-violet" aria-hidden="true"></div>
+                <img src="assets/images/products/hero-macbook-pro.png" alt="MacBook Pro 16 M3 Max chính hãng" class="hero-visual-img hero-visual-laptop" loading="lazy" width="480" height="360">
+                <figcaption class="sr-only">MacBook Pro 16 M3 Max chính hãng</figcaption>
+                <span class="hero-float-card hero-float-card-top" aria-hidden="true">💻 Liquid Retina XDR</span>
+                <span class="hero-float-card hero-float-card-bottom" aria-hidden="true">🔋 Pin bền bỉ 22 giờ</span>
+              </figure>
             </div>
           </article>
           <article
             class="hero-slide"
-            style="--hero-image: url('assets/images/banner-watch.jpg')"
             aria-hidden="true"
             inert
+            aria-label="Khuyến mãi thiết bị thông minh & gaming"
           >
-            <div class="hero-slide-content">
-              <span class="hero-eyebrow">Thiết bị thông minh</span>
-              <h2>Kết nối liền mạch mỗi ngày</h2>
-              <p>
-                Đồng hồ thông minh và phụ kiện thiết thực giúp hoàn thiện hệ sinh
-                thái công nghệ của bạn.
-              </p>
-              <button
-                class="hero-cta"
-                type="button"
-                data-carousel-category="Đồng hồ thông minh"
-              >
-                Xem đồng hồ
-              </button>
+            <div class="hero-slide-grid">
+              <div class="hero-slide-content">
+                <p class="hero-badge-wrap">
+                  <span class="hero-badge-dot"></span>
+                  <span class="hero-eyebrow">Gaming & Thiết bị thông minh</span>
+                </p>
+                <h2>Giải trí bùng nổ <br><span class="hero-highlight">Kết nối thông minh</span></h2>
+                <p class="hero-desc">
+                  Đắm chìm trong không gian giải trí đỉnh cao cùng PlayStation 5 Slim, Nintendo Switch OLED và smartwatch chăm sóc sức khỏe.
+                </p>
+                <ul class="hero-features" role="list">
+                  <li><span class="hero-feature-pill">🎮 Console thế hệ mới</span></li>
+                  <li><span class="hero-feature-pill">🎁 Tặng kèm game hot</span></li>
+                  <li><span class="hero-feature-pill">🛡️ Bảo hành chính hãng</span></li>
+                </ul>
+                <button
+                  class="hero-cta"
+                  type="button"
+                  data-carousel-category="Máy chơi game"
+                >
+                  Khám phá console
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+              <figure class="hero-slide-visual">
+                <div class="hero-visual-glow" aria-hidden="true"></div>
+                <img src="assets/images/products/test-ps5-clean.png" alt="Sony PlayStation 5 Slim chính hãng" class="hero-visual-img" loading="lazy" width="380" height="420" style="max-height: 310px;">
+                <figcaption class="sr-only">Sony PlayStation 5 Slim chính hãng</figcaption>
+                <span class="hero-float-card hero-float-card-top" aria-hidden="true">🎮 Đồ họa 4K 120Hz</span>
+                <span class="hero-float-card hero-float-card-bottom" aria-hidden="true">⚡ Tốc độ SSD siêu tốc</span>
+              </figure>
             </div>
           </article>
         </div>
@@ -789,7 +847,7 @@
 
     <footer id="site-footer"></footer>
 
-    <script src="assets/js/shop.js?v=navigation-sync-20260712-2"></script>
+    <script src="assets/js/shop.js?v=wishlist-fix-20260914-1"></script>
     <script src="assets/js/footer.js?v=navigation-sync-20260712-1"></script>
     <script src="assets/js/chatbox.js?v=ai-workspace-20260720-1"></script>
   </body>

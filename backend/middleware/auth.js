@@ -30,8 +30,10 @@ const protect = async (req, res, next) => {
 
         return next();
     } catch (error) {
-        console.error(error);
-        return res.status(401).json({ message: 'Không có quyền truy cập, token lỗi!' });
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ message: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại!' });
+        }
+        return res.status(401).json({ message: 'Không có quyền truy cập, token không hợp lệ!' });
     }
 };
 

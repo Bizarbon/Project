@@ -87,8 +87,12 @@
             button.addEventListener('click', () => {
                 const shouldShow = input.type === 'password';
                 input.type = shouldShow ? 'text' : 'password';
-                button.textContent = shouldShow ? 'Ẩn' : 'Hiện';
                 button.setAttribute('aria-label', shouldShow ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+                button.dataset.visible = shouldShow ? 'true' : 'false';
+                const hasSvg = button.querySelector('svg');
+                if (!hasSvg) {
+                    button.textContent = shouldShow ? 'Ẩn' : 'Hiện';
+                }
                 input.focus({ preventScroll: true });
             });
         });

@@ -1,0 +1,680 @@
+/* ==========================================================================
+   CellphoneS-Style Authentication System (TechEcommerce TECHMEMBER)
+   Theme: TechEcommerce Brand Blue (#2563eb / #2f80ed)
+   ========================================================================== */
+
+:root {
+    --cps-primary: #2563eb;
+    --cps-primary-hover: #1d4ed8;
+    --cps-primary-gradient: linear-gradient(135deg, #38a3ff, #2563eb);
+    --cps-primary-light: #eff6ff;
+    --cps-primary-border: #bfdbfe;
+    --cps-text-main: #1f2937;
+    --cps-text-muted: #6b7280;
+    --cps-text-sub: #4b5563;
+    --cps-border: #e5e7eb;
+    --cps-border-focus: #2563eb;
+    --cps-card-bg: #f8fafc;
+    --cps-link-blue: #2563eb;
+    --cps-radius-sm: 6px;
+    --cps-radius-md: 8px;
+    --cps-radius-lg: 12px;
+}
+
+/* Page Base */
+body.auth-cellphones-body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--cps-text-main);
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Quick store return nav bar (Minimal, unobtrusive) */
+.auth-top-bar {
+    padding: 12px 24px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+    background: #ffffff;
+}
+
+.auth-return-store-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--cps-text-sub);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: var(--cps-radius-sm);
+    transition: all 0.2s ease;
+}
+
+.auth-return-store-link:hover {
+    color: var(--cps-primary);
+    background: var(--cps-primary-light);
+}
+
+/* Main Layout: 2 Columns */
+.auth-cellphones-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px 48px;
+}
+
+.auth-cellphones-container {
+    width: 100%;
+    max-width: 1120px;
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
+    gap: 48px;
+    align-items: start;
+}
+
+/* ==========================================================================
+   LEFT COLUMN: BENEFITS & MASCOT
+   ========================================================================== */
+.auth-benefits-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Brand Logos */
+.auth-brand-logos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-badge {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+    letter-spacing: -0.2px;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.brand-badge:hover {
+    transform: translateY(-1px);
+    opacity: 0.95;
+}
+
+.brand-badge--primary {
+    background: var(--cps-primary-gradient);
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: var(--cps-radius-sm);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.brand-badge--primary .brand-badge-tag {
+    background: #ffffff;
+    color: var(--cps-primary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 5px;
+    border-radius: 4px;
+    margin-left: 2px;
+}
+
+.brand-badge--secondary {
+    color: var(--cps-primary);
+    padding: 7px 12px;
+    border: 1.5px solid var(--cps-primary);
+    border-radius: var(--cps-radius-sm);
+    font-weight: 600;
+    background: transparent;
+}
+
+/* Welcome Text */
+.auth-welcome-text {
+    margin-top: 4px;
+}
+
+.auth-welcome-title {
+    margin: 0 0 6px 0;
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #111827;
+}
+
+.auth-welcome-title .text-red,
+.auth-welcome-title .text-blue,
+.auth-welcome-title .text-brand {
+    color: var(--cps-primary);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.auth-welcome-sub {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #374151;
+    line-height: 1.4;
+}
+
+.auth-welcome-sub strong {
+    color: var(--cps-primary);
+    font-weight: 700;
+}
+
+/* Benefits Card */
+.auth-benefits-card {
+    background-color: var(--cps-card-bg);
+    border: 1px solid var(--cps-border);
+    border-left: 4px solid var(--cps-primary);
+    border-radius: var(--cps-radius-lg);
+    padding: 20px 22px;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.04);
+}
+
+.auth-benefits-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.auth-benefits-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: #374151;
+}
+
+.auth-benefits-list li strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+.benefit-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.auth-benefits-link-wrap {
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px dashed var(--cps-border);
+    text-align: center;
+}
+
+.auth-benefits-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--cps-primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+
+.auth-benefits-link:hover {
+    gap: 7px;
+    text-decoration: underline;
+}
+
+/* Mascot Illustration */
+.auth-mascot-figure {
+    margin: 4px 0 0;
+    padding: 0;
+    text-align: center;
+}
+
+.auth-mascot-img {
+    max-width: 320px;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.06));
+    animation: mascotFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes mascotFloat {
+    0% {
+        transform: translateY(0px);
+    }
+    100% {
+        transform: translateY(-6px);
+    }
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: FORM CARD
+   ========================================================================== */
+.auth-card-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.auth-form-card {
+    background: #ffffff;
+    border: 1px solid var(--cps-border);
+    border-radius: var(--cps-radius-lg);
+    padding: 32px 28px;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.06);
+}
+
+.auth-form-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.auth-form-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--cps-primary);
+    letter-spacing: -0.3px;
+}
+
+.auth-form-title .text-red,
+.auth-form-title .text-blue,
+.auth-form-title .text-brand {
+    color: var(--cps-primary);
+}
+
+.auth-form-subtitle {
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+    color: var(--cps-text-muted);
+}
+
+/* Fields */
+.auth-form-cellphones {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-form-grid-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.auth-field-cellphones {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.auth-field-cellphones label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.auth-input-wrap-cellphones {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.auth-input-wrap-cellphones input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--cps-text-main);
+    background-color: #ffffff;
+    border: 1px solid var(--cps-border);
+    border-radius: var(--cps-radius-md);
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input-wrap-cellphones input::placeholder {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.auth-input-wrap-cellphones input:focus {
+    border-color: var(--cps-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.auth-input-wrap-cellphones input[aria-invalid="true"],
+.auth-input-wrap-cellphones input[data-state="error"] {
+    border-color: #ef4444 !important;
+    background-color: #fffafa;
+}
+
+/* Password Toggle Eye Button */
+.auth-input-wrap-cellphones .auth-password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 4px;
+    color: #9ca3af;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.auth-input-wrap-cellphones .auth-password-toggle:hover {
+    color: var(--cps-primary);
+}
+
+.auth-password-toggle svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    pointer-events: none;
+}
+
+.auth-password-toggle .eye-off {
+    display: none;
+}
+
+.auth-password-toggle[data-visible="true"] .eye-on {
+    display: none;
+}
+
+.auth-password-toggle[data-visible="true"] .eye-off {
+    display: block;
+}
+
+/* Field Help Text */
+.auth-field-help {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--cps-text-muted);
+    min-height: 16px;
+    line-height: 1.3;
+}
+
+.auth-field-help[data-state="error"] {
+    color: #dc2626 !important;
+    font-weight: 500;
+}
+
+/* Primary Submit Button */
+.btn-cellphones-red,
+.btn-cellphones-primary {
+    width: 100%;
+    height: 46px;
+    margin-top: 4px;
+    background: var(--cps-primary-gradient);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    border-radius: var(--cps-radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.btn-cellphones-red:hover,
+.btn-cellphones-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38);
+}
+
+.btn-cellphones-red:active,
+.btn-cellphones-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-cellphones-red:disabled,
+.btn-cellphones-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Status Message */
+.auth-form-status {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    text-align: center;
+    min-height: 20px;
+}
+
+.auth-form-status[data-state="error"] {
+    color: #dc2626;
+    font-weight: 500;
+}
+
+.auth-form-status[data-state="success"] {
+    color: #16a34a;
+    font-weight: 500;
+}
+
+/* Forgot Password Link */
+.auth-forgot-wrap {
+    margin: -2px 0 0;
+    text-align: center;
+}
+
+.auth-forgot-link {
+    color: var(--cps-link-blue);
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.auth-forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Divider: "Hoặc đăng nhập bằng" */
+.auth-divider-cellphones {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    text-align: center;
+    color: #9ca3af;
+    font-size: 0.82rem;
+}
+
+.auth-divider-cellphones::before,
+.auth-divider-cellphones::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.auth-divider-cellphones span {
+    padding: 0 12px;
+    white-space: nowrap;
+}
+
+/* Social Buttons */
+.auth-social-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.btn-social-card {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #ffffff;
+    border: 1px solid var(--cps-border);
+    border-radius: var(--cps-radius-md);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #1f2937;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-social-card:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.btn-social-card svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* Switch Link: "Bạn chưa có tài khoản? Đăng ký ngay" */
+.auth-switch-cellphones {
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--cps-text-sub);
+}
+
+.auth-switch-cellphones a {
+    color: var(--cps-primary);
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 2px;
+}
+
+.auth-switch-cellphones a:hover {
+    text-decoration: underline;
+}
+
+/* Bottom Shop Domain Notice */
+.auth-shop-notice {
+    margin: 20px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+    text-align: center;
+    font-size: 0.82rem;
+    color: var(--cps-text-muted);
+    line-height: 1.5;
+}
+
+.auth-shop-notice a {
+    color: var(--cps-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-shop-notice a:hover {
+    text-decoration: underline;
+}
+
+/* Success Panel */
+.auth-success-panel {
+    text-align: center;
+    padding: 24px 12px;
+}
+
+.auth-success-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #eff6ff;
+    color: var(--cps-primary);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.auth-success-panel h2 {
+    margin: 0 0 8px;
+    font-size: 1.4rem;
+    color: #111827;
+}
+
+.auth-success-panel p {
+    margin: 0 0 20px;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 960px) {
+    .auth-cellphones-container {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        max-width: 540px;
+    }
+
+    .auth-benefits-col {
+        order: 2;
+    }
+
+    .auth-card-col {
+        order: 1;
+    }
+
+    .auth-mascot-img {
+        max-width: 240px;
+    }
+}
+
+@media (max-width: 540px) {
+    .auth-cellphones-main {
+        padding: 12px 12px 32px;
+    }
+
+    .auth-form-card {
+        padding: 24px 18px;
+        border-radius: var(--cps-radius-md);
+    }
+
+    .auth-form-title {
+        font-size: 1.5rem;
+    }
+
+    .auth-form-grid-two {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-welcome-title {
+        font-size: 1.25rem;
+    }
+
+    .auth-benefits-card {
+        padding: 16px 16px;
+    }
+}

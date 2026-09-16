@@ -1,0 +1,512 @@
+[
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy S26 Ultra 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s26-ultra-1.jpg",
+    "rawPath": "s/a/samsung-galaxy-s26-ultra-1.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy S25 Ultra 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-ultra_3__3.png",
+    "rawPath": "d/i/dien-thoai-samsung-galaxy-s25-ultra_3__3.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "POCO X8 Pro Max 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-poco-x8-pro-max_2.jpg",
+    "rawPath": "x/i/xiaomi-poco-x8-pro-max_2.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy A57 5G 8GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-a57-2.jpg",
+    "rawPath": "d/i/dien-thoai-samsung-galaxy-a57-2.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy S25 Plus 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-s25-plus_3_.png",
+    "rawPath": "d/i/dien-thoai-samsung-galaxy-s25-plus_3_.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Xiaomi Redmi Note 14 Pro Plus 5G 8GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-redmi-note-14-pro-plus.jpg",
+    "rawPath": "x/i/xiaomi-redmi-note-14-pro-plus.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "HONOR 400 Pro 5G 12GB 512GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/o/honor_400_pro_5g_12gb_512gb-2_1.jpg",
+    "rawPath": "h/o/honor_400_pro_5g_12gb_512gb-2_1.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Xiaomi POCO F8 Pro 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/p/o/poco-f8-pro.jpg",
+    "rawPath": "p/o/poco-f8-pro.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "POCO X8 Pro Max 12GB 512GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-poco-x8-pro-max_3.jpg",
+    "rawPath": "x/i/xiaomi-poco-x8-pro-max_3.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Nothing Phone 2A Plus 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-nothing-phone-2a-plus_1_.png",
+    "rawPath": "d/i/dien-thoai-nothing-phone-2a-plus_1_.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Xiaomi Redmi A7 Pro 4GB 128GB NFC",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-redmi-a7-pro_1.png",
+    "rawPath": "x/i/xiaomi-redmi-a7-pro_1.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "HONOR X9d 5G 12GB 512GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-honor-x9d-3_1.jpg",
+    "rawPath": "d/i/dien-thoai-honor-x9d-3_1.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "HONOR 400 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/_/i/_i_n_tho_i_honor_400_5g_12gb_256gb.jpg",
+    "rawPath": "_/i/_i_n_tho_i_honor_400_5g_12gb_256gb.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "HONOR 400 5G 12GB 512GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/_/i/_i_n_tho_i_honor_400_5g_12gb_256gb_2.jpg",
+    "rawPath": "_/i/_i_n_tho_i_honor_400_5g_12gb_256gb_2.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 17 Pro Max 256GB | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-pro-max_3.jpg",
+    "rawPath": "i/p/iphone-17-pro-max_3.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 17 Pro 256GB | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-pro-256-gb.png",
+    "rawPath": "i/p/iphone-17-pro-256-gb.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 17 256GB | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone_17_256gb-3_2.jpg",
+    "rawPath": "i/p/iphone_17_256gb-3_2.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Xiaomi POCO F9 Ultra 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-poco-f9-ultra-red.jpg",
+    "rawPath": "x/i/xiaomi-poco-f9-ultra-red.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy Z Fold8 Ultra 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-fold-8-violet-01.jpg",
+    "rawPath": "s/a/samsung-galaxy-z-fold-8-violet-01.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 18 Pro Max 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-18-pro-01_2.jpg",
+    "rawPath": "i/p/iphone-18-pro-01_2.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy Z Fold8 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-fold-8-lavender-01.jpg",
+    "rawPath": "s/a/samsung-galaxy-z-fold-8-lavender-01.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 17 Pro Max 512GB | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-pro-cam_3.jpg",
+    "rawPath": "i/p/iphone-17-pro-cam_3.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Samsung Galaxy Z Flip8 5G 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-flip-8-pink-01.jpg",
+    "rawPath": "s/a/samsung-galaxy-z-flip-8-pink-01.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone Air 256GB | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone_air-3_2.jpg",
+    "rawPath": "i/p/iphone_air-3_2.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 15 128GB | Chính hãng VN/A",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-plus_1__1.png",
+    "rawPath": "i/p/iphone-15-plus_1__1.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Điện thoại iPhone 16 Pro Max 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-16-pro-max.png",
+    "rawPath": "i/p/iphone-16-pro-max.png"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "Nubia Neo 5 5G 8GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-nubia-neo-5-5g-den.jpg",
+    "rawPath": "d/i/dien-thoai-nubia-neo-5-5g-den.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "OPPO Reno16 F 5G 8GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo-reno16f-pop-white-9.jpg",
+    "rawPath": "o/p/oppo-reno16f-pop-white-9.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 17 Pro 512GB | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone_17_pro_512gb.jpg",
+    "rawPath": "i/p/iphone_17_pro_512gb.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "OPPO Find X9s 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo-find-x9s-25.jpg",
+    "rawPath": "o/p/oppo-find-x9s-25.jpg"
+  },
+  {
+    "category": "Điện thoại",
+    "name": "iPhone 13 128GB | Chính hãng VN/A",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-13_2_2.jpg",
+    "rawPath": "i/p/iphone-13_2_2.jpg"
+  },
+  {
+    "category": "Laptop",
+    "name": "Samsung",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/b/r/brand-icon-samsung_2.png",
+    "rawPath": "b/r/brand-icon-samsung_2.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "MacBook Air M5 13 inch 2026 10CPU 8GPU 16GB 512GB | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook_13_17.png",
+    "rawPath": "m/a/macbook_13_17.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop MSI Katana 15 B13VEK-2440VN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_1__4_62.png",
+    "rawPath": "t/e/text_d_i_1__4_62.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Acer Gaming Aspire 7 A715-59G-59RD",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_1042.png",
+    "rawPath": "g/r/group_1042.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Acer Gaming Nitro ProPanel ANV15-52-50VA",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_975_17.png",
+    "rawPath": "g/r/group_975_17.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Lenovo IdeaPad Slim 3 14IWC11 83RQ002PVN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_945_2__3.png",
+    "rawPath": "g/r/group_945_2__3.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop ASUS VivoBook Go 14 E1404FA-EB935W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_3__10_35.png",
+    "rawPath": "t/e/text_ng_n_3__10_35.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Lenovo IdeaPad Slim 3 14IPH11 83UQ003NVN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_16_63.png",
+    "rawPath": "t/e/text_ng_n_16_63.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop ASUS Vivobook 14 X1404VA-EB355W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_744_1_107.png",
+    "rawPath": "g/r/group_744_1_107.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop ASUS TUF Gaming A16 FA607NUQ-RL007W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_9_23.png",
+    "rawPath": "t/e/text_d_i_9_23.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Dell 14 DC14250 DC4C5375W1 - Bảo hành 2 năm",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_945_1_21.png",
+    "rawPath": "g/r/group_945_1_21.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop ASUS VivoBook S14 S3407CA-SF913W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_881_4_.png",
+    "rawPath": "g/r/group_881_4_.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop HP Omnibook 5 AI 16-AF1048TU BZ7Q9PA",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_744_1_42.png",
+    "rawPath": "g/r/group_744_1_42.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop ASUS VivoBook 14 X1407CA-LY008W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_4__10_30.png",
+    "rawPath": "t/e/text_ng_n_4__10_30.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "MacBook Neo 13 inch A18 Pro 2026 6CPU 5GPU 8GB 256GB | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook_13_19.png",
+    "rawPath": "m/a/macbook_13_19.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Lenovo LOQ Essential 15ARP10E 83S0000DVN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_9_2.png",
+    "rawPath": "t/e/text_d_i_9_2.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop MSI Cyborg 15 A13UC-2082VN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_7_126.png",
+    "rawPath": "t/e/text_d_i_7_126.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Dell 14 DC14250 DC4C5386W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_945_33.png",
+    "rawPath": "g/r/group_945_33.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "MacBook Neo 13 inch A18 Pro 2026 6CPU 5GPU 8GB 512GB Touch ID | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook_1__7_10.png",
+    "rawPath": "m/a/macbook_1__7_10.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Lenovo Legion 5 15IRX10 83LY00HRVN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_902_1.png",
+    "rawPath": "g/r/group_902_1.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Dell Pro 15 Essential PV15250 VKVKD - Nhập khẩu chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_2__13_50.png",
+    "rawPath": "t/e/text_ng_n_2__13_50.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Apple Studio Display XDR 27 5K Ngàm VESA 2026 | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook_13_18_1.png",
+    "rawPath": "m/a/macbook_13_18_1.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop Lenovo LOQ 15ARP10E 83S0007AVN",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_8_16.png",
+    "rawPath": "t/e/text_d_i_8_16.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Apple MacBook Air M2 2024 8CPU 8GPU 16GB 256GB I Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/m/image_1396_1.png",
+    "rawPath": "i/m/image_1396_1.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "MacBook Air M5 13 inch 2026 10CPU 8GPU 16GB 512GB Sạc 70W | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/macbook_13_17_1.png",
+    "rawPath": "m/a/macbook_13_17_1.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop HP Victus 15-FA2731TX B85LNPA",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_7_78.png",
+    "rawPath": "t/e/text_d_i_7_78.png"
+  },
+  {
+    "category": "Laptop",
+    "name": "Laptop ASUS ROG Strix G16 G614PH-S5101W",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_1__4_51.png",
+    "rawPath": "t/e/text_d_i_1__4_51.png"
+  },
+  {
+    "category": "Tablet",
+    "name": "HONOR Pad 10 Wifi 8GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/o/honnor-pad-10.jpg",
+    "rawPath": "h/o/honnor-pad-10.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Pad 8 Pro 8GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-xiaomi-pad-8-pro-8gb-128gb.jpg",
+    "rawPath": "m/a/may-tinh-bang-xiaomi-pad-8-pro-8gb-128gb.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Poco Pad M1 Wifi 8GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-xiaomi-poco-pad-m1.jpg",
+    "rawPath": "m/a/may-tinh-bang-xiaomi-poco-pad-m1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Redmi Pad 2 Wifi 4GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-redmi-pad-2-wifi-1_5.jpg",
+    "rawPath": "x/i/xiaomi-redmi-pad-2-wifi-1_5.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Poco Pad X1 8GB 512GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-xiaomi-poco-pad-x1-4.jpg",
+    "rawPath": "m/a/may-tinh-bang-xiaomi-poco-pad-x1-4.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Lenovo Yoga Tab Wifi 12GB 256GB TB710 ZAG60105VN - Kèm bút, bàn phím",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/e/lenovo-yoga-tab-tb710-4_1.jpg",
+    "rawPath": "l/e/lenovo-yoga-tab-tb710-4_1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Honor Pad X8b Wifi 6GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-honor-pad-x8b.jpg",
+    "rawPath": "m/a/may-tinh-bang-honor-pad-x8b.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Masstel Tab 10 Edu 4G 3GB 32GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/masstel-tab-10-edu-4g_7_.png",
+    "rawPath": "m/a/masstel-tab-10-edu-4g_7_.png"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad A16 Wifi 128GB 2025 | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-a16-11-inch_10_.jpg",
+    "rawPath": "i/p/ipad-a16-11-inch_10_.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Samsung Galaxy Tab A11 Wifi 4GB 64GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-samsung-galaxy-tab-a11-wifi.jpg",
+    "rawPath": "m/a/may-tinh-bang-samsung-galaxy-tab-a11-wifi.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad mini 7 2024 Wifi 128GB | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_13_7.png",
+    "rawPath": "t/e/text_ng_n_13_7.png"
+  },
+  {
+    "category": "Tablet",
+    "name": "Huawei MatePad 11.5 S 2026 12GB 256GB - Kèm bàn phím",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/u/huawei-matepad-11-5-s-2026_1.jpg",
+    "rawPath": "h/u/huawei-matepad-11-5-s-2026_1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad A16 Wifi 256GB 2025 | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-a16-11-inch_10__1.jpg",
+    "rawPath": "i/p/ipad-a16-11-inch_10__1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad Air 11 inch M4 Wifi 128GB 2026 | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/1/_/1_1__1_1.png",
+    "rawPath": "1/_/1_1__1_1.png"
+  },
+  {
+    "category": "Tablet",
+    "name": "Lenovo Idea Tab Plus Matte Edition Wifi 8GB 128GB ZAG70981VN - Kèm bút, bàn phím",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/e/lenovo-idea-tab-plus-wifi_1.jpg",
+    "rawPath": "l/e/lenovo-idea-tab-plus-wifi_1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Pad Mini 8GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-pad-mini.jpg",
+    "rawPath": "x/i/xiaomi-pad-mini.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad Pro chip M5 11 inch Wifi 256GB | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-pro-m5.jpg",
+    "rawPath": "i/p/ipad-pro-m5.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Samsung Galaxy Tab S11 Wifi 12GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-samsung-galaxy-tab-s11_7.jpg",
+    "rawPath": "m/a/may-tinh-bang-samsung-galaxy-tab-s11_7.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Huawei MatePad Papermatte 11.5 inch 2025 8GB 256GB - Kèm bàn phím",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/u/huawei-matepad-papermate-11-5-inch_1_9.jpg",
+    "rawPath": "h/u/huawei-matepad-papermate-11-5-inch_1_9.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Samsung Galaxy Tab S10 Lite Wifi 6GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-samsung-galaxy-tab-a11-plus-wifi_2.jpg",
+    "rawPath": "m/a/may-tinh-bang-samsung-galaxy-tab-a11-plus-wifi_2.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad Air 11 inch M4 Wifi 256GB 2026 | Chính hãng",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/1/_/1_1__1_1_2.png",
+    "rawPath": "1/_/1_1__1_1_2.png"
+  },
+  {
+    "category": "Tablet",
+    "name": "Huawei MatePad SE 11 inch Wifi 8GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/h/u/huawei-matepad-se-11-inch_1_1.jpg",
+    "rawPath": "h/u/huawei-matepad-se-11-inch_1_1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "iPad Air 11 inch M3 Wifi 128GB 2025 | Chính hãng Apple Việt Nam",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/ipad-air-11-wifi-1.jpg",
+    "rawPath": "i/p/ipad-air-11-wifi-1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Redmi Pad 2 9.7 inch Wifi 4GB 64GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/r/e/redmi-pad-2-9-7-inch.jpg",
+    "rawPath": "r/e/redmi-pad-2-9-7-inch.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Xiaomi Pad 8 8GB 128GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-xiaomi-pad-8-pro-8gb-128gb_2.jpg",
+    "rawPath": "m/a/may-tinh-bang-xiaomi-pad-8-pro-8gb-128gb_2.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Lenovo Legion Tab Gen 5 12GB 256GB",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/e/lenovo-legion-tab-gen-5_1.jpg",
+    "rawPath": "l/e/lenovo-legion-tab-gen-5_1.jpg"
+  },
+  {
+    "category": "Tablet",
+    "name": "Lenovo Idea Tab Pro Gen 2 Matte Edition 8GB 256GB ZAHD0452VN - Kèm bút, bàn phím",
+    "image": "https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/m/a/may-tinh-bang-lenovo-legion-tab-pro-gen-2-zahd0452vn-kem-but-ban-phim.jpg",
+    "rawPath": "m/a/may-tinh-bang-lenovo-legion-tab-pro-gen-2-zahd0452vn-kem-but-ban-phim.jpg"
+  }
+]
