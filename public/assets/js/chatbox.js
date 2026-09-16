@@ -51,11 +51,12 @@
                     <div class="ai-chat-title">
                         <div class="ai-chat-avatar">AI</div>
                         <div>
-                            <strong>AI tư vấn khách hàng</strong>
-                            <span id="aiChatStatus" role="status">Hỏi kỹ nhu cầu trước khi gợi ý</span>
+                            <strong>AI tư vấn</strong>
+                            <span id="aiChatStatus" role="status">Sẵn sàng hỗ trợ bạn</span>
                         </div>
                     </div>
                     <div class="ai-chat-header-actions">
+                        <button class="ai-chat-minimize" type="button" aria-label="Thu nhỏ chat" title="Thu nhỏ">─</button>
                         <a class="ai-chat-expand" href="${root}pages/ai/assistant.html" aria-label="Mở giao diện AI đầy đủ" title="Mở giao diện AI đầy đủ">↗</a>
                         <button class="ai-chat-voice" type="button" aria-label="Bật đọc câu trả lời" aria-pressed="false" title="Đọc câu trả lời bằng giọng nói"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m2-9a9 9 0 0 1 0 12"/></svg></button>
                         <button class="ai-chat-close" type="button" aria-label="Đóng chat">×</button>
@@ -72,6 +73,11 @@
                     </button>
                 </form>
             </aside>
+            <button class="ai-chat-min-pill" type="button" aria-label="Mở lại AI tư vấn" title="Mở lại AI tư vấn">
+                <span class="ai-chat-min-avatar">AI</span>
+                <span>AI tư vấn</span>
+                <span class="ai-chat-min-arrow" aria-hidden="true">▲</span>
+            </button>
             <button class="ai-chat-toggle" type="button" aria-label="Mở trợ lý tư vấn">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m8-2a8 8 0 1 1-3.1-6.32L21 5l-1.04 3.05A7.97 7.97 0 0 1 21 12Z"></path>
@@ -226,7 +232,7 @@
                 micButton.classList.remove('listening');
                 micButton.setAttribute('aria-label', 'Nhập bằng giọng nói');
                 input.placeholder = 'Nhập nhu cầu mua hàng...';
-                status.textContent = 'Hỏi kỹ nhu cầu trước khi gợi ý';
+                status.textContent = 'Sẵn sàng hỗ trợ bạn';
                 if (recognizedText) send(recognizedText);
             };
             micButton.addEventListener('click', () => {
@@ -280,15 +286,49 @@
             }
         });
 
+        function openChat(focusInput = false) {
+            chat.classList.add('open');
+            chat.classList.remove('minimized');
+            document.body.classList.add('ai-chat-open');
+            sessionStorage.removeItem('ai_chat_closed');
+            if (focusInput) input.focus();
+        }
+
+        function closeChat() {
+            chat.classList.remove('open');
+            chat.classList.remove('minimized');
+            document.body.classList.remove('ai-chat-open');
+            sessionStorage.setItem('ai_chat_closed', 'true');
+            if (recognition && micButton.classList.contains('listening')) recognition.abort();
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        }
+
+        function minimizeChat() {
+            const isMin = chat.classList.toggle('minimized');
+            if (isMin) {
+                document.body.classList.remove('ai-chat-open');
+            } else {
+                document.body.classList.add('ai-chat-open');
+                input.focus();
+            }
+        }
+
         chat.querySelector('.ai-chat-toggle').addEventListener('click', () => {
-            chat.classList.toggle('open');
-            if (chat.classList.contains('open')) input.focus();
+            openChat(true);
         });
 
         chat.querySelector('.ai-chat-close').addEventListener('click', () => {
-            chat.classList.remove('open');
-            if (recognition && micButton.classList.contains('listening')) recognition.abort();
-            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            closeChat();
+        });
+
+        const minBtn = chat.querySelector('.ai-chat-minimize');
+        if (minBtn) minBtn.addEventListener('click', () => {
+            minimizeChat();
+        });
+
+        const pillBtn = chat.querySelector('.ai-chat-min-pill');
+        if (pillBtn) pillBtn.addEventListener('click', () => {
+            openChat(true);
         });
 
         form.addEventListener('submit', event => {
@@ -298,6 +338,11 @@
 
         appendMessage(body, 'ai', 'Xin chào. Bạn đang cần sản phẩm nào hoặc quan tâm nhóm nào của cửa hàng? Mình sẽ hỏi thêm ngân sách, người sử dụng và điều bạn ưu tiên trước khi gợi ý sản phẩm.');
         renderSuggestions(body, starterSuggestions, send);
+
+        // Auto-open on page load like CellphoneS
+        setTimeout(() => {
+            openChat(false);
+        }, 450);
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

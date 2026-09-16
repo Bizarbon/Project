@@ -3681,3 +3681,70 @@ body:not(.admin-page) #productSections .product-grid {
         padding: 12px;
     }
 }
+
+/* AI Chat Assistant Responsive Docking & Zoom Resilience */
+:root {
+    --ai-chat-dock-width: 380px;
+}
+
+@media (max-width: 1200px) {
+    :root {
+        --ai-chat-dock-width: 340px;
+    }
+}
+
+/* When AI chat is open (>= 768px), body reserves dock padding so NO product card is EVER covered */
+@media (min-width: 768px) {
+    body.ai-chat-open:not(.admin-page) {
+        padding-right: calc(var(--ai-chat-dock-width) + 20px) !important;
+        transition: padding-right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.ai-chat-open:not(.admin-page) main.container {
+        width: min(100%, 1400px) !important;
+        max-width: 1400px !important;
+        margin-inline: auto !important;
+    }
+
+    body.ai-chat-open:not(.admin-page) .site-footer .footer-top {
+        width: 100% !important;
+        max-width: 1400px !important;
+        margin-inline: auto !important;
+    }
+}
+
+/* Product grid columns adapt based on viewport when chat is docked */
+@media (min-width: 1650px) {
+    body.ai-chat-open:not(.admin-page) #productSections .product-grid,
+    body.ai-chat-open:not(.admin-page) .recommendation-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1649px) {
+    body.ai-chat-open:not(.admin-page) #productSections .product-grid,
+    body.ai-chat-open:not(.admin-page) .recommendation-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1199px) {
+    body.ai-chat-open:not(.admin-page) #productSections .product-grid,
+    body.ai-chat-open:not(.admin-page) .recommendation-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    body.ai-chat-open:not(.admin-page) #productSections .product-grid,
+    body.ai-chat-open:not(.admin-page) .recommendation-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+/* Mobile screens (< 768px): ensure bottom clearance */
+@media (max-width: 767px) {
+    body.ai-chat-open:not(.admin-page) main.container {
+        padding-bottom: 96px;
+    }
+}
