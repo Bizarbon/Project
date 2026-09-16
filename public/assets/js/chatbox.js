@@ -27,7 +27,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=ai-workspace-20260720-1`;
+        link.href = `${root}assets/css/chatbox.css?v=ai-chat-dock-20260916-1`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }
