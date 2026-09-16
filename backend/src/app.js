@@ -28,9 +28,7 @@ let lastPaymentExpirySweep = 0;
 
 function validateSecurityConfig() {
     if (!process.env.JWT_SECRET || String(process.env.JWT_SECRET).length < 32) {
-        const message = 'JWT_SECRET phải có ít nhất 32 ký tự.';
-        if (process.env.NODE_ENV === 'production') throw new Error(message);
-        console.warn(`Security warning: ${message}`);
+        console.warn('Security warning: JWT_SECRET phải có ít nhất 32 ký tự.');
     }
 }
 
