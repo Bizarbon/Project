@@ -118,35 +118,36 @@ async function normalizeProductPayload(body, existingProduct = null) {
     return payload;
 }
 
-let gamingSeedPromise = null;
-async function ensureGamingProductsSeeded() {
-    if (gamingSeedPromise) return gamingSeedPromise;
-    gamingSeedPromise = (async () => {
-        try {
-            const gamingCount = await Product.countDocuments({ category: 'Máy chơi game' });
-            if (gamingCount === 0) {
-                console.log('Detecting 0 gaming products in database. Auto-seeding gaming catalog...');
-                const { seedGaming } = require('../../scripts/seedGamingProducts');
-                if (typeof seedGaming === 'function') {
-                    await seedGaming();
-                    console.log('Auto-seed gaming catalog completed successfully.');
-                }
-            }
-        } catch (err) {
-            console.error('Auto-seed gaming error:', err.message);
-            gamingSeedPromise = null;
-        }
-    })();
-    return gamingSeedPromise;
-}
+const { syncUniformCatalog, ensureCatalogSynchronized } = require('../utils/catalogSync');
 
-// POST endpoint to manually trigger seeding of gaming products
+// POST endpoint to manually trigger full catalog synchronization
+router.post('/sync-catalog', async (req, res) => {
+    try {
+        const force = req.query.force !== 'false';
+        const result = await syncUniformCatalog({ force });
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// GET endpoint to check or trigger catalog synchronization
+router.get('/sync-catalog', async (req, res) => {
+    try {
+        const force = req.query.force === 'true';
+        const result = await syncUniformCatalog({ force });
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// POST endpoint backward compatibility
 router.post('/seed-gaming', async (req, res) => {
     try {
-        const { seedGaming } = require('../../scripts/seedGamingProducts');
-        await seedGaming();
+        const result = await syncUniformCatalog({ force: false });
         const total = await Product.countDocuments({ category: 'Máy chơi game' });
-        res.json({ message: 'Seeded gaming products successfully', count: total });
+        res.json({ message: 'Catalog checked and synchronized', count: total, ...result });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -155,7 +156,7 @@ router.post('/seed-gaming', async (req, res) => {
 // GET product metadata for filters/forms
 router.get('/meta/options', async (req, res) => {
     try {
-        await ensureGamingProductsSeeded();
+        await ensureCatalogSynchronized();
         const [categories, brands, tags] = await Promise.all([
             Product.distinct('category', { active: { $ne: false } }),
             Product.distinct('brand', { active: { $ne: false }, brand: { $ne: '' } }),
@@ -195,7 +196,7 @@ router.get('/recommendations', optionalAuth, async (req, res) => {
 // GET products with optional filters
 router.get('/', async (req, res) => {
     try {
-        await ensureGamingProductsSeeded();
+        await ensureCatalogSynchronized();
         const filter = {};
         if (!req.user?.isAdmin) filter.active = { $ne: false };
         if (req.query.category && req.query.category !== 'all') filter.category = req.query.category;

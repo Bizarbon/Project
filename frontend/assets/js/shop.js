@@ -17,6 +17,16 @@ const categoryLabels = {
     'Máy chơi game': 'Máy chơi game'
 };
 
+const CANONICAL_CATEGORY_ORDER = [
+    'Điện thoại',
+    'Laptop',
+    'Tablet',
+    'Tai nghe',
+    'Đồng hồ thông minh',
+    'Phụ kiện',
+    'Máy chơi game'
+];
+
 const DELIVERY_DATA_URL = 'assets/data/vietnam-administrative-2025.json?v=20260712-1';
 let deliveryAreas = [];
 let deliveryAreasState = 'idle';
@@ -268,7 +278,10 @@ function filteredProducts() {
     const filters = currentFilters();
     let products = [...allProducts];
 
-    if (activeCategory !== 'all') products = products.filter(p => p.category === activeCategory);
+    if (activeCategory !== 'all') {
+        const target = activeCategory.normalize('NFC').trim().toLowerCase();
+        products = products.filter(p => (p.category || '').normalize('NFC').trim().toLowerCase() === target);
+    }
     if (filters.brand !== 'all') products = products.filter(p => (p.brand || '') === filters.brand);
     if (filters.search) {
         products = products.filter(p =>
@@ -331,7 +344,15 @@ async function loadProducts() {
 }
 
 function renderCategoryNav() {
-    const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+    const rawCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+    const categories = rawCategories.sort((a, b) => {
+        const idxA = CANONICAL_CATEGORY_ORDER.indexOf(a);
+        const idxB = CANONICAL_CATEGORY_ORDER.indexOf(b);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.localeCompare(b, 'vi');
+    });
     const nav = document.getElementById('categoryNav');
     if (!nav) return;
     const categoryCount = category => allProducts.filter(product => product.category === category).length;
@@ -1127,7 +1148,16 @@ function renderProducts() {
         grouped[product.category].push(product);
     });
 
-    sections.innerHTML = Object.entries(grouped).map(([category, items]) => `
+    const sortedEntries = Object.entries(grouped).sort(([catA], [catB]) => {
+        const idxA = CANONICAL_CATEGORY_ORDER.indexOf(catA);
+        const idxB = CANONICAL_CATEGORY_ORDER.indexOf(catB);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return catA.localeCompare(catB, 'vi');
+    });
+
+    sections.innerHTML = sortedEntries.map(([category, items]) => `
         <section class="category-section">
             <header class="category-header">
                 <h3>${escapeHTML(categoryLabels[category] || category)}</h3>

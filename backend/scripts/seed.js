@@ -593,12 +593,20 @@ const seedData = async () => {
         await Customer.deleteMany({});
         await Order.deleteMany({});
 
-        console.log('📦 Đang thêm sản phẩm...');
-        const products = [];
-        for (let p of sampleProducts) {
-            products.push(await new Product(p).save());
-        }
-        console.log(`✅ Đã thêm ${products.length} sản phẩm`);
+        console.log('📦 Đang thêm 55 sản phẩm chuẩn...');
+        const Counter = require('../src/models/Counter');
+        const uniformCatalog = require('../src/data/uniformCatalog');
+        const productsToInsert = uniformCatalog.map((item, index) => {
+            const id = index + 1;
+            return {
+                ...item,
+                _id: id,
+                sku: item.sku || `TECH-${String(id).padStart(5, '0')}`
+            };
+        });
+        const products = await Product.insertMany(productsToInsert);
+        await Counter.findByIdAndUpdate('productId', { seq: products.length }, { upsert: true });
+        console.log(`✅ Đã thêm ${products.length} sản phẩm chuẩn`);
 
         console.log('👥 Đang thêm khách hàng...');
         const customers = [];
@@ -679,12 +687,12 @@ const seedData = async () => {
         console.log(`✅ Đã thêm ${orders.length} đơn hàng`);
 
         // Thống kê theo danh mục
-        const categories = [...new Set(sampleProducts.map(p => p.category))];
+        const categories = [...new Set(products.map(p => p.category))];
         console.log('\n🎉 Seed data thành công!');
         console.log('📊 Thống kê:');
         console.log(`   - Sản phẩm: ${products.length}`);
         categories.forEach(cat => {
-            const count = sampleProducts.filter(p => p.category === cat).length;
+            const count = products.filter(p => p.category === cat).length;
             console.log(`     • ${cat}: ${count} sản phẩm`);
         });
         console.log(`   - Khách hàng: ${customers.length}`);
