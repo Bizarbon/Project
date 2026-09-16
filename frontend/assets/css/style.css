@@ -327,6 +327,7 @@ h2 {
     min-height: 0;
     object-fit: contain;
     object-position: center;
+    background: transparent !important;
     transition: transform 0.25s ease;
 }
 
@@ -340,6 +341,7 @@ h2 {
 }
 
 [data-theme='dark'] .product-card .product-media img {
+    background: transparent !important;
     mix-blend-mode: normal !important;
     filter: none !important;
 }

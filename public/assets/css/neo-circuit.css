@@ -2941,12 +2941,9 @@ html[data-theme='dark'] .hero-control {
     box-shadow: 0 22px 44px rgba(47, 128, 237, 0.16) !important;
 }
 
-.product-card img {
-    background: #eef7ff !important;
-}
-
+.product-card img,
 html[data-theme='dark'] .product-card img {
-    background: #111827 !important;
+    background: transparent !important;
 }
 
 .price,
