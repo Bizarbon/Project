@@ -13,8 +13,8 @@
     <meta property="og:description" content="Khám phá sản phẩm công nghệ chính hãng, so sánh cấu hình và mua sắm trực tuyến thuận tiện." />
     <meta property="og:url" content="https://techecommerce-shop.vercel.app/" />
     <title>TechEcommerce - Cửa hàng công nghệ</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=mobile-opt-20260917-2" />
-    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=mobile-opt-20260917-2" />
+    <link rel="stylesheet" href="assets/css/style.css?v=mobile-opt-20260917-4" />
+    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=mobile-opt-20260917-4" />
     <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-cost-20260722-1" />
     <style>
       .cart-drawer[aria-hidden='true'] {
@@ -210,8 +210,9 @@
         bottom: 0;
         z-index: 4;
       }
-      .hide-admin-stats .admin-metric {
-        display: none;
+      #adminStats.hide-admin-stats,
+      .hide-admin-stats {
+        display: none !important;
       }
       @media (max-width: 1024px) {
         .cart-section {
@@ -231,15 +232,37 @@
           grid-template-columns: 1fr 1fr;
         }
       }
-      @media (max-width: 640px) {
+      @media (max-width: 768px) {
+        #adminStats {
+          display: none !important;
+        }
         .shop-toolbar {
-          grid-template-columns: 1fr;
+          grid-template-columns: 1fr 1fr !important;
+          gap: 0.45rem !important;
+          padding: 0.65rem !important;
+        }
+        .shop-toolbar #searchInput {
+          display: none !important;
+        }
+        .shop-toolbar input,
+        .shop-toolbar select {
+          height: 38px !important;
+          font-size: 0.82rem !important;
+          padding: 0 10px !important;
+          border-radius: 8px !important;
+        }
+        .stock-filter-toggle {
+          grid-column: 1 / -1 !important;
+          min-height: 32px !important;
+          justify-content: center !important;
+          font-size: 0.82rem !important;
+          margin: 0 !important;
         }
         .hero-banner {
-          padding: 1.4rem;
+          padding: 1rem !important;
         }
         .hero-banner h2 {
-          font-size: 1.45rem;
+          font-size: 1.25rem !important;
         }
       }
     </style>

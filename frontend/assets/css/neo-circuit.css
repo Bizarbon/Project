@@ -2073,46 +2073,25 @@ body.address-modal-open {
     }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
     .header-shell {
         width: min(100% - 16px, 1500px);
     }
 
+    /* Hide intrusive marquee on mobile to save precious screen height */
     .header-promotion {
-        min-height: 32px;
-        height: 32px;
-    }
-
-    .promotion-inner,
-    .promotion-marquee-shell {
-        min-height: 32px;
-        gap: 0.5rem;
-    }
-
-    .promo-item {
-        font-size: 0.76rem;
-    }
-
-    .promo-tag {
-        font-size: 0.68rem;
-        padding: 0.1rem 0.45rem;
-    }
-
-    .promotion-marquee-btn {
-        min-height: 24px;
-        padding: 0.18rem 0.55rem !important;
-        font-size: 0.7rem;
+        display: none !important;
     }
 
     .header-main {
-        padding-block: 0.45rem 0.6rem;
+        padding-block: 0.32rem 0.42rem !important;
     }
 
     .header-main-inner {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         grid-template-rows: auto auto;
-        gap: 0.45rem 0.65rem;
+        gap: 0.3rem 0.5rem;
         min-height: auto;
         align-items: center;
         padding: 0;
@@ -2123,20 +2102,20 @@ body.address-modal-open {
         grid-row: 1;
         display: inline-flex !important;
         align-items: center !important;
-        gap: 0.5rem !important;
+        gap: 0.4rem !important;
         text-decoration: none !important;
         white-space: nowrap;
     }
 
     .storefront-logo-mark {
-        width: 34px !important;
-        height: 34px !important;
-        flex: 0 0 34px !important;
+        width: 28px !important;
+        height: 28px !important;
+        flex: 0 0 28px !important;
     }
 
     .storefront-logo-text {
         display: inline-block !important;
-        font-size: 1.12rem !important;
+        font-size: 0.98rem !important;
         font-weight: 800 !important;
         letter-spacing: -0.02em;
         color: var(--neo-primary) !important;
@@ -2152,7 +2131,7 @@ body.address-modal-open {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 0.35rem !important;
+        gap: 0.3rem !important;
         background: transparent !important;
         box-shadow: none !important;
         border: none !important;
@@ -2170,9 +2149,9 @@ body.address-modal-open {
     .header-action-btn,
     .header-account-link,
     .storefront-header .user-profile-btn {
-        width: 38px !important;
-        height: 38px !important;
-        min-height: 38px !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
         border-radius: 50% !important;
         background: rgba(0, 104, 255, 0.08) !important;
         border: 1px solid rgba(0, 104, 255, 0.16) !important;
@@ -2192,9 +2171,9 @@ body.address-modal-open {
     }
 
     .header-action-icon {
-        width: 22px;
-        height: 22px;
-        font-size: 1.15rem;
+        width: 18px;
+        height: 18px;
+        font-size: 1rem;
         color: var(--neo-primary);
         display: flex;
         align-items: center;
@@ -2205,9 +2184,9 @@ body.address-modal-open {
         top: -3px !important;
         right: -3px !important;
         left: auto !important;
-        min-width: 17px !important;
-        height: 17px !important;
-        font-size: 0.65rem !important;
+        min-width: 15px !important;
+        height: 15px !important;
+        font-size: 0.62rem !important;
         font-weight: 700;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
@@ -2220,7 +2199,7 @@ body.address-modal-open {
     .header-search {
         grid-column: 1 / -1;
         grid-row: 2;
-        height: 42px;
+        height: 36px !important;
         border-radius: 9999px !important;
         border: 1.5px solid var(--neo-border);
         background: var(--neo-panel-solid, #ffffff);
@@ -2237,29 +2216,29 @@ body.address-modal-open {
     }
 
     .header-search-icon {
-        padding-left: 0.85rem;
+        padding-left: 0.75rem;
         color: var(--neo-muted);
-        font-size: 1.25rem;
+        font-size: 1.1rem;
         flex: 0 0 auto;
     }
 
     .header-search input {
         height: 100% !important;
-        font-size: 0.88rem !important;
-        padding: 0 0.65rem !important;
+        font-size: 0.82rem !important;
+        padding: 0 0.5rem !important;
         flex: 1 1 auto;
         min-width: 0;
     }
 
     .header-search button {
-        min-width: 44px !important;
+        min-width: 38px !important;
         height: 100% !important;
-        padding: 0 14px !important;
+        padding: 0 12px !important;
         border: 0 !important;
         border-radius: 0 !important;
         background: linear-gradient(135deg, #0068FF, #0091FF) !important;
         color: #ffffff !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -2274,7 +2253,7 @@ body.address-modal-open {
         border-bottom: 1px solid var(--neo-border) !important;
         min-height: auto !important;
         height: auto !important;
-        padding: 0.45rem 0 !important;
+        padding: 0.32rem 0 !important;
         box-shadow: none !important;
         overflow: hidden;
     }
@@ -2286,8 +2265,8 @@ body.address-modal-open {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
-        gap: 0.5rem !important;
-        padding: 0 12px !important;
+        gap: 0.4rem !important;
+        padding: 0 10px !important;
         margin: 0 !important;
         justify-content: flex-start !important;
         scroll-snap-type: x proximity;
@@ -2308,13 +2287,13 @@ body.address-modal-open {
     .header-category-list > li > button {
         display: inline-flex !important;
         align-items: center !important;
-        gap: 0.4rem !important;
-        padding: 0.42rem 0.85rem !important;
+        gap: 0.32rem !important;
+        padding: 0.32rem 0.7rem !important;
         border-radius: 9999px !important;
         background: var(--neo-bg, #f1f5f9) !important;
         border: 1px solid var(--neo-border) !important;
         color: var(--neo-text) !important;
-        font-size: 0.82rem !important;
+        font-size: 0.78rem !important;
         font-weight: 600 !important;
         white-space: nowrap !important;
         flex-shrink: 0 !important;
@@ -3053,58 +3032,88 @@ html[data-theme='dark'] .hero-control {
     }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
     .hero-carousel {
-        min-height: 400px;
-        margin-top: 1rem;
-        border-radius: 14px;
+        min-height: auto !important;
+        margin-top: 0.5rem !important;
+        border-radius: 12px !important;
     }
 
     .hero-slide {
         align-items: center;
-        padding: 1.5rem 1.25rem 4rem;
+        padding: 0.85rem 1rem 2.2rem !important;
     }
 
     .hero-slide-visual {
-        display: none;
+        display: none !important;
     }
 
     .hero-slide-content {
-        width: 100%;
-        max-width: 100%;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .hero-badge-wrap {
+        margin-bottom: 0.25rem !important;
+    }
+
+    .hero-eyebrow {
+        font-size: 0.72rem !important;
     }
 
     .hero-slide h2 {
-        font-size: 1.85rem;
+        font-size: 1.22rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 0.35rem !important;
     }
 
     .hero-desc {
-        display: -webkit-box;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-        line-clamp: 3;
+        display: -webkit-box !important;
+        overflow: hidden !important;
+        -webkit-box-orient: vertical !important;
+        -webkit-line-clamp: 2 !important;
+        line-clamp: 2 !important;
+        font-size: 0.8rem !important;
+        line-height: 1.35 !important;
+        margin-bottom: 0.45rem !important;
+    }
+
+    .hero-features {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.3rem !important;
+        margin-bottom: 0.55rem !important;
+    }
+
+    .hero-feature-pill {
+        font-size: 0.7rem !important;
+        padding: 2px 7px !important;
+    }
+
+    .hero-cta {
+        padding: 0.38rem 0.85rem !important;
+        font-size: 0.8rem !important;
     }
 
     .hero-control {
-        top: auto;
-        bottom: 14px;
-        width: 36px;
-        height: 36px;
-        transform: none;
-        font-size: 1.6rem;
+        top: auto !important;
+        bottom: 8px !important;
+        width: 28px !important;
+        height: 28px !important;
+        transform: none !important;
+        font-size: 1.2rem !important;
     }
 
     .hero-control-prev {
-        left: 14px;
+        left: 10px !important;
     }
 
     .hero-control-next {
-        right: 14px;
+        right: 10px !important;
     }
 
     .hero-dots {
-        bottom: 27px;
+        bottom: 15px !important;
     }
 
     .catalog-heading {
