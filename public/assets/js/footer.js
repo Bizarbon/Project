@@ -25,7 +25,7 @@
         const link = document.createElement('link');
         link.id = 'cellphonesFooterCss';
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/cellphones-footer.css?v=20260914-3`;
+        link.href = `${root}assets/css/cellphones-footer.css?v=mobile-footer-20260917-1`;
         document.head.appendChild(link);
     }
 

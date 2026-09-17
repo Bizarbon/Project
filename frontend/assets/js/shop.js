@@ -1241,10 +1241,15 @@ function cartItemCount() {
 
 function updateCartBadge() {
     const headerBadge = document.getElementById('headerCartBadge');
+    const bottomBadge = document.getElementById('bottomNavCartBadge');
     const count = cartItemCount();
     if (headerBadge) {
         headerBadge.textContent = count;
         headerBadge.hidden = count < 1;
+    }
+    if (bottomBadge) {
+        bottomBadge.textContent = count;
+        bottomBadge.hidden = count < 1;
     }
 }
 
@@ -1720,6 +1725,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (pageParams.get('openAddress') === '1') {
         document.getElementById('headerLocationToggle')?.click();
     }
+    document.getElementById('bottomNavCategoryBtn')?.addEventListener('click', () => {
+        document.getElementById('storefrontCategories')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.getElementById('bottomNavStoreBtn')?.addEventListener('click', () => {
+        document.getElementById('headerLocationToggle')?.click();
+    });
     setupPromoCarousel();
     document.querySelectorAll('[data-product-filter]').forEach(el => {
         el.addEventListener('input', renderProducts);

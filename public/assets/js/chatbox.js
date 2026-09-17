@@ -27,7 +27,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=mobile-opt-20260917-4`;
+        link.href = `${root}assets/css/chatbox.css?v=mobile-opt-20260917-6`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }

@@ -513,16 +513,172 @@ html[data-theme='dark'] .cps-back-to-top {
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .cps-footer-main {
-        grid-template-columns: 1fr;
-        padding: 2rem 1rem;
-        gap: 1.75rem;
+        grid-template-columns: 1fr 1fr;
+        padding: 1.5rem 1rem 1.25rem;
+        gap: 1.5rem 1rem;
+    }
+
+    .cps-col-brand {
+        grid-column: 1 / -1;
+        gap: 0.75rem;
+    }
+
+    .cps-footer-brand-title {
+        font-size: 1.22rem;
+    }
+
+    .cps-brand-desc {
+        font-size: 0.78rem;
+        line-height: 1.45;
+        margin: 0;
+    }
+
+    .cps-social-list {
+        gap: 0.5rem;
+    }
+
+    .cps-social-list img {
+        width: 26px;
+        height: 26px;
+    }
+
+    .cps-payment-wrap {
+        margin-top: 0.15rem;
+    }
+
+    .cps-sub-title {
+        font-size: 0.75rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .cps-payment-grid {
+        gap: 0.35rem;
+    }
+
+    .cps-payment-grid li {
+        height: 28px;
+        min-width: 42px;
+        padding: 2px 4px;
+    }
+
+    .cps-payment-grid img {
+        max-height: 18px;
+        max-width: 36px;
+    }
+
+    .cps-cert-badge img {
+        height: 28px;
+    }
+
+    /* Columns 2 & 3: Chức năng and Hỗ trợ & Chính sách sit side by side */
+    .site-footer.cps-footer .cps-footer-title {
+        font-size: 0.82rem;
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.01em;
+    }
+
+    .site-footer.cps-footer .cps-nav-list {
+        gap: 0.45rem;
+        font-size: 0.76rem;
+    }
+
+    .site-footer.cps-footer .cps-nav-list a {
+        display: block;
+        padding: 2px 0;
+    }
+
+    /* Column 4: Contact spans full width */
+    .cps-col-contact {
+        grid-column: 1 / -1;
+        gap: 0.75rem;
+    }
+
+    /* 2 hotline cards side by side like CellphoneS */
+    .cps-hotline-list {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem !important;
+    }
+
+    .cps-hotline-list li {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.45rem 0.5rem;
+        font-size: 0.74rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    html[data-theme='dark'] .cps-hotline-list li {
+        background: #131c2e;
+        border-color: #1e293b;
+    }
+
+    .cps-address-list {
+        font-size: 0.76rem;
+        gap: 0.35rem;
+        line-height: 1.4;
+    }
+
+    .cps-newsletter-compact {
+        padding: 0.65rem 0.75rem !important;
+        border-radius: 8px !important;
+    }
+
+    .cps-newsletter-heading {
+        font-size: 0.75rem !important;
+        margin-bottom: 0.35rem !important;
+    }
+
+    .cps-compact-input-wrap {
+        gap: 0.4rem !important;
+    }
+
+    .cps-compact-input-wrap input {
+        height: 34px !important;
+        font-size: 0.78rem !important;
+        padding: 0 0.65rem !important;
+    }
+
+    .cps-compact-input-wrap button {
+        height: 34px !important;
+        font-size: 0.76rem !important;
+        padding: 0 0.85rem !important;
+    }
+
+    /* Bottom footer clearance above 54px bottom navigation bar */
+    .cps-footer-bottom {
+        padding: 1rem 1rem calc(54px + 1.25rem) 1rem !important;
     }
 
     .cps-bottom-container {
-        flex-direction: column;
-        text-align: center;
-        justify-content: center;
+        flex-direction: column !important;
+        text-align: center !important;
+        gap: 0.65rem !important;
+    }
+
+    .cps-copyright {
+        font-size: 0.74rem;
+    }
+
+    .cps-bottom-nav {
+        justify-content: center !important;
+        gap: 0.5rem !important;
+        font-size: 0.74rem;
+    }
+
+    .cps-back-to-top {
+        margin-left: 0 !important;
+        font-size: 0.72rem;
+        padding: 3px 8px;
     }
 }
+

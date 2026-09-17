@@ -13,8 +13,8 @@
     <meta property="og:description" content="Khám phá sản phẩm công nghệ chính hãng, so sánh cấu hình và mua sắm trực tuyến thuận tiện." />
     <meta property="og:url" content="https://techecommerce-shop.vercel.app/" />
     <title>TechEcommerce - Cửa hàng công nghệ</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=mobile-opt-20260917-4" />
-    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=mobile-opt-20260917-4" />
+    <link rel="stylesheet" href="assets/css/style.css?v=mobile-opt-20260917-6" />
+    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=mobile-opt-20260917-6" />
     <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-cost-20260722-1" />
     <style>
       .cart-drawer[aria-hidden='true'] {
@@ -341,19 +341,6 @@
           </nav>
         </div>
       </section>
-
-      <nav class="header-categories" aria-label="Danh mục sản phẩm">
-        <ul class="header-shell header-category-list">
-          <li><button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản phẩm</button></li>
-          <li><button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện thoại</button></li>
-          <li><button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg" alt="" />Laptop</button></li>
-          <li><button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg" alt="" />Tablet</button></li>
-          <li><button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai nghe</button></li>
-          <li><button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg" alt="" />Đồng hồ thông minh</button></li>
-          <li><button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ kiện</button></li>
-          <li><button type="button" data-header-category="Máy chơi game"><img src="assets/icons/gaming.svg" alt="" />Máy chơi game</button></li>
-        </ul>
-      </nav>
     </header>
 
     <aside class="address-modal" id="addressModal" role="dialog" aria-modal="true" aria-labelledby="addressModalTitle" aria-hidden="true" inert>
@@ -557,6 +544,20 @@
           <button class="hero-dot" type="button" data-carousel-slide="2" aria-label="Ảnh 3" aria-current="false"></button>
         </div>
       </section>
+
+      <!-- Category Navigation: CellphoneS Style below Banner -->
+      <nav class="header-categories" id="storefrontCategories" aria-label="Danh mục sản phẩm">
+        <ul class="header-shell header-category-list">
+          <li><button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản phẩm</button></li>
+          <li><button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện thoại</button></li>
+          <li><button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg" alt="" />Laptop</button></li>
+          <li><button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg" alt="" />Tablet</button></li>
+          <li><button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai nghe</button></li>
+          <li><button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg" alt="" />Đồng hồ thông minh</button></li>
+          <li><button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ kiện</button></li>
+          <li><button type="button" data-header-category="Máy chơi game"><img src="assets/icons/gaming.svg" alt="" />Máy chơi game</button></li>
+        </ul>
+      </nav>
 
       <section
         class="stats-grid reveal"
@@ -872,8 +873,35 @@
 
     <footer id="site-footer"></footer>
 
-    <script src="assets/js/shop.js?v=category-sync-20260916-2"></script>
-    <script src="assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="assets/js/chatbox.js?v=compact-center-20260916-2"></script>
+    <!-- CellphoneS Style Mobile Bottom Navigation Bar -->
+    <nav class="cps-bottom-nav-bar" id="cpsBottomNavBar" aria-label="Thanh điều hướng ứng dụng">
+      <a href="index.html" class="cps-nav-item is-active" aria-label="Trang chủ">
+        <svg class="cps-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="cps-nav-label">Trang chủ</span>
+      </a>
+      <button type="button" class="cps-nav-item" id="bottomNavCategoryBtn" aria-label="Danh mục">
+        <svg class="cps-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span class="cps-nav-label">Danh mục</span>
+      </button>
+      <button type="button" class="cps-nav-item" id="bottomNavStoreBtn" aria-label="Cửa hàng">
+        <svg class="cps-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+        <span class="cps-nav-label">Cửa hàng</span>
+      </button>
+      <button type="button" class="cps-nav-item" id="bottomNavCartBtn" onclick="toggleCartDrawer()" aria-label="Giỏ hàng">
+        <span class="cps-nav-icon-wrap">
+          <svg class="cps-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cps-nav-badge" id="bottomNavCartBadge" hidden>0</span>
+        </span>
+        <span class="cps-nav-label">Giỏ hàng</span>
+      </button>
+      <a href="pages/account/profile.html" class="cps-nav-item" id="bottomNavAccountBtn" aria-label="Tài khoản">
+        <svg class="cps-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="cps-nav-label">Tài khoản</span>
+      </a>
+    </nav>
+
+    <script src="assets/js/shop.js?v=mobile-opt-20260917-6"></script>
+    <script src="assets/js/footer.js?v=mobile-opt-20260917-6"></script>
+    <script src="assets/js/chatbox.js?v=mobile-opt-20260917-6"></script>
   </body>
 </html>
