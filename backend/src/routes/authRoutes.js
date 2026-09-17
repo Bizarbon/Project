@@ -201,6 +201,119 @@ router.post('/login', [
     }
 });
 
+// POST social-login (Google, Zalo)
+router.post('/social-login', [
+    body('provider').isIn(['google', 'zalo']).withMessage('Phương thức đăng nhập không hợp lệ')
+], async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ message: errors.array()[0].msg });
+
+        let { provider, email, phone, name, avatar, credential } = req.body;
+
+        // Decode Google GIS credential token if passed
+        if (provider === 'google' && credential) {
+            try {
+                const parts = String(credential).split('.');
+                if (parts.length === 3) {
+                    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+                    if (payload.email) {
+                        email = payload.email;
+                        name = payload.name || name;
+                        avatar = payload.picture || avatar;
+                    }
+                }
+            } catch (e) {
+                console.warn('Cannot decode Google credential token:', e.message);
+            }
+        }
+
+        email = String(email || '').trim().toLowerCase();
+        name = String(name || '').trim();
+        const normalizedPhone = phone ? normalizeVietnamPhone(phone) : null;
+        const phoneLocal = normalizedPhone?.local || '';
+
+        let customer = null;
+
+        if (provider === 'google') {
+            if (!email) {
+                return res.status(400).json({ message: 'Vui lòng cung cấp email Google để đăng nhập.' });
+            }
+            customer = await Customer.findOne({ email });
+            if (!customer && phoneLocal) {
+                customer = await Customer.findOne({ phone: { $in: phoneVariants(phoneLocal) } });
+            }
+            if (!customer) {
+                const emailPrefix = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').toLowerCase().slice(0, 20) || 'google_user';
+                let username = emailPrefix.length >= 3 ? emailPrefix : `gg_${emailPrefix}`;
+                let count = 1;
+                while (await Customer.findOne({ username })) {
+                    username = `${emailPrefix.slice(0, 16)}_${count++}`;
+                }
+
+                const randomPassword = crypto.randomBytes(24).toString('hex');
+                customer = new Customer({
+                    name: name || email.split('@')[0] || 'Khách hàng Google',
+                    username,
+                    email,
+                    phone: phoneLocal || undefined,
+                    avatar: avatar || '',
+                    password: randomPassword
+                });
+                await customer.save();
+            }
+        } else if (provider === 'zalo') {
+            if (phoneLocal) {
+                customer = await Customer.findOne({ phone: { $in: phoneVariants(phoneLocal) } });
+            }
+            if (!customer && email) {
+                customer = await Customer.findOne({ email });
+            }
+            if (!customer) {
+                const phoneSeed = phoneLocal || Date.now().toString().slice(-6);
+                let username = `zalo_${phoneSeed}`;
+                let count = 1;
+                while (await Customer.findOne({ username })) {
+                    username = `zalo_${phoneSeed}_${count++}`;
+                }
+
+                const randomPassword = crypto.randomBytes(24).toString('hex');
+                customer = new Customer({
+                    name: name || (phoneLocal ? `Zalo ${phoneLocal}` : 'Khách hàng Zalo'),
+                    username,
+                    phone: phoneLocal || undefined,
+                    email: email || undefined,
+                    avatar: avatar || '',
+                    password: randomPassword
+                });
+                await customer.save();
+            }
+        }
+
+        if (customer) {
+            customer.loginAttempts = 0;
+            customer.lockUntil = null;
+            customer.lastLoginAt = new Date();
+            if (!customer.avatar && avatar) {
+                customer.avatar = avatar;
+            }
+            await customer.save({ validateBeforeSave: false });
+
+            return res.json({
+                message: `Đăng nhập ${provider === 'google' ? 'Google' : 'Zalo'} thành công!`,
+                token: signToken(customer),
+                user: publicUser(customer)
+            });
+        }
+
+        return res.status(400).json({ message: 'Không thể xử lý đăng nhập lúc này.' });
+    } catch (error) {
+        console.error('Social login error:', error);
+        res.status(500).json({ message: 'Lỗi hệ thống khi đăng nhập mạng xã hội.' });
+    }
+});
+
+
 router.post('/forgot-password', passwordResetLimiter, [
     body('phone')
         .trim()

@@ -27,7 +27,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=ai-chat-dock-20260916-1`;
+        link.href = `${root}assets/css/chatbox.css?v=mobile-opt-20260917-1`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }
@@ -49,7 +49,9 @@
             <aside class="ai-chat-panel" role="dialog" aria-label="Trợ lý tư vấn mua hàng">
                 <header class="ai-chat-header">
                     <div class="ai-chat-title">
-                        <div class="ai-chat-avatar">AI</div>
+                        <div class="ai-chat-avatar">
+                            <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="32" height="32" class="ai-avatar-img">
+                        </div>
                         <div>
                             <strong>AI tư vấn</strong>
                             <span id="aiChatStatus" role="status">Sẵn sàng hỗ trợ bạn</span>
@@ -74,14 +76,17 @@
                 </form>
             </aside>
             <button class="ai-chat-min-pill" type="button" aria-label="Mở lại AI tư vấn" title="Mở lại AI tư vấn">
-                <span class="ai-chat-min-avatar">AI</span>
+                <span class="ai-chat-min-avatar">
+                    <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="20" height="20" class="ai-avatar-img">
+                </span>
                 <span>AI tư vấn</span>
                 <span class="ai-chat-min-arrow" aria-hidden="true">▲</span>
             </button>
-            <button class="ai-chat-toggle" type="button" aria-label="Mở trợ lý tư vấn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m8-2a8 8 0 1 1-3.1-6.32L21 5l-1.04 3.05A7.97 7.97 0 0 1 21 12Z"></path>
-                </svg>
+            <button class="ai-chat-toggle" type="button" aria-label="Mở trợ lý tư vấn" title="Tư vấn mua sắm cùng AI">
+                <span class="ai-chat-toggle-icon" aria-hidden="true">
+                    <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="26" height="26" class="ai-toggle-avatar-img">
+                </span>
+                <span class="ai-chat-toggle-label">Tư vấn</span>
             </button>
         `;
         document.body.appendChild(chat);

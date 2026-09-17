@@ -33,7 +33,9 @@
             <section class="header-main" aria-label="Thanh công cụ mua sắm">
                 <div class="header-shell header-main-inner">
                     <a class="storefront-logo" href="${root}index.html" aria-label="TechEcommerce - Trang chủ">
-                        <span class="storefront-logo-mark">TE</span>
+                        <span class="storefront-logo-mark" aria-hidden="true">
+                            <img src="${root}assets/images/logo/techecommerce-logo.svg" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
+                        </span>
                         <span class="storefront-logo-text">TechEcommerce</span>
                     </a>
                     <form class="header-search" action="${root}index.html" method="get" role="search">

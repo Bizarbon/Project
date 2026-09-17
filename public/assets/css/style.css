@@ -1222,14 +1222,16 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 768px) {
-    nav {
+    body > nav:not(.header-actions):not(.header-categories):not(.storefront-header nav),
+    .main-nav {
         padding: 0.8rem 1rem;
         flex-direction: column;
         height: auto;
         gap: 0.8rem;
     }
 
-    nav ul {
+    body > nav:not(.header-actions):not(.header-categories) ul,
+    .main-nav ul {
         gap: 0.25rem;
         flex-wrap: wrap;
         justify-content: center;

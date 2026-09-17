@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title id="oauthPageTitle">Đăng nhập - Tài khoản Google</title>
+    <meta name="description" content="Đăng nhập tài khoản nhanh chóng và an toàn qua Google hoặc Zalo để tiếp tục tại TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="icon" id="oauthFavicon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234285F4' d='M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z'/></svg>">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ==========================================================================
+           1. GOOGLE DARK THEME (accounts.google.com/v3/signin/accountchooser)
+           Matches Screenshot 1 Exactly
+           ========================================================================== */
+        body.theme-google {
+            background-color: #131314;
+            color: #e3e3e3;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 20px;
+        }
+
+        .google-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #202124;
+            overflow: hidden;
+            display: none;
+            z-index: 9999;
+        }
+
+        .google-progress-bar.active {
+            display: block;
+        }
+
+        .google-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 40%;
+            background: #8ab4f8;
+            animation: googleProgress 1.2s infinite ease-in-out;
+        }
+
+        @keyframes googleProgress {
+            0% { left: -40%; width: 40%; }
+            50% { left: 30%; width: 50%; }
+            100% { left: 100%; width: 30%; }
+        }
+
+        .google-main-wrap {
+            width: 100%;
+            max-width: 1040px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .google-card {
+            width: 100%;
+            background-color: #1e1f20;
+            border-radius: 28px;
+            padding: 40px 48px 44px;
+            box-sizing: border-box;
+        }
+
+        .google-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+
+        .google-card-header svg {
+            flex-shrink: 0;
+        }
+
+        .google-header-text {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #e3e3e3;
+            letter-spacing: 0.1px;
+        }
+
+        .google-card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 56px;
+            align-items: start;
+        }
+
+        /* Google Left Column */
+        .google-left-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .google-app-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #d70018;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(215, 0, 24, 0.4);
+        }
+
+        .google-title {
+            font-size: 2.25rem;
+            font-weight: 400;
+            color: #f2f2f2;
+            line-height: 1.2;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .google-subtitle {
+            font-size: 0.95rem;
+            color: #e3e3e3;
+            line-height: 1.45;
+        }
+
+        .google-subtitle a,
+        .google-subtitle span.app-link {
+            color: #8ab4f8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Google Right Column */
+        .google-right-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .google-acc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .google-acc-item {
+            border-bottom: 1px solid #36373a;
+        }
+
+        .google-acc-item:last-child {
+            border-bottom: none;
+        }
+
+        .google-acc-btn {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s ease;
+            font-family: inherit;
+        }
+
+        .google-acc-btn:hover,
+        .google-acc-btn:focus-visible {
+            background-color: #28292a;
+            outline: none;
+        }
+
+        .google-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .google-avatar.avatar-blue {
+            background-color: #0288d1;
+            color: #ffffff;
+        }
+
+        .google-avatar.avatar-gray {
+            background-color: #3c4043;
+            color: #9aa0a6;
+        }
+
+        .google-avatar.avatar-teal {
+            background-color: #00897b;
+            color: #ffffff;
+        }
+
+        .google-avatar.avatar-letter {
+            background-color: #424242;
+            color: #ffffff;
+        }
+
+        .google-avatar.avatar-outline {
+            background: transparent;
+            border: 1px solid #5f6368;
+            color: #c4c7c5;
+        }
+
+        .google-acc-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .google-acc-name {
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: #f2f2f2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .google-acc-email {
+            font-size: 0.8rem;
+            color: #9aa0a6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Custom Google Login Box */
+        .google-custom-box {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px 0;
+        }
+
+        .google-input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .google-input-wrap label {
+            font-size: 0.8rem;
+            color: #c4c7c5;
+        }
+
+        .google-input-field {
+            width: 100%;
+            height: 48px;
+            background: transparent;
+            border: 1px solid #5f6368;
+            border-radius: 4px;
+            color: #f2f2f2;
+            padding: 0 14px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .google-input-field:focus {
+            border-color: #8ab4f8;
+            box-shadow: 0 0 0 1px #8ab4f8;
+        }
+
+        .google-custom-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 14px;
+            margin-top: 8px;
+        }
+
+        .google-btn-cancel {
+            background: transparent;
+            border: none;
+            color: #8ab4f8;
+            font-size: 0.88rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .google-btn-submit {
+            background: #8ab4f8;
+            color: #041e49;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 24px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .google-btn-submit:hover {
+            background: #93bbf9;
+        }
+
+        .google-disclaimer {
+            font-size: 0.76rem;
+            color: #9aa0a6;
+            line-height: 1.45;
+            margin-top: 24px;
+        }
+
+        .google-disclaimer a {
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+
+        .google-disclaimer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Google Page Footer */
+        .google-page-footer {
+            width: 100%;
+            max-width: 1040px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            color: #9aa0a6;
+            padding: 0 4px;
+        }
+
+        .google-lang-select {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .google-footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .google-footer-links a {
+            color: #9aa0a6;
+            text-decoration: none;
+        }
+
+        .google-footer-links a:hover {
+            color: #e3e3e3;
+        }
+
+        /* ==========================================================================
+           2. ZALO LIGHT THEME (id.zalo.me/account/login)
+           Matches Screenshot 2 Exactly (Clean, Centered, No Extra Buttons)
+           ========================================================================== */
+        body.theme-zalo {
+            background: #eef5fe;
+            color: #0f172a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .zalo-main-wrap {
+            width: 100%;
+            max-width: 410px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .zalo-page-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .zalo-wordmark {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #0068FF;
+            letter-spacing: -0.5px;
+            line-height: 1;
+            margin-bottom: 14px;
+        }
+
+        .zalo-page-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 5px;
+        }
+
+        .zalo-page-subtitle {
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .zalo-card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .zalo-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .zalo-card-title {
+            flex: 1;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .zalo-menu-btn {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 4px 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .zalo-menu-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .zalo-card-body {
+            padding: 32px 24px 36px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Clean QR Frame identical to Screenshot 2 */
+        .zalo-qr-frame {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            background: #ffffff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .zalo-qr-frame:hover {
+            transform: scale(1.02);
+        }
+
+        .zalo-qr-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.92);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 8px;
+        }
+
+        .zalo-qr-overlay.active {
+            display: flex;
+        }
+
+        .zalo-spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #0068FF;
+            border-radius: 50%;
+            animation: zaloSpin 0.8s linear infinite;
+        }
+
+        @keyframes zaloSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Zalo Phone Form View (toggled via menu button) */
+        .zalo-phone-form {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            gap: 14px;
+            padding: 24px 20px;
+        }
+
+        .zalo-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .zalo-form-group label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .zalo-form-input {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .zalo-form-input:focus {
+            border-color: #0068FF;
+            box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.15);
+        }
+
+        .btn-zalo-submit {
+            width: 100%;
+            height: 44px;
+            background: #0068FF;
+            color: #ffffff;
+            font-size: 0.92rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            margin-top: 6px;
+        }
+
+        .btn-zalo-submit:hover {
+            background: #0056d6;
+        }
+
+        .zalo-status-msg {
+            font-size: 0.82rem;
+            text-align: center;
+            min-height: 18px;
+            width: 100%;
+            padding: 0 12px 14px;
+        }
+
+        .zalo-status-msg.error {
+            color: #dc2626;
+        }
+
+        .zalo-status-msg.success {
+            color: #16a34a;
+        }
+
+        /* Zalo Footer matching Screenshot 2: Tiếng Việt English */
+        .zalo-page-footer {
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.82rem;
+        }
+
+        .zalo-page-footer a {
+            color: #0068FF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .zalo-page-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ==========================================================================
+           3. RESPONSIVE BREAKPOINTS
+           ========================================================================== */
+        @media (max-width: 768px) {
+            .google-card {
+                padding: 28px 20px 32px;
+                border-radius: 20px;
+            }
+
+            .google-card-grid {
+                grid-template-columns: 1fr;
+                gap: 28px;
+            }
+
+            .google-title {
+                font-size: 1.75rem;
+            }
+
+            .google-page-footer {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="theme-google" id="oauthBody">
+    <!-- Google Top Loading Progress Line -->
+    <div class="google-progress-bar" id="googleProgressBar" aria-hidden="true"></div>
+
+    <!-- ==========================================================================
+         1. GOOGLE VIEW (accounts.google.com/v3/signin/accountchooser)
+         ========================================================================== -->
+    <main class="google-main-wrap" id="googleView" aria-label="Giao diện đăng nhập tài khoản Google">
+        <article class="google-card">
+            <!-- Header Google Icon -->
+            <header class="google-card-header">
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+                <span class="google-header-text">Đăng nhập bằng Google</span>
+            </header>
+
+            <!-- 2-Column Content Grid -->
+            <section class="google-card-grid">
+                <!-- Left Column -->
+                <section class="google-left-col">
+                    <figure class="google-app-logo" aria-label="Logo CellphoneS">
+                        <!-- Authentic CellphoneS 'S' Logo -->
+                        <svg viewBox="0 0 40 40" width="36" height="36" aria-hidden="true">
+                            <rect width="40" height="40" rx="8" fill="#d70018"/>
+                            <path fill="#ffffff" fill-rule="evenodd" d="M10 9h19a5 5 0 0 1 5 5v2a5 5 0 0 1-5 5h-10a2 2 0 0 0-2 2v2h17v5H15a5 5 0 0 1-5-5v-2a5 5 0 0 1 5-5h10a2 2 0 0 0 2-2v-2H10V9z"/>
+                        </svg>
+                    </figure>
+                    <h1 class="google-title">Chọn tài khoản</h1>
+                    <p class="google-subtitle">Tiếp tục tới <span class="app-link">CellphoneS Login</span></p>
+                </section>
+
+                <!-- Right Column: Account List -->
+                <section class="google-right-col">
+                    <ul class="google-acc-list" id="googleAccountList">
+                        <!-- Account 1: Long Vũ -->
+                        <li class="google-acc-item">
+                            <button type="button" class="google-acc-btn" data-email="vuphilong2k4@gmail.com" data-name="Long Vũ" aria-label="Đăng nhập tài khoản Long Vũ">
+                                <figure class="google-avatar avatar-blue">
+                                    <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+                                        <circle cx="20" cy="20" r="20" fill="#0288d1"/>
+                                        <circle cx="20" cy="15" r="7" fill="#ffe082"/>
+                                        <path fill="#ffffff" d="M8 34c0-6.627 5.373-12 12-12s12 5.373 12 12z"/>
+                                    </svg>
+                                </figure>
+                                <div class="google-acc-info">
+                                    <strong class="google-acc-name">Long Vũ</strong>
+                                    <span class="google-acc-email">vuphilong2k4@gmail.com</span>
+                                </div>
+                            </button>
+                        </li>
+
+                        <!-- Account 2: Golbal Ban -->
+                        <li class="google-acc-item">
+                            <button type="button" class="google-acc-btn" data-email="vuphilong2k4@gmail.com" data-name="Golbal Ban" aria-label="Đăng nhập tài khoản Golbal Ban">
+                                <figure class="google-avatar avatar-gray">
+                                    <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+                                        <circle cx="20" cy="20" r="20" fill="#3c4043"/>
+                                        <path fill="#9aa0a6" d="M20 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zm0 3c-5.33 0-16 2.67-16 8v3h32v-3c0-5.33-10.67-8-16-8z"/>
+                                    </svg>
+                                </figure>
+                                <div class="google-acc-info">
+                                    <strong class="google-acc-name">Golbal Ban</strong>
+                                    <span class="google-acc-email">vuphilong2k4@gmail.com</span>
+                                </div>
+                            </button>
+                        </li>
+
+                        <!-- Account 3: Long Phi -->
+                        <li class="google-acc-item">
+                            <button type="button" class="google-acc-btn" data-email="vuphiilong2k4@gmail.com" data-name="Long Phi" aria-label="Đăng nhập tài khoản Long Phi">
+                                <figure class="google-avatar avatar-teal">
+                                    <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+                                        <circle cx="20" cy="20" r="20" fill="#00897b"/>
+                                        <circle cx="20" cy="15" r="7" fill="#80deea"/>
+                                        <path fill="#ffffff" d="M8 34c0-6.627 5.373-12 12-12s12 5.373 12 12z"/>
+                                    </svg>
+                                </figure>
+                                <div class="google-acc-info">
+                                    <strong class="google-acc-name">Long Phi</strong>
+                                    <span class="google-acc-email">vuphiilong2k4@gmail.com</span>
+                                </div>
+                            </button>
+                        </li>
+
+                        <!-- Account 4: Linh Do -->
+                        <li class="google-acc-item">
+                            <button type="button" class="google-acc-btn" data-email="dothiailinh456@gmail.com" data-name="Linh Do" aria-label="Đăng nhập tài khoản Linh Do">
+                                <figure class="google-avatar avatar-letter">
+                                    <svg viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+                                        <circle cx="20" cy="20" r="20" fill="#424242"/>
+                                        <text x="20" y="26" fill="#ffffff" font-size="18" font-weight="500" text-anchor="middle" font-family="Roboto, sans-serif">L</text>
+                                    </svg>
+                                </figure>
+                                <div class="google-acc-info">
+                                    <strong class="google-acc-name">Linh Do</strong>
+                                    <span class="google-acc-email">dothiailinh456@gmail.com</span>
+                                </div>
+                            </button>
+                        </li>
+
+                        <!-- Account 5: Use another account -->
+                        <li class="google-acc-item">
+                            <button type="button" class="google-acc-btn" id="googleUseAnotherBtn" aria-label="Sử dụng một tài khoản khác">
+                                <figure class="google-avatar avatar-outline">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                </figure>
+                                <div class="google-acc-info">
+                                    <strong class="google-acc-name">Sử dụng một tài khoản khác</strong>
+                                </div>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Form nhập tài khoản khác (ẩn mặc định) -->
+                    <form class="google-custom-box" id="googleCustomBox" onsubmit="return false;">
+                        <p class="google-input-wrap">
+                            <label for="customGoogleEmail">Email Google của bạn</label>
+                            <input type="email" id="customGoogleEmail" class="google-input-field" placeholder="Email hoặc số điện thoại" required autocomplete="email">
+                        </p>
+                        <p class="google-input-wrap">
+                            <label for="customGoogleName">Tên hiển thị</label>
+                            <input type="text" id="customGoogleName" class="google-input-field" placeholder="Họ và tên">
+                        </p>
+                        <div class="google-custom-actions">
+                            <button type="button" class="google-btn-cancel" id="customGoogleCancelBtn">Hủy</button>
+                            <button type="submit" class="google-btn-submit" id="customGoogleSubmitBtn">Tiếp theo</button>
+                        </div>
+                    </form>
+
+                    <!-- Disclaimer matching Screenshot 1 -->
+                    <p class="google-disclaimer">
+                        Trước khi sử dụng <span style="color: #8ab4f8;">CellphoneS Login</span>, bạn có thể xem <a href="../legal/privacy.html" target="_blank">Chính sách quyền riêng tư</a> và <a href="../legal/terms.html" target="_blank">Điều khoản dịch vụ</a> của ứng dụng này.
+                    </p>
+                </section>
+            </section>
+        </article>
+
+        <!-- Footer matching Screenshot 1 -->
+        <footer class="google-page-footer">
+            <span class="google-lang-select" role="button" tabindex="0">Tiếng Việt &#x25BE;</span>
+            <nav class="google-footer-links" aria-label="Liên kết trợ giúp và điều khoản">
+                <a href="#">Trợ giúp</a>
+                <a href="#">Quyền riêng tư</a>
+                <a href="#">Điều khoản</a>
+            </nav>
+        </footer>
+    </main>
+
+    <!-- ==========================================================================
+         2. ZALO VIEW (id.zalo.me/account/login)
+         Matches Screenshot 2 Exactly
+         ========================================================================== -->
+    <main class="zalo-main-wrap" id="zaloView" aria-label="Giao diện đăng nhập tài khoản Zalo">
+        <header class="zalo-page-header">
+            <h1 class="zalo-wordmark">Zalo</h1>
+            <h2 class="zalo-page-title">Đăng nhập tài khoản Zalo</h2>
+            <p class="zalo-page-subtitle">để kết nối với ứng dụng CellphoneS App</p>
+        </header>
+
+        <article class="zalo-card">
+            <!-- Header inside card -->
+            <header class="zalo-card-header">
+                <h3 class="zalo-card-title" id="zaloCardHeaderTitle">Đăng nhập qua mã QR</h3>
+                <button type="button" class="zalo-menu-btn" id="zaloToggleModeBtn" aria-label="Đổi phương thức đăng nhập">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- QR Code Section - EXACTLY like Screenshot 2 (No extra buttons) -->
+            <section class="zalo-card-body" id="zaloQrSection">
+                <figure class="zalo-qr-frame" id="zaloQrFrame" role="button" tabindex="0" title="Bấm vào mã QR để đăng nhập ngay">
+                    <!-- Clean Authentic Zalo QR Code matching Screenshot 2 -->
+                    <svg viewBox="0 0 240 240" width="240" height="240" aria-label="Mã QR Zalo">
+                        <rect width="240" height="240" fill="#ffffff"/>
+                        <!-- Top-Left Finder -->
+                        <rect x="18" y="18" width="54" height="54" rx="8" fill="none" stroke="#0068FF" stroke-width="7"/>
+                        <rect x="31" y="31" width="28" height="28" rx="4" fill="#0068FF"/>
+                        <!-- Top-Right Finder -->
+                        <rect x="168" y="18" width="54" height="54" rx="8" fill="none" stroke="#0068FF" stroke-width="7"/>
+                        <rect x="181" y="31" width="28" height="28" rx="4" fill="#0068FF"/>
+                        <!-- Bottom-Left Finder -->
+                        <rect x="18" y="168" width="54" height="54" rx="8" fill="none" stroke="#0068FF" stroke-width="7"/>
+                        <rect x="31" y="181" width="28" height="28" rx="4" fill="#0068FF"/>
+
+                        <!-- QR Data Modules -->
+                        <g fill="#0f172a">
+                            <rect x="85" y="24" width="8" height="8"/>
+                            <rect x="101" y="24" width="8" height="8"/>
+                            <rect x="117" y="24" width="8" height="8"/>
+                            <rect x="133" y="24" width="8" height="8"/>
+                            <rect x="149" y="24" width="8" height="8"/>
+                            <rect x="24" y="85" width="8" height="8"/>
+                            <rect x="24" y="101" width="8" height="8"/>
+                            <rect x="24" y="117" width="8" height="8"/>
+                            <rect x="24" y="133" width="8" height="8"/>
+                            <rect x="24" y="149" width="8" height="8"/>
+
+                            <rect x="85" y="44" width="16" height="16"/>
+                            <rect x="117" y="44" width="8" height="8"/>
+                            <rect x="133" y="40" width="24" height="8"/>
+                            <rect x="44" y="85" width="16" height="16"/>
+                            <rect x="44" y="117" width="8" height="16"/>
+
+                            <rect x="85" y="85" width="16" height="16"/>
+                            <rect x="117" y="85" width="24" height="8"/>
+                            <rect x="149" y="85" width="16" height="24"/>
+                            <rect x="181" y="85" width="24" height="8"/>
+                            <rect x="213" y="85" width="8" height="8"/>
+
+                            <rect x="85" y="117" width="8" height="24"/>
+                            <rect x="101" y="125" width="24" height="16"/>
+                            <rect x="133" y="117" width="16" height="8"/>
+                            <rect x="157" y="125" width="8" height="24"/>
+                            <rect x="181" y="109" width="16" height="32"/>
+                            <rect x="205" y="117" width="24" height="16"/>
+
+                            <rect x="85" y="149" width="24" height="16"/>
+                            <rect x="117" y="149" width="16" height="24"/>
+                            <rect x="141" y="157" width="24" height="8"/>
+                            <rect x="173" y="149" width="32" height="16"/>
+                            <rect x="213" y="149" width="16" height="16"/>
+
+                            <rect x="85" y="181" width="16" height="32"/>
+                            <rect x="109" y="181" width="32" height="16"/>
+                            <rect x="149" y="181" width="24" height="16"/>
+                            <rect x="181" y="173" width="16" height="24"/>
+                            <rect x="205" y="181" width="24" height="16"/>
+
+                            <rect x="109" y="205" width="16" height="24"/>
+                            <rect x="133" y="205" width="24" height="16"/>
+                            <rect x="165" y="205" width="16" height="24"/>
+                            <rect x="189" y="205" width="24" height="16"/>
+                        </g>
+
+                        <!-- Center Zalo badge -->
+                        <rect x="98" y="98" width="44" height="44" rx="10" fill="#ffffff" stroke="#0068FF" stroke-width="2.5"/>
+                        <text x="120" y="125" fill="#0068FF" font-size="14" font-weight="bold" text-anchor="middle" font-family="'Inter', sans-serif">Zalo</text>
+                    </svg>
+
+                    <!-- Feedback spinner overlay when clicked -->
+                    <div class="zalo-qr-overlay" id="zaloQrOverlay">
+                        <div class="zalo-spinner"></div>
+                        <span style="font-size: 0.82rem; color: #0068FF; font-weight: 600;">Đang xác thực...</span>
+                    </div>
+                </figure>
+            </section>
+
+            <!-- Phone Section (toggled via menu icon) -->
+            <form class="zalo-phone-form" id="zaloPhoneSection" onsubmit="return false;">
+                <p class="zalo-form-group">
+                    <label for="zaloPhoneInput">Số điện thoại Zalo</label>
+                    <input type="tel" id="zaloPhoneInput" class="zalo-form-input" placeholder="Nhập số điện thoại" value="0842331606" required autocomplete="tel">
+                </p>
+                <p class="zalo-form-group">
+                    <label for="zaloNameInput">Tên tài khoản Zalo</label>
+                    <input type="text" id="zaloNameInput" class="zalo-form-input" placeholder="Tên của bạn" value="Long Vũ">
+                </p>
+                <button type="submit" class="btn-zalo-submit" id="zaloPhoneSubmitBtn">Đăng nhập với Zalo</button>
+            </form>
+
+            <output class="zalo-status-msg" id="zaloStatusMsg" role="status" aria-live="polite"></output>
+        </article>
+
+        <!-- Zalo Footer matching Screenshot 2: Tiếng Việt English -->
+        <footer class="zalo-page-footer">
+            <a href="#">Tiếng Việt</a>
+            <a href="#">English</a>
+        </footer>
+    </main>
+
+    <script>
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const provider = (params.get('provider') || 'google').toLowerCase();
+            const prefill = params.get('prefill') || '';
+            const returnUrl = params.get('returnUrl') || '../../index.html';
+
+            const oauthBody = document.getElementById('oauthBody');
+            const pageTitle = document.getElementById('oauthPageTitle');
+            const favicon = document.getElementById('oauthFavicon');
+            const googleView = document.getElementById('googleView');
+            const zaloView = document.getElementById('zaloView');
+            const googleProgressBar = document.getElementById('googleProgressBar');
+
+            // API Endpoint resolving
+            const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1']);
+            const STATIC_DEV_PORTS = new Set(['5500', '5501']);
+            const API_URL = LOCAL_HOSTS.has(window.location.hostname) && STATIC_DEV_PORTS.has(window.location.port)
+                ? 'http://localhost:5000/api'
+                : `${window.location.origin}/api`;
+
+            async function performSocialLogin(payload) {
+                const response = await fetch(`${API_URL}/auth/social-login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Lỗi xác thực đăng nhập.');
+                return data;
+            }
+
+            function handleAuthComplete(data) {
+                // Save auth tokens in localStorage
+                if (data.token) localStorage.setItem('token', data.token);
+                if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+
+                // Send postMessage if opened as popup
+                if (window.opener && !window.opener.closed) {
+                    try {
+                        window.opener.postMessage({
+                            type: 'SOCIAL_AUTH_SUCCESS',
+                            token: data.token,
+                            user: data.user,
+                            message: data.message
+                        }, window.location.origin);
+                    } catch (e) {
+                        console.warn('postMessage error:', e);
+                    }
+                    window.setTimeout(() => window.close(), 350);
+                } else {
+                    // Direct navigation redirect to index.html or admin dashboard
+                    window.setTimeout(() => {
+                        window.location.href = data.user && data.user.isAdmin
+                            ? '../../admin/products.html'
+                            : '../../index.html';
+                    }, 400);
+                }
+            }
+
+            if (provider === 'google') {
+                // Configure Google View
+                oauthBody.className = 'theme-google';
+                pageTitle.textContent = 'Đăng nhập - Tài khoản Google';
+                favicon.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%234285F4' d='M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z'/></svg>";
+                googleView.style.display = 'flex';
+                zaloView.style.display = 'none';
+
+                // Handle click on existing Google accounts
+                document.querySelectorAll('.google-acc-btn[data-email]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const email = btn.dataset.email;
+                        const name = btn.dataset.name;
+                        googleProgressBar.classList.add('active');
+                        try {
+                            const data = await performSocialLogin({
+                                provider: 'google',
+                                email,
+                                name
+                            });
+                            handleAuthComplete(data);
+                        } catch (err) {
+                            alert(err.message);
+                            googleProgressBar.classList.remove('active');
+                        }
+                    });
+                });
+
+                // Handle "Sử dụng một tài khoản khác"
+                const googleAccountList = document.getElementById('googleAccountList');
+                const googleCustomBox = document.getElementById('googleCustomBox');
+                const googleUseAnotherBtn = document.getElementById('googleUseAnotherBtn');
+                const customGoogleCancelBtn = document.getElementById('customGoogleCancelBtn');
+                const customGoogleEmail = document.getElementById('customGoogleEmail');
+                const customGoogleName = document.getElementById('customGoogleName');
+
+                if (prefill && prefill.includes('@')) {
+                    customGoogleEmail.value = prefill;
+                }
+
+                googleUseAnotherBtn.addEventListener('click', () => {
+                    googleAccountList.style.display = 'none';
+                    googleCustomBox.style.display = 'flex';
+                    customGoogleEmail.focus();
+                });
+
+                customGoogleCancelBtn.addEventListener('click', () => {
+                    googleCustomBox.style.display = 'none';
+                    googleAccountList.style.display = 'flex';
+                });
+
+                googleCustomBox.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = customGoogleEmail.value.trim();
+                    const name = customGoogleName.value.trim() || email.split('@')[0];
+                    if (!email) {
+                        alert('Vui lòng nhập địa chỉ email Google.');
+                        return;
+                    }
+                    googleProgressBar.classList.add('active');
+                    try {
+                        const data = await performSocialLogin({
+                            provider: 'google',
+                            email,
+                            name
+                        });
+                        handleAuthComplete(data);
+                    } catch (err) {
+                        alert(err.message);
+                        googleProgressBar.classList.remove('active');
+                    }
+                });
+
+            } else {
+                // Configure Zalo View
+                oauthBody.className = 'theme-zalo';
+                pageTitle.textContent = 'Đăng nhập tài khoản Zalo';
+                favicon.href = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%230068FF' d='M24 4C12.95 4 4 12.95 4 24c0 3.96 1.15 7.66 3.14 10.78L5 43l8.6-2.14C16.54 42.6 20.14 44 24 44c11.05 0 20-8.95 20-20S35.05 4 24 4z'/></svg>";
+                googleView.style.display = 'none';
+                zaloView.style.display = 'flex';
+
+                const zaloQrSection = document.getElementById('zaloQrSection');
+                const zaloPhoneSection = document.getElementById('zaloPhoneSection');
+                const zaloToggleModeBtn = document.getElementById('zaloToggleModeBtn');
+                const zaloCardHeaderTitle = document.getElementById('zaloCardHeaderTitle');
+                const zaloStatusMsg = document.getElementById('zaloStatusMsg');
+                const zaloPhoneInput = document.getElementById('zaloPhoneInput');
+                const zaloNameInput = document.getElementById('zaloNameInput');
+                const zaloQrOverlay = document.getElementById('zaloQrOverlay');
+
+                if (prefill && /^\d+$/.test(prefill)) {
+                    zaloPhoneInput.value = prefill;
+                }
+
+                let isPhoneMode = false;
+                zaloToggleModeBtn.addEventListener('click', () => {
+                    isPhoneMode = !isPhoneMode;
+                    if (isPhoneMode) {
+                        zaloQrSection.style.display = 'none';
+                        zaloPhoneSection.style.display = 'flex';
+                        zaloCardHeaderTitle.textContent = 'Đăng nhập với số điện thoại';
+                        zaloPhoneInput.focus();
+                    } else {
+                        zaloQrSection.style.display = 'flex';
+                        zaloPhoneSection.style.display = 'none';
+                        zaloCardHeaderTitle.textContent = 'Đăng nhập qua mã QR';
+                    }
+                });
+
+                async function submitZaloAuth(phone, name) {
+                    if (zaloQrOverlay) zaloQrOverlay.classList.add('active');
+                    zaloStatusMsg.className = 'zalo-status-msg';
+                    zaloStatusMsg.textContent = 'Đang xác thực tài khoản Zalo...';
+                    try {
+                        const data = await performSocialLogin({
+                            provider: 'zalo',
+                            phone: phone || '0842331606',
+                            name: name || 'Long Vũ'
+                        });
+                        zaloStatusMsg.className = 'zalo-status-msg success';
+                        zaloStatusMsg.textContent = 'Đăng nhập thành công! Đang chuyển hướng...';
+                        handleAuthComplete(data);
+                    } catch (err) {
+                        if (zaloQrOverlay) zaloQrOverlay.classList.remove('active');
+                        zaloStatusMsg.className = 'zalo-status-msg error';
+                        zaloStatusMsg.textContent = err.message;
+                    }
+                }
+
+                // Click on QR code directly to simulate scan
+                document.getElementById('zaloQrFrame').addEventListener('click', () => {
+                    submitZaloAuth('0842331606', 'Long Vũ');
+                });
+
+                zaloPhoneSection.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const phone = zaloPhoneInput.value.trim();
+                    const name = zaloNameInput.value.trim() || 'Khách hàng Zalo';
+                    submitZaloAuth(phone, name);
+                });
+            }
+        })();
+    </script>
+</body>
+
+</html>

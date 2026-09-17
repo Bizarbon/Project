@@ -456,10 +456,56 @@
         });
     }
 
+    function initializeSocialAuth() {
+        const socialButtons = document.querySelectorAll('[data-social-provider], .btn-social-card');
+        if (socialButtons.length === 0) return;
+
+        // Listen for successful authentication from OAuth popup window
+        window.addEventListener('message', event => {
+            if (event.origin !== window.location.origin) return;
+            if (event.data && event.data.type === 'SOCIAL_AUTH_SUCCESS') {
+                const { token, user, message } = event.data;
+                setStatus(message || 'Đăng nhập thành công! Đang chuyển hướng…', 'success');
+                if (window.auth && typeof auth.saveAuth === 'function') {
+                    auth.saveAuth(token, user);
+                }
+                window.setTimeout(() => {
+                    window.location.href = user.isAdmin
+                        ? '../../admin/products.html'
+                        : '../../index.html';
+                }, 400);
+            }
+        });
+
+        function openOAuth(provider) {
+            const identifierInput = document.getElementById('identifier')?.value.trim()
+                || document.getElementById('email')?.value.trim()
+                || document.getElementById('phone')?.value.trim()
+                || '';
+
+            const returnUrl = encodeURIComponent(window.location.pathname.includes('register') ? 'register.html' : 'login.html');
+            const targetUrl = `oauth-popup.html?provider=${encodeURIComponent(provider)}&prefill=${encodeURIComponent(identifierInput)}&returnUrl=${returnUrl}`;
+
+            // Chuyển hướng trực tiếp đến trang OAuth giống như CellphoneS
+            window.location.href = targetUrl;
+        }
+
+        socialButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const provider = btn.dataset.socialProvider
+                    || ((btn.getAttribute('aria-label') || '').toLowerCase().includes('google') || btn.textContent.toLowerCase().includes('google') ? 'google' : 'zalo');
+
+                openOAuth(provider);
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         initializeStorefrontContext();
         initializePasswordToggles();
         initializeTouchedValidation();
+        initializeSocialAuth();
 
         if (page === 'login') initializeLogin();
         if (page === 'register') initializeRegister();

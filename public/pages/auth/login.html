@@ -137,14 +137,14 @@
                             <p class="auth-divider-cellphones"><span>Hoặc đăng nhập bằng</span></p>
 
                             <nav class="auth-social-row" aria-label="Đăng nhập bằng mạng xã hội">
-                                <button type="button" class="btn-social-card" aria-label="Đăng nhập nhanh với Google">
+                                <a href="oauth-popup.html?provider=google" class="btn-social-card" data-social-provider="google" id="btnGoogleAuth" aria-label="Đăng nhập nhanh với Google">
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
                                     <span>Google</span>
-                                </button>
-                                <button type="button" class="btn-social-card" aria-label="Đăng nhập nhanh với Zalo">
+                                </a>
+                                <a href="oauth-popup.html?provider=zalo" class="btn-social-card" data-social-provider="zalo" id="btnZaloAuth" aria-label="Đăng nhập nhanh với Zalo">
                                     <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#0068FF" d="M24 4C12.95 4 4 12.95 4 24c0 3.96 1.15 7.66 3.14 10.78L5 43l8.6-2.14C16.54 42.6 20.14 44 24 44c11.05 0 20-8.95 20-20S35.05 4 24 4z"/><path fill="#FFF" d="M24 10c-7.73 0-14 6.27-14 14 0 2.87.87 5.54 2.37 7.78L11 37l5.42-1.35C18.66 36.43 21.23 37 24 37c7.73 0 14-6.27 14-14s-6.27-14-14-14zm-5.5 8h11v2.5l-6.8 8h6.8V31h-11v-2.5l6.8-8h-6.8V18z"/></svg>
                                     <span>Zalo</span>
-                                </button>
+                                </a>
                             </nav>
 
                             <p class="auth-switch-cellphones">Bạn chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>
@@ -160,7 +160,7 @@
     </main>
 
     <script src="../../assets/js/auth.js?v=account-ui-20260711-1"></script>
-    <script src="../../assets/js/auth-flow.js?v=auth-flow-20260914-1"></script>
+    <script src="../../assets/js/auth-flow.js?v=auth-flow-20260916-2"></script>
 </body>
 
 </html>

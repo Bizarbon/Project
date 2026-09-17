@@ -5,18 +5,18 @@ const uniformCatalog = require('../data/uniformCatalog');
 let syncPromise = null;
 
 async function syncUniformCatalog({ force = false } = {}) {
-    const marker = await Product.findOne({ sku: 'TECH-00001' });
     const count = await Product.countDocuments();
 
-    if (!force && marker && count >= 55) {
+    // Nếu cơ sở dữ liệu đã có sản phẩm và không yêu cầu cưỡng chế (force: true), giữ nguyên dữ liệu
+    if (!force && count > 0) {
         return {
             synced: false,
-            message: 'Catalog đã chuẩn hóa và đầy đủ.',
+            message: 'Catalog đã có dữ liệu sản phẩm.',
             count
         };
     }
 
-    console.log(`[CatalogSync] Cần đồng bộ catalog. Hiện tại: ${count} sản phẩm. Đang cập nhật 55 sản phẩm chuẩn...`);
+    console.log(`[CatalogSync] Khởi tạo catalog sản phẩm mẫu (force=${force}, count=${count}). Đang nạp ${uniformCatalog.length} sản phẩm chuẩn...`);
 
     // Chuẩn bị 55 sản phẩm với _id và sku chuẩn
     const productsToInsert = uniformCatalog.map((item, index) => {

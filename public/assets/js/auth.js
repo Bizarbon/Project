@@ -175,6 +175,10 @@ function updateThemeToggle() {
 
 function renderThemeToggle() {
     if (document.getElementById('themeToggle')) return;
+    const path = window.location.pathname.replace(/\\/g, '/');
+    if (path.includes('/pages/auth/') || document.body.classList.contains('auth-cellphones-body') || document.querySelector('[data-auth-page]')) {
+        return;
+    }
     const button = document.createElement('button');
     button.id = 'themeToggle';
     button.className = 'theme-toggle';

@@ -344,6 +344,7 @@ async function loadProducts() {
 }
 
 function renderCategoryNav() {
+    updateHeaderCategoryState();
     const rawCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
     const categories = rawCategories.sort((a, b) => {
         const idxA = CANONICAL_CATEGORY_ORDER.indexOf(a);
@@ -371,23 +372,27 @@ function renderCategoryNav() {
     nav.querySelectorAll('[data-category]').forEach(button => {
         button.addEventListener('click', () => setCategory(button.dataset.category));
     });
-    updateHeaderCategoryState();
 }
 
 function updateHeaderCategoryState() {
-    document.querySelectorAll('[data-header-category]').forEach(button => {
-        const isActive = button.dataset.headerCategory === activeCategory;
+    const rawActive = activeCategory || new URLSearchParams(window.location.search).get('category') || 'all';
+    const normalizedActive = String(rawActive).trim().toLowerCase();
+
+    document.querySelectorAll('.header-categories [data-header-category]').forEach(button => {
+        const cat = String(button.dataset.headerCategory || '').trim().toLowerCase();
+        const isActive = cat === normalizedActive || (cat === 'all' && (normalizedActive === 'all' || !normalizedActive));
         button.classList.toggle('active', isActive);
         button.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
 }
 
 function setCategory(category, options = {}) {
-    activeCategory = category;
+    activeCategory = category || 'all';
     const url = new URL(window.location.href);
-    if (category === 'all') url.searchParams.delete('category');
+    if (!category || category === 'all') url.searchParams.delete('category');
     else url.searchParams.set('category', category);
     window.history.replaceState({}, '', url);
+    updateHeaderCategoryState();
     renderCategoryNav();
     renderProducts();
 
@@ -1727,6 +1732,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.addEventListener('shopping-address-change', async () => {
         await applySavedAddressToCheckout();
         refreshShippingQuote(checkoutAddressValue());
+    });
+    window.addEventListener('popstate', () => {
+        activeCategory = new URLSearchParams(window.location.search).get('category') || 'all';
+        updateHeaderCategoryState();
+        renderProducts();
     });
 
     document.getElementById('customerSelectionGroup').style.display = auth.isAdmin() ? 'block' : 'none';

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <!-- Background subtle radial glow -->
+    <radialGradient id="teGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00D2FF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0052D4" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Main Shield Gradient -->
+    <linearGradient id="teHexGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0A0F1D"/>
+    </linearGradient>
+
+    <!-- Border Neon Gradient -->
+    <linearGradient id="teBorderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F2FE"/>
+      <stop offset="45%" stop-color="#4FACFE"/>
+      <stop offset="100%" stop-color="#0052D4"/>
+    </linearGradient>
+
+    <!-- Primary Logo Mark Gradient -->
+    <linearGradient id="teMarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="30%" stop-color="#E0F2FE"/>
+      <stop offset="70%" stop-color="#38BDF8"/>
+      <stop offset="100%" stop-color="#0284C7"/>
+    </linearGradient>
+
+    <!-- Accent Cyan Gradient -->
+    <linearGradient id="teAccentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F5D4"/>
+      <stop offset="100%" stop-color="#00BBF9"/>
+    </linearGradient>
+
+    <filter id="teDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0066FF" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Glow -->
+  <circle cx="50" cy="50" r="48" fill="url(#teGlow)"/>
+
+  <!-- Outer Rounded Hexagon / Shield Base -->
+  <path d="M50 6 L88 27 L88 73 L50 94 L12 73 L12 27 Z" 
+        fill="url(#teHexGrad)" 
+        stroke="url(#teBorderGrad)" 
+        stroke-width="3" 
+        stroke-linejoin="round"
+        filter="url(#teDropShadow)"/>
+
+  <!-- Subtle Circuit Track Lines -->
+  <path d="M22 34 L32 34 L38 40 L38 52" stroke="#38BDF8" stroke-width="1.5" stroke-opacity="0.35" stroke-linecap="round" fill="none"/>
+  <circle cx="22" cy="34" r="2" fill="#00F5D4" opacity="0.6"/>
+
+  <path d="M78 66 L68 66 L62 60 L62 48" stroke="#38BDF8" stroke-width="1.5" stroke-opacity="0.35" stroke-linecap="round" fill="none"/>
+  <circle cx="78" cy="66" r="2" fill="#00F5D4" opacity="0.6"/>
+
+  <!-- Stylized Modern "T" and "E" Monogram -->
+  <!-- "T" Top Bar -->
+  <path d="M26 28 L74 28 C76.2 28 78 29.8 78 32 L78 36 C78 37.1 77.1 38 76 38 L57 38 L57 74 C57 76.2 55.2 78 53 78 L47 78 C44.8 78 43 76.2 43 74 L43 38 L24 38 C22.9 38 22 37.1 22 36 L22 32 C22 29.8 23.8 28 26 28 Z" 
+        fill="url(#teMarkGrad)"/>
+
+  <!-- "E" Tech Accent Wings on the right side -->
+  <!-- Upper E Bar -->
+  <path d="M59 42 L72 42 C73.7 42 75 43.3 75 45 L75 47 C75 48.7 73.7 50 72 50 L59 50 Z" 
+        fill="url(#teAccentGrad)"/>
+
+  <!-- Middle E Bar (Slightly shorter, cyber angled) -->
+  <path d="M59 54 L68 54 C69.7 54 71 55.3 71 57 L71 59 C71 60.7 69.7 62 68 62 L59 62 Z" 
+        fill="url(#teAccentGrad)"/>
+
+  <!-- Lower E Bar -->
+  <path d="M59 66 L72 66 C73.7 66 75 67.3 75 69 L75 71 C75 72.7 73.7 74 72 74 L59 74 Z" 
+        fill="url(#teAccentGrad)"/>
+
+  <!-- Center Glowing Energy Core -->
+  <circle cx="50" cy="38" r="3" fill="#00F5D4"/>
+  <circle cx="50" cy="38" r="1.5" fill="#FFFFFF"/>
+</svg>

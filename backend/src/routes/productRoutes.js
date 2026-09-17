@@ -228,10 +228,13 @@ router.get('/', async (req, res) => {
 });
 
 // GET product by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id).populate('supplier', 'name');
-        if (!product || product.active === false) return res.status(404).json({ message: 'Product not found' });
+        const id = isNaN(req.params.id) ? req.params.id : Number(req.params.id);
+        const product = await Product.findById(id).populate('supplier', 'name');
+        if (!product || (!req.user?.isAdmin && product.active === false)) {
+            return res.status(404).json({ message: 'Không tìm thấy sản phẩm!' });
+        }
         res.json(product);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -243,9 +246,9 @@ router.post('/', protect, admin, async (req, res) => {
     try {
         const payload = await normalizeProductPayload(req.body);
         const existing = await Product.findOne({ name: payload.name });
-        if (existing) return res.status(400).json({ message: 'Đã có sản phẩm này!' });
+        if (existing) return res.status(400).json({ message: 'Tên sản phẩm này đã tồn tại!' });
         if (payload.sku && await Product.findOne({ sku: payload.sku })) {
-            return res.status(400).json({ message: 'SKU đã tồn tại!' });
+            return res.status(400).json({ message: 'Mã SKU này đã tồn tại!' });
         }
 
         const newProduct = await new Product(payload).save();
@@ -258,15 +261,16 @@ router.post('/', protect, admin, async (req, res) => {
 // PUT update product (Admin only)
 router.put('/:id', protect, admin, async (req, res) => {
     try {
-        const current = await Product.findById(req.params.id);
-        if (!current) return res.status(404).json({ message: 'Product not found' });
+        const id = isNaN(req.params.id) ? req.params.id : Number(req.params.id);
+        const current = await Product.findById(id);
+        if (!current) return res.status(404).json({ message: 'Không tìm thấy sản phẩm cần cập nhật!' });
 
         const payload = await normalizeProductPayload(req.body, current);
-        const duplicateName = await Product.findOne({ name: payload.name, _id: { $ne: Number(req.params.id) } });
-        if (duplicateName) return res.status(400).json({ message: 'Đã có sản phẩm này!' });
+        const duplicateName = await Product.findOne({ name: payload.name, _id: { $ne: id } });
+        if (duplicateName) return res.status(400).json({ message: 'Tên sản phẩm này đã được sử dụng!' });
         if (payload.sku) {
-            const duplicateSku = await Product.findOne({ sku: payload.sku, _id: { $ne: Number(req.params.id) } });
-            if (duplicateSku) return res.status(400).json({ message: 'SKU đã tồn tại!' });
+            const duplicateSku = await Product.findOne({ sku: payload.sku, _id: { $ne: id } });
+            if (duplicateSku) return res.status(400).json({ message: 'Mã SKU này đã tồn tại!' });
         }
 
         Object.keys(payload).forEach(key => {
@@ -282,10 +286,11 @@ router.put('/:id', protect, admin, async (req, res) => {
 // DELETE product (Admin only)
 router.delete('/:id', protect, admin, async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
-        if (!product) return res.status(404).json({ message: 'Product not found' });
-        await Product.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Product deleted successfully', deletedId: req.params.id });
+        const id = isNaN(req.params.id) ? req.params.id : Number(req.params.id);
+        const product = await Product.findById(id);
+        if (!product) return res.status(404).json({ message: 'Không tìm thấy sản phẩm để xóa!' });
+        await Product.findByIdAndDelete(id);
+        res.json({ message: 'Đã xóa sản phẩm thành công!', deletedId: id });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

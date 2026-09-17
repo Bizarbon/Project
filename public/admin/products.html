@@ -39,6 +39,10 @@
         </header>
 
         <section class="form-section glass-card reveal">
+            <div id="editingNotice" class="editing-notice" style="display: none;">
+                <span>✏️ Đang chỉnh sửa sản phẩm: <strong id="editingProductName"></strong> (<code id="editingProductSku"></code>)</span>
+                <button type="button" class="btn-cancel-edit" onclick="resetForm()">✕ Hủy chỉnh sửa (Tạo mới)</button>
+            </div>
             <h2><span id="formTitle">Thêm sản phẩm mới</span></h2>
             <form id="productForm">
                 <input type="hidden" id="productId">
@@ -49,7 +53,7 @@
                 </div>
                 <div class="form-group">
                     <label for="sku">SKU / Mã hàng</label>
-                    <input type="text" id="sku" placeholder="VD: IP15PM-256-BLK">
+                    <input type="text" id="sku" placeholder="VD: IP15PM-256-BLK (bỏ trống để tự tạo)">
                 </div>
                 <div class="form-group">
                     <label for="brand">Thương hiệu</label>
@@ -57,19 +61,30 @@
                 </div>
                 <div class="form-group">
                     <label for="price">Giá bán (VNĐ)</label>
-                    <input type="number" id="price" placeholder="Nhập giá..." required>
+                    <input type="number" id="price" placeholder="Nhập giá..." required min="0">
                 </div>
                 <div class="form-group">
                     <label for="compareAtPrice">Giá niêm yết / Giá gạch (VNĐ)</label>
-                    <input type="number" id="compareAtPrice" placeholder="VD: 32990000">
+                    <input type="number" id="compareAtPrice" placeholder="VD: 32990000" min="0">
                 </div>
                 <div class="form-group">
-                    <label for="category">Danh mục</label>
-                    <input type="text" id="category" placeholder="VD: Điện thoại, Laptop..." required>
+                    <label for="categorySelect">Danh mục sản phẩm</label>
+                    <select id="categorySelect" required onchange="handleCategorySelectChange()">
+                        <option value="">-- Chọn danh mục --</option>
+                        <option value="Điện thoại">📱 Điện thoại</option>
+                        <option value="Laptop">💻 Laptop</option>
+                        <option value="Tablet">📟 Tablet</option>
+                        <option value="Tai nghe">🎧 Tai nghe</option>
+                        <option value="Đồng hồ thông minh">⌚ Đồng hồ thông minh</option>
+                        <option value="Phụ kiện">🔌 Phụ kiện</option>
+                        <option value="Máy chơi game">🎮 Máy chơi game</option>
+                        <option value="__custom__">➕ Thêm danh mục khác...</option>
+                    </select>
+                    <input type="text" id="category" placeholder="Nhập tên danh mục mới..." style="display: none; margin-top: 0.5rem;" required>
                 </div>
                 <div class="form-group">
                     <label for="stock">Số lượng tồn kho</label>
-                    <input type="number" id="stock" placeholder="Nhập số lượng..." required>
+                    <input type="number" id="stock" placeholder="Nhập số lượng..." required min="0">
                 </div>
                 <div class="form-group full-width">
                     <label for="description">Mô tả chi tiết</label>
@@ -106,7 +121,13 @@
                 </div>
                 <div class="form-group full-width">
                     <label for="image">URL hình ảnh sản phẩm</label>
-                    <input type="text" id="image" placeholder="https://...">
+                    <div class="image-input-row" style="display: flex; gap: 12px; align-items: center;">
+                        <input type="text" id="image" placeholder="https://..." style="flex: 1;" oninput="updateImagePreview()">
+                        <div id="imagePreviewBox" class="image-preview-box" style="width: 52px; height: 52px; border-radius: 8px; border: 1.5px dashed var(--neo-border-strong, #3b82f6); display: flex; align-items: center; justify-content: center; overflow: hidden; background: rgba(0,0,0,0.04); flex-shrink: 0;">
+                            <img id="imagePreviewImg" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;" onerror="this.style.display='none'; document.getElementById('imagePreviewPlaceholder').style.display='block';">
+                            <span id="imagePreviewPlaceholder" style="font-size: 0.72rem; color: var(--text-muted, #888); font-weight: 600;">Xem ảnh</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group full-width">
                     <label for="tags">Tags tìm kiếm</label>
@@ -134,32 +155,90 @@
                     </div>
                 </fieldset>
                 <div class="form-actions">
-                    <button type="submit" class="btn-primary">Lưu sản phẩm</button>
+                    <button type="submit" class="btn-primary" id="btnSubmitProduct">Lưu sản phẩm</button>
                     <button type="button" class="btn-secondary" onclick="resetForm()">Hủy bỏ</button>
                 </div>
             </form>
         </section>
 
-        <div class="filter-bar reveal admin-filter-bar">
-            <label class="sr-only" for="adminProductSearch">Tìm sản phẩm</label>
-            <input id="adminProductSearch" type="search" placeholder="Tìm sản phẩm...">
-            <label class="sr-only" for="adminStockFilter">Lọc theo tồn kho</label>
-            <select id="adminStockFilter">
-                <option value="">Tất cả tồn kho</option>
-                <option value="low">Sắp hết hàng</option>
-                <option value="out">Hết hàng</option>
-                <option value="in">Còn hàng</option>
-            </select>
-            <label class="sr-only" for="adminSortProducts">Sắp xếp sản phẩm</label>
-            <select id="adminSortProducts">
-                <option value="">Mặc định</option>
-                <option value="price_asc">Giá tăng dần</option>
-                <option value="price_desc">Giá giảm dần</option>
-                <option value="stock_asc">Tồn kho thấp</option>
-                <option value="stock_desc">Tồn kho cao</option>
-                <option value="name">Tên A-Z</option>
-            </select>
-        </div>
+        <!-- Product Filter & Category Management Hub -->
+        <section class="admin-filter-hub glass-card reveal" aria-labelledby="filterHubTitle">
+            <header class="admin-hub-header">
+                <div class="admin-hub-title-group">
+                    <div class="admin-hub-icon-wrap" aria-hidden="true">
+                        <span class="admin-hub-icon">📁</span>
+                    </div>
+                    <div class="admin-hub-text">
+                        <h2 id="filterHubTitle" class="admin-hub-title">Phân loại & Bộ lọc sản phẩm</h2>
+                        <p class="admin-hub-subtitle">Chọn danh mục chuyên biệt, tra cứu theo từ khóa và kiểm soát nhanh trạng thái kho hàng</p>
+                    </div>
+                </div>
+                <div class="admin-hub-stats" id="adminHubQuickStats">
+                    <!-- Injected dynamically by products.js -->
+                </div>
+            </header>
+
+            <!-- Category Filter Tabs Navigation -->
+            <nav class="admin-category-panel" aria-label="Phân loại theo danh mục hàng hóa">
+                <div class="admin-category-tabs-label-row">
+                    <span class="admin-category-tag-title">📁 Danh mục hàng hóa</span>
+                    <span class="admin-category-tip">Bấm từng danh mục để xem nhanh danh sách sản phẩm</span>
+                </div>
+                <div class="admin-category-tabs" id="adminCategoryTabs" role="tablist">
+                    <!-- Injected by products.js -->
+                </div>
+            </nav>
+
+            <!-- Filter Controls Toolbar -->
+            <form class="admin-filter-toolbar" id="adminFilterToolbar" role="search" onsubmit="return false;">
+                <div class="filter-control-search">
+                    <label class="sr-only" for="adminProductSearch">Tìm kiếm sản phẩm</label>
+                    <span class="search-input-icon" aria-hidden="true">🔍</span>
+                    <input id="adminProductSearch" type="search" placeholder="Tìm tên sản phẩm, SKU, thương hiệu, tag..." autocomplete="off">
+                </div>
+
+                <div class="filter-control-item filter-control-category">
+                    <label class="sr-only" for="adminCategoryFilter">Lọc theo danh mục</label>
+                    <select id="adminCategoryFilter" title="Lọc theo danh mục">
+                        <option value="">📁 Tất cả danh mục</option>
+                    </select>
+                </div>
+
+                <div class="filter-control-item filter-control-stock">
+                    <label class="sr-only" for="adminStockFilter">Lọc theo trạng thái tồn kho</label>
+                    <select id="adminStockFilter" title="Lọc theo trạng thái tồn kho">
+                        <option value="">📦 Tất cả tồn kho</option>
+                        <option value="low">⚠️ Sắp hết hàng (≤ 5)</option>
+                        <option value="out">❌ Hết hàng (= 0)</option>
+                        <option value="in">✅ Còn hàng (> 0)</option>
+                    </select>
+                </div>
+
+                <div class="filter-control-item filter-control-sort">
+                    <label class="sr-only" for="adminSortProducts">Sắp xếp sản phẩm</label>
+                    <select id="adminSortProducts" title="Sắp xếp sản phẩm">
+                        <option value="">⇅ Sắp xếp mặc định</option>
+                        <option value="price_asc">Giá tăng dần</option>
+                        <option value="price_desc">Giá giảm dần</option>
+                        <option value="stock_asc">Tồn kho thấp trước</option>
+                        <option value="stock_desc">Tồn kho cao trước</option>
+                        <option value="name">Tên A-Z</option>
+                    </select>
+                </div>
+
+                <div class="filter-control-actions">
+                    <button type="button" class="btn-reset-filters" id="btnResetFilters" title="Đặt lại toàn bộ bộ lọc" onclick="resetFilters()">
+                        <span class="btn-reset-icon" aria-hidden="true">🔄</span>
+                        <span>Đặt lại</span>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Real-time Filter & Stock Status Footer -->
+            <footer class="admin-category-summary-bar" id="adminCategorySummaryBar">
+                <!-- Injected by products.js -->
+            </footer>
+        </section>
 
         <section class="table-section glass-card reveal">
             <h2>Danh sách sản phẩm (<span id="productCount">0</span>)</h2>

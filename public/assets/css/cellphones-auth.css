@@ -629,6 +629,141 @@ body.auth-cellphones-body {
     font-size: 0.95rem;
 }
 
+/* Hidden elements safeguard */
+[hidden] {
+    display: none !important;
+}
+
+/* Recovery Progress Steps */
+.auth-recovery-progress {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.auth-recovery-progress::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: #e5e7eb;
+    z-index: 1;
+}
+
+.auth-recovery-progress li {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+}
+
+.auth-recovery-progress .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2px solid #d1d5db;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.auth-recovery-progress li[aria-current="step"] {
+    color: var(--cps-primary);
+    font-weight: 700;
+}
+
+.auth-recovery-progress li[aria-current="step"] .step-num {
+    background: var(--cps-primary);
+    border-color: var(--cps-primary);
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+/* OTP Destination Badge */
+.auth-otp-badge-wrap {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--cps-radius-md);
+    padding: 10px 14px;
+    margin-bottom: 6px;
+}
+
+.auth-otp-destination {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #1e40af;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+/* OTP Secondary Actions */
+.auth-otp-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+.btn-text-action {
+    background: none;
+    border: none;
+    padding: 6px 0;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--cps-primary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.btn-text-action:hover:not(:disabled) {
+    text-decoration: underline;
+    color: #1d4ed8;
+}
+
+.btn-text-action:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* Security Box */
+.auth-security-box {
+    margin: 16px 0 0;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--cps-radius-md);
+    padding: 10px 14px;
+}
+
+.auth-security-box p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #6b7280;
+}
+
+.auth-security-box strong {
+    color: #374151;
+}
+
 /* ==========================================================================
    RESPONSIVE DESIGN
    ========================================================================== */
@@ -678,3 +813,472 @@ body.auth-cellphones-body {
         padding: 16px 16px;
     }
 }
+
+/* ==========================================================================
+   SOCIAL AUTH MODAL (Google & Zalo Quick Login)
+   ========================================================================== */
+.social-auth-modal {
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    max-width: 440px;
+    width: 92%;
+    background: #ffffff;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+}
+
+.social-auth-modal::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.social-auth-modal[open] {
+    animation: socialModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes socialModalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.social-auth-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.social-auth-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.social-auth-brand {
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.social-auth-header-text {
+    flex: 1;
+}
+
+.social-auth-header-text h3 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.social-auth-header-text p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: #6b7280;
+}
+
+.social-auth-close-btn {
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.social-auth-close-btn:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.social-auth-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.social-auth-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Account card item */
+.social-account-select-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 2px solid #3b82f6;
+    border-radius: 12px;
+    background: #eff6ff;
+    cursor: default;
+}
+
+.social-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.social-user-avatar.google-avatar {
+    background: linear-gradient(135deg, #4285F4, #34A853);
+}
+
+.social-user-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.social-user-meta strong {
+    font-size: 0.95rem;
+    color: #1e3a8a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.social-user-meta small {
+    font-size: 0.82rem;
+    color: #3b82f6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.social-check-icon {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #2563eb;
+    background: #dbeafe;
+    padding: 4px 8px;
+    border-radius: 999px;
+}
+
+/* Custom details */
+.social-custom-field-group {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.social-custom-toggle {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    user-select: none;
+}
+
+.social-custom-toggle:hover {
+    color: #111827;
+}
+
+.social-form-group {
+    margin: 10px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.social-form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.social-text-input {
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    background: #ffffff;
+    color: #111827;
+}
+
+.social-text-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Zalo Tabs */
+.zalo-tabs-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    background: #f3f4f6;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.zalo-tab-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.zalo-tab-btn.active {
+    background: #ffffff;
+    color: #0068FF;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.zalo-tab-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.zalo-qr-box {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+}
+
+.zalo-qr-frame {
+    margin: 0;
+    padding: 8px;
+    border: 2px solid #0068FF;
+    border-radius: 12px;
+    background: #ffffff;
+    display: inline-block;
+}
+
+.zalo-qr-hint {
+    font-size: 0.82rem;
+    color: #4b5563;
+    margin: 0;
+    max-width: 280px;
+}
+
+.btn-zalo-mock-scan {
+    border: 1px dashed #0068FF;
+    background: #eff6ff;
+    color: #0068FF;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-zalo-mock-scan:hover {
+    background: #0068FF;
+    color: #ffffff;
+}
+
+/* Modal Status */
+.social-auth-status {
+    min-height: 20px;
+    font-size: 0.86rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.social-auth-status[data-state="error"] {
+    color: #dc2626;
+}
+
+.social-auth-status[data-state="success"] {
+    color: #16a34a;
+}
+
+/* Modal Footer */
+.social-auth-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.btn-social-cancel {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-social-cancel:hover {
+    background: #f9fafb;
+}
+
+.btn-social-submit {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-google-submit {
+    background: #4285F4;
+}
+
+.btn-google-submit:hover {
+    background: #3367D6;
+}
+
+.btn-zalo-submit {
+    background: #0068FF;
+}
+
+.btn-zalo-submit:hover {
+    background: #0052cc;
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] .social-auth-modal {
+    background: #1e293b;
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .social-auth-header-text h3 {
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .social-auth-brand,
+[data-theme="dark"] .social-auth-close-btn {
+    background: #334155;
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .social-account-select-card {
+    background: #1e3a5f;
+    border-color: #60a5fa;
+}
+
+[data-theme="dark"] .social-user-meta strong {
+    color: #bfdbfe;
+}
+
+[data-theme="dark"] .social-custom-field-group {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .social-custom-toggle {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .social-text-input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .zalo-tabs-row {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .zalo-tab-btn.active {
+    background: #1e293b;
+    color: #38bdf8;
+}
+
+[data-theme="dark"] .btn-social-cancel {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .auth-recovery-progress::before {
+    background: #334155;
+}
+
+[data-theme="dark"] .auth-recovery-progress .step-num {
+    background: #1e293b;
+    border-color: #475569;
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .auth-recovery-progress li[aria-current="step"] .step-num {
+    background: #2563eb;
+    border-color: #60a5fa;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .auth-otp-badge-wrap {
+    background: #1e3a5f;
+    border-color: #2563eb;
+}
+
+[data-theme="dark"] .auth-otp-destination {
+    color: #bfdbfe;
+}
+
+[data-theme="dark"] .auth-security-box {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .auth-security-box p {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .auth-security-box strong {
+    color: #e2e8f0;
+}
+
+/* Ẩn nút Dark Mode trôi nổi ở cuối trang đăng nhập / xác thực */
+#themeToggle,
+.theme-toggle {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+
+
