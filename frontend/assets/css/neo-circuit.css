@@ -531,87 +531,167 @@ html[data-theme='dark'] .product-card .product-media {
     color: var(--neo-cyan) !important;
 }
 
-.admin-page .admin-sidebar > nav {
+/* Admin Layout: Fixed Modern 260px Sidebar */
+.admin-page header.admin-sidebar {
     position: fixed;
     inset: 0 auto 0 0;
-    width: 320px;
+    width: 260px;
     height: 100vh;
-    min-height: 0;
-    display: block;
-    padding: 30px 20px;
+    z-index: 1000;
+    background: #ffffff;
     border-right: 1px solid var(--neo-border);
-    border-bottom: 0;
-    background: rgba(13, 17, 23, 0.94);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.03);
 }
 
-.admin-page .admin-sidebar > nav h1,
-.admin-page .admin-brand {
-    margin-bottom: 2rem;
-    font-size: 1.2rem;
-    text-transform: none;
+html[data-theme='dark'] .admin-page header.admin-sidebar {
+    background: #0d1117;
+    border-right-color: #21262d;
+    box-shadow: none;
 }
 
-.admin-page .admin-sidebar > nav .admin-brand > a {
-    display: inline;
-    padding: 0;
-    color: var(--neo-primary-soft);
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: 800;
+.admin-page .admin-sidebar > nav {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    padding: 24px 16px !important;
+    position: static !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
 }
 
-.admin-page .admin-sidebar > nav .admin-brand > a:hover {
-    background: transparent;
-    color: var(--neo-cyan);
+.admin-page .admin-sidebar .admin-brand {
+    display: block !important;
+    margin: 0 0 24px 0 !important;
+    padding: 0 8px !important;
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
 }
 
-.admin-page .admin-sidebar > nav h1::after,
-.admin-page .admin-brand::after {
-    content: 'Khu Quản Trị';
-    display: block;
-    margin-top: 0.8rem;
-    color: var(--neo-dim);
-    font: 500 0.78rem/1 'JetBrains Mono', monospace;
+.admin-page .admin-sidebar .admin-brand > a {
+    color: var(--neo-text) !important;
+    text-decoration: none !important;
+    display: block !important;
+    font-weight: 800 !important;
 }
 
-.admin-page .admin-sidebar > nav ul {
-    display: grid;
-    gap: 0.55rem;
+.admin-page .admin-sidebar .admin-brand::after {
+    content: 'Khu Quản Trị' !important;
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: var(--neo-dim) !important;
+    font-family: inherit !important;
 }
 
-.admin-page .admin-sidebar > nav li {
-    width: 100%;
+.admin-page .admin-sidebar > nav ul#main-navbar {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 1 1 auto !important;
 }
 
-.admin-page .admin-sidebar > nav a {
-    display: block;
-    padding: 0.9rem 1rem;
-    border: 0;
-    border-radius: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--neo-muted);
+.admin-page .admin-sidebar > nav ul#main-navbar > li {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
 }
 
-.admin-page .admin-sidebar > nav a:hover,
-.admin-page .admin-sidebar > nav a.active {
-    color: var(--neo-primary-soft);
-    background: rgba(173, 198, 255, 0.16);
+.admin-page .admin-sidebar > nav ul#main-navbar > li > a {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    color: var(--neo-muted) !important;
+    background: transparent !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    font-family: inherit !important;
+}
+
+.admin-page .admin-sidebar > nav ul#main-navbar > li > a:hover {
+    background: rgba(47, 128, 237, 0.08) !important;
+    color: var(--neo-primary) !important;
+}
+
+.admin-page .admin-sidebar > nav ul#main-navbar > li > a.active {
+    background: linear-gradient(135deg, #38a3ff, #2f80ed) !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.admin-page .admin-sidebar #nav-auth-section {
+    margin-top: auto !important;
+    margin-left: 0 !important;
+    padding-top: 16px !important;
+    border-top: 1px solid var(--neo-border) !important;
+    width: 100% !important;
+}
+
+.admin-page .admin-sidebar #nav-auth-section .user-menu-container {
+    width: 100% !important;
+    position: relative !important;
+}
+
+.admin-page .admin-sidebar #nav-auth-section .user-profile-btn {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+    background: var(--neo-panel-solid, #f8fafc) !important;
+    border: 1px solid var(--neo-border) !important;
+    box-sizing: border-box !important;
+}
+
+.admin-page .admin-sidebar #nav-auth-section .user-info {
+    overflow: hidden !important;
+}
+
+.admin-page .admin-sidebar #nav-auth-section .user-name {
+    max-width: 130px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 
 .admin-page main,
 .admin-page .site-footer {
-    margin-left: 320px;
+    margin-left: 260px !important;
 }
 
-.admin-page main.container {
-    max-width: 1180px;
-    padding-top: 72px;
+.admin-page main.container,
+.admin-page > .container {
+    width: calc(100% - 260px) !important;
+    max-width: none !important;
+    margin-right: 0 !important;
+    margin-left: 260px !important;
+    padding: 40px clamp(20px, 3vw, 48px) 64px !important;
+    box-sizing: border-box !important;
 }
 
 .admin-page .page-header h2,
 .admin-page .page-header h1 {
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    line-height: 1.04;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
 }
 
 table {
@@ -649,28 +729,49 @@ th {
     background: linear-gradient(135deg, #007aff, #00b8d9) !important;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
     nav {
         padding-inline: 20px;
     }
 
-    .admin-page .admin-sidebar > nav {
+    .admin-page header.admin-sidebar {
         position: sticky;
+        top: 0;
         width: 100%;
         height: auto;
-        padding: 18px 20px;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .admin-page .admin-sidebar > nav {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 12px 16px !important;
         border-right: 0;
         border-bottom: 1px solid var(--neo-border);
     }
 
-    .admin-page .admin-sidebar > nav ul {
-        display: flex;
-        overflow-x: auto;
+    .admin-page .admin-sidebar > nav ul#main-navbar {
+        display: flex !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+    }
+
+    .admin-page .admin-sidebar > nav ul#main-navbar > li {
+        width: auto !important;
+        flex-shrink: 0 !important;
     }
 
     .admin-page main,
-    .admin-page .site-footer {
-        margin-left: 0;
+    .admin-page .site-footer,
+    .admin-page main.container,
+    .admin-page > .container {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 20px 16px !important;
     }
 
     .cart-section {
@@ -1186,7 +1287,7 @@ html[data-theme='dark'] .storefront-header {
 
 .header-main {
     position: relative;
-    z-index: 30;
+    z-index: 1000 !important;
     overflow: visible;
     border-bottom: 1px solid var(--neo-border);
 }
@@ -1430,16 +1531,32 @@ html[data-theme='dark'] .storefront-header {
 }
 
 .storefront-header .dropdown-menu {
-    z-index: 80;
+    z-index: 2500 !important;
+    pointer-events: auto !important;
     top: calc(100% + 8px);
     margin-top: 0;
     color: var(--neo-text);
     background: var(--neo-panel-solid);
 }
 
+.user-menu-container {
+    position: relative;
+    z-index: 1001 !important;
+}
+
+.user-menu-container .dropdown-menu {
+    z-index: 2500 !important;
+    pointer-events: auto !important;
+}
+
+.dropdown-item {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
 .header-categories {
     position: relative;
-    z-index: 10;
+    z-index: 10 !important;
     top: auto;
     height: auto;
     min-height: 0;
@@ -3345,7 +3462,30 @@ html[data-theme='dark'] .hero-control {
     }
 
     body:not(.admin-page) main.container {
+        display: flex !important;
+        flex-direction: column !important;
         padding-bottom: 75px !important;
+    }
+
+    body:not(.admin-page) main.container > #promoCarousel {
+        order: 1 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    body:not(.admin-page) main.container > #storefrontCategories {
+        order: 2 !important;
+        margin-top: 0 !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    body:not(.admin-page) main.container > #adminStats {
+        order: 3 !important;
+    }
+
+    body:not(.admin-page) main.container > #productCatalogSection,
+    body:not(.admin-page) main.container > .catalog-section {
+        order: 4 !important;
     }
 
     .catalog-heading {
@@ -3367,11 +3507,40 @@ html[data-theme='dark'] .hero-control {
     }
 }
 
-/* Desktop default: Bottom navigation is hidden */
+/* Desktop default: Bottom navigation is hidden & Categories placed in Green Box (above Hero Carousel) */
 @media (min-width: 769px) {
     .cps-bottom-nav-bar,
     nav#cpsBottomNavBar {
         display: none !important;
+    }
+
+    body:not(.admin-page) main.container {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    body:not(.admin-page) main.container > #storefrontCategories {
+        order: 1 !important;
+        margin-top: 0 !important;
+        margin-bottom: 1.25rem !important;
+        background: transparent !important;
+        border-bottom: 1px solid var(--neo-border) !important;
+        padding-bottom: 0.25rem !important;
+    }
+
+    body:not(.admin-page) main.container > #promoCarousel {
+        order: 2 !important;
+        margin-top: 0 !important;
+        margin-bottom: 2rem !important;
+    }
+
+    body:not(.admin-page) main.container > #adminStats {
+        order: 3 !important;
+    }
+
+    body:not(.admin-page) main.container > #productCatalogSection,
+    body:not(.admin-page) main.container > .catalog-section {
+        order: 4 !important;
     }
 }
 
@@ -3903,11 +4072,11 @@ html[data-theme='dark'] .admin-page .admin-sidebar > nav {
 
 .admin-page main.container,
 .admin-page > .container {
-    width: calc(100% - 320px);
+    width: calc(100% - 260px);
     max-width: none;
     margin-right: 0;
-    margin-left: 320px;
-    padding: 56px clamp(24px, 2.5vw, 48px) 64px;
+    margin-left: 260px;
+    padding: 40px clamp(20px, 3vw, 48px) 64px;
 }
 
 .admin-page .page-header h2,
@@ -3984,8 +4153,8 @@ body:not(.admin-page) #productSections .product-grid {
 }
 
 .admin-page .admin-footer {
-    width: calc(100% - 320px);
-    margin-left: 320px;
+    width: calc(100% - 260px);
+    margin-left: 260px;
 }
 
 .admin-page .admin-footer .footer-bottom {
