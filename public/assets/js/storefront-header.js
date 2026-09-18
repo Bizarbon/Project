@@ -68,7 +68,9 @@
             </section>
             ${isAccountPage ? '' : `
             <nav class="header-categories" aria-label="Danh mục sản phẩm">
+                <button type="button" class="category-scroll-arrow category-scroll-prev" aria-label="Cuộn danh mục sang trái" hidden>‹</button>
                 <ul class="header-shell header-category-list">${categoryLinks}</ul>
+                <button type="button" class="category-scroll-arrow category-scroll-next" aria-label="Cuộn danh mục sang phải" hidden>›</button>
             </nav>`}
         </header>`;
 
@@ -83,4 +85,111 @@
     else document.body.prepend(nextHeader);
 
     if (typeof window.updateNavbar === 'function') window.updateNavbar();
+
+    // Attach drag and arrow scroll
+    if (typeof window.setupCategoryDragScroll === 'function') {
+        window.setupCategoryDragScroll(nextHeader);
+    } else {
+        setupCategoryDragScroll(nextHeader);
+    }
 })();
+
+function setupCategoryDragScroll(navEl) {
+    if (!navEl) return;
+    const list = navEl.querySelector('.header-category-list') || (navEl.classList.contains('header-category-list') ? navEl : null);
+    if (!list) return;
+
+    if (list._dragScrollInit) return;
+    list._dragScrollInit = true;
+
+    const prevBtn = navEl.querySelector('.category-scroll-prev');
+    const nextBtn = navEl.querySelector('.category-scroll-next');
+
+    list.querySelectorAll('img, button, a').forEach(el => {
+        el.setAttribute('draggable', 'false');
+    });
+
+    function updateArrows() {
+        const canScroll = list.scrollWidth > (list.clientWidth + 4);
+        if (!canScroll) {
+            if (prevBtn) prevBtn.hidden = true;
+            if (nextBtn) nextBtn.hidden = true;
+            return;
+        }
+        const maxScroll = list.scrollWidth - list.clientWidth;
+        if (prevBtn) prevBtn.hidden = list.scrollLeft <= 6;
+        if (nextBtn) nextBtn.hidden = list.scrollLeft >= (maxScroll - 6);
+    }
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', e => {
+            e.preventDefault();
+            list.scrollBy({ left: -220, behavior: 'smooth' });
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', e => {
+            e.preventDefault();
+            list.scrollBy({ left: 220, behavior: 'smooth' });
+        });
+    }
+
+    list.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows, { passive: true });
+
+    // Drag-to-scroll via mouse
+    let isDown = false;
+    let startX = 0;
+    let scrollStart = 0;
+    let hasMoved = false;
+
+    list.addEventListener('mousedown', e => {
+        if (e.button !== 0) return;
+        isDown = true;
+        hasMoved = false;
+        startX = e.clientX;
+        scrollStart = list.scrollLeft;
+        list.classList.add('is-dragging');
+    });
+
+    window.addEventListener('mousemove', e => {
+        if (!isDown) return;
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 4) {
+            hasMoved = true;
+        }
+        if (hasMoved) {
+            e.preventDefault();
+            list.scrollLeft = scrollStart - dx;
+        }
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        list.classList.remove('is-dragging');
+    });
+
+    list.addEventListener('click', e => {
+        if (hasMoved) {
+            e.preventDefault();
+            e.stopPropagation();
+            hasMoved = false;
+        }
+    }, true);
+
+    // Mouse wheel horizontal scroll
+    list.addEventListener('wheel', e => {
+        if (list.scrollWidth > list.clientWidth) {
+            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+                e.preventDefault();
+                list.scrollLeft += e.deltaY;
+            }
+        }
+    }, { passive: false });
+
+    setTimeout(updateArrows, 60);
+    setTimeout(updateArrows, 350);
+}
+window.setupCategoryDragScroll = setupCategoryDragScroll;

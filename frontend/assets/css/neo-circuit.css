@@ -1623,7 +1623,7 @@ html[data-theme='dark'] .dropdown-item:hover {
 }
 
 .header-categories {
-    position: relative;
+    position: relative !important;
     z-index: 10 !important;
     top: auto;
     height: auto;
@@ -1643,16 +1643,88 @@ html[data-theme='dark'] .dropdown-item:hover {
     display: flex !important;
     min-height: 44px !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: clamp(8px, 1.8vw, 24px) !important;
+    justify-content: flex-start !important;
+    gap: clamp(6px, 1.4vw, 16px) !important;
     overflow-x: auto !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
     margin: 0 auto !important;
-    padding: 4px 16px !important;
+    padding: 4px 38px !important;
     list-style: none !important;
-    width: 100% !important;
-    max-width: 1400px !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    cursor: grab !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    touch-action: pan-x !important;
+    scroll-behavior: smooth !important;
+}
+
+.header-category-list.is-dragging {
+    cursor: grabbing !important;
+    scroll-behavior: auto !important;
+}
+
+.header-category-list img {
+    -webkit-user-drag: none !important;
+    user-drag: none !important;
+    pointer-events: none !important;
+}
+
+.header-category-list button,
+.header-category-list a {
+    -webkit-user-drag: none !important;
+    user-drag: none !important;
+}
+
+.category-scroll-arrow {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 20 !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 1px solid var(--neo-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+    color: var(--neo-text) !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    opacity: 0.92 !important;
+}
+
+.category-scroll-arrow:hover {
+    background: var(--neo-primary) !important;
+    color: #ffffff !important;
+    border-color: var(--neo-primary) !important;
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.08) !important;
+}
+
+.category-scroll-prev {
+    left: 6px !important;
+}
+
+.category-scroll-next {
+    right: 6px !important;
+}
+
+.category-scroll-arrow[hidden] {
+    display: none !important;
+}
+
+html[data-theme='dark'] .category-scroll-arrow {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
 }
 
 .header-category-list > li {
