@@ -78,8 +78,8 @@
                         <li><a href="${root}index.html">Cửa hàng</a></li>
                         <li><a href="${root}pages/account/orders.html">Đơn hàng của tôi</a></li>
                         <li><a href="${root}pages/account/profile.html">Hồ sơ cá nhân</a></li>
-                        <li><a href="${root}index.html?search=khuyen+mai">Khuyến mãi hot</a></li>
-                        <li><a href="${root}index.html?search=tra+gop">Trả góp 0%</a></li>
+                        <li><a href="${root}pages/legal/promotions.html">Khuyến mãi hot</a></li>
+                        <li><a href="${root}pages/legal/installment.html">Trả góp 0%</a></li>
                         ${adminLinks}
                     </ul>
                 </nav>

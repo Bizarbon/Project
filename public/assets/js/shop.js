@@ -284,9 +284,19 @@ function filteredProducts() {
     }
     if (filters.brand !== 'all') products = products.filter(p => (p.brand || '') === filters.brand);
     if (filters.search) {
-        products = products.filter(p =>
-            `${p.name} ${p.description || ''} ${p.category || ''} ${p.brand || ''} ${p.sku || ''} ${(p.tags || []).join(' ')}`.toLowerCase().includes(filters.search)
-        );
+        const queryNorm = normalizeAddressSearch(filters.search);
+        const isPromoQuery = queryNorm.includes('khuyen mai') || queryNorm.includes('giam gia') || queryNorm.includes('sale') || queryNorm.includes('deal');
+        const isInstallmentQuery = queryNorm.includes('tra gop') || queryNorm.includes('installment');
+
+        if (isPromoQuery) {
+            products = products.filter(p => (p.compareAtPrice > p.price) || (p.discount > 0) || p.featured);
+        } else if (isInstallmentQuery) {
+            products = products.filter(p => p.price >= 3000000);
+        } else {
+            products = products.filter(p =>
+                `${p.name} ${p.description || ''} ${p.category || ''} ${p.brand || ''} ${p.sku || ''} ${(p.tags || []).join(' ')}`.toLowerCase().includes(filters.search)
+            );
+        }
     }
     if (filters.minPrice) products = products.filter(p => p.price >= filters.minPrice);
     if (filters.maxPrice) products = products.filter(p => p.price <= filters.maxPrice);
@@ -1259,6 +1269,8 @@ function openCartDrawer() {
     drawer?.setAttribute('aria-hidden', 'false');
     drawer?.removeAttribute('inert');
     document.getElementById('cartOverlay')?.setAttribute('aria-hidden', 'false');
+    const zaloBtn = document.getElementById('zaloFloatingBtn');
+    if (zaloBtn) zaloBtn.style.setProperty('display', 'none', 'important');
 }
 
 function closeCartDrawer() {
@@ -1267,6 +1279,8 @@ function closeCartDrawer() {
     drawer?.setAttribute('aria-hidden', 'true');
     drawer?.setAttribute('inert', '');
     document.getElementById('cartOverlay')?.setAttribute('aria-hidden', 'true');
+    const zaloBtn = document.getElementById('zaloFloatingBtn');
+    if (zaloBtn) zaloBtn.style.removeProperty('display');
 }
 
 function toggleCartDrawer() {

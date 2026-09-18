@@ -344,3 +344,298 @@
         overflow-x: auto;
     }
 }
+
+/* Voucher Hub */
+.voucher-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+}
+
+.voucher-card {
+    position: relative;
+    padding: 20px;
+    border: 1px dashed var(--neo-primary);
+    border-radius: 10px;
+    background: var(--neo-panel-solid);
+    box-shadow: var(--neo-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.voucher-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(47, 128, 237, 0.15);
+}
+
+.voucher-badge {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    margin-bottom: 10px;
+}
+
+.voucher-card h3 {
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    color: var(--neo-text);
+}
+
+.voucher-card p {
+    margin: 0 0 16px;
+    font-size: 0.88rem;
+    color: var(--neo-muted);
+}
+
+.voucher-action-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--neo-border);
+}
+
+.voucher-code {
+    font-family: monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--neo-primary);
+    background: rgba(47, 128, 237, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.voucher-copy-btn {
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    border: 1px solid var(--neo-primary);
+    background: var(--neo-primary);
+    color: #fff;
+    transition: all 0.2s ease;
+}
+
+.voucher-copy-btn:hover {
+    opacity: 0.9;
+}
+
+.voucher-copy-btn.copied {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+/* Deals Grid in promotions */
+.promotions-deals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+}
+
+.deal-item-card {
+    border: 1px solid var(--neo-border);
+    border-radius: 10px;
+    background: var(--neo-panel-solid);
+    overflow: hidden;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.deal-item-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--neo-primary);
+}
+
+.deal-thumb {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.deal-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--neo-text);
+    margin: 0 0 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.deal-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.deal-price-current {
+    color: #e11d48;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.deal-price-old {
+    color: var(--neo-muted);
+    font-size: 0.8rem;
+    text-decoration: line-through;
+}
+
+.deal-buy-btn {
+    display: block;
+    text-align: center;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--neo-primary);
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+/* Installment Calculator */
+.calc-card {
+    border: 1px solid var(--neo-border);
+    border-radius: 12px;
+    padding: 24px;
+    background: var(--neo-panel-solid);
+    box-shadow: var(--neo-shadow-sm);
+    margin-top: 20px;
+}
+
+.calc-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+.calc-fields {
+    display: grid;
+    gap: 18px;
+}
+
+.calc-field-group {
+    display: grid;
+    gap: 6px;
+}
+
+.calc-field-group label {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: var(--neo-text);
+}
+
+.calc-input,
+.calc-select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border: 1px solid var(--neo-border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: var(--neo-text);
+    background: var(--neo-bg);
+}
+
+.calc-input:focus,
+.calc-select:focus {
+    outline: none;
+    border-color: var(--neo-primary);
+}
+
+.calc-results-box {
+    border: 1px solid rgba(47, 128, 237, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    background: rgba(47, 128, 237, 0.04);
+    display: grid;
+    gap: 12px;
+}
+
+.calc-result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--neo-border);
+    font-size: 0.88rem;
+    color: var(--neo-muted);
+}
+
+.calc-result-row strong {
+    color: var(--neo-text);
+}
+
+.calc-monthly-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 6px;
+}
+
+.calc-monthly-row span {
+    font-size: 0.86rem;
+    color: var(--neo-text);
+    font-weight: 700;
+}
+
+.calc-monthly-value {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #e11d48;
+}
+
+.calc-partner-logos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+    list-style: none;
+    padding: 0;
+}
+
+.calc-partner-item {
+    border: 1px solid var(--neo-border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    background: var(--neo-panel-solid);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--neo-text);
+}
+
+@media (max-width: 768px) {
+    .calc-grid {
+        grid-template-columns: 1fr;
+    }
+}

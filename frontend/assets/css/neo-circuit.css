@@ -4022,10 +4022,13 @@ body.cart-open .compare-bar {
     transform: translate(-50%, 120%) !important;
 }
 
-body.cart-open .ai-chat {
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(16px);
+body.cart-open .ai-chat,
+body.cart-open #zaloFloatingBtn,
+body.cart-open .zalo-floating-btn {
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transform: translateY(16px) scale(0.8) !important;
 }
 
 .compare-selected {
@@ -5073,7 +5076,17 @@ button.category-badge.cat-clickable:hover {
 }
 
 .admin-page #zaloFloatingBtn,
-.admin-page .zalo-floating-btn {
+.admin-page .zalo-floating-btn,
+body.cart-open #zaloFloatingBtn,
+body.cart-open .zalo-floating-btn,
+body:has(#cartDrawer[aria-hidden='false']) #zaloFloatingBtn,
+body:has(#cartDrawer[aria-hidden='false']) .zalo-floating-btn,
+body:has(#cartDrawer:not([aria-hidden='true'])) #zaloFloatingBtn,
+body:has(#cartDrawer:not([aria-hidden='true'])) .zalo-floating-btn {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: scale(0.6) !important;
 }
 

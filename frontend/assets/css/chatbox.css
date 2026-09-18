@@ -889,7 +889,10 @@ button.ai-chat-toggle,
     }
 
     .ai-chat.open ~ #zaloFloatingBtn,
-    body:has(.ai-chat.open) #zaloFloatingBtn {
+    body:has(.ai-chat.open) #zaloFloatingBtn,
+    body.cart-open #zaloFloatingBtn,
+    body.cart-open .zalo-floating-btn,
+    body:has(#cartDrawer[aria-hidden='false']) #zaloFloatingBtn {
         display: none !important;
     }
 }
