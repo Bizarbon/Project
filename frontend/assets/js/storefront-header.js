@@ -28,6 +28,14 @@
         cartCount = 0;
     }
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    const currentPath = window.location.pathname.replace(/\\/g, '/');
+    const isAccountPage = currentPath.includes('/account/') || document.body.classList.contains('account-page');
+
     const headerHTML = `
         <header class="storefront-header account-storefront-header">
             <section class="header-main" aria-label="Thanh công cụ mua sắm">
@@ -58,9 +66,10 @@
                     </nav>
                 </div>
             </section>
+            ${isAccountPage ? '' : `
             <nav class="header-categories" aria-label="Danh mục sản phẩm">
                 <ul class="header-shell header-category-list">${categoryLinks}</ul>
-            </nav>
+            </nav>`}
         </header>`;
 
     const template = document.createElement('template');

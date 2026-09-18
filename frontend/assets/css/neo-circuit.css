@@ -1633,20 +1633,42 @@ html[data-theme='dark'] .dropdown-item:hover {
     background: rgba(47, 128, 237, 0.06);
     box-shadow: none;
     backdrop-filter: none;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 
 .header-category-list {
     display: flex !important;
     min-height: 44px !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    gap: 0.5rem !important;
+    justify-content: center !important;
+    gap: clamp(8px, 1.8vw, 24px) !important;
     overflow-x: auto !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0 auto !important;
+    padding: 4px 16px !important;
     list-style: none !important;
+    width: 100% !important;
+    max-width: 1400px !important;
+}
+
+.header-category-list > li {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+/* Hide category navbar on account pages */
+body.account-page .header-categories,
+body:has(#profileForm) .header-categories,
+body:has(#ordersList) .header-categories,
+body:has(#orderDetailContent) .header-categories,
+body:has(.tracking-page) .header-categories {
+    display: none !important;
 }
 
 .header-category-list::-webkit-scrollbar {
