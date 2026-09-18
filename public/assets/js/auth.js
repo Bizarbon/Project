@@ -212,21 +212,43 @@ function updateNavbar() {
             : initial;
         authSection.innerHTML = `
             <div class="user-menu-container">
-                <div class="user-profile-btn">
+                <button type="button" class="user-profile-btn" aria-label="Menu tài khoản" aria-haspopup="true" aria-expanded="false">
                     <div class="user-avatar">${avatar}</div>
                     <div class="user-info">
                         <span class="user-name">${name}</span>
                         <span class="user-role">${isAdmin ? 'Quản trị viên' : 'Thành viên'}</span>
                     </div>
-                </div>
-                <div class="dropdown-menu">
-                    ${isAdmin ? `<a href="${base}admin/dashboard.html?${ADMIN_CACHE_VERSION}" class="dropdown-item">Tổng quan</a>` : ''}
-                    <a href="${base}pages/account/orders.html" class="dropdown-item">📋 Đơn hàng của tôi</a>
-                    <a href="${base}pages/account/profile.html" class="dropdown-item">👤 Hồ sơ cá nhân</a>
-                    <a href="#" class="dropdown-item logout" onclick="auth.logout()">🚪 Đăng xuất</a>
+                </button>
+                <div class="dropdown-menu" role="menu">
+                    ${isAdmin ? `<a href="${base}admin/dashboard.html?${ADMIN_CACHE_VERSION}" class="dropdown-item" role="menuitem">Tổng quan</a>` : ''}
+                    <a href="${base}pages/account/orders.html" class="dropdown-item" role="menuitem">📋 Đơn hàng của tôi</a>
+                    <a href="${base}pages/account/profile.html" class="dropdown-item" role="menuitem">👤 Hồ sơ cá nhân</a>
+                    <a href="#" class="dropdown-item logout" role="menuitem" onclick="auth.logout()">🚪 Đăng xuất</a>
                 </div>
             </div>
         `;
+
+        const container = authSection.querySelector('.user-menu-container');
+        const btn = authSection.querySelector('.user-profile-btn');
+        if (btn && container) {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', String(isOpen));
+            });
+        }
+
+        if (!window.__userMenuClickBound) {
+            window.__userMenuClickBound = true;
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.user-menu-container')) {
+                    document.querySelectorAll('.user-menu-container.open').forEach(el => {
+                        el.classList.remove('open');
+                        el.querySelector('.user-profile-btn')?.setAttribute('aria-expanded', 'false');
+                    });
+                }
+            });
+        }
     } else {
         authSection.innerHTML = isStorefrontHeader
             ? `
