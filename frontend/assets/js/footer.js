@@ -189,7 +189,11 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Floating Zalo button - stacked vertically above AI chat
+    // Floating Zalo button - only for storefront, never on admin pages!
+    if (window.location.pathname.includes('/admin/')) {
+        return;
+    }
+
     if (!document.getElementById('zaloFloatingBtn')) {
         const zaloBtn = document.createElement('a');
         zaloBtn.id = 'zaloFloatingBtn';

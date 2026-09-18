@@ -1568,109 +1568,119 @@ html[data-theme='dark'] .storefront-header {
 }
 
 .header-category-list {
-    display: flex;
-    min-height: 48px;
-    align-items: stretch;
-    justify-content: space-between;
-    gap: 0.35rem;
-    overflow-x: auto;
-    scrollbar-width: thin;
+    display: flex !important;
+    min-height: 44px !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
 }
 
-.header-category-list button {
-    position: relative;
-    min-width: max-content;
-    padding: 0.65rem 0.8rem !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    color: var(--neo-text) !important;
+.header-category-list::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.header-category-list button,
+.header-category-list > a,
+.header-category-list > li > a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 8px 16px !important;
+    border: 1px solid transparent !important;
+    border-radius: 12px !important;
+    color: #475569 !important;
     background: transparent !important;
+    font-family: inherit !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     box-shadow: none !important;
-    white-space: nowrap;
+    position: relative !important;
+    text-decoration: none !important;
 }
 
-.header-category-list button::after {
-    content: '';
-    position: absolute;
-    right: 0.8rem;
-    bottom: 0;
-    left: 0.8rem;
-    height: 3px;
-    border-radius: 3px 3px 0 0;
-    background: transparent;
+html[data-theme='dark'] .header-category-list button,
+html[data-theme='dark'] .header-category-list > a,
+html[data-theme='dark'] .header-category-list > li > a {
+    color: #94a3b8 !important;
 }
 
 .header-category-list button:hover,
-.header-category-list button.active {
-    color: var(--neo-primary) !important;
-    background: rgba(47, 128, 237, 0.08) !important;
-}
-
-.header-category-list button.active::after {
-    background: var(--neo-primary);
-}
-
-.header-category-list > a,
-.header-category-list > li > a {
-    position: relative;
-    display: inline-flex;
-    min-width: max-content;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0.65rem 0.8rem;
-    color: var(--neo-text);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
 .header-category-list > a:hover,
-.header-category-list > a.active,
-.header-category-list > li > a:hover,
-.header-category-list > li > a.active {
-    color: var(--neo-primary);
-    background: rgba(47, 128, 237, 0.08);
+.header-category-list > li > a:hover {
+    color: #2563eb !important;
+    background: rgba(37, 99, 235, 0.08) !important;
+    border-color: rgba(37, 99, 235, 0.15) !important;
+    transform: translateY(-1px) !important;
 }
 
+html[data-theme='dark'] .header-category-list button:hover,
+html[data-theme='dark'] .header-category-list > a:hover,
+html[data-theme='dark'] .header-category-list > li > a:hover {
+    color: #60a5fa !important;
+    background: rgba(96, 165, 250, 0.12) !important;
+    border-color: rgba(96, 165, 250, 0.2) !important;
+}
+
+.header-category-list button.active,
+.header-category-list > a.active,
+.header-category-list > li > a.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    transform: translateY(-1px) !important;
+}
+
+.header-category-list button::after,
 .header-category-list > a::after,
 .header-category-list > li > a::after {
-    content: '';
-    position: absolute;
-    right: 0.8rem;
-    bottom: 0;
-    left: 0.8rem;
-    height: 3px;
-    border-radius: 3px 3px 0 0;
-    background: transparent;
+    display: none !important;
 }
 
-.header-category-list > a.active::after,
-.header-category-list > li > a.active::after {
-    background: var(--neo-primary);
-}
-
-.header-category-list button img {
-    width: 19px;
-    height: 19px;
-    flex: 0 0 auto;
-}
-
+.header-category-list button img,
 .header-category-list > a img,
 .header-category-list > li > a img {
-    width: 19px;
-    height: 19px;
-    flex: 0 0 auto;
+    width: 18px !important;
+    height: 18px !important;
+    object-fit: contain !important;
+    transition: transform 0.2s ease, filter 0.2s ease !important;
 }
 
-html[data-theme='dark'] .header-category-list button img {
-    filter: invert(1);
+.header-category-list button:hover img,
+.header-category-list > a:hover img,
+.header-category-list > li > a:hover img {
+    transform: scale(1.1) !important;
 }
 
+.header-category-list button.active img,
+.header-category-list > a.active img,
+.header-category-list > li > a.active img {
+    filter: brightness(0) invert(1) !important;
+    transform: scale(1.1) !important;
+}
+
+html[data-theme='dark'] .header-category-list button img,
 html[data-theme='dark'] .header-category-list > a img,
 html[data-theme='dark'] .header-category-list > li > a img {
-    filter: invert(1);
+    filter: brightness(0.9) !important;
+}
+
+html[data-theme='dark'] .header-category-list button.active img,
+html[data-theme='dark'] .header-category-list > a.active img,
+html[data-theme='dark'] .header-category-list > li > a.active img {
+    filter: brightness(0) invert(1) !important;
 }
 
 body.address-modal-open {
@@ -3531,10 +3541,20 @@ html[data-theme='dark'] .hero-control {
     body:not(.admin-page) main.container > #storefrontCategories {
         order: 1 !important;
         margin-top: 0 !important;
-        margin-bottom: 1.25rem !important;
-        background: transparent !important;
-        border-bottom: 1px solid var(--neo-border) !important;
-        padding-bottom: 0.25rem !important;
+        margin-bottom: 1.5rem !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        border-radius: 16px !important;
+        padding: 8px 16px !important;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 6px -1px rgba(0, 0, 0, 0.02) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+    }
+
+    html[data-theme='dark'] body:not(.admin-page) main.container > #storefrontCategories {
+        background: rgba(15, 23, 42, 0.85) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3) !important;
     }
 
     body:not(.admin-page) main.container > #promoCarousel {
@@ -4951,5 +4971,41 @@ button.category-badge.cat-clickable:hover {
     border-radius: 8px;
     cursor: pointer;
     white-space: nowrap;
+}
+
+/* Floating Zalo Chat Button - strictly sized, hidden on admin */
+.zalo-floating-btn {
+    position: fixed !important;
+    right: 24px !important;
+    bottom: 96px !important;
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    border-radius: 50% !important;
+    z-index: 1700 !important;
+    box-shadow: 0 4px 16px rgba(0, 104, 255, 0.35) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.zalo-floating-btn:hover {
+    transform: scale(1.08) !important;
+    box-shadow: 0 6px 20px rgba(0, 104, 255, 0.45) !important;
+}
+
+.zalo-floating-btn svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+.admin-page #zaloFloatingBtn,
+.admin-page .zalo-floating-btn {
+    display: none !important;
 }
 
