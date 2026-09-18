@@ -3467,6 +3467,10 @@ html[data-theme='dark'] .hero-control {
         padding-bottom: 75px !important;
     }
 
+    body:not(.admin-page) main.container > * {
+        order: 10;
+    }
+
     body:not(.admin-page) main.container > #promoCarousel {
         order: 1 !important;
         margin-top: 0 !important;
@@ -3483,6 +3487,7 @@ html[data-theme='dark'] .hero-control {
         order: 3 !important;
     }
 
+    body:not(.admin-page) main.container > .flex-layout,
     body:not(.admin-page) main.container > #productCatalogSection,
     body:not(.admin-page) main.container > .catalog-section {
         order: 4 !important;
@@ -3519,6 +3524,10 @@ html[data-theme='dark'] .hero-control {
         flex-direction: column !important;
     }
 
+    body:not(.admin-page) main.container > * {
+        order: 10;
+    }
+
     body:not(.admin-page) main.container > #storefrontCategories {
         order: 1 !important;
         margin-top: 0 !important;
@@ -3538,6 +3547,7 @@ html[data-theme='dark'] .hero-control {
         order: 3 !important;
     }
 
+    body:not(.admin-page) main.container > .flex-layout,
     body:not(.admin-page) main.container > #productCatalogSection,
     body:not(.admin-page) main.container > .catalog-section {
         order: 4 !important;
