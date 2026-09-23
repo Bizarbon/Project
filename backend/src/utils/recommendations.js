@@ -107,6 +107,8 @@ async function recommendProducts({
         referenceProductId ? Product.findById(referenceProductId) : null
     ]);
     const searchTerms = normalizeText(search).split(/\s+/).filter(term => term.length > 1);
+    const categoryTerms = new Set(normalizeText(category).split(/\s+/));
+    const specificSearchTerms = searchTerms.filter(term => !categoryTerms.has(term));
 
     return products
         .filter(product => !referenceProduct || Number(product._id) !== Number(referenceProduct._id))
@@ -125,6 +127,10 @@ async function recommendProducts({
                 { match: priority.includes('nhe') && Boolean(product.specs?.weight), reason: `Có thông tin khối lượng: ${product.specs?.weight}` }
             ];
             const requirement = requirementChecks.find(item => item.match);
+            const nameNorm = normalizeText(product.name);
+            const nameMatchCount = specificSearchTerms.filter(term => nameNorm.includes(term)).length;
+            const tagMatchCount = (product.tags || []).filter(tag => specificSearchTerms.some(term => normalizeText(tag).includes(term))).length;
+
             const signals = {
                 preferredCategory: preferences.categoryWeights.has(categoryKey),
                 preferredBrand: preferences.brandWeights.has(brandKey),
@@ -147,6 +153,8 @@ async function recommendProducts({
             score += signals.referenceCategory ? 8 : 0;
             score += referenceProduct && normalizeText(referenceProduct.brand) === brandKey ? 4 : 0;
             score += signals.searchMatch ? 7 : 0;
+            score += nameMatchCount * 15;
+            score += tagMatchCount * 8;
             score += signals.budgetMatch ? 2 : 0;
             score += signals.requirementMatch ? 4 : 0;
             score -= preferences.purchasedIds.has(Number(product._id)) ? 1.5 : 0;
