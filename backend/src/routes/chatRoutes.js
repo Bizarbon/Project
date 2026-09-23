@@ -48,23 +48,6 @@ function hasWordOrPhrase(text, phrase) {
 }
 
 const KNOWN_UNSUPPORTED_ITEMS = [
-    {
-        keywords: [
-            'ban phim may tinh', 'ban phim co', 'ban phim roi', 'ban phim khong day',
-            'ban phim bluetooth', 'ban phim laptop', 'ban phim van phong', 'ban phim gaming',
-            'ban phim pc', 'ban phim', 'keyboard'
-        ],
-        name: 'bàn phím máy tính rời',
-        excludeIf: (normText) => normText.includes('matepad') || normText.includes('huawei'),
-        customReply: `Dạ hiện tại TechEcommerce **chưa kinh doanh sản phẩm bàn phím máy tính rời** ạ! 🙏\n\n` +
-            `Trong nhóm phụ kiện và thiết bị làm việc, cửa hàng chúng mình hiện có sẵn các sản phẩm chính hãng nổi bật:\n` +
-            `• 🖱️ **Chuột máy tính:** Chuột không dây cao cấp Logitech MX Master 3S (chống ồn, cuộn siêu tốc MagSpeed), Chuột Gaming Logitech G502 Hero...\n` +
-            `• 🔌 **Hub chuyển đổi Type-C:** Hub Ugreen USB-C 5 IN 1 mở rộng HDMI, USB tiện lợi...\n` +
-            `• 🔋 **Pin sạc dự phòng & sạc nhanh:** Anker 165W, Ugreen 130W, Baseus 20W sạc nhanh cho cả laptop và điện thoại...\n` +
-            `• 📲 **Tablet kèm bàn phím thông minh:** Huawei MatePad 11.5 S (đã kèm sẵn ốp bàn phím từ tính phục vụ gõ văn bản và làm việc cực tiện lợi).\n\n` +
-            `👉 Bạn có muốn tham khảo các mẫu chuột Logitech hay dòng tablet kèm bàn phím này không ạ?`,
-        suggestions: ['Chuột Logitech MX Master 3S', 'Chuột Gaming G502', 'Huawei MatePad kèm bàn phím', 'Hub chuyển đổi Ugreen']
-    },
     { keywords: ['may doc sach', 'kindle', 'kobo', 'boox', 'sach dien tu', 'doc sach'], name: 'máy đọc sách' },
     { keywords: ['tivi', 'ti vi', 'smart tv', 'television'], name: 'tivi / màn hình TV' },
     { keywords: ['tu lanh', 'refrigerator'], name: 'tủ lạnh' },
@@ -225,6 +208,7 @@ function inferCategory(text) {
         ]],
         ['Phụ kiện', [
             'phu kien', 'chuot may tinh', 'chuot khong day', 'chuot gaming',
+            'ban phim', 'ban phim may tinh', 'ban phim co', 'ban phim khong day', 'ban phim logitech', 'keyboard',
             'cu sac', 'bo sac', 'day sac', 'coc sac', 'sac nhanh', 'pin du phong', 'sac du phong',
             'cap sac', 'cap type c', 'cap lightning', 'hub chuyen doi', 'hub usb', 'op lung', 'tui chong soc',
             'but cam ung', 'apple pencil'
@@ -314,7 +298,7 @@ async function buildProductFilter(text) {
         category = await detectCategoryFromDatabase(text);
     }
 
-    const brands = ['apple', 'samsung', 'xiaomi', 'oppo', 'asus', 'acer', 'dell', 'hp', 'lenovo', 'msi', 'sony', 'lg', 'garmin', 'nintendo', 'valve', 'huawei'];
+    const brands = ['apple', 'samsung', 'xiaomi', 'oppo', 'asus', 'acer', 'dell', 'hp', 'lenovo', 'msi', 'sony', 'lg', 'garmin', 'nintendo', 'valve', 'huawei', 'logitech', 'anker', 'ugreen', 'baseus'];
     const brand = brands.find(item => text.includes(item));
 
     return { budget, category, brand };
@@ -930,6 +914,8 @@ async function answerProductQuestion(message, user, previousContext = {}) {
     // Kiểm tra xem khách hàng có đang hỏi một loại phụ kiện cụ thể (chuột, sạc dự phòng, hub, bút cảm ứng...) hay không
     const hasSpecificAccessory = category === 'Phụ kiện' && (
         hasWordOrPhrase(text, 'chuot') ||
+        hasWordOrPhrase(text, 'ban phim') ||
+        hasWordOrPhrase(text, 'keyboard') ||
         hasWordOrPhrase(text, 'pin du phong') ||
         hasWordOrPhrase(text, 'sac du phong') ||
         hasWordOrPhrase(text, 'hub') ||
@@ -1087,11 +1073,13 @@ async function answerProductQuestion(message, user, previousContext = {}) {
 
         if (category === 'Phụ kiện') {
             const reply = budget
-                ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn đang quan tâm loại phụ kiện nào (như chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) ạ?`
-                : `Chào bạn! Với danh mục Phụ kiện, bạn đang quan tâm loại sản phẩm nào (như chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) để mình tư vấn mẫu tốt nhất nhé?`;
+                ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn đang quan tâm loại phụ kiện nào (như bàn phím máy tính, chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) ạ?`
+                : `Chào bạn! Với danh mục Phụ kiện, bạn đang quan tâm loại sản phẩm nào (như bàn phím máy tính, chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) để mình tư vấn mẫu tốt nhất nhé?`;
             const suggestions = [
+                'Bàn phím cơ & không dây',
                 'Chuột không dây & gaming',
                 'Pin sạc dự phòng',
+                'Củ sạc nhanh Anker',
                 'Hub chuyển đổi Type-C',
                 'Bút cảm ứng Apple Pencil'
             ];

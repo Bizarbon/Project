@@ -1319,7 +1319,7 @@ module.exports = [
         "reviewCount": 65,
         "soldCount": 280,
         "stock": 40,
-        "videoUrl": "https://www.youtube.com/embed/8oCPUXHYij8"
+        "videoUrl": "https://www.youtube.com/embed/xJNSADqpie0"
     },
     {
         "name": "Pin sạc dự phòng Baseus Bipow Digital Display 20.000mAh 20W",
@@ -1636,5 +1636,100 @@ module.exports = [
         "soldCount": 310,
         "stock": 30,
         "videoUrl": "https://www.youtube.com/embed/LxqNAxQh5WA"
+    },
+    {
+        "name": "Bàn phím không dây Logitech MX Keys S",
+        "brand": "Logitech",
+        "category": "Phụ kiện",
+        "price": 2790000,
+        "compareAtPrice": 3290000,
+        "image": "assets/images/product-cards/logitech-mx-keys-s.webp",
+        "images": [
+            "assets/images/product-cards/logitech-mx-keys-s.webp"
+        ],
+        "description": "Bàn phím không dây cao cấp thiết kế phím lõm Perfect Stroke, đèn nền thông minh tự sáng khi lại gần, kết nối đa thiết bị Easy-Switch qua Bluetooth hoặc Logi Bolt.",
+        "specs": {
+            "type": "Bàn phím không dây văn phòng cao cấp",
+            "layout": "Full-size 108 phím tiêu chuẩn",
+            "connectivity": "Bluetooth Low Energy, Logi Bolt USB",
+            "battery": "Pin sạc Type-C, dùng lên đến 5 tháng khi tắt đèn",
+            "features": "Cảm biến tiệm cận tự sáng phím, gán macro Smart Actions"
+        },
+        "tags": [
+            "Logitech",
+            "MX Keys S",
+            "Bàn phím không dây",
+            "Bàn phím văn phòng",
+            "Phụ kiện"
+        ],
+        "featured": true,
+        "rating": 5.0,
+        "reviewCount": 86,
+        "soldCount": 340,
+        "stock": 25,
+        "videoUrl": "https://www.youtube.com/embed/1BjmvK2CtoM"
+    },
+    {
+        "name": "Bàn phím cơ Gaming Logitech G413 SE Mechanical",
+        "brand": "Logitech",
+        "category": "Phụ kiện",
+        "price": 1590000,
+        "compareAtPrice": 1890000,
+        "image": "assets/images/product-cards/logitech-g413-se.webp",
+        "images": [
+            "assets/images/product-cards/logitech-g413-se.webp"
+        ],
+        "description": "Bàn phím cơ gaming bền bỉ với switch cơ học tactile, keycap chất liệu PBT chống mài mòn, khung trên bằng hợp kim nhôm 5052 cao cấp và hệ thống LED trắng hiện đại.",
+        "specs": {
+            "type": "Bàn phím cơ Gaming",
+            "switch": "Tactile Mechanical Switches",
+            "keycaps": "Chất liệu PBT cao cấp chống mòn bóng",
+            "material": "Khung vỏ hợp kim nhôm máy bay 5052",
+            "connectivity": "Cáp USB bọc dù dài 1.8m"
+        },
+        "tags": [
+            "Logitech",
+            "G413 SE",
+            "Bàn phím cơ",
+            "Gaming",
+            "Phụ kiện"
+        ],
+        "featured": false,
+        "rating": 4.8,
+        "reviewCount": 62,
+        "soldCount": 290,
+        "stock": 30,
+        "videoUrl": "https://www.youtube.com/embed/a-Oia5CafkQ"
+    },
+    {
+        "name": "Củ sạc nhanh Anker Prime 100W GaN 3 cổng A2688",
+        "brand": "Anker",
+        "category": "Phụ kiện",
+        "price": 1690000,
+        "compareAtPrice": 1990000,
+        "image": "assets/images/product-cards/anker-prime-100w.webp",
+        "images": [
+            "assets/images/product-cards/anker-prime-100w.webp"
+        ],
+        "description": "Củ sạc công nghệ GaN siêu nhỏ gọn công suất tối đa 100W, trang bị 2 cổng USB-C và 1 cổng USB-A hỗ trợ phân bổ điện năng thông minh PowerIQ 4.0 và ActiveShield 2.0.",
+        "specs": {
+            "power": "100W Max",
+            "ports": "2x USB-C (Tối đa 100W), 1x USB-A (22.5W)",
+            "technology": "GaNPrime, PowerIQ 4.0, ActiveShield 2.0",
+            "compatibility": "MacBook Pro, iPhone 16/15, iPad, Dell XPS, Samsung S24"
+        },
+        "tags": [
+            "Anker",
+            "Prime 100W",
+            "Củ sạc nhanh",
+            "GaN",
+            "Phụ kiện"
+        ],
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 94,
+        "soldCount": 410,
+        "stock": 35,
+        "videoUrl": "https://www.youtube.com/embed/iMqw8lEgEhE"
     }
 ];
