@@ -48,6 +48,23 @@ function hasWordOrPhrase(text, phrase) {
 }
 
 const KNOWN_UNSUPPORTED_ITEMS = [
+    {
+        keywords: [
+            'ban phim may tinh', 'ban phim co', 'ban phim roi', 'ban phim khong day',
+            'ban phim bluetooth', 'ban phim laptop', 'ban phim van phong', 'ban phim gaming',
+            'ban phim pc', 'ban phim', 'keyboard'
+        ],
+        name: 'bàn phím máy tính rời',
+        excludeIf: (normText) => normText.includes('matepad') || normText.includes('huawei'),
+        customReply: `Dạ hiện tại TechEcommerce **chưa kinh doanh sản phẩm bàn phím máy tính rời** ạ! 🙏\n\n` +
+            `Trong nhóm phụ kiện và thiết bị làm việc, cửa hàng chúng mình hiện có sẵn các sản phẩm chính hãng nổi bật:\n` +
+            `• 🖱️ **Chuột máy tính:** Chuột không dây cao cấp Logitech MX Master 3S (chống ồn, cuộn siêu tốc MagSpeed), Chuột Gaming Logitech G502 Hero...\n` +
+            `• 🔌 **Hub chuyển đổi Type-C:** Hub Ugreen USB-C 5 IN 1 mở rộng HDMI, USB tiện lợi...\n` +
+            `• 🔋 **Pin sạc dự phòng & sạc nhanh:** Anker 165W, Ugreen 130W, Baseus 20W sạc nhanh cho cả laptop và điện thoại...\n` +
+            `• 📲 **Tablet kèm bàn phím thông minh:** Huawei MatePad 11.5 S (đã kèm sẵn ốp bàn phím từ tính phục vụ gõ văn bản và làm việc cực tiện lợi).\n\n` +
+            `👉 Bạn có muốn tham khảo các mẫu chuột Logitech hay dòng tablet kèm bàn phím này không ạ?`,
+        suggestions: ['Chuột Logitech MX Master 3S', 'Chuột Gaming G502', 'Huawei MatePad kèm bàn phím', 'Hub chuyển đổi Ugreen']
+    },
     { keywords: ['may doc sach', 'kindle', 'kobo', 'boox', 'sach dien tu', 'doc sach'], name: 'máy đọc sách' },
     { keywords: ['tivi', 'ti vi', 'smart tv', 'television'], name: 'tivi / màn hình TV' },
     { keywords: ['tu lanh', 'refrigerator'], name: 'tủ lạnh' },
@@ -72,27 +89,39 @@ const KNOWN_UNSUPPORTED_ITEMS = [
 function checkUnsupportedProduct(text) {
     const norm = normalizeText(text);
     for (const item of KNOWN_UNSUPPORTED_ITEMS) {
+        if (typeof item.excludeIf === 'function' && item.excludeIf(norm)) {
+            continue;
+        }
         if (item.keywords.some(k => hasWordOrPhrase(norm, k))) {
-            return item.name;
+            return item;
         }
     }
     return null;
 }
 
-function buildOutOfCatalogResponse(productName) {
+function buildOutOfCatalogResponse(unsupportedInfo) {
+    const isObject = typeof unsupportedInfo === 'object' && unsupportedInfo !== null;
+    const productName = isObject ? unsupportedInfo.name : unsupportedInfo;
+    const customReply = isObject ? unsupportedInfo.customReply : null;
+    const customSuggestions = isObject ? unsupportedInfo.suggestions : null;
+
     const itemLabel = productName ? `sản phẩm **${productName}**` : 'sản phẩm này';
+    const reply = customReply || (
+        `Dạ hiện tại TechEcommerce **chưa kinh doanh ${itemLabel}** này ạ! 🙏\n\n` +
+        `Cửa hàng chúng mình hiện chuyên phân phối chính hãng 100% các nhóm sản phẩm công nghệ hàng đầu:\n` +
+        `• 📱 **Điện thoại:** iPhone 16 / 15 Series, Samsung Galaxy S24, Galaxy Z Fold/Flip, Xiaomi, OPPO...\n` +
+        `• 💻 **Laptop:** MacBook Air / Pro M3, ASUS ROG Strix, Dell Inspiron, Lenovo IdeaPad, Acer Nitro...\n` +
+        `• 📲 **Tablet:** iPad Pro M4, iPad Air M2, Samsung Galaxy Tab, Huawei MatePad...\n` +
+        `• ⌚ **Đồng hồ thông minh:** Apple Watch Series, Samsung Galaxy Watch, Garmin GPS...\n` +
+        `• 🎮 **Máy chơi game:** PlayStation 5 Slim, Nintendo Switch OLED, Steam Deck...\n` +
+        `• 🎧 **Tai nghe & Phụ kiện:** AirPods Pro 2, củ sạc nhanh, pin dự phòng, chuột Logitech, cáp sạc...\n\n` +
+        `👉 Bạn có muốn tham khảo dòng sản phẩm công nghệ nào ở trên không, mình sẽ tư vấn chi tiết thông số và giá ưu đãi tốt nhất cho bạn nhé! 😊`
+    );
+
     return {
-        reply: `Dạ hiện tại TechEcommerce **chưa kinh doanh ${itemLabel}** này ạ! 🙏\n\n` +
-            `Cửa hàng chúng mình hiện chuyên phân phối chính hãng 100% các nhóm sản phẩm công nghệ hàng đầu:\n` +
-            `• 📱 **Điện thoại:** iPhone 16 / 15 Series, Samsung Galaxy S24, Galaxy Z Fold/Flip, Xiaomi, OPPO...\n` +
-            `• 💻 **Laptop:** MacBook Air / Pro M3, ASUS ROG Strix, Dell Inspiron, Lenovo IdeaPad, Acer Nitro...\n` +
-            `• 📲 **Tablet:** iPad Pro M4, iPad Air M2, Samsung Galaxy Tab, Huawei MatePad...\n` +
-            `• ⌚ **Đồng hồ thông minh:** Apple Watch Series, Samsung Galaxy Watch, Garmin GPS...\n` +
-            `• 🎮 **Máy chơi game:** PlayStation 5 Slim, Nintendo Switch OLED, Steam Deck...\n` +
-            `• 🎧 **Tai nghe & Phụ kiện:** AirPods Pro 2, củ sạc nhanh, pin dự phòng, chuột Logitech, cáp sạc...\n\n` +
-            `👉 Bạn có muốn tham khảo dòng sản phẩm công nghệ nào ở trên không, mình sẽ tư vấn chi tiết thông số và giá ưu đãi tốt nhất cho bạn nhé! 😊`,
+        reply,
         products: [],
-        suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Xem iPad & Tablet', 'Đồng hồ thông minh', 'Săn mã giảm giá'],
+        suggestions: customSuggestions || ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Xem iPad & Tablet', 'Đồng hồ thông minh', 'Săn mã giảm giá'],
         context: { stage: 'out_of_catalog', notFound: true },
         notFound: true
     };
@@ -195,7 +224,7 @@ function inferCategory(text) {
             'tablet', 'may tinh bang', 'ipad', 'galaxy tab', 'matepad', 'honor pad', 'xiaomi pad'
         ]],
         ['Phụ kiện', [
-            'phu kien', 'chuot may tinh', 'chuot khong day', 'chuot gaming', 'ban phim co', 'ban phim',
+            'phu kien', 'chuot may tinh', 'chuot khong day', 'chuot gaming',
             'cu sac', 'bo sac', 'day sac', 'coc sac', 'sac nhanh', 'pin du phong', 'sac du phong',
             'cap sac', 'cap type c', 'cap lightning', 'hub chuyen doi', 'hub usb', 'op lung', 'tui chong soc',
             'but cam ung', 'apple pencil'
@@ -552,7 +581,8 @@ async function performRagRecommendation({
 }) {
     // 1. RAG Retrieval: Tìm sản phẩm chính phù hợp từ MongoDB
     let products = [];
-    const searchKeywords = [category, brand, useCase, priority, profile].filter(Boolean).join(' ');
+    const userQueryWords = extractProductQuery(message);
+    const searchKeywords = [category, brand, useCase, priority, profile, userQueryWords].filter(Boolean).join(' ');
 
     if (category) {
         products = await recommendProducts({
@@ -579,8 +609,17 @@ async function performRagRecommendation({
             // Lấy các sản phẩm có giá lân cận ngân sách (từ 65% đến 125% budget)
             query.price = { $gte: Math.round(budget * 0.65), $lte: Math.round(budget * 1.25) };
         }
+        if (userQueryWords && userQueryWords.length >= 3) {
+            const queryRegex = new RegExp(escapeRegex(userQueryWords), 'i');
+            const words = userQueryWords.split(/\s+/).filter(w => w.length >= 2);
+            query.$or = [
+                { name: queryRegex },
+                { tags: queryRegex },
+                { tags: { $in: words } }
+            ];
+        }
         products = await Product.find(query).sort({ rating: -1, soldCount: -1 }).limit(3);
-        if (!products.length) {
+        if (!products.length && !userQueryWords) {
             products = await Product.find({ category, active: { $ne: false }, stock: { $gt: 0 } })
                 .sort({ price: 1 }).limit(3);
         }
@@ -888,11 +927,24 @@ async function answerProductQuestion(message, user, previousContext = {}) {
     const priority = extractPriority(text);
     const profile = extractUserProfile(text);
 
+    // Kiểm tra xem khách hàng có đang hỏi một loại phụ kiện cụ thể (chuột, sạc dự phòng, hub, bút cảm ứng...) hay không
+    const hasSpecificAccessory = category === 'Phụ kiện' && (
+        hasWordOrPhrase(text, 'chuot') ||
+        hasWordOrPhrase(text, 'pin du phong') ||
+        hasWordOrPhrase(text, 'sac du phong') ||
+        hasWordOrPhrase(text, 'hub') ||
+        hasWordOrPhrase(text, 'but cam ung') ||
+        hasWordOrPhrase(text, 'pencil') ||
+        hasWordOrPhrase(text, 'cu sac') ||
+        hasWordOrPhrase(text, 'bo sac') ||
+        hasWordOrPhrase(text, 'osmo')
+    );
+
     // NGUYÊN TẮC TƯ VẤN SƠ ĐỒ TƯ DUY:
-    // Khi khách hàng đưa ra nhu cầu chung chung (ví dụ "Tư vấn laptop 15 triệu", "tôi có khoảng 10 triệu Tôi muốn mua đồng hồ di động")
-    // mà CHƯA nói rõ mục đích sử dụng và yếu tố ưu tiên:
-    // AI KHÔNG NÊN lập tức đề xuất sản phẩm, mà cần tiếp tục hỏi về mục đích sử dụng!
-    const isGeneralInquiry = category && (!useCase && !priority);
+    // Khi khách hàng đưa ra nhu cầu chung chung (ví dụ "Tư vấn laptop 15 triệu", "Tư vấn phụ kiện")
+    // mà CHƯA nói rõ mục đích sử dụng, yếu tố ưu tiên hoặc loại phụ kiện cụ thể:
+    // AI tiếp tục hỏi để làm rõ nhu cầu; ngược lại nếu đã chỉ rõ loại phụ kiện cụ thể thì tiến hành tư vấn ngay!
+    const isGeneralInquiry = category && (!useCase && !priority) && !hasSpecificAccessory;
 
     if (isGeneralInquiry) {
         if (category === 'Tai nghe') {
@@ -1035,13 +1087,13 @@ async function answerProductQuestion(message, user, previousContext = {}) {
 
         if (category === 'Phụ kiện') {
             const reply = budget
-                ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn đang quan tâm loại phụ kiện nào (như chuột, bàn phím, sạc nhanh, pin dự phòng hay hub chuyển đổi) ạ?`
-                : `Chào bạn! Với danh mục Phụ kiện, bạn đang quan tâm loại sản phẩm nào (như chuột, bàn phím, sạc nhanh, pin dự phòng hay hub chuyển đổi) để mình tư vấn mẫu tốt nhất nhé?`;
+                ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn đang quan tâm loại phụ kiện nào (như chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) ạ?`
+                : `Chào bạn! Với danh mục Phụ kiện, bạn đang quan tâm loại sản phẩm nào (như chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) để mình tư vấn mẫu tốt nhất nhé?`;
             const suggestions = [
                 'Chuột không dây & gaming',
                 'Pin sạc dự phòng',
-                'Củ cáp sạc nhanh',
-                'Hub chuyển đổi Type-C'
+                'Hub chuyển đổi Type-C',
+                'Bút cảm ứng Apple Pencil'
             ];
             return {
                 reply,

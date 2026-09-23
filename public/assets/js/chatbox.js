@@ -786,7 +786,7 @@
                 else if (/tablet|máy tính bảng|ipad|matepad/i.test(userMsgLower)) targetCategory = 'Tablet';
                 else if (/tai nghe|headphone|airpods/i.test(userMsgLower)) targetCategory = 'Tai nghe';
                 else if (/máy chơi game|playstation|ps5|nintendo/i.test(userMsgLower)) targetCategory = 'Máy chơi game';
-                else if (/\b(phụ kiện|củ sạc|dây sạc|cáp sạc|pin dự phòng|sạc dự phòng|chuột|bàn phím)\b/i.test(userMsgLower)) targetCategory = 'Phụ kiện';
+                else if (/\b(phụ kiện|củ sạc|dây sạc|cáp sạc|pin dự phòng|sạc dự phòng|chuột|hub chuyển đổi)\b/i.test(userMsgLower)) targetCategory = 'Phụ kiện';
             }
 
             // 2. Yêu cầu của người dùng:
