@@ -1,0 +1,52 @@
+{
+  "1": {
+    "id": 1,
+    "sku": "TECH-00001",
+    "name": "Tai nghe Apple EarPods Lightning MWTY3ZA/A",
+    "category": "Tai nghe",
+    "embedUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+    "youtubeId": "6Mf6gZRTrwg",
+    "youtubeTitle": "Tai Nghe Dây EarPods 500K Nghe Hay Hơn Cả AirPods Vài Triệu: Lời Đồn Hay Sự Thật?",
+    "author": "GenZ Viet"
+  },
+  "2": {
+    "id": 2,
+    "sku": "TECH-00002",
+    "name": "DJI Osmo Pocket 3 Creator Combo",
+    "category": "Phụ kiện",
+    "embedUrl": "https://www.youtube.com/embed/89eiFLvM36k",
+    "youtubeId": "89eiFLvM36k",
+    "youtubeTitle": "Review DJI Osmo Pocket 3 sau 1,5 năm: nhiều vấn đề vậy đâu là phương án thay thế?",
+    "author": "Vinh Xô"
+  },
+  "3": {
+    "id": 3,
+    "sku": "TECH-00003",
+    "name": "Chuột Gaming Logitech G502 Hero",
+    "category": "Phụ kiện",
+    "embedUrl": "https://www.youtube.com/embed/nKFUOIPD-rM",
+    "youtubeId": "nKFUOIPD-rM",
+    "youtubeTitle": "[Dạo Review] Trải nghiệm và đánh giá chi tiết chuột gaming Logitech G502 Hero | huyền thoại!",
+    "author": "Dạo ModTech"
+  },
+  "4": {
+    "id": 4,
+    "sku": "TECH-00004",
+    "name": "Hub chuyển đổi Ugreen USB-C 5 IN 1 CM478 15495",
+    "category": "Phụ kiện",
+    "embedUrl": "https://www.youtube.com/embed/txAO5aAFC3k",
+    "youtubeId": "txAO5aAFC3k",
+    "youtubeTitle": "Đánh giá nhanh UGREEN - Hub chuyển đổi 5 in 1 và 9 in 1: dùng ngon giá chỉ từ 359K | Genz Viet",
+    "author": "GenZ Viet"
+  },
+  "5": {
+    "id": 5,
+    "sku": "TECH-00005",
+    "name": "Pin sạc dự phòng Anker A1695 25.000mAh 165W",
+    "category": "Phụ kiện",
+    "embedUrl": "https://www.youtube.com/embed/gWK4-C_IUXM",
+    "youtubeId": "gWK4-C_IUXM",
+    "youtubeTitle": "Pin Dự Phòng Anker Zolo 25000 165W – A1695 | Trùm Sạc Dự Phòng 2025 | VUA2HAND",
+    "author": "Vua2hand"
+  }
+}

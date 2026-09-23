@@ -50,6 +50,11 @@ const productSchema = new mongoose.Schema({
         type: String,
         trim: true
     }],
+    videoUrl: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     supplier: {
         type: Number,
         ref: 'Supplier',

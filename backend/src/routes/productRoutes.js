@@ -81,6 +81,7 @@ async function normalizeProductPayload(body, existingProduct = null) {
         stock: Math.max(Number(body.stock) || 0, 0),
         image: compactString(body.image || ''),
         images: splitList(body.images),
+        videoUrl: compactString(body.videoUrl || ''),
         supplier: await resolveSupplier(body.supplier),
         minStock: Math.max(Number(body.minStock) || 5, 0),
         warranty: compactString(body.warranty || 'Không bảo hành'),

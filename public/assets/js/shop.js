@@ -410,6 +410,7 @@ function setCategory(category, options = {}) {
         document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
+window.setCategory = setCategory;
 
 function setupPromoCarousel() {
     const carousel = document.getElementById('promoCarousel');
@@ -1882,6 +1883,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await refreshShippingQuote(checkoutAddressValue());
     await loadCustomers();
     updatePaymentInfo();
+    if (pageParams.get('category') || window.location.hash === '#catalogStart') {
+        setTimeout(() => {
+            document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+    }
     if (pageParams.get('openCart') === '1' || (auth.isLoggedIn() && localStorage.getItem('checkoutAfterLogin') === 'true')) {
         localStorage.removeItem('checkoutAfterLogin');
         openCartDrawer();

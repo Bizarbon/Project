@@ -160,12 +160,81 @@
         return data;
     }
 
+    function formatVndForSpeech(priceStr) {
+        const cleaned = String(priceStr || '').replace(/[^\d]/g, '');
+        const num = parseInt(cleaned, 10);
+        if (isNaN(num) || num <= 0) return priceStr;
+
+        const millions = Math.floor(num / 1000000);
+        const thousands = Math.floor((num % 1000000) / 1000);
+
+        let result = '';
+        if (millions > 0) {
+            result += `${millions} triệu`;
+            if (thousands > 0) result += ` ${thousands} nghìn`;
+            result += ' đồng';
+        } else if (thousands > 0) {
+            result += `${thousands} nghìn đồng`;
+        } else {
+            result += `${num} đồng`;
+        }
+        return result;
+    }
+
+    function cleanSpeechText(text) {
+        if (!text) return '';
+        const lines = String(text).split('\n');
+        const spokenLines = [];
+
+        for (let rawLine of lines) {
+            let line = rawLine.trim();
+            if (!line) continue;
+
+            // Bỏ các ký tự đặc biệt / emoji ở đầu dòng để kiểm tra từ khóa
+            const normalized = line.replace(/^[\s•\-\*✨🎁💡👉🛡️🚚🔄💳]+/u, '').trim();
+
+            // Bỏ qua dòng thông số, cấu hình, đánh giá, chính sách, ưu đãi, phụ kiện kèm...
+            if (/^(?:thông số|cấu hình|đánh giá|cpu|ram|bộ nhớ|màn hình|pin|chính sách|ưu đãi|tăng cường trải nghiệm|bạn có muốn xem thêm|quà tặng|hỗ trợ|100%|bạn có thể|lỗi 1 đổi 1)/i.test(normalized)) {
+                continue;
+            }
+
+            const productMatch = line.match(/^(\d+)[\.\)]\s*(?:\*\*)?(.*?)(?:\*\*)?\s*[-–:]\s*(?:\*\*)?([0-9\.,]+(?:\s*(?:đ|vnd|đồng|₫))?)(?:\*\*)?(.*)$/i);
+            if (productMatch) {
+                const index = productMatch[1];
+                const name = productMatch[2].replace(/\*\*|\*|`/g, '').trim();
+                const priceRaw = productMatch[3].trim();
+                const priceSpeech = formatVndForSpeech(priceRaw);
+                spokenLines.push(`Sản phẩm ${index}: ${name}, giá ${priceSpeech}.`);
+                continue;
+            }
+
+            let cleanLine = line
+                .replace(/\*\*|\*|`|#/g, '')
+                .replace(/^[•\-]\s*/, '')
+                .replace(/\((?:còn|tạm hết)[^)]*\)/gi, '')
+                .replace(/[\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+                .trim();
+
+            cleanLine = cleanLine.replace(/(\d{1,3}(?:\.\d{3}){1,3})\s*(?:đ|vnd|đồng|₫)/gi, (m, p) => formatVndForSpeech(p));
+
+            if (cleanLine.length > 2) {
+                spokenLines.push(cleanLine);
+            }
+        }
+
+        return spokenLines.join(' ');
+    }
+
     function speak(text) {
         if (!voiceOutputEnabled || !('speechSynthesis' in window)) return;
         speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
+        const cleanText = cleanSpeechText(text);
+        if (!cleanText) return;
+        const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'vi-VN';
-        utterance.rate = 1;
+        utterance.rate = 1.05;
+        const voices = speechSynthesis.getVoices();
+        utterance.voice = voices.find(voice => voice.lang?.toLowerCase().startsWith('vi')) || null;
         speechSynthesis.speak(utterance);
     }
 

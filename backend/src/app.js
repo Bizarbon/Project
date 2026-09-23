@@ -135,7 +135,7 @@ if (!IS_VERCEL) {
         maxAge: process.env.NODE_ENV === 'production' ? '1h' : 0,
         setHeaders: res => {
             res.setHeader('X-Content-Type-Options', 'nosniff');
-            res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+            res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
         }
     }));
 
