@@ -213,15 +213,62 @@ function setupStorefrontLiveSearch(headerEl, root) {
     if (!form || !input || !dropdown) return;
 
     const apiUrl = (typeof window !== 'undefined' && window.API_URL) ? window.API_URL : (root.includes('techecommerce-shop.vercel.app') ? 'https://techecommerce-shop.vercel.app/api' : 'http://localhost:5000/api');
-    const trendingSearches = [
-        'iPhone 16 Pro Max',
-        'MacBook Air M3',
-        'Logitech MX Keys S',
-        'Sony WH-1000XM5',
-        'Củ sạc Anker 65W',
-        'Samsung Galaxy S24 Ultra',
-        'iPad Air M2'
+    function saveRecentSearch(term) {
+        if (!term || term.trim().length < 2) return;
+        const clean = term.trim();
+        try {
+            let list = JSON.parse(localStorage.getItem('techecommerce_recent_searches') || '[]');
+            list = [clean, ...list.filter(x => x.toLowerCase() !== clean.toLowerCase())].slice(0, 5);
+            localStorage.setItem('techecommerce_recent_searches', JSON.stringify(list));
+        } catch (e) {}
+    }
+
+    function getRecentSearches() {
+        try {
+            return JSON.parse(localStorage.getItem('techecommerce_recent_searches') || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function clearRecentSearches() {
+        try {
+            localStorage.removeItem('techecommerce_recent_searches');
+        } catch (e) {}
+        renderTrending();
+    }
+
+    function removeRecentSearch(index) {
+        try {
+            let list = getRecentSearches();
+            list.splice(index, 1);
+            localStorage.setItem('techecommerce_recent_searches', JSON.stringify(list));
+        } catch (e) {}
+        renderTrending();
+    }
+
+    const trendingList = [
+        { rank: 1, term: 'iPhone 16 Pro Max', tag: 'HOT', tagType: 'hot' },
+        { rank: 2, term: 'MacBook Air M3', tag: 'MỚI', tagType: 'new' },
+        { rank: 3, term: 'Samsung Galaxy S24 Ultra', tag: 'AI', tagType: 'ai' },
+        { rank: 4, term: 'Sony WH-1000XM5', tag: '', tagType: '' },
+        { rank: 5, term: 'Logitech MX Keys S', tag: '', tagType: '' },
+        { rank: 6, term: 'Củ sạc Anker 65W GaN', tag: 'SALE', tagType: 'hot' }
     ];
+
+    let cachedHotProducts = null;
+    async function getHotProducts() {
+        if (cachedHotProducts) return cachedHotProducts;
+        try {
+            const res = await fetch(`${apiUrl}/products?limit=3`);
+            if (res.ok) {
+                const data = await res.json();
+                cachedHotProducts = Array.isArray(data) ? data.slice(0, 3) : [];
+                return cachedHotProducts;
+            }
+        } catch (e) {}
+        return [];
+    }
 
     let debounceTimer = null;
     let selectedIndex = -1;
@@ -242,20 +289,116 @@ function setupStorefrontLiveSearch(headerEl, root) {
         return escapeHTML(text).replace(regex, '<mark class="search-highlight">$1</mark>');
     }
 
-    function renderTrending() {
-        dropdown.innerHTML = `
-            <header class="live-search-header">
-                <span class="live-search-title">🔥 Từ khóa tìm kiếm thịnh hành</span>
-            </header>
-            <nav class="live-search-trending-chips" aria-label="Từ khóa nổi bật">
-                ${trendingSearches.map(term => `
-                    <button type="button" class="trending-chip" data-search-term="${escapeHTML(term)}">
-                        <span>🔍</span> ${escapeHTML(term)}
-                    </button>
-                `).join('')}
-            </nav>
+    async function renderTrending() {
+        const recents = getRecentSearches();
+        const hotProducts = await getHotProducts();
+
+        let html = '';
+
+        // Section 1: Lịch sử tìm kiếm (nếu có)
+        if (recents.length > 0) {
+            html += `
+                <div class="search-section search-section-history">
+                    <div class="search-section-header">
+                        <span class="search-section-title"><span class="section-icon">🕒</span> Tìm kiếm gần đây</span>
+                        <button type="button" class="btn-clear-history" id="btnClearSearchHistory">Xóa tất cả</button>
+                    </div>
+                    <div class="search-history-chips">
+                        ${recents.map((term, idx) => `
+                            <span class="history-chip" data-search-term="${escapeHTML(term)}">
+                                <span class="history-chip-text">${escapeHTML(term)}</span>
+                                <button type="button" class="history-chip-remove" data-remove-index="${idx}" aria-label="Xóa">×</button>
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Section 2: Xu hướng tìm kiếm
+        html += `
+            <div class="search-section search-section-trending">
+                <div class="search-section-header">
+                    <span class="search-section-title"><span class="section-icon">🔥</span> Xu hướng tìm kiếm</span>
+                    <span class="search-section-badge">PHỔ BIẾN</span>
+                </div>
+                <div class="search-trending-grid">
+                    ${trendingList.map(item => `
+                        <button type="button" class="trending-rank-btn" data-search-term="${escapeHTML(item.term)}">
+                            <span class="rank-badge rank-badge-${item.rank <= 3 ? item.rank : 'other'}">${item.rank}</span>
+                            <span class="rank-title">${escapeHTML(item.term)}</span>
+                            ${item.tag ? `<span class="rank-tag rank-tag-${item.tagType}">${item.tag}</span>` : ''}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
         `;
-        bindChipClicks();
+
+        // Section 3: Gợi ý sản phẩm nổi bật
+        if (hotProducts.length > 0) {
+            html += `
+                <div class="search-section search-featured-box">
+                    <div class="search-section-header">
+                        <span class="search-section-title"><span class="section-icon">⚡</span> Gợi ý mua sắm hàng đầu</span>
+                    </div>
+                    <div class="search-featured-list">
+                        ${hotProducts.map(p => {
+                            const discount = p.compareAtPrice && p.compareAtPrice > p.price;
+                            const percent = discount ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
+                            return `
+                                <a class="search-featured-card" href="${root}pages/catalog/product.html?id=${p._id}">
+                                    <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="search-featured-thumb" loading="lazy" onerror="this.src='${root}assets/images/logo/techecommerce-logo.svg'">
+                                    <div class="search-featured-info">
+                                        <strong class="search-featured-title">${escapeHTML(p.name)}</strong>
+                                        <div class="search-featured-price-row">
+                                            <span class="search-featured-price">${formatVND(p.price)}</span>
+                                            ${discount ? `<del class="search-featured-compare">${formatVND(p.compareAtPrice)}</del>` : ''}
+                                            ${percent > 0 ? `<span class="search-featured-badge">-${percent}%</span>` : ''}
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Section 4: Tip Footer
+        html += `
+            <div class="live-search-tip-footer">
+                <span>💡 <strong>Mẹo:</strong> Gõ từ 2 ký tự để tìm kiếm tức thì</span>
+                <span>📷 AI Visual Search</span>
+            </div>
+        `;
+
+        dropdown.innerHTML = html;
+
+        // Bind click events
+        dropdown.querySelector('#btnClearSearchHistory')?.addEventListener('click', e => {
+            e.stopPropagation();
+            clearRecentSearches();
+        });
+
+        dropdown.querySelectorAll('.history-chip-remove').forEach(btn => {
+            btn.addEventListener('click', e => {
+                e.stopPropagation();
+                const idx = Number(btn.getAttribute('data-remove-index'));
+                removeRecentSearch(idx);
+            });
+        });
+
+        dropdown.querySelectorAll('.history-chip, .trending-rank-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const term = btn.getAttribute('data-search-term');
+                if (term) {
+                    input.value = term;
+                    saveRecentSearch(term);
+                    performSearch(term);
+                }
+            });
+        });
+
         dropdown.hidden = false;
         selectedIndex = -1;
     }
