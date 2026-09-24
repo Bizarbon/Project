@@ -49,8 +49,13 @@
                     <form class="header-search" action="${root}index.html" method="get" role="search">
                         <label class="sr-only" for="sharedStorefrontSearch">Tìm kiếm sản phẩm</label>
                         <span class="header-search-icon" aria-hidden="true">⌕</span>
-                        <input id="sharedStorefrontSearch" name="search" type="search" value="${escapeHTML(currentSearch)}" placeholder="Bạn đang tìm sản phẩm gì?">
+                        <input id="sharedStorefrontSearch" name="search" type="search" value="${escapeHTML(currentSearch)}" placeholder="Bạn đang tìm sản phẩm gì?" autocomplete="off">
+                        <button type="button" class="header-search-camera-btn" id="headerVisualSearchBtn" title="Tìm kiếm bằng hình ảnh (AI Visual Search)" aria-label="Tìm kiếm bằng hình ảnh">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </button>
+                        <input type="file" id="headerVisualSearchInput" accept="image/*" style="display:none" aria-hidden="true">
                         <button type="submit">Tìm kiếm</button>
+                        <section id="sharedLiveSearchResults" class="live-search-dropdown" aria-label="Gợi ý tìm kiếm tức thì" hidden></section>
                     </form>
                     <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
                         <span id="nav-auth-section"></span>
@@ -92,6 +97,9 @@
     } else {
         setupCategoryDragScroll(nextHeader);
     }
+
+    // Attach Live Search & Visual AI Search
+    setupStorefrontLiveSearch(nextHeader, root);
 })();
 
 function setupCategoryDragScroll(navEl) {
@@ -193,3 +201,292 @@ function setupCategoryDragScroll(navEl) {
     setTimeout(updateArrows, 350);
 }
 window.setupCategoryDragScroll = setupCategoryDragScroll;
+
+function setupStorefrontLiveSearch(headerEl, root) {
+    if (!headerEl) return;
+    const form = headerEl.querySelector('.header-search');
+    const input = headerEl.querySelector('#sharedStorefrontSearch');
+    const dropdown = headerEl.querySelector('#sharedLiveSearchResults');
+    const cameraBtn = headerEl.querySelector('#headerVisualSearchBtn');
+    const cameraInput = headerEl.querySelector('#headerVisualSearchInput');
+
+    if (!form || !input || !dropdown) return;
+
+    const apiUrl = (typeof window !== 'undefined' && window.API_URL) ? window.API_URL : (root.includes('techecommerce-shop.vercel.app') ? 'https://techecommerce-shop.vercel.app/api' : 'http://localhost:5000/api');
+    const trendingSearches = [
+        'iPhone 16 Pro Max',
+        'MacBook Air M3',
+        'Logitech MX Keys S',
+        'Sony WH-1000XM5',
+        'Củ sạc Anker 65W',
+        'Samsung Galaxy S24 Ultra',
+        'iPad Air M2'
+    ];
+
+    let debounceTimer = null;
+    let selectedIndex = -1;
+
+    function formatVND(val) {
+        return (Number(val) || 0).toLocaleString('vi-VN') + ' đ';
+    }
+
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function highlightMatch(text, query) {
+        if (!query || !text) return escapeHTML(text);
+        const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedQuery})`, 'gi');
+        return escapeHTML(text).replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
+
+    function renderTrending() {
+        dropdown.innerHTML = `
+            <header class="live-search-header">
+                <span class="live-search-title">🔥 Từ khóa tìm kiếm thịnh hành</span>
+            </header>
+            <nav class="live-search-trending-chips" aria-label="Từ khóa nổi bật">
+                ${trendingSearches.map(term => `
+                    <button type="button" class="trending-chip" data-search-term="${escapeHTML(term)}">
+                        <span>🔍</span> ${escapeHTML(term)}
+                    </button>
+                `).join('')}
+            </nav>
+        `;
+        bindChipClicks();
+        dropdown.hidden = false;
+        selectedIndex = -1;
+    }
+
+    function renderProductsList(products, query) {
+        if (!products.length) {
+            dropdown.innerHTML = `
+                <div class="live-search-empty">
+                    <p>Không tìm thấy sản phẩm khớp với "<strong>${escapeHTML(query)}</strong>"</p>
+                </div>
+                <header class="live-search-header">
+                    <span class="live-search-title">🔥 Gợi ý từ khóa thịnh hành</span>
+                </header>
+                <nav class="live-search-trending-chips" aria-label="Từ khóa gợi ý">
+                    ${trendingSearches.map(term => `
+                        <button type="button" class="trending-chip" data-search-term="${escapeHTML(term)}">
+                            <span>🔍</span> ${escapeHTML(term)}
+                        </button>
+                    `).join('')}
+                </nav>
+            `;
+            bindChipClicks();
+            dropdown.hidden = false;
+            selectedIndex = -1;
+            return;
+        }
+
+        dropdown.innerHTML = `
+            <header class="live-search-header">
+                <span class="live-search-title">⚡ Sản phẩm gợi ý (${products.length})</span>
+            </header>
+            <ul class="live-search-list">
+                ${products.map(p => {
+                    const discount = p.compareAtPrice > p.price;
+                    return `
+                        <li class="live-search-item">
+                            <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
+                                <figure class="live-search-thumb">
+                                    <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.src='${root}assets/images/logo/techecommerce-logo.svg'">
+                                </figure>
+                                <div class="live-search-meta">
+                                    <strong class="live-search-name">${highlightMatch(p.name, query)}</strong>
+                                    <div class="live-search-price-row">
+                                        <span class="live-search-price">${formatVND(p.price)}</span>
+                                        ${discount ? `<del class="live-search-compare">${formatVND(p.compareAtPrice)}</del>` : ''}
+                                        <span class="live-search-stock ${p.stock > 0 ? 'in' : 'out'}">${p.stock > 0 ? '✓ Còn hàng' : 'Tạm hết'}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    `;
+                }).join('')}
+            </ul>
+            <footer class="live-search-footer">
+                <a class="live-search-view-all" href="${root}index.html?search=${encodeURIComponent(query)}">
+                    Xem tất cả kết quả cho "<strong>${escapeHTML(query)}</strong>" ➔
+                </a>
+            </footer>
+        `;
+        dropdown.hidden = false;
+        selectedIndex = -1;
+    }
+
+    function bindChipClicks() {
+        dropdown.querySelectorAll('.trending-chip').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const term = btn.getAttribute('data-search-term');
+                input.value = term;
+                performSearch(term);
+            });
+        });
+    }
+
+    async function performSearch(query) {
+        const trimmed = query.trim();
+        if (trimmed.length < 2) {
+            renderTrending();
+            return;
+        }
+        try {
+            const res = await fetch(`${apiUrl}/products?search=${encodeURIComponent(trimmed)}&limit=5`);
+            if (!res.ok) throw new Error('Search failed');
+            const data = await res.json();
+            renderProductsList(data, trimmed);
+        } catch (err) {
+            console.error('Live search error:', err);
+        }
+    }
+
+    // Input events
+    input.addEventListener('input', e => {
+        clearTimeout(debounceTimer);
+        const query = e.target.value;
+        if (query.trim().length < 2) {
+            if (query.trim().length === 0) dropdown.hidden = true;
+            else renderTrending();
+            return;
+        }
+        debounceTimer = setTimeout(() => performSearch(query), 200);
+    });
+
+    input.addEventListener('focus', () => {
+        const query = input.value.trim();
+        if (query.length >= 2) performSearch(query);
+        else renderTrending();
+    });
+
+    // Keyboard navigation
+    input.addEventListener('keydown', e => {
+        if (dropdown.hidden) return;
+        const items = dropdown.querySelectorAll('.live-search-link, .trending-chip');
+        if (!items.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+            updateSelection(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+            updateSelection(items);
+        } else if (e.key === 'Enter') {
+            if (selectedIndex >= 0 && items[selectedIndex]) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            }
+        } else if (e.key === 'Escape') {
+            dropdown.hidden = true;
+        }
+    });
+
+    function updateSelection(items) {
+        items.forEach((item, idx) => {
+            if (idx === selectedIndex) {
+                item.classList.add('is-focused');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('is-focused');
+            }
+        });
+    }
+
+    // Click outside to close
+    document.addEventListener('click', e => {
+        if (!form.contains(e.target)) {
+            dropdown.hidden = true;
+        }
+    });
+
+    // Camera Visual AI Search
+    if (cameraBtn && cameraInput) {
+        cameraBtn.addEventListener('click', () => {
+            cameraInput.click();
+        });
+
+        cameraInput.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            dropdown.hidden = false;
+            dropdown.innerHTML = `
+                <div class="visual-search-loading">
+                    <div class="visual-search-spinner" aria-hidden="true"></div>
+                    <strong>🔍 AI đang phân tích thiết bị từ hình ảnh...</strong>
+                    <p>Nhận diện model, thương hiệu và thông số kỹ thuật...</p>
+                </div>
+            `;
+
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const base64Data = reader.result;
+                try {
+                    const res = await fetch(`${apiUrl}/chat/visual-search`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            image: base64Data,
+                            filename: file.name
+                        })
+                    });
+                    const result = await res.json();
+                    if (!res.ok) throw new Error(result.message || 'Không thể tìm kiếm bằng hình ảnh');
+
+                    const detected = result.detectedItem || 'Thiết bị công nghệ';
+                    const products = result.products || [];
+
+                    dropdown.innerHTML = `
+                        <header class="visual-search-result-badge">
+                            <span class="badge-ai-chip">✨ AI Visual Search</span>
+                            <div class="visual-detected-title">Nhận diện: <strong>${escapeHTML(detected)}</strong></div>
+                            <small>${escapeHTML(result.description || '')}</small>
+                        </header>
+                        <header class="live-search-header" style="margin-top:0.5rem;">
+                            <span class="live-search-title">Sản phẩm tương thích (${products.length})</span>
+                        </header>
+                        <ul class="live-search-list">
+                            ${products.map(p => `
+                                <li class="live-search-item">
+                                    <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
+                                        <figure class="live-search-thumb">
+                                            <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy">
+                                        </figure>
+                                        <div class="live-search-meta">
+                                            <strong class="live-search-name">${escapeHTML(p.name)}</strong>
+                                            <div class="live-search-price-row">
+                                                <span class="live-search-price">${formatVND(p.price)}</span>
+                                                <span class="live-search-stock ${p.stock > 0 ? 'in' : 'out'}">${p.stock > 0 ? '✓ Còn hàng' : 'Tạm hết'}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            `).join('')}
+                        </ul>
+                        <footer class="live-search-footer">
+                            <a class="live-search-view-all" href="${root}index.html?search=${encodeURIComponent(detected)}">
+                                Xem tất cả dòng máy & phụ kiện liên quan ➔
+                            </a>
+                        </footer>
+                    `;
+                } catch (err) {
+                    console.error('Visual search error:', err);
+                    dropdown.innerHTML = `
+                        <div class="live-search-empty">
+                            <p>⚠️ Không thể nhận diện được hình ảnh này. Vui lòng thử lại với ảnh rõ nét hơn!</p>
+                        </div>
+                    `;
+                }
+            };
+            reader.readAsDataURL(file);
+            cameraInput.value = '';
+        });
+    }
+}
+window.setupStorefrontLiveSearch = setupStorefrontLiveSearch;

@@ -114,6 +114,10 @@
                     <button type="button" class="ai-suggestions-arrow ai-suggestions-next" aria-label="Cuộn gợi ý sang phải" hidden>›</button>
                 </nav>
                 <form class="ai-chat-form" id="aiChatForm" role="search">
+                    <button class="ai-chat-camera" id="aiChatCameraBtn" type="button" aria-label="Tìm kiếm sản phẩm bằng hình ảnh" title="Gửi ảnh để AI tìm sản phẩm">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </button>
+                    <input type="file" id="aiChatCameraInput" accept="image/*" style="display:none" aria-hidden="true">
                     <button class="ai-chat-mic" type="button" aria-label="Nhập bằng giọng nói" title="Nhập bằng giọng nói">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Zm-7 9a7 7 0 0 0 14 0m-7 7v3m-4 0h8"/>
@@ -574,6 +578,33 @@
         return list;
     }
 
+    function renderActionCard(body, data) {
+        if (!data || !data.product) return;
+        const card = document.createElement('section');
+        card.className = 'ai-action-card';
+        card.setAttribute('aria-label', 'Tác vụ mua hàng tự động');
+
+        const prod = data.product;
+        const voucherInfo = data.coupon ? ` · Áp voucher <b>${escapeHTML(data.coupon.code)}</b> (-${Number(data.coupon.discount || 0).toLocaleString('vi-VN')} đ)` : '';
+        const finalPrice = data.finalPrice || prod.price;
+
+        card.innerHTML = `
+            <div class="ai-action-badge">⚡ Hành động tự động đã thực thi</div>
+            <div class="ai-action-prod">
+                <img src="${escapeHTML(prod.image)}" alt="${escapeHTML(prod.name)}">
+                <div>
+                    <strong>${escapeHTML(prod.name)}</strong>
+                    <div style="font-size:0.8rem; color:#38bdf8;">Tổng thanh toán: <b>${Number(finalPrice).toLocaleString('vi-VN')} đ</b>${voucherInfo}</div>
+                </div>
+            </div>
+            <button type="button" class="ai-action-btn-checkout" onclick="window.location.href='${root}pages/checkout/cart.html'">
+                🛒 Chuyển Đến Giỏ Hàng &amp; Thanh Toán Ngay
+            </button>
+        `;
+        body.appendChild(card);
+        scrollToBottom(body);
+    }
+
     async function askAssistant(message, context) {
         const token = localStorage.getItem('token');
         const headers = { 'Content-Type': 'application/json' };
@@ -598,6 +629,8 @@
         const panel = chat.querySelector('.ai-chat-panel');
         const input = chat.querySelector('#aiChatInput');
         const sendButton = chat.querySelector('.ai-chat-send');
+        const cameraButton = chat.querySelector('#aiChatCameraBtn');
+        const cameraInput = chat.querySelector('#aiChatCameraInput');
         const micButton = chat.querySelector('.ai-chat-mic');
         const voiceButton = chat.querySelector('.ai-chat-voice');
         const status = chat.querySelector('#aiChatStatus');
@@ -762,6 +795,55 @@
         } else {
             micButton.disabled = true;
             micButton.title = 'Trình duyệt này chưa hỗ trợ nhận dạng giọng nói';
+        }
+
+        if (cameraButton && cameraInput) {
+            cameraButton.addEventListener('click', () => {
+                cameraInput.click();
+            });
+
+            cameraInput.addEventListener('change', async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64Data = reader.result;
+                    const imgMsg = document.createElement('article');
+                    imgMsg.className = 'ai-message user';
+                    imgMsg.innerHTML = `<section class="ai-bubble"><div style="max-width:180px; border-radius:8px; overflow:hidden;"><img src="${base64Data}" alt="Ảnh tải lên" style="width:100%; display:block;"></div><p style="margin-top:4px; font-size:0.8rem;">[Tìm sản phẩm từ hình ảnh]</p></section>`;
+                    body.appendChild(imgMsg);
+                    scrollToBottom(body);
+
+                    const typing = appendMessage(body, 'ai ai-typing', 'AI đang phân tích nhận diện thiết bị công nghệ...');
+                    try {
+                        const res = await fetch(`${apiUrl}/chat/visual-search`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: base64Data, filename: file.name })
+                        });
+                        const visualResult = await res.json();
+                        typing.remove();
+
+                        if (!res.ok) throw new Error(visualResult.message || 'Không thể nhận diện hình ảnh');
+
+                        const detected = visualResult.detectedItem || 'Thiết bị công nghệ';
+                        const reply = `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!\n${visualResult.description || ''}\nDưới đây là các sản phẩm tương thích chính hãng tốt nhất tại TechEcommerce:`;
+
+                        streamAIMessage(body, reply, () => {
+                            if (visualResult.products?.length) {
+                                renderChatProducts(body, visualResult.products);
+                            }
+                            scrollToBottom(body);
+                        });
+                    } catch (err) {
+                        typing.remove();
+                        appendMessage(body, 'ai', 'Rất tiếc, AI chưa thể nhận diện rõ thiết bị trong ảnh này. Bạn hãy thử chụp góc rõ hơn nhé!');
+                    }
+                };
+                reader.readAsDataURL(file);
+                cameraInput.value = '';
+            });
         }
 
         function handleAutoNavigation(userMessage, data) {
@@ -979,6 +1061,15 @@
                     }
                     if (data.products && data.products.length > 0) {
                         renderChatProducts(body, data.products);
+                    }
+
+                    if (data.action === 'add_to_cart_and_checkout' && data.product) {
+                        handleAddToCart(data.product._id);
+                        if (data.coupon) {
+                            sessionStorage.setItem('appliedCoupon', JSON.stringify(data.coupon));
+                            localStorage.setItem('checkout_coupon', data.coupon.code);
+                        }
+                        renderActionCard(body, data);
                     }
 
                     // Tự động chuyển hướng đến danh mục sản phẩm (hoặc chi tiết sản phẩm nếu có yêu cầu đích danh)

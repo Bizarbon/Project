@@ -219,9 +219,13 @@ router.get('/', async (req, res) => {
         if (req.query.minPrice) filter.price = { ...(filter.price || {}), $gte: Number(req.query.minPrice) };
         if (req.query.maxPrice) filter.price = { ...(filter.price || {}), $lte: Number(req.query.maxPrice) };
 
-        const products = await Product.find(filter)
+        let query = Product.find(filter)
             .populate('supplier', 'name')
             .sort(productSort(req.query.sort));
+        if (req.query.limit) {
+            query = query.limit(Math.min(Math.max(Number(req.query.limit) || 10, 1), 100));
+        }
+        const products = await query;
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });

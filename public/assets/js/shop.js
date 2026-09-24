@@ -263,6 +263,168 @@ async function toggleWishlist(id) {
     renderProducts();
 }
 
+const activeSpecFacets = new Map();
+
+const FACETED_SPEC_CONFIG = {
+    Laptop: [
+        { key: 'ram', label: '💾 RAM', options: ['16GB', '32GB', '64GB'] },
+        { key: 'cpu', label: '⚡ Vi xử lý (CPU)', options: ['Apple Silicon', 'Core i7', 'Core i9', 'Ryzen 7'] },
+        { key: 'gpu', label: '🎮 Card đồ họa (GPU)', options: ['RTX 4050', 'RTX 4060', 'RTX 4070', 'Apple GPU'] }
+    ],
+    'Điện thoại': [
+        { key: 'storage', label: '📦 Dung lượng', options: ['128GB', '256GB', '512GB', '1TB'] },
+        { key: 'screen', label: '📱 Màn hình', options: ['OLED', '120Hz', 'Super Retina'] }
+    ],
+    Tablet: [
+        { key: 'screen', label: '📐 Màn hình', options: ['11 inch', '13 inch'] },
+        { key: 'storage', label: '💾 Dung lượng', options: ['128GB', '256GB', '512GB'] }
+    ],
+    'Tai nghe': [
+        { key: 'feature', label: '🎧 Tính năng', options: ['Chống ồn ANC', 'Bluetooth 5.3', 'Pin > 30h'] }
+    ],
+    'Phụ kiện': [
+        { key: 'type', label: '⌨️ Loại phụ kiện', options: ['Bàn phím cơ', 'Chuột không dây', 'Củ sạc nhanh 65W-100W', 'Pin dự phòng'] }
+    ]
+};
+
+function productMatchesFacet(product, key, valuesSet) {
+    if (!valuesSet || valuesSet.size === 0) return true;
+    const nameNorm = normalizeAddressSearch(product.name || '');
+    const descNorm = normalizeAddressSearch(product.description || '');
+    const specs = product.specs || {};
+
+    for (const val of valuesSet) {
+        const valNorm = normalizeAddressSearch(val);
+        if (key === 'ram') {
+            const ramNorm = normalizeAddressSearch(specs.ram || '');
+            if (ramNorm.includes(valNorm) || nameNorm.includes(valNorm) || descNorm.includes(valNorm)) return true;
+        } else if (key === 'cpu') {
+            const cpuNorm = normalizeAddressSearch(specs.cpu || '');
+            if (val === 'Apple Silicon') {
+                if (cpuNorm.includes('apple') || cpuNorm.includes('m1') || cpuNorm.includes('m2') || cpuNorm.includes('m3') || cpuNorm.includes('m4') || nameNorm.includes('m3') || nameNorm.includes('m2') || nameNorm.includes('m1')) return true;
+            } else if (cpuNorm.includes(valNorm) || nameNorm.includes(valNorm) || descNorm.includes(valNorm)) {
+                return true;
+            }
+        } else if (key === 'gpu') {
+            const gpuNorm = normalizeAddressSearch(specs.gpu || '');
+            if (val === 'Apple GPU') {
+                if (gpuNorm.includes('apple') || nameNorm.includes('macbook') || descNorm.includes('apple gpu')) return true;
+            } else if (gpuNorm.includes(valNorm) || nameNorm.includes(valNorm) || descNorm.includes(valNorm)) {
+                return true;
+            }
+        } else if (key === 'storage') {
+            const storageNorm = normalizeAddressSearch(specs.storage || '');
+            if (storageNorm.includes(valNorm) || nameNorm.includes(valNorm) || descNorm.includes(valNorm)) return true;
+        } else if (key === 'screen') {
+            const screenNorm = normalizeAddressSearch(specs.screen || '');
+            if (val === 'OLED') {
+                if (screenNorm.includes('oled') || screenNorm.includes('amoled') || screenNorm.includes('retina') || descNorm.includes('oled') || descNorm.includes('super retina')) return true;
+            } else if (val === '120Hz') {
+                if (screenNorm.includes('120') || descNorm.includes('120hz') || descNorm.includes('promotion')) return true;
+            } else if (val === 'Super Retina') {
+                if (screenNorm.includes('retina') || descNorm.includes('retina')) return true;
+            } else if (screenNorm.includes(valNorm) || nameNorm.includes(valNorm) || descNorm.includes(valNorm)) {
+                return true;
+            }
+        } else if (key === 'feature') {
+            if (val === 'Chống ồn ANC') {
+                if (descNorm.includes('chong on') || descNorm.includes('anc') || descNorm.includes('noise') || nameNorm.includes('chong on')) return true;
+            } else if (val === 'Bluetooth 5.3') {
+                if (descNorm.includes('5.3') || descNorm.includes('bluetooth') || specs.os?.includes('5.3')) return true;
+            } else if (val === 'Pin > 30h') {
+                if (descNorm.includes('30h') || descNorm.includes('30 gio') || specs.battery?.includes('30')) return true;
+            }
+        } else if (key === 'type') {
+            if (val === 'Bàn phím cơ') {
+                if (nameNorm.includes('ban phim') || descNorm.includes('ban phim') || (product.tags || []).some(t => normalizeAddressSearch(t).includes('phim'))) return true;
+            } else if (val === 'Chuột không dây') {
+                if (nameNorm.includes('chuot') || descNorm.includes('chuot') || (product.tags || []).some(t => normalizeAddressSearch(t).includes('chuot'))) return true;
+            } else if (val === 'Củ sạc nhanh 65W-100W') {
+                if (nameNorm.includes('sac') || nameNorm.includes('cu sac') || descNorm.includes('65w') || descNorm.includes('100w')) return true;
+            } else if (val === 'Pin dự phòng') {
+                if (nameNorm.includes('du phong') || descNorm.includes('du phong') || (product.tags || []).some(t => normalizeAddressSearch(t).includes('du phong'))) return true;
+            }
+        }
+    }
+    return false;
+}
+
+function renderFacetedSpecBar() {
+    const bar = document.getElementById('facetedSpecBar');
+    if (!bar) return;
+
+    const groups = FACETED_SPEC_CONFIG[activeCategory];
+    if (!groups || !groups.length) {
+        bar.hidden = true;
+        bar.innerHTML = '';
+        return;
+    }
+
+    let totalActive = 0;
+    activeSpecFacets.forEach(set => totalActive += set.size);
+
+    bar.innerHTML = `
+        ${groups.map(group => {
+            const activeSet = activeSpecFacets.get(group.key) || new Set();
+            return `
+                <div class="faceted-spec-group">
+                    <span class="faceted-spec-label">${escapeHTML(group.label)}:</span>
+                    <div class="faceted-spec-chips">
+                        ${group.options.map(opt => {
+                            const isSelected = activeSet.has(opt);
+                            return `
+                                <button type="button" class="faceted-chip ${isSelected ? 'active' : ''}"
+                                    data-facet-key="${group.key}" data-facet-val="${escapeHTML(opt)}"
+                                    aria-pressed="${isSelected}">
+                                    ${escapeHTML(opt)}
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('')}
+        ${totalActive > 0 ? `
+            <div style="display:flex; justify-content:flex-end; margin-top:0.25rem;">
+                <button type="button" class="faceted-clear-btn" id="clearAllFacetsBtn">
+                    ✕ Xóa bộ lọc thông số (${totalActive})
+                </button>
+            </div>
+        ` : ''}
+    `;
+
+    bar.hidden = false;
+
+    // Attach click events
+    bar.querySelectorAll('.faceted-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const key = btn.dataset.facetKey;
+            const val = btn.dataset.facetVal;
+            if (!activeSpecFacets.has(key)) {
+                activeSpecFacets.set(key, new Set());
+            }
+            const set = activeSpecFacets.get(key);
+            if (set.has(val)) {
+                set.delete(val);
+                if (set.size === 0) activeSpecFacets.delete(key);
+            } else {
+                set.add(val);
+            }
+            renderFacetedSpecBar();
+            renderProducts();
+        });
+    });
+
+    const clearBtn = bar.querySelector('#clearAllFacetsBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            activeSpecFacets.clear();
+            renderFacetedSpecBar();
+            renderProducts();
+        });
+    }
+}
+
 function currentFilters() {
     return {
         search: document.getElementById('searchInput')?.value.trim().toLowerCase() || '',
@@ -301,6 +463,15 @@ function filteredProducts() {
     if (filters.minPrice) products = products.filter(p => p.price >= filters.minPrice);
     if (filters.maxPrice) products = products.filter(p => p.price <= filters.maxPrice);
     if (filters.inStock) products = products.filter(p => p.stock > 0);
+
+    // Apply Faceted Spec Filters
+    if (activeSpecFacets.size > 0) {
+        for (const [key, valuesSet] of activeSpecFacets.entries()) {
+            if (valuesSet.size > 0) {
+                products = products.filter(p => productMatchesFacet(p, key, valuesSet));
+            }
+        }
+    }
 
     const sorters = {
         price_asc: (a, b) => a.price - b.price,
@@ -344,6 +515,7 @@ async function loadProducts() {
         allProducts = await res.json();
         renderBrandFilter();
         renderCategoryNav();
+        renderFacetedSpecBar();
         renderProducts();
         renderCart();
         if (auth.isAdmin()) loadStats();
@@ -398,12 +570,14 @@ function updateHeaderCategoryState() {
 
 function setCategory(category, options = {}) {
     activeCategory = category || 'all';
+    activeSpecFacets.clear();
     const url = new URL(window.location.href);
     if (!category || category === 'all') url.searchParams.delete('category');
     else url.searchParams.set('category', category);
     window.history.replaceState({}, '', url);
     updateHeaderCategoryState();
     renderCategoryNav();
+    renderFacetedSpecBar();
     renderProducts();
 
     if (options.scroll !== false) {
@@ -486,6 +660,8 @@ function setupStorefrontHeader() {
 
     searchForm?.addEventListener('submit', event => {
         event.preventDefault();
+        const liveDropdown = document.getElementById('headerLiveSearchDropdown');
+        if (liveDropdown) liveDropdown.hidden = true;
         if (!catalogSearch || !headerSearch) return;
         catalogSearch.value = headerSearch.value.trim();
         renderProducts();
@@ -496,6 +672,227 @@ function setupStorefrontHeader() {
             headerSearch.value = catalogSearch.value;
         }
     });
+
+    // Live search & Visual search in header
+    const liveDropdown = document.getElementById('headerLiveSearchDropdown');
+    const cameraBtn = document.getElementById('headerVisualSearchBtn');
+    const cameraInput = document.getElementById('headerVisualSearchInput');
+
+    if (headerSearch && liveDropdown) {
+        let debounceTimer = null;
+        let selectedIndex = -1;
+        const trendingSearches = [
+            'iPhone 16 Pro Max',
+            'MacBook Air M3',
+            'Logitech MX Keys S',
+            'Sony WH-1000XM5',
+            'Củ sạc Anker 65W',
+            'Samsung Galaxy S24 Ultra',
+            'iPad Air M2'
+        ];
+
+        function renderTrending() {
+            liveDropdown.innerHTML = `
+                <header class="live-search-header">
+                    <span class="live-search-title">🔥 Từ khóa tìm kiếm thịnh hành</span>
+                </header>
+                <nav class="live-search-trending-chips" aria-label="Từ khóa nổi bật">
+                    ${trendingSearches.map(term => `
+                        <button type="button" class="trending-chip" data-search-term="${escapeHTML(term)}">
+                            <span>🔍</span> ${escapeHTML(term)}
+                        </button>
+                    `).join('')}
+                </nav>
+            `;
+            liveDropdown.querySelectorAll('.trending-chip').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const term = btn.getAttribute('data-search-term');
+                    headerSearch.value = term;
+                    performLiveSearch(term);
+                });
+            });
+            liveDropdown.hidden = false;
+            selectedIndex = -1;
+        }
+
+        function highlightMatch(text, query) {
+            if (!query || !text) return escapeHTML(text);
+            const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escaped})`, 'gi');
+            return escapeHTML(text).replace(regex, '<mark class="search-highlight">$1</mark>');
+        }
+
+        function renderProductsDropdown(prods, query) {
+            if (!prods.length) {
+                liveDropdown.innerHTML = `
+                    <div class="live-search-empty">
+                        <span>🔎</span> Không tìm thấy sản phẩm nào khớp với "<strong>${escapeHTML(query)}</strong>"
+                    </div>
+                `;
+                liveDropdown.hidden = false;
+                return;
+            }
+
+            liveDropdown.innerHTML = `
+                <header class="live-search-header">
+                    <span class="live-search-title">Gợi ý sản phẩm (${prods.length})</span>
+                </header>
+                <ul class="live-search-list" role="listbox">
+                    ${prods.map(p => {
+                        const discount = p.compareAtPrice && p.compareAtPrice > p.price;
+                        return `
+                            <li class="live-search-item" role="option">
+                                <a class="live-search-link" href="pages/catalog/product.html?id=${p._id}">
+                                    <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="live-search-thumb" loading="lazy">
+                                    <div class="live-search-meta">
+                                        <strong class="live-search-name">${highlightMatch(p.name, query)}</strong>
+                                        <div class="live-search-price-row">
+                                            <span class="live-search-price">${fmt(p.price)}</span>
+                                            ${discount ? `<del class="live-search-compare">${fmt(p.compareAtPrice)}</del>` : ''}
+                                            <span class="live-search-stock ${p.stock > 0 ? 'in' : 'out'}">${p.stock > 0 ? '✓ Còn hàng' : 'Tạm hết'}</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        `;
+                    }).join('')}
+                </ul>
+                <footer class="live-search-footer">
+                    <button type="button" class="live-search-view-all" onclick="headerSearchForm.requestSubmit()">
+                        Xem tất cả kết quả cho "<strong>${escapeHTML(query)}</strong>" ➔
+                    </button>
+                </footer>
+            `;
+            liveDropdown.hidden = false;
+            selectedIndex = -1;
+        }
+
+        async function performLiveSearch(query) {
+            const trimmed = query.trim();
+            if (trimmed.length < 2) {
+                renderTrending();
+                return;
+            }
+            try {
+                const res = await fetch(`${API_URL}/products?search=${encodeURIComponent(trimmed)}&limit=5`);
+                if (!res.ok) throw new Error('Search API error');
+                const prods = await res.json();
+                renderProductsDropdown(prods, trimmed);
+            } catch (err) {
+                console.error('Live search error:', err);
+            }
+        }
+
+        headerSearch.addEventListener('input', e => {
+            clearTimeout(debounceTimer);
+            const q = e.target.value;
+            if (q.trim().length < 2) {
+                if (q.trim().length === 0) liveDropdown.hidden = true;
+                else renderTrending();
+                return;
+            }
+            debounceTimer = setTimeout(() => performLiveSearch(q), 200);
+        });
+
+        headerSearch.addEventListener('focus', () => {
+            if (headerSearch.value.trim().length >= 2) performLiveSearch(headerSearch.value);
+            else renderTrending();
+        });
+
+        document.addEventListener('click', e => {
+            if (!searchForm?.contains(e.target)) liveDropdown.hidden = true;
+        });
+
+        headerSearch.addEventListener('keydown', e => {
+            const items = liveDropdown.querySelectorAll('.live-search-link');
+            if (!items.length || liveDropdown.hidden) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                updateSelection(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                updateSelection(items);
+            } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                e.preventDefault();
+                items[selectedIndex].click();
+            } else if (e.key === 'Escape') {
+                liveDropdown.hidden = true;
+            }
+        });
+
+        function updateSelection(items) {
+            items.forEach((it, idx) => {
+                if (idx === selectedIndex) {
+                    it.classList.add('is-focused');
+                    it.scrollIntoView({ block: 'nearest' });
+                } else {
+                    it.classList.remove('is-focused');
+                }
+            });
+        }
+    }
+
+    if (cameraBtn && cameraInput && liveDropdown) {
+        cameraBtn.addEventListener('click', () => cameraInput.click());
+        cameraInput.addEventListener('change', async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            liveDropdown.hidden = false;
+            liveDropdown.innerHTML = `
+                <div class="visual-search-loading">
+                    <div class="visual-search-spinner" aria-hidden="true"></div>
+                    <strong>🔍 AI đang phân tích thiết bị từ hình ảnh...</strong>
+                    <p>Nhận diện model, thương hiệu và thông số kỹ thuật...</p>
+                </div>
+            `;
+
+            const reader = new FileReader();
+            reader.onload = async () => {
+                try {
+                    const res = await fetch(`${API_URL}/chat/visual-search`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ image: reader.result, filename: file.name })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.message);
+
+                    const detected = data.detectedItem || 'Thiết bị công nghệ';
+                    const prods = data.products || [];
+
+                    liveDropdown.innerHTML = `
+                        <header class="visual-search-result-badge">
+                            <span class="badge-ai-chip">✨ AI Visual Search</span>
+                            <div class="visual-detected-title">Nhận diện: <strong>${escapeHTML(detected)}</strong></div>
+                            <small>${escapeHTML(data.description || '')}</small>
+                        </header>
+                        <ul class="live-search-list" role="listbox">
+                            ${prods.slice(0, 5).map(p => `
+                                <li class="live-search-item" role="option">
+                                    <a class="live-search-link" href="pages/catalog/product.html?id=${p._id}">
+                                        <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="live-search-thumb" loading="lazy">
+                                        <div class="live-search-meta">
+                                            <strong class="live-search-name">${escapeHTML(p.name)}</strong>
+                                            <div class="live-search-price-row">
+                                                <span class="live-search-price">${fmt(p.price)}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+                } catch (err) {
+                    liveDropdown.innerHTML = `<div class="live-search-empty">⚠️ Không thể nhận diện ảnh lúc này. Vui lòng thử lại.</div>`;
+                }
+            };
+            reader.readAsDataURL(file);
+            cameraInput.value = '';
+        });
+    }
 
     document.querySelectorAll('[data-header-category]').forEach(button => {
         button.addEventListener('click', () => setCategory(button.dataset.headerCategory));

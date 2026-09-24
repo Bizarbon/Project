@@ -409,6 +409,64 @@ function renderProduct() {
                     </ul>
                 </section>
 
+                <!-- Trade-in / Thu Cũ Đổi Mới Section -->
+                <section class="trade-in-card" id="tradeInCard" aria-label="Thu cũ đổi mới trợ giá">
+                    <header class="trade-in-header">
+                        <div class="trade-in-title-wrap">
+                            <span class="trade-in-icon" aria-hidden="true">🔄</span>
+                            <div>
+                                <strong>Thu cũ đổi mới - Lên đời trợ giá</strong>
+                                <span class="trade-in-sub">Trợ giá thêm đến 1.500.000 đ vào giá máy mới</span>
+                            </div>
+                        </div>
+                        <button type="button" class="trade-in-open-btn" id="openTradeInBtn" onclick="toggleTradeInCalculator()">Định giá ngay ▾</button>
+                    </header>
+                    <div class="trade-in-drawer" id="tradeInDrawer" hidden>
+                        <form id="tradeInForm" onsubmit="event.preventDefault(); applyTradeIn();">
+                            <div class="trade-in-grid">
+                                <div class="trade-in-field">
+                                    <label for="tradeInCategory">1. Loại thiết bị cũ:</label>
+                                    <select id="tradeInCategory" onchange="onTradeInCategoryChange()">
+                                        <option value="phone">Điện thoại</option>
+                                        <option value="laptop">Laptop / MacBook</option>
+                                        <option value="tablet">Máy tính bảng / iPad</option>
+                                        <option value="watch">Đồng hồ thông minh</option>
+                                    </select>
+                                </div>
+                                <div class="trade-in-field">
+                                    <label for="tradeInModel">2. Model máy cũ của bạn:</label>
+                                    <select id="tradeInModel" onchange="recalculateTradeIn()"></select>
+                                </div>
+                                <div class="trade-in-field" style="grid-column: 1 / -1;">
+                                    <label for="tradeInCondition">3. Tình trạng máy:</label>
+                                    <select id="tradeInCondition" onchange="recalculateTradeIn()">
+                                        <option value="1">Loại 1: Hoạt động hoàn hảo, đẹp như mới 99%, pin tốt</option>
+                                        <option value="2">Loại 2: Máy trầy xước nhẹ 95%, màn hình sáng đẹp</option>
+                                        <option value="3">Loại 3: Máy cấn viền/trầy nhiều 90%, đủ chức năng</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="trade-in-summary-box">
+                                <div class="trade-in-summary-row">
+                                    <span>Giá thu cũ ước tính:</span>
+                                    <strong id="tradeInBaseValue">0 đ</strong>
+                                </div>
+                                <div class="trade-in-summary-row" style="color:#10b981;">
+                                    <span>Trợ giá lên đời từ TechEcommerce:</span>
+                                    <strong id="tradeInSubsidy">+0 đ</strong>
+                                </div>
+                                <div class="trade-in-summary-row highlight">
+                                    <span>Số tiền cần bù cho sản phẩm mới:</span>
+                                    <strong id="tradeInFinalPay">0 đ</strong>
+                                </div>
+                            </div>
+                            <button type="submit" class="trade-in-apply-btn">
+                                🚀 Áp Dụng Lên Đời &amp; Đặt Mua Ngay
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
                 <!-- Key Spec Highlights Pills -->
                 <section class="spec-pills-row" aria-label="Tóm tắt thông số">
                     ${specs.slice(0, 4).map(([label, val]) => `
@@ -633,6 +691,128 @@ function bindReviewForm() {
         }
     });
 }
+
+const TRADE_IN_MODELS = {
+    phone: [
+        { model: 'iPhone 15 Pro Max 256GB', price: 21500000 },
+        { model: 'iPhone 15 Pro 128GB', price: 17500000 },
+        { model: 'iPhone 14 Pro Max 128GB', price: 15500000 },
+        { model: 'iPhone 14 Pro 128GB', price: 13000000 },
+        { model: 'iPhone 13 Pro Max 128GB', price: 11500000 },
+        { model: 'iPhone 13 128GB', price: 9000000 },
+        { model: 'Samsung Galaxy S23 Ultra', price: 13500000 },
+        { model: 'Samsung Galaxy S22 Ultra', price: 9000000 },
+        { model: 'Samsung Galaxy Z Fold 5', price: 17000000 },
+        { model: 'Điện thoại thông minh khác', price: 4000000 }
+    ],
+    laptop: [
+        { model: 'MacBook Pro 14 M2 Pro (2023)', price: 27000000 },
+        { model: 'MacBook Air M2 (2022)', price: 16000000 },
+        { model: 'MacBook Air M1 (2020)', price: 11000000 },
+        { model: 'Dell XPS 13 9310 Core i7', price: 12500000 },
+        { model: 'ASUS ROG Zephyrus G14 RTX 3060', price: 14000000 },
+        { model: 'Laptop Windows khác', price: 5000000 }
+    ],
+    tablet: [
+        { model: 'iPad Pro 11 M2 (2022)', price: 13000000 },
+        { model: 'iPad Air 5 M1 (2022)', price: 9000000 },
+        { model: 'iPad Gen 10 64GB', price: 6000000 },
+        { model: 'Samsung Galaxy Tab S9', price: 10500000 },
+        { model: 'Máy tính bảng khác', price: 3500000 }
+    ],
+    watch: [
+        { model: 'Apple Watch Ultra', price: 10000000 },
+        { model: 'Apple Watch Series 8 / 9', price: 5000000 },
+        { model: 'Samsung Galaxy Watch 6 Classic', price: 3500000 },
+        { model: 'Smartwatch khác', price: 1500000 }
+    ]
+};
+
+function toggleTradeInCalculator() {
+    const drawer = document.getElementById('tradeInDrawer');
+    const btn = document.getElementById('openTradeInBtn');
+    if (!drawer || !btn) return;
+    drawer.hidden = !drawer.hidden;
+    btn.textContent = drawer.hidden ? 'Định giá ngay ▾' : 'Thu gọn ▴';
+    if (!drawer.hidden) {
+        onTradeInCategoryChange();
+    }
+}
+
+function onTradeInCategoryChange() {
+    const cat = document.getElementById('tradeInCategory')?.value || 'phone';
+    const modelSelect = document.getElementById('tradeInModel');
+    if (!modelSelect) return;
+    const models = TRADE_IN_MODELS[cat] || [];
+    modelSelect.innerHTML = models.map((m, idx) => `
+        <option value="${idx}">${escapeHTML(m.model)} (Định giá đến ${fmt(m.price)})</option>
+    `).join('');
+    recalculateTradeIn();
+}
+
+function recalculateTradeIn() {
+    if (!product) return;
+    const cat = document.getElementById('tradeInCategory')?.value || 'phone';
+    const modelIdx = Number(document.getElementById('tradeInModel')?.value || 0);
+    const condition = Number(document.getElementById('tradeInCondition')?.value || 1);
+
+    const modelObj = (TRADE_IN_MODELS[cat] || [])[modelIdx] || { price: 5000000, model: 'Thiết bị cũ' };
+    const rate = condition === 1 ? 1.0 : (condition === 2 ? 0.85 : 0.7);
+    const baseValue = Math.round(modelObj.price * rate);
+
+    let subsidy = 500000;
+    if (product.price >= 20000000) subsidy = 1500000;
+    else if (product.price >= 10000000) subsidy = 1000000;
+
+    const totalDeduction = baseValue + subsidy;
+    const finalPay = Math.max(product.price - totalDeduction, 0);
+
+    const baseEl = document.getElementById('tradeInBaseValue');
+    const subEl = document.getElementById('tradeInSubsidy');
+    const finalEl = document.getElementById('tradeInFinalPay');
+
+    if (baseEl) baseEl.textContent = fmt(baseValue);
+    if (subEl) subEl.textContent = `+${fmt(subsidy)}`;
+    if (finalEl) finalEl.textContent = fmt(finalPay);
+}
+
+function applyTradeIn() {
+    if (!product) return;
+    const cat = document.getElementById('tradeInCategory')?.value || 'phone';
+    const modelIdx = Number(document.getElementById('tradeInModel')?.value || 0);
+    const condition = Number(document.getElementById('tradeInCondition')?.value || 1);
+    const modelObj = (TRADE_IN_MODELS[cat] || [])[modelIdx] || { price: 5000000, model: 'Thiết bị cũ' };
+
+    const rate = condition === 1 ? 1.0 : (condition === 2 ? 0.85 : 0.7);
+    const baseValue = Math.round(modelObj.price * rate);
+    let subsidy = product.price >= 20000000 ? 1500000 : (product.price >= 10000000 ? 1000000 : 500000);
+    const totalDeduction = baseValue + subsidy;
+
+    const conditionText = condition === 1 ? 'Loại 1 (99%)' : (condition === 2 ? 'Loại 2 (95%)' : 'Loại 3 (90%)');
+
+    const tradeInPlan = {
+        oldModel: modelObj.model,
+        condition: conditionText,
+        baseValue,
+        subsidy,
+        totalDeduction,
+        newProductId: product._id,
+        newProductName: product.name,
+        netPay: Math.max(product.price - totalDeduction, 0)
+    };
+
+    sessionStorage.setItem('activeTradeInPlan', JSON.stringify(tradeInPlan));
+    addToCart(product._id);
+    showToast(`Đã áp dụng trợ giá Thu cũ đổi mới (-${fmt(totalDeduction)}) thành công!`);
+    setTimeout(() => {
+        window.location.href = '../checkout/cart.html';
+    }, 500);
+}
+
+window.toggleTradeInCalculator = toggleTradeInCalculator;
+window.onTradeInCategoryChange = onTradeInCategoryChange;
+window.recalculateTradeIn = recalculateTradeIn;
+window.applyTradeIn = applyTradeIn;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadProduct();

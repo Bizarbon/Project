@@ -1178,12 +1178,143 @@ function answerPolicyQuestion(message) {
     return '';
 }
 
+/**
+ * Xử lý tác vụ Action-Driven AI:
+ * Tự động tìm sản phẩm được yêu cầu, tìm mã coupon tốt nhất,
+ * và trả về action để frontend tự động thêm vào giỏ và áp mã.
+ */
+async function handleActionExecution(message, context = {}) {
+    const norm = normalizeText(message);
+    const hasAddIntent = ['them vao gio', 'them vao cart', 'cho vao gio', 'mua ngay', 'dat mua', 'mua mau nay', 'mua san pham nay', 'lay mau nay', 'chon mau nay', 'them mau'].some(k => norm.includes(k));
+    const hasCouponIntent = ['ap ma giam gia', 'ap voucher', 'ma tot nhat', 'ma giam gia tot nhat', 'uu dai tot nhat', 'voucher tot nhat', 'giam gia tot nhat'].some(k => norm.includes(k));
+
+    if (!hasAddIntent && !hasCouponIntent) return null;
+
+    // 1. Xác định sản phẩm mục tiêu
+    let targetProduct = null;
+
+    // A. Thử tìm theo tên hoặc từ khóa trực tiếp trong message
+    const allActive = await Product.find({ active: { $ne: false }, stock: { $gt: 0 } });
+    const sortedCatalog = [...allActive].sort((a, b) => (b.name || '').length - (a.name || '').length);
+
+    for (const p of sortedCatalog) {
+        const pNorm = normalizeText(p.name);
+        if (norm.includes(pNorm)) {
+            targetProduct = p;
+            break;
+        }
+        const significantTokens = pNorm.split(/\s+/).filter(w => w.length > 2);
+        if (significantTokens.length >= 2 && significantTokens.every(t => norm.includes(t))) {
+            targetProduct = p;
+            break;
+        }
+    }
+
+    // B. Nếu chưa tìm thấy, kiểm tra context sản phẩm gần nhất
+    if (!targetProduct && Array.isArray(context?.lastProducts) && context.lastProducts.length > 0) {
+        const candidateId = context.lastProducts[0]._id || context.lastProducts[0];
+        targetProduct = allActive.find(p => String(p._id) === String(candidateId)) || null;
+    }
+
+    // C. Tìm kiếm lỏng theo brand hoặc từ khóa công nghệ trong câu
+    if (!targetProduct) {
+        const matched = sortedCatalog.find(p => {
+            const pNorm = normalizeText(p.name + ' ' + (p.brand || '') + ' ' + (p.category || ''));
+            const words = norm.split(/\s+/).filter(w => w.length >= 3 && !['them', 'vao', 'gio', 'cho', 'va', 'ap', 'ma', 'giam', 'gia', 'tot', 'nhat', 'toi'].includes(w));
+            return words.length > 0 && words.some(w => pNorm.includes(w));
+        });
+        if (matched) targetProduct = matched;
+    }
+
+    if (!targetProduct) {
+        return {
+            reply: 'Dạ mình rất sẵn sàng hỗ trợ bạn thêm vào giỏ và áp mã ưu đãi ngay! Bạn có thể cho mình biết rõ hơn tên model sản phẩm (ví dụ: *Logitech MX Keys S*, *iPhone 16 Pro Max*, *MacBook Air M3*...) được không ạ?',
+            suggestions: ['Xem mẫu Logitech MX Keys S', 'Xem iPhone 16 Pro Max', 'Xem MacBook Air M3', 'Mã giảm giá hôm nay']
+        };
+    }
+
+    // 2. Tìm mã giảm giá tốt nhất cho sản phẩm này
+    const now = new Date();
+    const activeCoupons = await Coupon.find({
+        isActive: { $ne: false },
+        $or: [
+            { expiryDate: { $exists: false } },
+            { expiryDate: null },
+            { expiryDate: { $gte: now } }
+        ]
+    });
+
+    let bestCoupon = null;
+    let maxDiscountAmount = 0;
+
+    for (const coupon of activeCoupons) {
+        const minOrder = Number(coupon.minOrderValue) || 0;
+        if (targetProduct.price >= minOrder) {
+            let discount = 0;
+            if (coupon.discountType === 'percentage') {
+                discount = Math.round((targetProduct.price * (coupon.discountValue || 0)) / 100);
+                if (coupon.maxDiscountAmount && discount > coupon.maxDiscountAmount) {
+                    discount = coupon.maxDiscountAmount;
+                }
+            } else {
+                discount = Number(coupon.discountValue) || 0;
+            }
+            if (discount > maxDiscountAmount) {
+                maxDiscountAmount = discount;
+                bestCoupon = {
+                    code: coupon.code,
+                    discountType: coupon.discountType,
+                    discountValue: coupon.discountValue,
+                    calculatedDiscount: discount,
+                    description: coupon.description || `Giảm ${money(discount)}`
+                };
+            }
+        }
+    }
+
+    const finalPrice = Math.max(targetProduct.price - maxDiscountAmount, 0);
+
+    let reply = `🎉 **AI ĐÃ THỰC THI HÀNH ĐỘNG TỰ ĐỘNG THÀNH CÔNG!**\n\n` +
+        `• 🛒 **Sản phẩm:** **${targetProduct.name}** đã được tự động thêm vào giỏ hàng.\n` +
+        `• 💰 **Giá niêm yết:** ${money(targetProduct.price)}\n`;
+
+    if (bestCoupon) {
+        reply += `• 🎟️ **Mã giảm giá tối ưu nhất:** Đã tự động áp mã **${bestCoupon.code}** (tiết kiệm ngay **-${money(maxDiscountAmount)}**)\n` +
+                 `• 🏷️ **Tổng tiền sau áp mã:** **${money(finalPrice)}**\n\n`;
+    } else {
+        reply += `• 🏷️ **Tổng tiền:** **${money(targetProduct.price)}** (Sản phẩm đang hưởng mức giá niêm yết kịch sàn tốt nhất)\n\n`;
+    }
+
+    reply += `Bạn có thể bấm vào nút **"Xác nhận đơn hàng ngay"** bên dưới để chuyển thẳng đến màn hình thanh toán nhé! 🚀`;
+
+    return {
+        action: 'add_to_cart_and_checkout',
+        product: {
+            _id: targetProduct._id,
+            name: targetProduct.name,
+            price: targetProduct.price,
+            image: targetProduct.image,
+            stock: targetProduct.stock
+        },
+        coupon: bestCoupon,
+        finalPrice,
+        reply,
+        suggestions: ['Xác nhận đơn hàng ngay', 'Xem thêm phụ kiện kèm', 'Tư vấn thêm sản phẩm']
+    };
+}
+
 router.post('/', chatLimiter, optionalAuth, async (req, res) => {
     try {
         const message = String(req.body.message || '').trim();
         if (!message) return res.status(400).json({ message: 'Vui lòng nhập nội dung cần tư vấn.' });
 
         const text = normalizeText(message);
+
+        // 0. Ý định thực thi hành động (Action-Driven AI): Tự động thêm giỏ + áp mã tối ưu
+        const actionResult = await handleActionExecution(message, req.body.context);
+        if (actionResult) {
+            return res.json(actionResult);
+        }
 
         // 1. Ý định kiểm tra mã giảm giá / khuyến mãi
         const isVoucherQuery = ['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => text.includes(k));
@@ -1226,6 +1357,156 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
     } catch (error) {
         console.error('Chatbot route error:', error);
         return res.status(500).json({ message: 'Chatbot đang bận một chút. Bạn thử lại sau nhé.' });
+    }
+});
+
+/**
+ * 📷 Visual AI Search: Tìm kiếm sản phẩm bằng hình ảnh
+ */
+router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
+    try {
+        const { image, filename = '' } = req.body;
+        if (!image) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp hình ảnh sản phẩm cần tìm.' });
+        }
+
+        let mimeType = 'image/jpeg';
+        let base64Data = image;
+        if (image.startsWith('data:')) {
+            const matches = image.match(/^data:([a-zA-Z0-9/+.-]+);base64,(.+)$/);
+            if (matches) {
+                mimeType = matches[1];
+                base64Data = matches[2];
+            }
+        }
+
+        let detectedKeyword = '';
+        let detectedCategory = '';
+        let detectedBrand = '';
+        let aiDescription = '';
+
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (apiKey) {
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const prompt = `Bạn là hệ thống AI nhận diện thiết bị công nghệ TechEcommerce.
+Hãy phân tích hình ảnh này và nhận diện thiết bị công nghệ (điện thoại, laptop, tablet, tai nghe, smartwatch, chuột, bàn phím, sạc cáp, phụ kiện máy tính).
+Trả về JSON ngắn gọn định dạng:
+{
+  "name": "tên thiết bị hoặc dòng máy cụ thể (ví dụ: Chuột không dây Logitech, Bàn phím cơ, iPhone 15 Pro, MacBook Air M3...)",
+  "category": "Điện thoại / Laptop / Tablet / Tai nghe / Đồng hồ thông minh / Phụ kiện / Máy chơi game",
+  "brand": "Apple / Logitech / Samsung / Sony / Asus / Dell / v.v.",
+  "keywords": ["từ khóa 1", "từ khóa 2"]
+}`;
+                const body = {
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [
+                                { text: prompt },
+                                { inline_data: { mime_type: mimeType, data: base64Data } }
+                            ]
+                        }
+                    ],
+                    generationConfig: {
+                        response_mime_type: 'application/json',
+                        temperature: 0.1,
+                        maxOutputTokens: 300
+                    }
+                };
+
+                const gemRes = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (gemRes.ok) {
+                    const gemData = await gemRes.json();
+                    const text = gemData?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        try {
+                            const parsed = JSON.parse(text);
+                            detectedKeyword = parsed.name || '';
+                            detectedCategory = parsed.category || '';
+                            detectedBrand = parsed.brand || '';
+                            aiDescription = `AI nhận diện: **${detectedKeyword}** (${detectedBrand ? detectedBrand + ' · ' : ''}${detectedCategory || 'Công nghệ'})`;
+                        } catch (e) {
+                            console.warn('[Visual Search] Parse JSON error:', e);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('[Visual Search] Gemini vision error:', err.message);
+            }
+        }
+
+        // Intelligent heuristic fallback
+        if (!detectedKeyword) {
+            const raw = (filename + ' ' + (req.body.hint || '')).toLowerCase();
+            if (raw.includes('logitech') || raw.includes('mx') || raw.includes('chuot') || raw.includes('mouse') || raw.includes('keyboard') || raw.includes('ban phim')) {
+                detectedKeyword = 'Logitech';
+                detectedCategory = 'Phụ kiện';
+            } else if (raw.includes('iphone') || raw.includes('phone') || raw.includes('samsung') || raw.includes('galaxy')) {
+                detectedKeyword = raw.includes('samsung') ? 'Samsung Galaxy' : 'iPhone';
+                detectedCategory = 'Điện thoại';
+            } else if (raw.includes('macbook') || raw.includes('laptop') || raw.includes('asus') || raw.includes('dell')) {
+                detectedKeyword = raw.includes('macbook') ? 'MacBook' : 'Laptop';
+                detectedCategory = 'Laptop';
+            } else if (raw.includes('ipad') || raw.includes('tablet')) {
+                detectedKeyword = 'iPad';
+                detectedCategory = 'Tablet';
+            } else if (raw.includes('headphone') || raw.includes('tai nghe') || raw.includes('airpods') || raw.includes('sony')) {
+                detectedKeyword = 'Tai nghe';
+                detectedCategory = 'Tai nghe';
+            } else {
+                detectedKeyword = 'Thiết bị công nghệ';
+                detectedCategory = 'all';
+            }
+            aiDescription = `AI nhận diện thiết bị công nghệ: **${detectedKeyword}**`;
+        }
+
+        let queryFilter = { active: { $ne: false } };
+        const searchConditions = [];
+        if (detectedKeyword) {
+            const words = detectedKeyword.split(/\s+/).filter(w => w.length > 2);
+            words.forEach(w => {
+                searchConditions.push({ name: new RegExp(escapeRegex(w), 'i') });
+                searchConditions.push({ description: new RegExp(escapeRegex(w), 'i') });
+                searchConditions.push({ tags: new RegExp(escapeRegex(w), 'i') });
+            });
+        }
+        if (detectedBrand) {
+            searchConditions.push({ brand: new RegExp(escapeRegex(detectedBrand), 'i') });
+        }
+        if (detectedCategory && detectedCategory !== 'all') {
+            searchConditions.push({ category: new RegExp(escapeRegex(detectedCategory), 'i') });
+        }
+
+        if (searchConditions.length > 0) {
+            queryFilter.$or = searchConditions;
+        }
+
+        let products = await Product.find(queryFilter).limit(6);
+        if (!products.length) {
+            products = await Product.find({ active: { $ne: false } }).sort({ soldCount: -1 }).limit(6);
+        }
+
+        return res.json({
+            success: true,
+            detectedItem: detectedKeyword || 'Thiết bị công nghệ',
+            detectedCategory,
+            detectedBrand,
+            description: aiDescription,
+            reply: `📷 **KẾT QUẢ TÌM KIẾM BẰNG HÌNH ẢNH (AI VISUAL SEARCH)**\n\n` +
+                   `• ${aiDescription}\n` +
+                   `• Đã tìm thấy **${products.length} sản phẩm** chính hãng & phụ kiện tương thích có sẵn tại TechEcommerce:`,
+            products,
+            suggestions: ['Thêm vào giỏ', 'So sánh giá', 'Xem khuyến mãi']
+        });
+    } catch (err) {
+        console.error('Visual Search error:', err);
+        return res.status(500).json({ message: 'Không thể xử lý hình ảnh lúc này. Vui lòng thử lại.' });
     }
 });
 

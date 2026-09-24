@@ -323,7 +323,12 @@
             <label class="sr-only" for="headerSearchInput">Tìm kiếm sản phẩm</label>
             <span class="header-search-icon" aria-hidden="true">⌕</span>
             <input id="headerSearchInput" type="search" autocomplete="off" placeholder="Bạn đang tìm sản phẩm gì?" />
+            <button type="button" class="header-search-camera-btn" id="headerVisualSearchBtn" title="Tìm kiếm bằng hình ảnh (AI Visual Search)" aria-label="Tìm kiếm bằng hình ảnh">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+            <input type="file" id="headerVisualSearchInput" accept="image/*" style="display:none" aria-hidden="true">
             <button type="submit">Tìm kiếm</button>
+            <section id="headerLiveSearchDropdown" class="live-search-dropdown" aria-label="Gợi ý tìm kiếm tức thì" hidden></section>
           </form>
 
           <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
@@ -657,6 +662,10 @@
               Còn hàng
             </label>
           </fieldset>
+
+          <!-- Faceted Spec Filters (Bộ lọc thông số kỹ thuật đa tầng) -->
+          <nav class="faceted-spec-bar" id="facetedSpecBar" aria-label="Bộ lọc thông số kỹ thuật đa tầng" hidden></nav>
+
           <div id="productSections"></div>
 
           <section class="recommendation-section" id="productRecommendations" aria-labelledby="recommendationTitle" hidden>
