@@ -28,7 +28,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=rag-consultant-20260923-3`;
+        link.href = `${root}assets/css/chatbox.css?v=mobile-align-20260924-2`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }
