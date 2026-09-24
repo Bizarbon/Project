@@ -5138,11 +5138,11 @@ button.category-badge.cat-clickable:hover {
     white-space: nowrap;
 }
 
-/* Floating Zalo Chat Button - strictly sized, hidden on admin */
+/* Floating Zalo Chat Button - strictly sized, hidden on admin & when chat/cart is open */
 .zalo-floating-btn {
     position: fixed !important;
-    right: 24px !important;
-    bottom: 96px !important;
+    right: 20px !important;
+    bottom: 80px !important;
     width: 48px !important;
     height: 48px !important;
     max-width: 48px !important;
@@ -5169,6 +5169,19 @@ button.category-badge.cat-clickable:hover {
     display: block !important;
 }
 
+@media (max-width: 768px) {
+    .zalo-floating-btn {
+        right: 14px !important;
+        bottom: calc(122px + env(safe-area-inset-bottom, 0px)) !important;
+        width: 46px !important;
+        height: 46px !important;
+        max-width: 46px !important;
+        max-height: 46px !important;
+        border-radius: 50% !important;
+        z-index: 1840 !important;
+    }
+}
+
 .admin-page #zaloFloatingBtn,
 .admin-page .zalo-floating-btn,
 body.cart-open #zaloFloatingBtn,
@@ -5176,11 +5189,16 @@ body.cart-open .zalo-floating-btn,
 body:has(#cartDrawer[aria-hidden='false']) #zaloFloatingBtn,
 body:has(#cartDrawer[aria-hidden='false']) .zalo-floating-btn,
 body:has(#cartDrawer:not([aria-hidden='true'])) #zaloFloatingBtn,
-body:has(#cartDrawer:not([aria-hidden='true'])) .zalo-floating-btn {
+body:has(#cartDrawer:not([aria-hidden='true'])) .zalo-floating-btn,
+body.ai-chat-open #zaloFloatingBtn,
+body.ai-chat-open .zalo-floating-btn,
+body:has(.ai-chat.open) #zaloFloatingBtn,
+body:has(.ai-chat.open) .zalo-floating-btn {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
     transform: scale(0.6) !important;
 }
+
 
