@@ -1,5 +1,7 @@
 let product = null;
 let relatedProducts = [];
+let allCatalogProducts = [];
+let bundleSelectedAccessories = [];
 let wishlistIds = new Set();
 let reviews = [];
 
@@ -190,7 +192,8 @@ async function loadProduct() {
 
         product = await productRes.json();
         const all = await listRes.json();
-        relatedProducts = all
+        allCatalogProducts = Array.isArray(all) ? all : [];
+        relatedProducts = allCatalogProducts
             .filter(p => (p.category === product.category || p.brand === product.brand) && String(p._id) !== String(product._id))
             .slice(0, 4);
 
@@ -550,6 +553,9 @@ function renderProduct() {
     renderReviews();
     bindReviewForm();
 
+    // 8.5. Render Frequently Bought Together (Mua Kèm Phụ Kiện Giảm Sốc)
+    renderBundleCrossell();
+
     // 9. Render Related Products
     const relatedContainer = document.getElementById('relatedProducts');
     if (relatedContainer) {
@@ -564,6 +570,237 @@ function renderProduct() {
             </a>
         `).join('') : '<div class="empty-state">Hiện chưa có sản phẩm liên quan trong cùng phân khúc.</div>';
     }
+}
+
+function getCuratedAccessories() {
+    if (!product || !allCatalogProducts.length) return [];
+
+    const isPhone = product.category === 'Điện thoại';
+    const isLaptop = product.category === 'Laptop';
+    const isTablet = product.category === 'Tablet';
+    const isGame = product.category === 'Máy chơi game';
+    const isApple = (product.brand && product.brand.toLowerCase().includes('apple')) || (product.name && product.name.toLowerCase().includes('iphone'));
+    const isSamsung = (product.brand && product.brand.toLowerCase().includes('samsung')) || (product.name && product.name.toLowerCase().includes('galaxy'));
+
+    let candidateIds = [];
+
+    if (isPhone) {
+        candidateIds = isApple ? [58, 45, 30] : (isSamsung ? [58, 45, 35] : [58, 45, 1]);
+    } else if (isLaptop) {
+        candidateIds = [46, 4, 56];
+    } else if (isTablet) {
+        candidateIds = isApple ? [44, 58, 30] : [4, 58, 45];
+    } else if (isGame) {
+        candidateIds = [54, 31, 5];
+    } else {
+        candidateIds = [58, 45, 4];
+    }
+
+    let items = candidateIds
+        .map(id => allCatalogProducts.find(p => Number(p._id) === Number(id)))
+        .filter(Boolean);
+
+    if (items.length < 3) {
+        const others = allCatalogProducts.filter(p => 
+            (p.category === 'Phụ kiện' || p.category === 'Tai nghe') && 
+            String(p._id) !== String(product._id) &&
+            !items.some(it => String(it._id) === String(p._id))
+        );
+        items = [...items, ...others].slice(0, 3);
+    }
+
+    const discountRates = [0.25, 0.30, 0.20];
+    return items.map((item, idx) => {
+        const pct = Math.round((discountRates[idx] || 0.2) * 100);
+        const discountedPrice = Math.round(item.price * (1 - pct / 100));
+        return {
+            ...item,
+            discountPct: pct,
+            discountedPrice: discountedPrice,
+            checked: idx < 2 // Pre-select top 2 by default
+        };
+    });
+}
+
+function renderBundleCrossell() {
+    const container = document.getElementById('bundleCrossellSection');
+    if (!container || !product) return;
+
+    bundleSelectedAccessories = getCuratedAccessories();
+    if (!bundleSelectedAccessories.length) {
+        container.hidden = true;
+        return;
+    }
+
+    container.hidden = false;
+    renderBundleUI();
+}
+
+function recalculateBundleSummary() {
+    if (!product) return;
+    const checkedAccessories = bundleSelectedAccessories.filter(a => a.checked);
+    const mainPrice = Number(product.price) || 0;
+    
+    const accOriginalSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
+    const accDiscountedSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.discountedPrice) || 0), 0);
+    
+    const totalOriginal = mainPrice + accOriginalSum;
+    const totalBundle = mainPrice + accDiscountedSum;
+    const totalSavings = totalOriginal - totalBundle;
+    const totalCount = 1 + checkedAccessories.length;
+
+    const countEl = document.getElementById('bundleSelectedCount');
+    const origEl = document.getElementById('bundleOriginalTotal');
+    const savedEl = document.getElementById('bundleSavedTotal');
+    const finalEl = document.getElementById('bundleFinalTotal');
+    const btnSub = document.getElementById('btnBundleSavingsSub');
+
+    if (countEl) countEl.textContent = `${totalCount} sản phẩm`;
+    if (origEl) origEl.textContent = fmt(totalOriginal);
+    if (savedEl) savedEl.textContent = `-${fmt(totalSavings)}`;
+    if (finalEl) finalEl.textContent = fmt(totalBundle);
+    if (btnSub) btnSub.textContent = `Tiết kiệm ngay ${fmt(totalSavings)}`;
+}
+
+function onBundleCheckChange(idx, isChecked) {
+    if (bundleSelectedAccessories[idx]) {
+        bundleSelectedAccessories[idx].checked = isChecked;
+        const card = document.querySelector(`.accessory-item[data-bundle-index="${idx}"]`);
+        if (card) {
+            card.classList.toggle('is-selected', isChecked);
+        }
+        recalculateBundleSummary();
+    }
+}
+
+function renderBundleUI() {
+    const container = document.getElementById('bundleCrossellSection');
+    if (!container || !product) return;
+
+    const checkedAccessories = bundleSelectedAccessories.filter(a => a.checked);
+    const mainPrice = Number(product.price) || 0;
+    
+    const accOriginalSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
+    const accDiscountedSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.discountedPrice) || 0), 0);
+    
+    const totalOriginal = mainPrice + accOriginalSum;
+    const totalBundle = mainPrice + accDiscountedSum;
+    const totalSavings = totalOriginal - totalBundle;
+    const totalCount = 1 + checkedAccessories.length;
+
+    container.innerHTML = `
+        <header class="bundle-header">
+            <div class="bundle-title-cluster">
+                <span class="bundle-icon" aria-hidden="true">🎁</span>
+                <div>
+                    <h2 class="bundle-title">Gợi Ý Mua Kèm Phụ Kiện - Giảm Thêm Đến 35%</h2>
+                    <p class="bundle-subtitle">Chọn combo phụ kiện tương thích cao cấp để nhận ưu đãi trợ giá độc quyền từ TechEcommerce</p>
+                </div>
+            </div>
+            <span class="bundle-hot-badge">COMBO SIÊU TIẾT KIỆM</span>
+        </header>
+
+        <div class="bundle-layout">
+            <div class="bundle-chain" role="group" aria-label="Danh sách phụ kiện trong combo">
+                <!-- Main product card -->
+                <article class="bundle-item main-product is-selected">
+                    <figure class="bundle-thumb">
+                        <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" onerror="this.src='https://via.placeholder.com/120?text=TechEcommerce'">
+                        <span class="bundle-main-pill">Sản phẩm chính</span>
+                    </figure>
+                    <div class="bundle-meta">
+                        <strong class="bundle-name" title="${escapeHTML(product.name)}">${escapeHTML(product.name)}</strong>
+                        <span class="bundle-price-val">${fmt(product.price)}</span>
+                    </div>
+                </article>
+
+                <!-- Accessories -->
+                ${bundleSelectedAccessories.map((acc, idx) => `
+                    <div class="bundle-plus-wrap" aria-hidden="true">
+                        <span class="bundle-plus">+</span>
+                    </div>
+                    <article class="bundle-item accessory-item ${acc.checked ? 'is-selected' : ''}" data-bundle-index="${idx}">
+                        <label class="bundle-check-label">
+                            <input type="checkbox" class="bundle-check-input" data-bundle-index="${idx}" ${acc.checked ? 'checked' : ''} onchange="onBundleCheckChange(${idx}, this.checked)">
+                            <span class="bundle-custom-checkbox" aria-hidden="true">✓</span>
+                            <span class="bundle-discount-badge">Giảm ${acc.discountPct}%</span>
+                        </label>
+                        <figure class="bundle-thumb">
+                            <img src="${escapeHTML(acc.image)}" alt="${escapeHTML(acc.name)}" onerror="this.src='https://via.placeholder.com/120?text=TechEcommerce'" loading="lazy">
+                        </figure>
+                        <div class="bundle-meta">
+                            <a href="product.html?id=${acc._id}" class="bundle-name" target="_blank" title="${escapeHTML(acc.name)}">${escapeHTML(acc.name)}</a>
+                            <div class="bundle-price-row">
+                                <strong class="bundle-price-val">${fmt(acc.discountedPrice)}</strong>
+                                <del class="bundle-price-orig">${fmt(acc.price)}</del>
+                            </div>
+                        </div>
+                    </article>
+                `).join('')}
+            </div>
+
+            <!-- Bundle Summary Box -->
+            <aside class="bundle-summary-panel" aria-label="Bảng tính giá combo">
+                <header class="bundle-summary-header">
+                    <span class="bundle-count-label">Đã chọn: <strong id="bundleSelectedCount">${totalCount} sản phẩm</strong></span>
+                </header>
+                <div class="bundle-summary-body">
+                    <div class="bundle-sum-row">
+                        <span>Tổng giá gốc:</span>
+                        <del id="bundleOriginalTotal">${fmt(totalOriginal)}</del>
+                    </div>
+                    <div class="bundle-sum-row bundle-saving-row">
+                        <span>Tiết kiệm mua kèm:</span>
+                        <strong id="bundleSavedTotal">-${fmt(totalSavings)}</strong>
+                    </div>
+                    <div class="bundle-sum-row bundle-final-row">
+                        <span>Giá trọn bộ combo:</span>
+                        <strong id="bundleFinalTotal">${fmt(totalBundle)}</strong>
+                    </div>
+                </div>
+                <button type="button" class="btn-bundle-buy-all" id="btnBuyBundleAll" onclick="buyBundleCombo()">
+                    <span class="btn-bundle-icon" aria-hidden="true">🛒</span>
+                    <div class="btn-bundle-text">
+                        <strong>Thêm trọn bộ vào giỏ</strong>
+                        <small id="btnBundleSavingSub">Tiết kiệm ngay ${fmt(totalSavings)}</small>
+                    </div>
+                </button>
+            </aside>
+        </div>
+    `;
+}
+
+function buyBundleCombo() {
+    if (!product || product.stock <= 0) {
+        showToast('Sản phẩm chính hiện đang tạm hết hàng!', 'error');
+        return;
+    }
+
+    const checkedAccessories = bundleSelectedAccessories.filter(a => a.checked);
+    const cartKey = auth.getCartStorageKey();
+    const cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+
+    // 1. Add main product
+    const input = document.getElementById('detailQty');
+    const mainQty = Math.max(Number(input?.value || 1), 1);
+    const existingMain = cart.find(i => String(i.productId) === String(product._id));
+    if (existingMain) existingMain.quantity += mainQty;
+    else cart.push({ productId: Number(product._id), quantity: mainQty });
+
+    // 2. Add each checked accessory
+    checkedAccessories.forEach(acc => {
+        const existingAcc = cart.find(i => String(i.productId) === String(acc._id));
+        if (existingAcc) existingAcc.quantity += 1;
+        else cart.push({ productId: Number(acc._id), quantity: 1, bundlePrice: acc.discountedPrice });
+    });
+
+    localStorage.setItem(cartKey, JSON.stringify(cart));
+    window.dispatchEvent(new Event('cartUpdated'));
+
+    const totalItems = 1 + checkedAccessories.length;
+    const totalSavings = checkedAccessories.reduce((sum, a) => sum + (Number(a.price) - Number(a.discountedPrice)), 0);
+
+    showToast(`🎉 Đã thêm trọn bộ ${totalItems} món vào giỏ hàng! Tiết kiệm ${fmt(totalSavings)}!`, 'success');
 }
 
 function renderReviews() {
@@ -813,6 +1050,8 @@ window.toggleTradeInCalculator = toggleTradeInCalculator;
 window.onTradeInCategoryChange = onTradeInCategoryChange;
 window.recalculateTradeIn = recalculateTradeIn;
 window.applyTradeIn = applyTradeIn;
+window.buyBundleCombo = buyBundleCombo;
+window.onBundleCheckChange = onBundleCheckChange;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadProduct();
