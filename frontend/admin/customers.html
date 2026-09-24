@@ -73,18 +73,98 @@
             </form>
         </section>
 
+        <!-- RFM Segmentation & Retargeting Dashboard -->
+        <section class="chart-section glass-card reveal" aria-label="Phân khúc khách hàng RFM" style="margin-bottom:2rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
+                <div>
+                    <h2 style="margin-bottom:0.2rem; font-size:1.3rem;">👥 Phân khúc Khách hàng RFM & Tiếp thị lại</h2>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:0;">Mô hình Recency (Gần đây) - Frequency (Tần suất) - Monetary (Chi tiêu) và kích hoạt chiến dịch 1-click.</p>
+                </div>
+                <span class="badge" style="background:rgba(47, 128, 237, 0.15); color:var(--primary); border:1px solid rgba(47, 128, 237, 0.3); padding:0.4rem 0.8rem; border-radius:50px; font-weight:700; font-size:0.8rem;">
+                    Tự động chấm điểm RFM
+                </span>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:1.2rem;">
+                <!-- VIP Champions -->
+                <article class="glass-card" style="padding:1.4rem; border-radius:var(--radius-md); border-top:4px solid #f59e0b; background:rgba(245, 158, 11, 0.04);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-size:1.5rem;">👑</span>
+                        <span id="rfmVipCount" style="font-size:1.6rem; font-weight:800; color:#f59e0b;">0</span>
+                    </div>
+                    <h3 style="font-size:1rem; margin:0.5rem 0 0.2rem 0; color:var(--text-primary);">VIP Champion</h3>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Chi tiêu > 15 triệu hoặc mua thường xuyên trong 45 ngày.</p>
+                    <button type="button" class="btn-primary" style="width:100%; font-size:0.82rem; padding:0.5rem;" onclick="openVoucherModal('champion', 'VIP10CHAMPION', 10, 'percent', 'Voucher Tri ân VIP 10%')">
+                        🎁 Tặng Voucher VIP 10%
+                    </button>
+                </article>
+
+                <!-- Potential -->
+                <article class="glass-card" style="padding:1.4rem; border-radius:var(--radius-md); border-top:4px solid var(--primary); background:rgba(47, 128, 237, 0.04);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-size:1.5rem;">🌟</span>
+                        <span id="rfmPotentialCount" style="font-size:1.6rem; font-weight:800; color:var(--primary);">0</span>
+                    </div>
+                    <h3 style="font-size:1rem; margin:0.5rem 0 0.2rem 0; color:var(--text-primary);">Khách tiềm năng</h3>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Mua trong 60 ngày, giá trị trung bình khá, tiềm năng upsell.</p>
+                    <button type="button" class="btn-primary" style="width:100%; font-size:0.82rem; padding:0.5rem; background:var(--primary);" onclick="openVoucherModal('potential', 'POTENTIAL50K', 50000, 'fixed', 'Voucher Nâng hạng 50K')">
+                        🎁 Tặng Voucher 50K
+                    </button>
+                </article>
+
+                <!-- At-Risk -->
+                <article class="glass-card" style="padding:1.4rem; border-radius:var(--radius-md); border-top:4px solid var(--danger); background:rgba(239, 68, 68, 0.04);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-size:1.5rem;">⚠️</span>
+                        <span id="rfmAtRiskCount" style="font-size:1.6rem; font-weight:800; color:var(--danger);">0</span>
+                    </div>
+                    <h3 style="font-size:1rem; margin:0.5rem 0 0.2rem 0; color:var(--text-primary);">Nguy cơ rời bỏ</h3>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Đã từng mua nhưng quá 60 ngày chưa quay lại mua sắm.</p>
+                    <button type="button" class="btn-secondary" style="width:100%; font-size:0.82rem; padding:0.5rem; border-color:var(--danger); color:var(--danger);" onclick="openVoucherModal('at_risk', 'COMEBACK15', 15, 'percent', 'Voucher Kéo khách quay lại 15%')">
+                        🎁 Tặng Voucher Giữ chân 15%
+                    </button>
+                </article>
+
+                <!-- New Customers -->
+                <article class="glass-card" style="padding:1.4rem; border-radius:var(--radius-md); border-top:4px solid var(--success); background:rgba(16, 185, 129, 0.04);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <span style="font-size:1.5rem;">🆕</span>
+                        <span id="rfmNewCount" style="font-size:1.6rem; font-weight:800; color:var(--success);">0</span>
+                    </div>
+                    <h3 style="font-size:1rem; margin:0.5rem 0 0.2rem 0; color:var(--text-primary);">Khách hàng mới</h3>
+                    <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:1rem;">Đơn hàng đầu tiên trong vòng 30 ngày qua.</p>
+                    <button type="button" class="btn-secondary" style="width:100%; font-size:0.82rem; padding:0.5rem; border-color:var(--success); color:var(--success);" onclick="openVoucherModal('new', 'NEXTORDER8', 8, 'percent', 'Voucher Đơn thứ 2 8%')">
+                        🎁 Tặng Voucher Đơn 2 (8%)
+                    </button>
+                </article>
+            </div>
+        </section>
+
         <section class="table-section glass-card reveal">
-            <h2>Danh sách khách hàng (<span id="customerCount">0</span>)</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                <h2 style="margin-bottom:0;">Danh sách khách hàng (<span id="customerCount">0</span>)</h2>
+                
+                <!-- RFM Segment Filters -->
+                <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                    <button type="button" class="btn-secondary btn-sm segment-btn active" onclick="filterBySegment('all', this)">Tất cả</button>
+                    <button type="button" class="btn-secondary btn-sm segment-btn" onclick="filterBySegment('champion', this)">👑 VIP</button>
+                    <button type="button" class="btn-secondary btn-sm segment-btn" onclick="filterBySegment('potential', this)">🌟 Tiềm năng</button>
+                    <button type="button" class="btn-secondary btn-sm segment-btn" onclick="filterBySegment('at_risk', this)">⚠️ Nguy cơ rời bỏ</button>
+                    <button type="button" class="btn-secondary btn-sm segment-btn" onclick="filterBySegment('new', this)">🆕 Khách mới</button>
+                    <button type="button" class="btn-secondary btn-sm segment-btn" onclick="filterBySegment('lead', this)">💤 Chưa có đơn</button>
+                </div>
+            </div>
+
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th style="width: 50px;">STT</th>
-                            <th>Họ tên</th>
-                            <th>Tên đăng nhập</th>
-                            <th>SĐT</th>
-                            <th>Email</th>
-                            <th>Địa chỉ</th>
+                            <th style="width: 45px;">STT</th>
+                            <th>Khách hàng</th>
+                            <th>Phân khúc RFM</th>
+                            <th>Lịch sử mua hàng</th>
+                            <th>Gần nhất</th>
+                            <th>Liên hệ</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
@@ -92,6 +172,45 @@
                 </table>
             </div>
         </section>
+
+        <!-- Voucher Modal for Retargeting -->
+        <dialog id="voucherDialog" style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg-card); color:var(--text-primary); padding:2rem; max-width:480px; width:90%; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+            <form method="dialog" onsubmit="event.preventDefault(); submitVoucherCampaign();">
+                <h3 id="voucherDialogTitle" style="margin-top:0; font-size:1.2rem;">🎁 Phát hành Voucher Kích cầu</h3>
+                <p id="voucherDialogDesc" style="color:var(--text-secondary); font-size:0.9rem;">Hệ thống sẽ tạo mã ưu đãi độc quyền cho nhóm khách hàng được chọn.</p>
+                
+                <input type="hidden" id="vSegment">
+                <div class="form-group">
+                    <label for="vCode">Mã Voucher (Code)</label>
+                    <input type="text" id="vCode" style="text-transform:uppercase; font-weight:700; letter-spacing:1px;" required>
+                </div>
+                <div class="form-group">
+                    <label for="vName">Tên chiến dịch</label>
+                    <input type="text" id="vName" required>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label for="vType">Loại giảm giá</label>
+                        <select id="vType">
+                            <option value="percent">Phần trăm (%)</option>
+                            <option value="fixed">Số tiền cố định (đ)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vValue">Giá trị giảm</label>
+                        <input type="number" id="vValue" min="1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="vMinOrder">Đơn hàng tối thiểu (đ)</label>
+                    <input type="number" id="vMinOrder" value="300000">
+                </div>
+                <div class="form-actions" style="margin-top:1.5rem;">
+                    <button type="submit" class="btn-primary">Xác nhận gửi Voucher</button>
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('voucherDialog').close()">Đóng</button>
+                </div>
+            </form>
+        </dialog>
     </main>
 
     <script src="../assets/js/customers.js?v=techecommerce-20260709-2"></script>

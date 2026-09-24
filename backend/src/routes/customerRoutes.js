@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Customer = require('../models/Customer');
 const Product = require('../models/Product');
+const Order = require('../models/Order');
+const Coupon = require('../models/Coupon');
 const bcrypt = require('bcryptjs');
 const { protect, admin } = require('../middleware/auth');
 
@@ -96,6 +98,157 @@ router.get('/', protect, admin, async (req, res) => {
     try {
         const customers = await Customer.find();
         res.json(customers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// GET customer RFM segmentation analysis (Admin only)
+router.get('/rfm-segmentation', protect, admin, async (req, res) => {
+    try {
+        const customers = await Customer.find().select('-password').lean();
+        const orders = await Order.find().select('_id customer customerPhone customerName guestEmail totalAmount orderDate status createdAt').lean();
+
+        const ordersByCustomer = new Map();
+        const ordersByPhone = new Map();
+
+        orders.forEach(o => {
+            if (o.status === 'cancelled') return;
+            if (o.customer) {
+                const cid = String(o.customer);
+                if (!ordersByCustomer.has(cid)) ordersByCustomer.set(cid, []);
+                ordersByCustomer.get(cid).push(o);
+            }
+            const phone = String(o.customerPhone || '').trim();
+            if (phone) {
+                if (!ordersByPhone.has(phone)) ordersByPhone.set(phone, []);
+                ordersByPhone.get(phone).push(o);
+            }
+        });
+
+        const segmentedCustomers = customers.map(cust => {
+            const custId = String(cust._id);
+            const phone = String(cust.phone || '').trim();
+
+            const matched = [];
+            const seenOrderIds = new Set();
+
+            const fromId = ordersByCustomer.get(custId) || [];
+            fromId.forEach(o => {
+                if (!seenOrderIds.has(String(o._id))) {
+                    seenOrderIds.add(String(o._id));
+                    matched.push(o);
+                }
+            });
+
+            if (phone) {
+                const fromPhone = ordersByPhone.get(phone) || [];
+                fromPhone.forEach(o => {
+                    if (!seenOrderIds.has(String(o._id))) {
+                        seenOrderIds.add(String(o._id));
+                        matched.push(o);
+                    }
+                });
+            }
+
+            const orderCount = matched.length;
+            const totalSpent = matched.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+            const lastOrderTs = orderCount
+                ? Math.max(...matched.map(o => new Date(o.orderDate || o.createdAt).getTime()))
+                : null;
+            const daysSinceLastOrder = lastOrderTs !== null
+                ? Math.max(0, Math.round((Date.now() - lastOrderTs) / (1000 * 60 * 60 * 24)))
+                : null;
+
+            let segment = 'lead';
+            let segmentLabel = 'Chưa phát sinh đơn';
+            let rfmBadge = 'badge-lead';
+            let suggestedAction = 'Tặng Voucher Chào mừng 50K';
+
+            if (daysSinceLastOrder !== null) {
+                if (totalSpent >= 15000000 || (orderCount >= 2 && daysSinceLastOrder <= 45)) {
+                    segment = 'champion';
+                    segmentLabel = '👑 VIP Champion';
+                    rfmBadge = 'badge-vip';
+                    suggestedAction = 'Tặng Voucher Tri ân VIP 10%';
+                } else if (daysSinceLastOrder > 60) {
+                    segment = 'at_risk';
+                    segmentLabel = '⚠️ Nguy cơ rời bỏ';
+                    rfmBadge = 'badge-at-risk';
+                    suggestedAction = 'Tặng Voucher Giữ chân 15%';
+                } else if (orderCount === 1 && daysSinceLastOrder <= 30) {
+                    segment = 'new';
+                    segmentLabel = '🆕 Khách hàng mới';
+                    rfmBadge = 'badge-new';
+                    suggestedAction = 'Tặng Voucher Mua lần 2 8%';
+                } else {
+                    segment = 'potential';
+                    segmentLabel = '🌟 Tiềm năng';
+                    rfmBadge = 'badge-potential';
+                    suggestedAction = 'Tặng Voucher Upsell 50K';
+                }
+            }
+
+            return {
+                ...cust,
+                orderCount,
+                totalSpent,
+                lastOrderDate: lastOrderTs ? new Date(lastOrderTs).toISOString() : null,
+                daysSinceLastOrder,
+                segment,
+                segmentLabel,
+                rfmBadge,
+                suggestedAction
+            };
+        });
+
+        // Summary counts
+        const summary = {
+            total: segmentedCustomers.length,
+            champion: segmentedCustomers.filter(c => c.segment === 'champion').length,
+            potential: segmentedCustomers.filter(c => c.segment === 'potential').length,
+            at_risk: segmentedCustomers.filter(c => c.segment === 'at_risk').length,
+            new: segmentedCustomers.filter(c => c.segment === 'new').length,
+            lead: segmentedCustomers.filter(c => c.segment === 'lead').length
+        };
+
+        res.json({
+            summary,
+            customers: segmentedCustomers
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// POST issue retargeting voucher for customer segment (Admin only)
+router.post('/send-segment-voucher', protect, admin, async (req, res) => {
+    try {
+        const { segment, code, value = 10, type = 'percent', minOrderValue = 300000, maxDiscount = 200000, name } = req.body;
+        if (!code) return res.status(400).json({ message: 'Thiếu mã voucher!' });
+
+        const voucherCode = String(code).trim().toUpperCase();
+        let coupon = await Coupon.findOne({ code: voucherCode });
+        if (!coupon) {
+            coupon = new Coupon({
+                code: voucherCode,
+                name: name || `Voucher kích cầu phân khúc ${segment || 'khách hàng'}`,
+                type: type === 'fixed' ? 'fixed' : 'percent',
+                value: Number(value) || 10,
+                minOrderValue: Number(minOrderValue) || 0,
+                maxDiscount: Number(maxDiscount) || 0,
+                usageLimit: 500,
+                active: true,
+                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+            });
+            await coupon.save();
+        }
+
+        res.json({
+            success: true,
+            message: `Đã phát hành và gửi mã ${voucherCode} thành công cho phân khúc khách hàng!`,
+            coupon
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
