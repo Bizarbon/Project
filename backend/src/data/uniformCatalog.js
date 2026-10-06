@@ -168,9 +168,9 @@ const uniformCatalog = [
         "category": "Điện thoại",
         "price": 34990000,
         "compareAtPrice": 36990000,
-        "image": "/assets/images/products/iphone-16-pro-max.png",
+        "image": "/assets/images/products/cps-iphone-16-pro-max.png",
         "images": [
-            "/assets/images/products/iphone-16-pro-max.png"
+            "/assets/images/products/cps-iphone-16-pro-max.png"
         ],
         "description": "Màn hình Super Retina XDR 6.9 inch, chip A18 Pro, khung viền Titan sa mạc đẳng cấp, nút điều khiển Camera Control chuyên nghiệp.",
         "specs": {

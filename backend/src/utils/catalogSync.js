@@ -4,7 +4,31 @@ const uniformCatalog = require('../data/uniformCatalog');
 
 let syncPromise = null;
 
+async function repairCanonicalProductAssets() {
+    const iphone16ProMax = uniformCatalog.find(item => item.name === 'iPhone 16 Pro Max 256GB');
+    if (!iphone16ProMax?.image) return 0;
+
+    const result = await Product.updateOne(
+        {
+            name: iphone16ProMax.name,
+            $or: [
+                { image: { $ne: iphone16ProMax.image } },
+                { images: { $ne: iphone16ProMax.images } }
+            ]
+        },
+        {
+            $set: {
+                image: iphone16ProMax.image,
+                images: iphone16ProMax.images || [iphone16ProMax.image]
+            }
+        }
+    );
+
+    return result.modifiedCount || 0;
+}
+
 async function syncUniformCatalog({ force = false } = {}) {
+    const repairedAssetCount = await repairCanonicalProductAssets();
     const count = await Product.countDocuments();
     const missingVideoCount = count > 0 ? await Product.countDocuments({
         $or: [
@@ -21,7 +45,8 @@ async function syncUniformCatalog({ force = false } = {}) {
         return {
             synced: false,
             message: 'Catalog đã có dữ liệu sản phẩm đầy đủ và cập nhật.',
-            count
+            count,
+            repairedAssetCount
         };
     }
 
@@ -51,7 +76,8 @@ async function syncUniformCatalog({ force = false } = {}) {
     return {
         synced: true,
         message: `Đã đồng bộ thành công ${inserted.length} sản phẩm chuẩn.`,
-        count: inserted.length
+        count: inserted.length,
+        repairedAssetCount
     };
 }
 
