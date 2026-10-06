@@ -1115,9 +1115,12 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
         const acknowledgement = confirmedDetails.length
             ? `mình đã ghi nhận ${confirmedDetails.join(', ')}. `
             : '';
+        const qualificationIntro = acknowledgement
+            ? `Dạ, ${acknowledgement}Để chọn đúng **${productType.label}** hợp nhất, mình chỉ cần hỏi thêm:`
+            : `Dạ được ạ! Để chọn đúng **${productType.label}** hợp nhất, mình xin hỏi thêm:`;
 
         return {
-            reply: `Dạ, ${acknowledgement}Để chọn đúng **${productType.label}** hợp nhất, mình chỉ cần hỏi thêm:\n\n` +
+            reply: `${qualificationIntro}\n\n` +
                 questions.map((question, index) => `${index + 1}. ${question}`).join('\n') +
                 `\n\nBạn trả lời từng ý hoặc gộp trong một tin nhắn đều được nhé. Mình sẽ giữ nguyên các thông tin đã ghi nhận và không hỏi lại. 😊`,
             products: [],
@@ -2312,6 +2315,27 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
     // Nếu khách đã chỉ rõ model máy -> trả lời đúng sản phẩm, giá, tồn kho ngay lập tức!
     if (matchedProducts.length >= 1 && !isComparingIntent) {
         return await handleExactProductLookup(matchedProducts[0], prev);
+    }
+
+    // Khách đang được hỏi về một loại sản phẩm nhưng chuyển hẳn sang loại khác
+    // (ví dụ: đang hỏi tai nghe rồi nói "điện thoại") thì phải reset bộ slot cũ.
+    const requestedProductType = detectProductType(message);
+    if (requestedProductType && requestedProductType.key !== prev.productType) {
+        const switchedContext = {
+            pageCategory: prev.pageCategory,
+            category: requestedProductType.category,
+            productType: requestedProductType.key,
+            stage: 'qualifying_needs',
+            currentIntent: 'qualifying_needs',
+            brand: '',
+            budget: 0,
+            budgetType: 'unspecified',
+            useCase: '',
+            qualification: {},
+            missingSlots: [],
+            lastProducts: []
+        };
+        return await handleCatalogProductTypeQuery(message, switchedContext, requestedProductType);
     }
 
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở

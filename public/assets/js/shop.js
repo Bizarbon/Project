@@ -524,8 +524,25 @@ function renderBrandFilter() {
     const current = select.value || 'all';
     const categoryName = activeCategory && activeCategory !== 'all' ? ` ${activeCategory.toLowerCase()}` : '';
     select.innerHTML = `<option value="all">Tất cả hãng${escapeHTML(categoryName)}</option>` +
-        brands.map(brand => `<option value="${escapeHTML(brand)}">${escapeHTML(brand)}</option>`).join('');
+        brands.map(brand => `<option value="${escapeHTML(brand)}">${escapeHTML(brandIconText(brand))} ${escapeHTML(brand)}</option>`).join('');
     select.value = brands.includes(current) ? current : 'all';
+}
+
+function brandIconText(brand) {
+    const normalized = String(brand || '').trim().toLowerCase();
+    const icons = {
+        apple: '●', samsung: 'S', xiaomi: 'Mi', poco: 'P', oppo: 'O', honor: 'H',
+        asus: 'A', acer: 'A', dell: 'D', hp: 'HP', lenovo: 'L', msi: 'MSI', microsoft: 'M',
+        sony: 'S', jbl: 'JBL', marshall: 'M', logitech: 'G', anker: 'A', ugreen: 'U',
+        baseus: 'B', dareu: 'D', dji: 'DJI', garmin: 'G', huawei: 'H', nintendo: 'N'
+    };
+    return icons[normalized] || String(brand || '?').trim().slice(0, 2).toUpperCase();
+}
+
+function brandIconMarkup(brand) {
+    const label = brand || 'TechStore Select';
+    const key = String(label).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return `<span class="brand-icon brand-icon-${escapeHTML(key)}" aria-hidden="true">${escapeHTML(brandIconText(label))}</span>`;
 }
 
 async function loadProducts() {
@@ -2583,7 +2600,7 @@ function productCard(p) {
             </a>
             <section class="card-body">
                 <span class="category-badge">${escapeHTML(p.category)}</span>
-                <div class="product-brand">${escapeHTML(p.brand || 'TechStore Select')} ${p.sku ? `<span>${escapeHTML(p.sku)}</span>` : ''}</div>
+                <div class="product-brand"><span class="product-brand-name">${brandIconMarkup(p.brand)} ${escapeHTML(p.brand || 'TechStore Select')}</span>${p.sku ? `<span>${escapeHTML(p.sku)}</span>` : ''}</div>
                 <h3 title="${escapeHTML(p.name)}"><a href="pages/catalog/product.html?id=${p._id}" onclick="event.stopPropagation()">${escapeHTML(p.name)}</a></h3>
                 <p class="product-desc">${escapeHTML(p.description || '')}</p>
                 ${p.recommendation?.reason ? `<p class="recommendation-reason">${escapeHTML(p.recommendation.reason)}</p>` : ''}

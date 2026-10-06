@@ -27,6 +27,26 @@ let currentCancelOrderId = null;
 let currentDetailOrder = null;
 let searchDebounceTimer = null;
 
+function normalizeLocation(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .toLowerCase();
+}
+
+function isHoChiMinhOrder(order) {
+    const provinceCode = String(order?.shippingProvinceCode || '').trim().toLowerCase();
+    if (['79', 'hcm', 'hochiminh'].includes(provinceCode)) return true;
+    const location = normalizeLocation([order?.shippingProvince, order?.shippingAddress].filter(Boolean).join(' '));
+    const hcmKeywords = [
+        'ho chi minh', 'tp hcm', 'tphcm', 'sai gon', 'thu duc', 'go vap', 'binh thanh',
+        'tan binh', 'tan phu', 'phu nhuan', 'binh tan', 'nha be', 'hoc mon', 'cu chi',
+        'binh chanh', 'can gio', ...Array.from({ length: 12 }, (_, index) => `quan ${index + 1}`)
+    ];
+    return hcmKeywords.some(keyword => location.includes(keyword));
+}
+
 // Label mappings
 const statusLabels = {
     pending: 'Chờ xử lý',
@@ -289,10 +309,18 @@ function renderOrdersTable(orders) {
             </select>
         `;
 
-        // Shipper Cell
+        // Shipper nội bộ chỉ giao trong TP.HCM; đơn tỉnh đi qua đối tác vận chuyển.
+        const isLocalDelivery = isHoChiMinhOrder(order);
         const shipperObj = order.shipper;
         let shipperCellHtml = '';
-        if (shipperObj && (typeof shipperObj === 'object' || typeof shipperObj === 'number')) {
+        if (!isLocalDelivery) {
+            shipperCellHtml = `
+                <div class="shipper-cell-box">
+                    <span class="status-badge" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:0.72rem;">Đối tác vận chuyển</span>
+                    <small style="display:block; margin-top:4px; color:var(--admin-text-muted);">Đơn liên tỉnh</small>
+                </div>
+            `;
+        } else if (shipperObj && (typeof shipperObj === 'object' || typeof shipperObj === 'number')) {
             const shipperName = shipperObj.name || order.shipperAssignedByName || `Shipper #${shipperObj._id || shipperObj}`;
             const shipperPhone = shipperObj.phone || '';
             shipperCellHtml = `
@@ -343,9 +371,9 @@ function renderOrdersTable(orders) {
                         <button type="button" class="dropdown-menu-item" onclick="openOrderDetail('${order._id}')">
                             👁️ Xem chi tiết
                         </button>
-                        <button type="button" class="dropdown-menu-item" onclick="openAssignShipperModal('${order._id}')">
-                            🛵 Phân công shipper
-                        </button>
+                        ${isLocalDelivery ? `<button type="button" class="dropdown-menu-item" onclick="openAssignShipperModal('${order._id}')">
+                            🛵 Phân công shipper nội thành
+                        </button>` : ''}
                         ${order.paymentStatus !== 'paid' ? `
                             <button type="button" class="dropdown-menu-item" onclick="promptMarkPaymentPaid('${order._id}')">
                                 💵 Xác nhận thanh toán
@@ -554,6 +582,11 @@ let currentShipperFilterTab = 'all';
 let currentShipperSearchQuery = '';
 
 async function openAssignShipperModal(orderId) {
+    const targetOrder = loadedOrders.find(order => String(order._id) === String(orderId));
+    if (targetOrder && !isHoChiMinhOrder(targetOrder)) {
+        showToast('Đơn liên tỉnh được giao qua đối tác vận chuyển; không phân công shipper nội bộ.', 'error');
+        return;
+    }
     currentAssignOrderId = orderId;
     const modal = document.getElementById('assignShipperModal');
     const order = loadedOrders.find(o => String(o._id) === String(orderId)) || currentDetailOrder;
@@ -965,6 +998,12 @@ function updateBulkSelectionToolbar() {
 }
 
 function openBulkShipperModal() {
+    const selectedOrders = loadedOrders.filter(order => selectedOrderIds.has(String(order._id)));
+    const provincialOrders = selectedOrders.filter(order => !isHoChiMinhOrder(order));
+    if (provincialOrders.length) {
+        showToast(`Có ${provincialOrders.length} đơn liên tỉnh. Chỉ có thể phân shipper nội bộ cho đơn TP.HCM.`, 'error');
+        return;
+    }
     const modal = document.getElementById('bulkActionModal');
     const title = document.getElementById('bulkModalTitle');
     const body = document.getElementById('bulkModalBody');
@@ -1094,6 +1133,7 @@ function closeOrderDetailModal() {
 }
 
 function buildOrderDetailHtml(order) {
+    const isLocalDelivery = isHoChiMinhOrder(order);
     const recipientName = order.recipientName || order.customer?.name || order.customerName || 'N/A';
     const recipientPhone = order.recipientPhone || order.customer?.phone || order.customerPhone || 'N/A';
     const customerEmail = order.guestEmail || order.customer?.email || 'N/A';
@@ -1210,8 +1250,8 @@ function buildOrderDetailHtml(order) {
                     <span class="status-badge" style="background: var(--admin-surface, #ffffff); border: 1px solid var(--admin-border, #e2e8f0); color: var(--admin-text-main, #0f172a);">${escapeHTML(shippingStatusLabels[order.shippingStatus] || order.shippingStatus || 'Chưa phân công')}</span>
                 </div>
                 <div class="detail-info-row">
-                    <span>Shipper phụ trách:</span>
-                    <span style="color: #34d399; font-weight: 600;">${escapeHTML(shipperName)}</span>
+                    <span>${isLocalDelivery ? 'Shipper phụ trách:' : 'Hình thức giao:'}</span>
+                    <span style="color: ${isLocalDelivery ? '#34d399' : '#2563eb'}; font-weight: 600;">${escapeHTML(isLocalDelivery ? shipperName : 'Đối tác vận chuyển liên tỉnh')}</span>
                 </div>
                 ${shipperPhone ? `
                     <div class="detail-info-row">
@@ -1227,11 +1267,11 @@ function buildOrderDetailHtml(order) {
                     <span>Đơn vị vận chuyển:</span>
                     <span>${escapeHTML(order.shippingUnit || 'Cửa hàng tự giao / Hãng')}</span>
                 </div>
-                <div style="margin-top: 10px; display: flex; gap: 8px;">
+                ${isLocalDelivery ? `<div style="margin-top: 10px; display: flex; gap: 8px;">
                     <button type="button" class="btn-detail-action" style="flex:1;" onclick="openAssignShipperModal('${order._id}')">
-                        🛵 Đổi / Phân công shipper
+                        🛵 Đổi / Phân công shipper nội thành
                     </button>
-                </div>
+                </div>` : '<p style="margin-top:10px; color:var(--admin-text-muted); font-size:0.8rem;">Đơn này được bàn giao cho hãng vận chuyển theo mã vận đơn.</p>'}
             </div>
 
             <!-- 3. Payment & Totals -->

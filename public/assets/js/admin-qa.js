@@ -134,7 +134,7 @@ function renderReviewsTable(list) {
             <tr>
                 <td><strong>${idStr}</strong></td>
                 <td>
-                    <div style="font-weight: 600; color: #f1f5f9; max-width: 220px; white-space: normal; line-height: 1.3;">
+                    <div style="font-weight: 600; color: var(--admin-text-main); max-width: 220px; white-space: normal; line-height: 1.3;">
                         ${escapeHTML(prodName)}
                     </div>
                 </td>

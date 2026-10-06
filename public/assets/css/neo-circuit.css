@@ -2073,12 +2073,12 @@ html[data-theme='dark'] .live-search-empty {
     gap: 0.75rem;
     margin-bottom: 1.25rem;
     padding: 1rem 1.25rem;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(56, 189, 248, 0.25);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(37, 99, 235, 0.18);
     border-radius: 12px;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px -8px rgba(15, 23, 42, 0.18);
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -2092,7 +2092,7 @@ html[data-theme='dark'] .live-search-empty {
 .faceted-spec-label {
     font-size: 0.82rem;
     font-weight: 700;
-    color: #38bdf8;
+    color: #0284c7;
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -2112,18 +2112,70 @@ html[data-theme='dark'] .live-search-empty {
     border-radius: 8px;
     font-size: 0.8rem;
     font-weight: 500;
-    color: #cbd5e1;
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #334155;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
     cursor: pointer;
     transition: all 0.15s ease;
     user-select: none;
 }
 
 .faceted-chip:hover {
+    color: #0369a1;
+    border-color: #38bdf8;
+    background: #e0f2fe;
+}
+
+html[data-theme='dark'] .faceted-spec-bar {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(56, 189, 248, 0.25);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .faceted-spec-label {
+    color: #38bdf8;
+}
+
+html[data-theme='dark'] .faceted-chip {
+    color: #cbd5e1;
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme='dark'] .faceted-chip:hover {
     color: #ffffff;
     border-color: rgba(56, 189, 248, 0.5);
     background: rgba(56, 189, 248, 0.15);
+}
+
+.product-brand-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    padding: 0 0.25rem;
+    border-radius: 0.4rem;
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    color: #0369a1;
+    font-size: 0.58rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+html[data-theme='dark'] .brand-icon {
+    background: rgba(14, 165, 233, 0.14);
+    border-color: rgba(56, 189, 248, 0.35);
+    color: #7dd3fc;
 }
 
 .faceted-chip.active {

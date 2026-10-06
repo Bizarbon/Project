@@ -83,6 +83,31 @@ function formatMoney(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(amount) || 0);
 }
 
+function normalizeLocation(value) {
+    return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .toLowerCase();
+}
+
+function isHoChiMinhDelivery(order) {
+    const provinceCode = String(order?.shippingProvinceCode || '').trim().toLowerCase();
+    if (['79', 'hcm', 'hochiminh'].includes(provinceCode)) return true;
+
+    const location = normalizeLocation([
+        order?.shippingProvince,
+        order?.shippingAddress
+    ].filter(Boolean).join(' '));
+
+    const hcmKeywords = [
+        'ho chi minh', 'tp hcm', 'tphcm', 'sai gon', 'thu duc', 'go vap', 'binh thanh',
+        'tan binh', 'tan phu', 'phu nhuan', 'binh tan', 'nha be', 'hoc mon', 'cu chi',
+        'binh chanh', 'can gio', ...Array.from({ length: 12 }, (_, index) => `quan ${index + 1}`)
+    ];
+    return hcmKeywords.some(keyword => location.includes(keyword));
+}
+
 function canAccessOrder(req, order) {
     if (req.user?.isAdmin) return true;
     if (req.user?.role === 'shipper' && order.shipper && String(order.shipper?._id || order.shipper) === String(req.user._id)) return true;
@@ -652,6 +677,13 @@ router.patch('/:id/assign-shipper', protect, admin, async (req, res) => {
             });
         }
 
+        if (!isHoChiMinhDelivery(order)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Đơn liên tỉnh phải giao qua đối tác vận chuyển. Shipper nội bộ chỉ nhận đơn trong TP.HCM.'
+            });
+        }
+
         const shipperId = Number(req.body.shipperId);
         if (!shipperId) {
             return res.status(400).json({ success: false, message: 'Vui lòng chọn người giao hàng hợp lệ!' });
@@ -1198,6 +1230,12 @@ router.post('/bulk', protect, admin, async (req, res) => {
                     if (['cancelled', 'completed', 'returned'].includes(order.status)) {
                         failed++;
                         errors.push({ orderId: id, message: `Đơn đã ${ORDER_STATUS_LABELS[order.status] || order.status}` });
+                        continue;
+                    }
+
+                    if (!isHoChiMinhDelivery(order)) {
+                        failed++;
+                        errors.push({ orderId: id, message: 'Đơn liên tỉnh phải giao qua đối tác vận chuyển' });
                         continue;
                     }
 
