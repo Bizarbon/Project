@@ -1,94 +1,478 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
-    <meta name="description" content="Tổng quan vận hành, doanh thu, đơn hàng và tồn kho TechEcommerce.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Bảng điều khiển quản trị TechEcommerce: tổng quan doanh thu, người dùng, sản phẩm, đơn hàng, lối tắt tính năng và cảnh báo tồn kho.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/dashboard.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
-    <title>Tổng quan quản trị - TechEcommerce</title>
+    <title>Dashboard - Bảng điều khiển quản trị TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
     <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <style>
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 1.5rem;
-        }
-        .mini-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .mini-row:last-child { border-bottom: none; }
-        .mini-row span { color: var(--text-secondary); }
-        @media (max-width: 900px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=commerce-dashboard-20261005-1">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Khu vực Quản trị",
+                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Dashboard",
+                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+            }
+        ]
+    }
+    </script>
 </head>
 
-<body class="admin-page">
-    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
-        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
-        <ul id="main-navbar">
-            <li><a href="dashboard.html?v=techecommerce-20260709-2" class="active">Tổng quan</a></li>
-            <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
-            <li><a href="orders.html?v=techecommerce-20260709-2">Đơn hàng</a></li>
-            <li><a href="customers.html?v=techecommerce-20260709-2">Khách hàng</a></li>
-            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
-            <li><a href="finance.html?v=techecommerce-20260709-2">Tài chính</a></li>
-            <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
-            <li id="nav-auth-section" style="margin-left: auto;"></li>
-        </ul>
-    </nav></header>
+<body class="admin-page admin-dashboard-page">
+    <!-- Fixed Admin Sidebar -->
+        <!-- Admin Sidebar Navigation -->
+    <header class="admin-sidebar" aria-label="Khu vực điều hướng quản trị">
+        <nav class="admin-sidebar-nav" aria-label="Menu chức năng hệ thống">
+            <!-- Brand Logo Header & Quick Return Home -->
+            <aside class="sidebar-brand-box" aria-label="Thương hiệu cửa hàng">
+                <a href="../index.html" class="sidebar-brand-link" title="Quay lại trang chủ bán hàng TechEcommerce">
+                    <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce Logo" width="32" height="32" class="sidebar-brand-img">
+                    <div class="sidebar-brand-info">
+                        <strong class="sidebar-brand-title">TechEcommerce</strong>
+                        <span class="sidebar-brand-badge">← Về trang chủ</span>
+                    </div>
+                </a>
+            </aside>
+
+            <p class="sidebar-category-heading">TÍNH NĂNG</p>
+            <ul id="main-navbar" class="admin-nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link active" aria-current="page">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span class="nav-link-text">Dashboard</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item has-dropdown">
+                    <details class="nav-accordion" >
+                        <summary class="nav-accordion-trigger">
+                            <span class="nav-accordion-title">
+                                <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="nav-link-text">Người dùng</span>
+                            </span>
+                            <svg class="chevron-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </summary>
+                        <ul class="nav-sub-menu">
+                            <li><a href="staff.html" class="sub-link "  id="navSubStaff">Quản lý nhân viên</a></li>
+                            <li><a href="customers.html" class="sub-link "  id="navSubCustomer">Quản lý khách hàng</a></li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span class="nav-link-text">Sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Đơn hàng</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link "  id="navMessagesLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="nav-link-text">Tin nhắn</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            </svg>
+                            <span class="nav-link-text">Blog</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="coupons.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span class="nav-link-text">Khuyến mãi</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <span class="nav-link-text">Tài chính</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="suppliers.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"></rect>
+                                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                            </svg>
+                            <span class="nav-link-text">Nhà cung cấp</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="qa.html" class="nav-link "  id="navQaLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span class="nav-link-text">Q&amp;A sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link" title="Xem giao diện mua sắm TechEcommerce">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Về trang chủ</span>
+                        </span>
+                        <span class="store-badge-pill">Store ↗</span>
+                    </a>
+                </li>
+
+                <li id="nav-auth-section" class="sidebar-auth-wrapper"></li>
+            </ul>
+        </nav>
+    </header>
+
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
-    <main class="container fade-in">
-        <header class="page-header reveal">
-            <h1>Tổng quan vận hành</h1>
-            <p>Doanh thu, đơn hàng, khách hàng và cảnh báo tồn kho</p>
-            <p id="dashboardError" style="color:var(--danger);"></p>
+    <!-- Main Content Area -->
+    <main class="commerce-dashboard" id="dashboardMain">
+        <header class="commerce-dashboard-header">
+            <section class="dashboard-heading" aria-labelledby="dashboardTitle">
+                <p class="dashboard-eyebrow"><span class="live-dot" aria-hidden="true"></span>Trung tâm điều hành · <time id="dashboardClock">--:--</time></p>
+                <h1 id="dashboardTitle">Tổng quan kinh doanh</h1>
+                <p id="dashboardPeriodLabel" class="dashboard-period">Đang tải khoảng thời gian...</p>
+            </section>
+            <form class="dashboard-controls" id="dashboardFilters" aria-label="Bộ lọc thời gian dashboard">
+                <fieldset class="period-pills">
+                    <legend class="sr-only">Khoảng thời gian</legend>
+                    <button type="button" class="period-pill" data-range="today">Hôm nay</button>
+                    <button type="button" class="period-pill" data-range="7d">7 ngày</button>
+                    <button type="button" class="period-pill active" data-range="month" aria-pressed="true">Tháng này</button>
+                    <button type="button" class="period-pill" data-range="custom">Tùy chọn</button>
+                </fieldset>
+                <fieldset class="custom-date-fields" id="customDateFields" hidden>
+                    <legend class="sr-only">Chọn khoảng ngày</legend>
+                    <label>Từ ngày <input type="date" id="dashboardFrom"></label>
+                    <label>Đến ngày <input type="date" id="dashboardTo"></label>
+                    <button type="submit" class="control-button">Áp dụng</button>
+                </fieldset>
+                <button type="button" id="dashboardRefresh" class="control-button refresh-button" aria-label="Làm mới dữ liệu">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8.1 8.1 0 1 0 2 5.3M20 4v7h-7"/></svg>
+                    <span>Làm mới</span>
+                </button>
+                <button type="button" id="dashboardThemeToggle" class="control-button theme-button" aria-label="Chuyển giao diện sáng tối">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                    <span>Giao diện</span>
+                </button>
+            </form>
         </header>
 
-        <section class="stats-grid dashboard-stats reveal" aria-label="Chỉ số vận hành">
-            <article class="stat-card"><span class="stat-icon">REV</span><strong class="stat-value" id="dbRevenue">0 </strong><span class="stat-label">Doanh thu tháng</span></article>
-            <article class="stat-card"><span class="stat-icon">DAY</span><strong class="stat-value" id="dbToday">0 </strong><span class="stat-label">Doanh thu hôm nay</span></article>
-            <article class="stat-card"><span class="stat-icon">PFT</span><strong class="stat-value" id="dbProfit">0 </strong><span class="stat-label">Lợi nhuận</span></article>
-            <article class="stat-card"><span class="stat-icon">ORD</span><strong class="stat-value" id="dbOrders">0</strong><span class="stat-label">Tổng đơn</span></article>
-            <article class="stat-card"><span class="stat-icon">PND</span><strong class="stat-value" id="dbPending">0</strong><span class="stat-label">Đơn chờ xử lý</span></article>
-            <article class="stat-card"><span class="stat-icon">SHP</span><strong class="stat-value" id="dbShipping">0</strong><span class="stat-label">Đang giao</span></article>
-            <article class="stat-card"><span class="stat-icon">SKU</span><strong class="stat-value" id="dbProducts">0</strong><span class="stat-label">Sản phẩm</span></article>
-            <article class="stat-card"><span class="stat-icon">USR</span><strong class="stat-value" id="dbCustomers">0</strong><span class="stat-label">Khách hàng</span></article>
-            <article class="stat-card"><span class="stat-icon">NEW</span><strong class="stat-value" id="dbNewCustomers">0</strong><span class="stat-label">Khách mới tháng này</span></article>
+        <nav class="dashboard-view-tabs" aria-label="Nhóm báo cáo">
+            <span class="view-tab-indicator" aria-hidden="true"></span>
+            <button type="button" class="view-tab" data-view="modules">Quản lý</button>
+            <button type="button" class="view-tab active" data-view="overview" aria-current="page">Tổng quan</button>
+            <button type="button" class="view-tab" data-view="revenue">Doanh thu</button>
+            <button type="button" class="view-tab" data-view="orders">Đơn hàng</button>
+        </nav>
+
+        <p id="dashboardError" class="dashboard-message error" role="alert" hidden></p>
+        <section id="dashboardLoading" class="dashboard-loading" aria-live="polite">
+            <span class="loading-spinner" aria-hidden="true"></span>
+            <p>Đang tổng hợp dữ liệu kinh doanh...</p>
         </section>
 
-        <section class="dashboard-grid">
-            <section class="table-section glass-card reveal">
-                <h2>Đơn gần đây</h2>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr><th>Mã</th><th>Khách</th><th>Tổng tiền</th><th>Trạng thái</th><th>Ngày</th></tr>
-                        </thead>
-                        <tbody id="recentOrders"></tbody>
-                    </table>
-                </div>
+        <section id="dashboardContent" class="dashboard-content" aria-label="Dữ liệu tổng quan" hidden>
+            <section class="kpi-strip" aria-label="Chỉ số nhanh">
+                <article class="kpi-card reveal" style="--accent:#24c8ce">
+                    <h2 class="kpi-label">Doanh thu đã thu</h2>
+                    <p class="kpi-value"><output id="kpiRevenue" data-format="money">0</output></p>
+                    <p id="kpiRevenueNote" class="kpi-note">So với kỳ trước</p>
+                    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg>
+                </article>
+                <article class="kpi-card reveal" style="--accent:#3488e6">
+                    <h2 class="kpi-label">Đơn hàng trong kỳ</h2>
+                    <p class="kpi-value"><output id="kpiOrders">0</output></p>
+                    <p id="kpiOrdersNote" class="kpi-note">0 đơn cần xử lý</p>
+                    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+                </article>
+                <article class="kpi-card reveal" style="--accent:#8b5cf6">
+                    <h2 class="kpi-label">Khách hàng</h2>
+                    <p class="kpi-value"><output id="kpiCustomers">0</output></p>
+                    <p id="kpiCustomersNote" class="kpi-note">+0 khách mới trong kỳ</p>
+                    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </article>
+                <article class="kpi-card reveal" style="--accent:#f2b44d">
+                    <h2 class="kpi-label">Sản phẩm</h2>
+                    <p class="kpi-value"><output id="kpiProducts">0</output></p>
+                    <p id="kpiProductsNote" class="kpi-note">0 sản phẩm sắp hết hàng</p>
+                    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
+                </article>
             </section>
-            <section class="table-section glass-card reveal">
-                <h2>Cảnh báo tồn kho</h2>
-                <div id="lowStockList"></div>
+
+            <section id="moduleHub" class="dashboard-card module-hub reveal" data-dashboard-section="modules" aria-labelledby="moduleHubTitle">
+                <header class="card-heading-row module-hub-header">
+                    <hgroup>
+                        <p class="card-kicker">Trung tâm quản lý</p>
+                        <h2 id="moduleHubTitle">Tất cả danh mục quản trị</h2>
+                    </hgroup>
+                    <search class="module-search">
+                        <label for="moduleSearch" class="sr-only">Tìm danh mục quản lý</label>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                        <input type="search" id="moduleSearch" placeholder="Tìm danh mục…" autocomplete="off">
+                        <kbd>/</kbd>
+                    </search>
+                </header>
+                <ul id="moduleGrid" class="module-grid">
+                    <li><article class="module-card" style="--accent:#3488e6" data-keywords="san pham kho hang ton kho product">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>
+                        <h3><a href="products.html" class="module-link">Sản phẩm</a></h3>
+                        <p>Danh mục, giá bán, tồn kho</p>
+                        <data id="badgeProducts" class="module-badge" value="0">0</data>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#24c8ce" data-keywords="don hang order giao van chuyen">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8"/></svg>
+                        <h3><a href="orders.html" class="module-link">Đơn hàng</a></h3>
+                        <p>Xử lý, giao vận, hoàn trả</p>
+                        <data id="badgeOrders" class="module-badge is-alert" value="0">0</data>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#8b5cf6" data-keywords="khach hang customer nguoi dung">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>
+                        <h3><a href="customers.html" class="module-link">Khách hàng</a></h3>
+                        <p>Hồ sơ, lịch sử mua hàng</p>
+                        <data id="badgeCustomers" class="module-badge" value="0">0</data>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#0ea5e9" data-keywords="nhan vien staff phan quyen nguoi dung">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6"/></svg>
+                        <h3><a href="staff.html" class="module-link">Nhân viên</a></h3>
+                        <p>Tài khoản, phân quyền</p>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#10b981" data-keywords="tin nhan chat message ho tro">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <h3><a href="messages.html" class="module-link">Tin nhắn</a></h3>
+                        <p>Hỗ trợ khách trực tuyến</p>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#ec4899" data-keywords="blog bai viet tin tuc noi dung">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19l7-7 3 3-7 7-3-3zM18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+                        <h3><a href="blog.html" class="module-link">Blog</a></h3>
+                        <p>Bài viết, tin công nghệ</p>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#f97316" data-keywords="khuyen mai coupon ma giam gia voucher">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01"/></svg>
+                        <h3><a href="coupons.html" class="module-link">Khuyến mãi</a></h3>
+                        <p>Mã giảm giá, chiến dịch</p>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#22c55e" data-keywords="tai chinh finance chi phi loi nhuan">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        <h3><a href="finance.html" class="module-link">Tài chính</a></h3>
+                        <p>Thu chi, lợi nhuận</p>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#64748b" data-keywords="nha cung cap supplier nhap hang">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7zM5.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5M18.5 21a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg>
+                        <h3><a href="suppliers.html" class="module-link">Nhà cung cấp</a></h3>
+                        <p>Đối tác, nhập hàng</p>
+                    </article></li>
+                    <li><article class="module-card" style="--accent:#eab308" data-keywords="hoi dap qa cau hoi san pham">
+                        <svg class="module-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+                        <h3><a href="qa.html" class="module-link">Q&amp;A sản phẩm</a></h3>
+                        <p>Câu hỏi từ khách hàng</p>
+                    </article></li>
+                </ul>
+                <p id="moduleEmpty" class="empty-dashboard" hidden>Không tìm thấy danh mục phù hợp.</p>
+            </section>
+
+            <section class="dashboard-primary-grid" aria-label="Chỉ số và biểu đồ chính">
+                <article class="dashboard-card revenue-hero-card" data-dashboard-section="revenue" aria-labelledby="revenueHeroTitle">
+                    <header>
+                        <p>Doanh thu đã thu</p>
+                        <span class="hero-card-icon" aria-hidden="true">₫</span>
+                    </header>
+                    <h2 id="revenueHeroTitle"><output id="paidRevenue">0 ₫</output></h2>
+                    <p id="revenueChange" class="revenue-change neutral">Chưa có dữ liệu kỳ trước</p>
+                    <figure class="sparkline-figure">
+                        <svg id="revenueSparkline" viewBox="0 0 320 82" role="img" aria-label="Xu hướng doanh thu trong kỳ"></svg>
+                        <figcaption>Tổng giá trị đơn hợp lệ: <strong id="orderValue">0 ₫</strong></figcaption>
+                    </figure>
+                    <dl class="hero-order-stats">
+                        <div><dt>Tổng đơn</dt><dd id="heroOrderCount">0</dd></div>
+                        <div><dt>Hoàn tất</dt><dd id="heroCompletedCount">0</dd></div>
+                    </dl>
+                    <section class="order-progress" aria-labelledby="orderProgressTitle">
+                        <h3 id="orderProgressTitle">Tiến độ xử lý</h3>
+                        <div class="progress-row"><span>Đang xử lý</span><strong id="processingCount">0</strong><span class="progress-track"><span id="processingBar" class="progress-fill"></span></span></div>
+                        <div class="progress-row"><span>Đang giao</span><strong id="shippingCount">0</strong><span class="progress-track"><span id="shippingBar" class="progress-fill"></span></span></div>
+                        <div class="progress-row"><span>Hoàn tất</span><strong id="completedCount">0</strong><span class="progress-track"><span id="completedBar" class="progress-fill"></span></span></div>
+                    </section>
+                </article>
+
+                <article class="dashboard-card revenue-chart-card" data-dashboard-section="revenue" aria-labelledby="revenueChartTitle">
+                    <header class="card-heading-row">
+                        <section><p class="card-kicker">Hiệu suất theo kỳ</p><h2 id="revenueChartTitle">Doanh thu theo thời gian</h2></section>
+                        <strong id="chartRevenueTotal">0 ₫</strong>
+                    </header>
+                    <figure class="chart-figure">
+                        <svg id="revenueBarChart" class="dashboard-chart" viewBox="0 0 720 310" role="img" aria-labelledby="revenueChartTitle revenueChartCaption"></svg>
+                        <figcaption id="revenueChartCaption">Cột teal biểu thị kỳ gần nhất có dữ liệu.</figcaption>
+                    </figure>
+                    <dl class="compact-kpis">
+                        <div><dt>Chi phí trong kỳ</dt><dd id="periodExpenses">0 ₫</dd></div>
+                        <div><dt>Lợi nhuận vận hành</dt><dd id="periodProfit">0 ₫</dd></div>
+                        <div><dt>Đơn hợp lệ</dt><dd id="validOrderCount">0</dd></div>
+                    </dl>
+                </article>
+
+                <article class="dashboard-card category-card" data-dashboard-section="overview" aria-labelledby="categoryTitle">
+                    <header class="card-heading-row"><section><p class="card-kicker">Danh mục</p><h2 id="categoryTitle">Cơ cấu bán hàng</h2></section></header>
+                    <figure class="category-figure">
+                        <div id="categoryBars" class="category-bars"></div>
+                        <figcaption>Tỷ trọng theo doanh thu sản phẩm trong các đơn hợp lệ.</figcaption>
+                    </figure>
+                </article>
+            </section>
+
+            <section class="dashboard-secondary-grid" aria-label="Phân tích vận hành">
+                <article class="dashboard-card status-card" data-dashboard-section="orders" aria-labelledby="statusTitle">
+                    <header class="card-heading-row"><section><p class="card-kicker">Vận hành</p><h2 id="statusTitle">Trạng thái đơn hàng</h2></section></header>
+                    <section class="donut-layout">
+                        <figure class="donut-figure">
+                            <svg id="statusDonut" viewBox="0 0 220 220" role="img" aria-label="Cơ cấu trạng thái đơn hàng"></svg>
+                            <figcaption><strong id="donutTotal">0</strong><span>Tổng đơn</span></figcaption>
+                        </figure>
+                        <ul id="statusLegend" class="chart-legend"></ul>
+                    </section>
+                </article>
+
+                <article class="dashboard-card trend-card" data-dashboard-section="revenue" aria-labelledby="trendTitle">
+                    <header class="card-heading-row"><section><p class="card-kicker">Dòng tiền</p><h2 id="trendTitle">Xu hướng doanh thu</h2></section></header>
+                    <figure class="chart-figure compact">
+                        <svg id="revenueAreaChart" class="dashboard-chart" viewBox="0 0 720 240" role="img" aria-label="Biểu đồ đường doanh thu"></svg>
+                        <figcaption>Chỉ bao gồm khoản đã thu; loại trừ đơn hủy, hoàn và boom.</figcaption>
+                    </figure>
+                </article>
+
+                <article class="dashboard-card bestseller-card" data-dashboard-section="overview" aria-labelledby="bestsellerTitle">
+                    <header class="card-heading-row"><section><p class="card-kicker">Sản phẩm</p><h2 id="bestsellerTitle">Bán chạy trong kỳ</h2></section><a href="products.html">Xem kho</a></header>
+                    <ol id="bestSellerList" class="bestseller-list"></ol>
+                </article>
+            </section>
+
+            <section class="dashboard-tertiary-grid" aria-label="Đơn hàng và tồn kho">
+            <article class="dashboard-card recent-orders-card" data-dashboard-section="orders" aria-labelledby="recentOrdersTitle">
+                <header class="card-heading-row"><section><p class="card-kicker">Cập nhật mới nhất</p><h2 id="recentOrdersTitle">Đơn hàng gần đây</h2></section><a href="orders.html">Quản lý tất cả</a></header>
+                <section class="dashboard-table-wrap" tabindex="0" aria-label="Bảng đơn hàng có thể cuộn ngang">
+                    <table class="commerce-orders-table">
+                        <thead><tr><th scope="col">Mã đơn</th><th scope="col">Khách hàng</th><th scope="col">Tổng tiền</th><th scope="col">Thanh toán</th><th scope="col">Trạng thái</th><th scope="col">Ngày tạo</th><th scope="col"><span class="sr-only">Thao tác</span></th></tr></thead>
+                        <tbody id="recentOrdersBody"></tbody>
+                    </table>
+                </section>
+            </article>
+            <aside class="dashboard-card stock-card" aria-labelledby="stockTitle">
+                <header class="card-heading-row"><hgroup><p class="card-kicker">Kho hàng</p><h2 id="stockTitle">Cảnh báo tồn kho</h2></hgroup><a href="products.html">Nhập hàng</a></header>
+                <ul id="lowStockList" class="stock-list"></ul>
+            </aside>
             </section>
         </section>
     </main>
 
-    <script src="../assets/js/dashboard.js?v=techecommerce-20260709-2"></script>
+
+    <!-- Footer placeholder strictly at the bottom -->
+    <footer id="site-footer"></footer>
+    <dialog id="dashActionDialog" class="dash-modal" aria-labelledby="dialogTitle">
+        <article class="dash-modal-content">
+            <header class="dash-modal-header">
+                <h3 id="dialogTitle">Thông báo</h3>
+                <button type="button" class="btn-close-modal" onclick="closeDashDialog()" aria-label="Đóng">✕</button>
+            </header>
+            <p id="dialogMessage" class="dash-modal-body">Nội dung</p>
+            <footer class="dash-modal-footer">
+                <button type="button" class="btn-primary" onclick="closeDashDialog()">Đồng ý</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <script src="../assets/js/dashboard.js?v=commerce-dashboard-20261005-1"></script>
     <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 

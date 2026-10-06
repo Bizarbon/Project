@@ -129,6 +129,48 @@
         return data;
     }
 
+    function getSafeReturnUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const returnUrl = params.get('returnUrl') || params.get('redirect') || '';
+        if (!returnUrl) return null;
+
+        // Reject protocol-relative URLs (//evil.com) and backslashes
+        if (returnUrl.startsWith('//') || returnUrl.includes('\\')) {
+            return null;
+        }
+
+        // Check if absolute URL
+        if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(returnUrl)) {
+            try {
+                const parsed = new URL(returnUrl, window.location.origin);
+                if (parsed.origin === window.location.origin) {
+                    return parsed.pathname + parsed.search + parsed.hash;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        }
+
+        // Must be safe relative path
+        if (/^[a-zA-Z0-9_\-./]+(\?[a-zA-Z0-9_\-.%=&#]*)?(#[a-zA-Z0-9_\-.]*)?$/.test(returnUrl)) {
+            return returnUrl;
+        }
+
+        return null;
+    }
+
+    function handleLoginSuccessRedirect(user) {
+        const safeUrl = getSafeReturnUrl();
+        if (safeUrl) {
+            window.location.href = safeUrl;
+            return;
+        }
+        window.location.href = user && user.isAdmin
+            ? '../../admin/products.html'
+            : '../../index.html';
+    }
+
     function initializeLogin() {
         const form = document.getElementById('loginForm');
         if (!form) return;
@@ -149,9 +191,7 @@
                 setStatus('Đăng nhập thành công. Đang mở tài khoản của bạn…', 'success');
                 auth.saveAuth(data.token, data.user);
                 window.setTimeout(() => {
-                    window.location.href = data.user.isAdmin
-                        ? '../../admin/products.html'
-                        : '../../index.html';
+                    handleLoginSuccessRedirect(data.user);
                 }, 600);
             } catch (error) {
                 setStatus(error.message, 'error');
@@ -456,48 +496,125 @@
         });
     }
 
-    function initializeSocialAuth() {
-        const socialButtons = document.querySelectorAll('[data-social-provider], .btn-social-card');
-        if (socialButtons.length === 0) return;
+    let googleAuthInProgress = false;
 
-        // Listen for successful authentication from OAuth popup window
-        window.addEventListener('message', event => {
-            if (event.origin !== window.location.origin) return;
-            if (event.data && event.data.type === 'SOCIAL_AUTH_SUCCESS') {
-                const { token, user, message } = event.data;
-                setStatus(message || 'Đăng nhập thành công! Đang chuyển hướng…', 'success');
-                if (window.auth && typeof auth.saveAuth === 'function') {
-                    auth.saveAuth(token, user);
+    async function handleGoogleCredentialResponse(response) {
+        if (!response || !response.credential) {
+            setStatus('Không nhận được mã xác thực từ Google.', 'error');
+            return;
+        }
+
+        if (googleAuthInProgress) return;
+        googleAuthInProgress = true;
+
+        setStatus('Đang xác thực tài khoản Google với hệ thống…', '');
+
+        try {
+            const result = await request('/auth/google', {
+                credential: response.credential
+            });
+
+            setStatus(result.message || 'Đăng nhập Google thành công! Đang chuyển hướng…', 'success');
+
+            if (window.auth && typeof auth.saveAuth === 'function') {
+                auth.saveAuth(result.token, result.user);
+            }
+
+            window.setTimeout(() => {
+                handleLoginSuccessRedirect(result.user);
+            }, 500);
+        } catch (error) {
+            console.warn('Google login error:', error.message);
+            setStatus(error.message || 'Không thể đăng nhập bằng Google. Vui lòng thử lại.', 'error');
+            googleAuthInProgress = false;
+        }
+    }
+
+    async function getGoogleClientId() {
+        if (window.GOOGLE_CLIENT_ID && typeof window.GOOGLE_CLIENT_ID === 'string') {
+            return window.GOOGLE_CLIENT_ID.trim();
+        }
+
+        try {
+            const res = await fetch(`${window.API_URL}/auth/google/config`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.clientId) {
+                    window.GOOGLE_CLIENT_ID = data.clientId.trim();
+                    return window.GOOGLE_CLIENT_ID;
                 }
-                window.setTimeout(() => {
-                    window.location.href = user.isAdmin
-                        ? '../../admin/products.html'
-                        : '../../index.html';
-                }, 400);
+            }
+        } catch (e) {
+            console.warn('Cannot fetch Google client ID from server:', e.message);
+        }
+        return '';
+    }
+
+    function initializeGoogleAuth() {
+        const mountPoint = document.getElementById('gsiMountPoint') || document.getElementById('gsiRegisterMountPoint');
+        const googleBtn = document.getElementById('btnGoogleAuth') || document.getElementById('btnGoogleRegister');
+        const container = document.getElementById('googleButtonContainer') || document.getElementById('googleRegisterContainer');
+
+        if (!googleBtn) return;
+
+        // Custom fallback click handler when official button is loading or prompt fallback
+        googleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.google?.accounts?.id) {
+                window.google.accounts.id.prompt();
+            } else {
+                setStatus('Đang kết nối dịch vụ Google. Vui lòng thử lại sau giây lát…', '');
             }
         });
 
-        function openOAuth(provider) {
-            const identifierInput = document.getElementById('identifier')?.value.trim()
-                || document.getElementById('email')?.value.trim()
-                || document.getElementById('phone')?.value.trim()
-                || '';
+        getGoogleClientId().then(clientId => {
+            if (!clientId) {
+                googleBtn.addEventListener('click', () => {
+                    setStatus('Google Client ID chưa được cấu hình. Vui lòng thêm GOOGLE_CLIENT_ID vào backend/.env.', 'error');
+                });
+                return;
+            }
 
-            const returnUrl = encodeURIComponent(window.location.pathname.includes('register') ? 'register.html' : 'login.html');
-            const targetUrl = `oauth-popup.html?provider=${encodeURIComponent(provider)}&prefill=${encodeURIComponent(identifierInput)}&returnUrl=${returnUrl}`;
+            let checkCount = 0;
+            const checkGsi = setInterval(() => {
+                checkCount++;
+                if (window.google?.accounts?.id) {
+                    clearInterval(checkGsi);
+                    try {
+                        window.google.accounts.id.initialize({
+                            client_id: clientId,
+                            callback: handleGoogleCredentialResponse,
+                            auto_select: false,
+                            cancel_on_tap_outside: true,
+                            itp_support: true
+                        });
 
-            // Chuyển hướng trực tiếp đến trang OAuth giống như CellphoneS
-            window.location.href = targetUrl;
-        }
+                        if (mountPoint && container) {
+                            mountPoint.classList.add('gsi-ready');
+                            container.classList.add('has-gsi');
 
-        socialButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const provider = btn.dataset.socialProvider
-                    || ((btn.getAttribute('aria-label') || '').toLowerCase().includes('google') || btn.textContent.toLowerCase().includes('google') ? 'google' : 'zalo');
+                            const width = Math.min(Math.max(container.offsetWidth || 340, 200), 380);
 
-                openOAuth(provider);
-            });
+                            window.google.accounts.id.renderButton(mountPoint, {
+                                type: 'standard',
+                                theme: 'outline',
+                                size: 'large',
+                                text: 'signin_with',
+                                shape: 'rectangular',
+                                logo_alignment: 'left',
+                                width: width
+                            });
+                        }
+
+                        // Try One Tap prompt
+                        window.google.accounts.id.prompt();
+                    } catch (err) {
+                        console.warn('GSI init error:', err);
+                    }
+                } else if (checkCount > 30) {
+                    clearInterval(checkGsi);
+                }
+            }, 150);
         });
     }
 
@@ -505,7 +622,7 @@
         initializeStorefrontContext();
         initializePasswordToggles();
         initializeTouchedValidation();
-        initializeSocialAuth();
+        initializeGoogleAuth();
 
         if (page === 'login') initializeLogin();
         if (page === 'register') initializeRegister();

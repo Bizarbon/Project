@@ -242,17 +242,42 @@ body.auth-cellphones-body {
 
 /* Mascot Illustration */
 .auth-mascot-figure {
-    margin: 4px 0 0;
+    position: relative;
+    margin: 1.25rem 0 0;
     padding: 0;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-mascot-figure::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 170px;
+    height: 16px;
+    background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.22) 0%, rgba(15, 23, 42, 0) 72%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: mascotShadowScale 4s ease-in-out infinite alternate;
 }
 
 .auth-mascot-img {
-    max-width: 320px;
+    position: relative;
+    z-index: 1;
+    max-width: 250px;
     width: 100%;
     height: auto;
+    max-height: 380px;
     object-fit: contain;
-    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.06));
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    filter: drop-shadow(0 12px 24px rgba(0, 60, 160, 0.16));
     animation: mascotFloat 4s ease-in-out infinite alternate;
 }
 
@@ -261,7 +286,18 @@ body.auth-cellphones-body {
         transform: translateY(0px);
     }
     100% {
-        transform: translateY(-6px);
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes mascotShadowScale {
+    0% {
+        transform: translateX(-50%) scale(1);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translateX(-50%) scale(0.78);
+        opacity: 0.4;
     }
 }
 
@@ -523,9 +559,50 @@ body.auth-cellphones-body {
 
 /* Social Buttons */
 .auth-social-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.btn-social-wrapper {
+    position: relative;
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-social-wrapper .btn-social-card {
+    width: 100%;
+    height: 100%;
+}
+
+.gsi-mount-point {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    overflow: hidden;
+    border-radius: var(--cps-radius-md);
+}
+
+.gsi-mount-point.gsi-ready {
+    display: flex;
+}
+
+.btn-social-wrapper.has-gsi #btnGoogleAuth,
+.btn-social-wrapper.has-gsi #btnGoogleRegister {
+    display: none;
+}
+
+.gsi-mount-point iframe {
+    border-radius: var(--cps-radius-md) !important;
 }
 
 .btn-social-card {

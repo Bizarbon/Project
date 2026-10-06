@@ -17,7 +17,7 @@ async function refreshProductRating(productId) {
 async function hasPurchased(customerId, productId) {
     const order = await Order.findOne({
         customer: customerId,
-        status: 'completed',
+        status: { $in: ['completed', 'shipping'] },
         'products.product': Number(productId)
     });
     return Boolean(order);
@@ -35,15 +35,18 @@ router.get('/product/:productId', async (req, res) => {
     }
 });
 
-router.post('/product/:productId', protect, async (req, res) => {
+async function handleSaveReview(req, res, targetProductId) {
     try {
-        const productId = Number(req.params.productId);
+        const productId = Number(targetProductId);
+        if (!productId) {
+            return res.status(400).json({ message: 'Mã sản phẩm không hợp lệ!' });
+        }
         const product = await Product.findById(productId);
-        if (!product) return res.status(404).json({ message: 'Product not found' });
+        if (!product) return res.status(404).json({ message: 'Không tìm thấy sản phẩm!' });
 
         const rating = Number(req.body.rating);
         if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-            return res.status(400).json({ message: 'Điểm đánh giá phải từ 1 đến 5!' });
+            return res.status(400).json({ message: 'Điểm đánh giá phải từ 1 đến 5 sao!' });
         }
 
         const verifiedPurchase = await hasPurchased(req.user._id, productId);
@@ -55,7 +58,7 @@ router.post('/product/:productId', protect, async (req, res) => {
             });
         }
 
-        review.customerName = req.user.name;
+        review.customerName = req.user.name || 'Khách hàng';
         review.rating = rating;
         review.title = String(req.body.title || '').trim();
         review.comment = String(req.body.comment || '').trim();
@@ -64,10 +67,24 @@ router.post('/product/:productId', protect, async (req, res) => {
         await review.save();
 
         await refreshProductRating(productId);
-        res.status(201).json(review);
+        res.status(201).json({
+            success: true,
+            message: 'Đánh giá sản phẩm thành công!',
+            data: review,
+            ...review.toObject()
+        });
     } catch (error) {
-        res.status(error.statusCode || 400).json({ message: error.message });
+        res.status(error.statusCode || 400).json({ message: error.message || 'Lỗi lưu đánh giá!' });
     }
+}
+
+router.post('/', protect, async (req, res) => {
+    const productId = req.body.productId || req.body.product;
+    return handleSaveReview(req, res, productId);
+});
+
+router.post('/product/:productId', protect, async (req, res) => {
+    return handleSaveReview(req, res, req.params.productId);
 });
 
 router.get('/', protect, admin, async (req, res) => {

@@ -1,9 +1,17 @@
+/**
+ * TechEcommerce - Customer Order Detail & Live Tracking
+ * Pure real data rendering, honest milestones, no fabricated inspection or fake dates
+ */
+
 const ORDER_STATUS_LABELS = {
     pending: 'Chờ xác nhận',
-    processing: 'Đang kiểm hàng',
+    confirmed: 'Đã xác nhận',
+    processing: 'Đang chuẩn bị',
+    ready_to_ship: 'Chờ lấy hàng',
     shipping: 'Đang giao hàng',
-    completed: 'Đã giao hàng',
+    completed: 'Giao thành công',
     cancelled: 'Đã hủy',
+    delivery_failed: 'Giao không thành công',
     returned: 'Hoàn hoặc đổi trả',
     boom: 'Giao không thành công'
 };
@@ -21,34 +29,14 @@ const ORDER_PAYMENT_METHODS = {
     bank_transfer: 'Chuyển khoản ngân hàng',
     vnpay: 'VNPay',
     momo: 'MoMo',
-    installment: 'Trả góp'
+    installment: 'Trả góp 0%',
+    ShipCOD: 'Thanh toán khi nhận hàng (COD)',
+    'Thanh toán trước': 'Chuyển khoản ngân hàng',
+    'Trả góp': 'Trả góp 0%'
 };
 
-const DELIVERY_STEPS = [
-    {
-        status: 'pending',
-        title: 'Đã tiếp nhận đơn hàng',
-        description: 'Đơn hàng đã được ghi nhận và đang chờ cửa hàng xác nhận.'
-    },
-    {
-        status: 'processing',
-        title: 'Kiểm hàng và đóng gói',
-        description: 'Cửa hàng kiểm tra ngoại quan, phụ kiện và niêm phong sản phẩm.'
-    },
-    {
-        status: 'shipping',
-        title: 'Đang giao hàng',
-        description: 'Đơn hàng đã được bàn giao cho đơn vị vận chuyển.'
-    },
-    {
-        status: 'completed',
-        title: 'Giao hàng thành công',
-        description: 'Người nhận đã nhận hàng và có thể gửi đánh giá sản phẩm.'
-    }
-];
-
-function orderMoney(value) {
-    return `${(Number(value) || 0).toLocaleString('vi-VN')} đ`;
+function orderMoney(val) {
+    return `${(Number(val) || 0).toLocaleString('vi-VN')} đ`;
 }
 
 function orderDate(value, fallback = 'Đang cập nhật') {
@@ -64,183 +52,442 @@ function orderDate(value, fallback = 'Đang cập nhật') {
     });
 }
 
-function estimatedDelivery(order) {
-    if (order.estimatedDeliveryAt) return orderDate(order.estimatedDeliveryAt);
-    const start = new Date(order.orderDate || order.createdAt);
-    if (Number.isNaN(start.getTime())) return 'Đang cập nhật';
-    start.setDate(start.getDate() + 3);
-    return orderDate(start);
-}
-
-function historyFor(order, status) {
-    const history = Array.isArray(order.statusHistory) ? order.statusHistory : [];
-    return history.find(entry => entry.status === status);
-}
-
-function stepState(order, index) {
-    const currentIndex = DELIVERY_STEPS.findIndex(step => step.status === order.status);
-    if (order.status === 'cancelled' || order.status === 'returned' || order.status === 'boom') {
-        return index === 0 ? 'is-complete' : '';
-    }
-    if (index < currentIndex || order.status === 'completed') return 'is-complete';
-    if (index === currentIndex) return 'is-current';
-    return '';
-}
-
-function renderTimeline(order) {
-    return DELIVERY_STEPS.map((step, index) => {
-        const history = historyFor(order, step.status);
-        const isInitial = step.status === 'pending';
-        const state = stepState(order, index);
-        const occurredAt = history?.occurredAt
-            || (isInitial ? order.orderDate || order.createdAt : null)
-            || (step.status === order.status ? order.deliveredAt || order.updatedAt : null);
-        return `
-            <li class="delivery-step ${state}"${state === 'is-current' ? ' aria-current="step"' : ''}>
-                <span class="delivery-step-marker" aria-hidden="true">${index + 1}</span>
-                <article class="delivery-step-content">
-                    <h3>${escapeHTML(history?.title || step.title)}</h3>
-                    <p>${escapeHTML(history?.description || step.description)}</p>
-                    ${occurredAt
-                        ? `<time datetime="${new Date(occurredAt).toISOString()}">${orderDate(occurredAt)}</time>`
-                        : `<span class="delivery-step-time">${state ? 'Đã hoàn tất - chưa lưu thời gian' : 'Chưa đến bước này'}</span>`}
-                </article>
-            </li>
-        `;
-    }).join('');
-}
-
-function productImage(item) {
-    return item.product?.image || item.product?.images?.[0] || 'https://placehold.co/176x144?text=TechEcommerce';
-}
-
-function renderProducts(order) {
-    return (order.products || []).map(item => `
-        <article class="tracking-product">
-            <img src="${escapeHTML(productImage(item))}" alt="${escapeHTML(item.product?.name || item.productName || 'Sản phẩm')}" loading="lazy">
-            <div>
-                <h3>${escapeHTML(item.product?.name || item.productName || 'Sản phẩm')}</h3>
-                <p>${orderMoney(item.price)} × ${Number(item.quantity) || 1}</p>
-            </div>
-            ${item.product?._id ? `<a href="../catalog/product.html?id=${encodeURIComponent(item.product._id)}">Xem sản phẩm</a>` : ''}
-        </article>
-    `).join('');
-}
-
-function renderReviewSection(order) {
-    if (order.status !== 'completed') {
-        return '<p class="tracking-review-locked">Đánh giá sẽ được mở sau khi đơn hàng được giao thành công.</p>';
-    }
-
-    return `<div class="tracking-reviews">${(order.products || []).map(item => {
-        const productId = item.product?._id || item.product;
-        if (!productId) return '';
-        const productName = item.product?.name || item.productName || 'Sản phẩm';
-        return `
-            <article class="tracking-review-card">
-                <img src="${escapeHTML(productImage(item))}" alt="${escapeHTML(productName)}" loading="lazy">
-                <div>
-                    <h3>${escapeHTML(productName)}</h3>
-                    <p>Chia sẻ trải nghiệm kiểm hàng và sử dụng sản phẩm.</p>
-                </div>
-                <button class="btn-primary" type="button" data-review-toggle="${productId}">Đánh giá</button>
-                <form class="tracking-review-form" data-review-form="${productId}" hidden>
-                    <label>
-                        Số sao
-                        <select name="rating" required>
-                            <option value="5">5 sao - Rất hài lòng</option>
-                            <option value="4">4 sao - Hài lòng</option>
-                            <option value="3">3 sao - Bình thường</option>
-                            <option value="2">2 sao - Chưa hài lòng</option>
-                            <option value="1">1 sao - Rất không hài lòng</option>
-                        </select>
-                    </label>
-                    <label class="review-title-field">
-                        Tiêu đề
-                        <input name="title" type="text" maxlength="120" placeholder="Tóm tắt trải nghiệm của bạn">
-                    </label>
-                    <label>
-                        Nội dung đánh giá
-                        <textarea name="comment" maxlength="1500" required placeholder="Sản phẩm, đóng gói và quá trình nhận hàng như thế nào?"></textarea>
-                    </label>
-                    <button class="btn-primary" type="submit">Gửi đánh giá</button>
-                </form>
-            </article>
-        `;
-    }).join('')}</div>`;
-}
-
-function exceptionNotice(order) {
-    if (!['cancelled', 'returned', 'boom'].includes(order.status)) return '';
-    const history = historyFor(order, order.status);
-    return `<p class="tracking-cancelled"><strong>${escapeHTML(ORDER_STATUS_LABELS[order.status])}:</strong> ${escapeHTML(history?.description || 'Vui lòng liên hệ cửa hàng nếu bạn cần hỗ trợ thêm.')}</p>`;
+function showOrderToast(msg, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => toast.remove(), 3200);
+    }, 100);
 }
 
 let loadedOrderData = null;
 
-function renderOrder(order) {
+async function loadOrderDetail() {
+    if (!auth.isLoggedIn()) {
+        window.location.href = '../auth/login.html';
+        return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('id');
+
+    const contentEl = document.getElementById('trackingContent');
+
+    if (!orderId) {
+        contentEl.innerHTML = `
+            <article class="orders-status-box">
+                <span class="orders-status-icon" aria-hidden="true">⚠️</span>
+                <h2>Thiếu mã đơn hàng</h2>
+                <p>Không tìm thấy thông tin mã đơn hàng cần xem.</p>
+                <a href="orders.html" class="btn-primary">Quay lại danh sách đơn hàng</a>
+            </article>
+        `;
+        return;
+    }
+
+    try {
+        const res = await fetch(`${API_URL}/orders/${encodeURIComponent(orderId)}`, {
+            headers: auth.getHeaders()
+        });
+        const order = await res.json();
+        if (auth.handleApiError(res, order)) return;
+
+        if (!res.ok || !order._id) {
+            contentEl.innerHTML = `
+                <article class="orders-status-box">
+                    <span class="orders-status-icon" aria-hidden="true">❌</span>
+                    <h2>Không tìm thấy đơn hàng</h2>
+                    <p>${escapeHTML(order.message || 'Đơn hàng không tồn tại hoặc bạn không có quyền xem.')}</p>
+                    <a href="orders.html" class="btn-primary">Về danh sách đơn hàng</a>
+                </article>
+            `;
+            return;
+        }
+
+        renderOrderDetail(order);
+    } catch (err) {
+        console.error('loadOrderDetail error:', err);
+        contentEl.innerHTML = `
+            <article class="orders-status-box">
+                <span class="orders-status-icon" aria-hidden="true">⚠️</span>
+                <h2>Lỗi tải dữ liệu</h2>
+                <p>Không thể kết nối đến máy chủ. Vui lòng thử lại sau.</p>
+                <button type="button" class="btn-primary" onclick="loadOrderDetail()">Tải lại</button>
+            </article>
+        `;
+    }
+}
+
+function getTimelineSteps(order) {
+    const history = Array.isArray(order.statusHistory) ? order.statusHistory : [];
+    
+    // Status rank to determine completed/current/upcoming
+    const orderStatus = order.status;
+    const isCancelled = orderStatus === 'cancelled' || orderStatus === 'boom' || orderStatus === 'delivery_failed';
+
+    const shipperObj = order.shipper;
+    const shipperName = (typeof shipperObj === 'object' && shipperObj?.name) ? shipperObj.name : (order.shipperAssignedByName || '');
+    const shipperPhone = (typeof shipperObj === 'object' && shipperObj?.phone) ? shipperObj.phone : '';
+
+    const getHistoryTime = (st) => {
+        const h = history.find(e => e.status === st);
+        return h ? h.occurredAt : null;
+    };
+
+    // Standard 4 milestone steps
+    const steps = [
+        {
+            key: 'created',
+            title: 'Tiếp nhận đơn hàng',
+            desc: 'Đơn hàng được gửi thành công lên hệ thống TechEcommerce.',
+            time: order.orderDate || order.createdAt,
+            completed: true,
+            current: orderStatus === 'pending' && !shipperName
+        },
+        {
+            key: 'processing',
+            title: 'Chuẩn bị hàng & Đóng gói',
+            desc: shipperName ? `Kho kỹ thuật chuẩn bị kiện hàng. Đã phân công cho shipper: ${shipperName}.` : 'Kho kỹ thuật kiểm tra ngoại quan, niêm phong và đóng gói kiện hàng.',
+            time: getHistoryTime('processing') || (orderStatus === 'processing' || orderStatus === 'shipping' || orderStatus === 'completed' || shipperName ? (order.shipperAssignedAt || order.updatedAt) : null),
+            completed: ['processing', 'ready_to_ship', 'shipping', 'completed'].includes(orderStatus) || Boolean(shipperName),
+            current: (orderStatus === 'processing' || orderStatus === 'ready_to_ship' || (orderStatus === 'pending' && Boolean(shipperName))) && orderStatus !== 'shipping' && orderStatus !== 'completed'
+        },
+        {
+            key: 'shipping',
+            title: 'Bàn giao vận chuyển',
+            desc: shipperName 
+                ? `Shipper phụ trách: ${shipperName}${shipperPhone ? ` (☎ ${shipperPhone})` : ''} · Đang phụ trách vận chuyển đến địa chỉ của bạn.`
+                : (order.shippingUnit ? `Đã bàn giao cho đơn vị vận chuyển: ${order.shippingUnit}` : 'Đang điều phối shipper hoặc đơn vị vận chuyển.'),
+            time: getHistoryTime('shipping') || (orderStatus === 'shipping' || orderStatus === 'completed' ? (order.shipperAssignedAt || null) : null),
+            completed: ['shipping', 'completed'].includes(orderStatus),
+            current: orderStatus === 'shipping'
+        },
+        {
+            key: 'completed',
+            title: 'Giao hàng thành công',
+            desc: 'Người nhận đã kiểm tra và nhận hàng hoàn tất.',
+            time: order.deliveredAt || getHistoryTime('completed'),
+            completed: orderStatus === 'completed',
+            current: orderStatus === 'completed'
+        }
+    ];
+
+    if (isCancelled) {
+        steps.push({
+            key: 'cancelled',
+            title: ORDER_STATUS_LABELS[orderStatus] || 'Đơn hàng đã hủy',
+            desc: 'Đơn hàng đã kết thúc xử lý hoặc bị hủy theo yêu cầu.',
+            time: order.updatedAt || Date.now(),
+            completed: true,
+            current: true,
+            isDanger: true
+        });
+    }
+
+    return steps;
+}
+
+function renderOrderDetail(order) {
     loadedOrderData = order;
     const orderCode = `#${String(order._id).padStart(4, '0')}`;
-    document.title = `${orderCode} - Quá trình giao hàng - TechEcommerce`;
+    const statusText = ORDER_STATUS_LABELS[order.status] || order.status;
+    const orderTime = orderDate(order.orderDate || order.createdAt);
+
+    // Update Headings & Breadcrumb
+    document.title = `${orderCode} - Chi tiết đơn hàng - TechEcommerce`;
+    document.getElementById('breadcrumbOrderCode').textContent = `Đơn hàng ${orderCode}`;
     document.getElementById('trackingTitle').textContent = `Đơn hàng ${orderCode}`;
-    document.getElementById('trackingSubtitle').textContent = `${ORDER_STATUS_LABELS[order.status] || order.status} · Đặt lúc ${orderDate(order.orderDate || order.createdAt)}`;
+    document.getElementById('trackingSubtitle').textContent = `Đặt lúc ${orderTime}`;
 
-    document.getElementById('trackingContent').innerHTML = `
-        ${exceptionNotice(order)}
-        <section class="tracking-summary" aria-label="Tóm tắt giao hàng">
-            <article><small>Trạng thái</small><strong>${escapeHTML(ORDER_STATUS_LABELS[order.status] || order.status)}</strong></article>
-            <article><small>Đơn vị vận chuyển</small><strong>${escapeHTML(order.shippingUnit || 'Đang phân công')}</strong></article>
-            <article><small>${order.status === 'completed' ? 'Thời gian nhận' : 'Dự kiến giao'}</small><strong>${order.status === 'completed' ? orderDate(order.deliveredAt || order.updatedAt) : estimatedDelivery(order)}</strong></article>
-        </section>
+    const badgeEl = document.getElementById('headerStatusBadge');
+    badgeEl.textContent = statusText;
+    badgeEl.className = `cust-badge status-${order.status}`;
 
-        <div class="tracking-layout">
-            <div>
-                <section id="journey" class="tracking-panel">
-                    <h2>Hành trình đơn hàng</h2>
-                    <ol class="delivery-timeline">${renderTimeline(order)}</ol>
-                </section>
+    // Calculate subtotal and shipping
+    const subtotal = order.subtotal || (order.products || []).reduce((acc, p) => acc + (p.price * (p.quantity || 1)), 0);
+    const discount = order.discountAmount || 0;
+    const finalTotal = order.totalAmount || (subtotal - discount);
+    const shippingFee = (finalTotal > (subtotal - discount)) ? (finalTotal - (subtotal - discount)) : 0;
 
-                <section id="inspection" class="tracking-panel">
-                    <h2>Thông tin kiểm hàng</h2>
-                    <ul class="inspection-list">
-                        <li><span>Kiểm tra ngoại quan</span><strong>${order.status === 'pending' ? 'Chờ kiểm tra' : 'Đã kiểm tra'}</strong></li>
-                        <li><span>Đối chiếu sản phẩm và số lượng</span><strong>${order.status === 'pending' ? 'Chờ kiểm tra' : 'Đã đối chiếu'}</strong></li>
-                        <li><span>Phụ kiện và niêm phong</span><strong>${order.status === 'pending' ? 'Chờ kiểm tra' : 'Đạt yêu cầu'}</strong></li>
-                    </ul>
-                    ${order.inspectionNote ? `<p>${escapeHTML(order.inspectionNote)}</p>` : ''}
-                </section>
+    // Timeline HTML
+    const steps = getTimelineSteps(order);
+    const timelineHtml = steps.map((s, idx) => {
+        let stepClass = '';
+        if (s.completed && !s.current) stepClass = 'is-completed';
+        else if (s.current) stepClass = s.isDanger ? 'is-completed' : 'is-current';
 
-                <section id="products" class="tracking-panel">
-                    <h2>Sản phẩm trong đơn</h2>
-                    <div class="tracking-products">${renderProducts(order)}</div>
-                </section>
+        return `
+            <li class="timeline-step-item ${stepClass}">
+                <div class="timeline-marker" aria-hidden="true">${idx + 1}</div>
+                <div class="timeline-body">
+                    <div class="timeline-title-row">
+                        <strong class="timeline-step-name">${escapeHTML(s.title)}</strong>
+                        ${s.time ? `<time class="timeline-time">${orderDate(s.time)}</time>` : ''}
+                    </div>
+                    <p class="timeline-desc">${escapeHTML(s.desc)}</p>
+                </div>
+            </li>
+        `;
+    }).join('');
 
-                <section id="review" class="tracking-panel">
-                    <h2>Đánh giá sau khi nhận hàng</h2>
-                    ${renderReviewSection(order)}
-                </section>
+    // Products table rows
+    const productsRowsHtml = (order.products || []).map(item => {
+        const prod = item.product || {};
+        const name = prod.name || item.productName || 'Sản phẩm công nghệ';
+        const img = prod.image || prod.images?.[0] || 'https://placehold.co/120x120?text=TechEcommerce';
+        const qty = item.quantity || 1;
+        const price = item.price || 0;
+        const lineTotal = price * qty;
+        const prodUrl = prod._id ? `../catalog/product.html?id=${encodeURIComponent(prod._id)}` : '#';
+
+        return `
+            <tr>
+                <td>
+                    <div class="table-product-cell">
+                        <figure class="table-product-thumb">
+                            <img src="${escapeHTML(img)}" alt="${escapeHTML(name)}" loading="lazy">
+                        </figure>
+                        <div class="table-product-meta">
+                            <a class="table-product-title" href="${prodUrl}">${escapeHTML(name)}</a>
+                            <span class="table-product-variant">${escapeHTML(prod.category || 'Chính hãng TechEcommerce')}</span>
+                        </div>
+                    </div>
+                </td>
+                <td style="text-align:center;">${orderMoney(price)}</td>
+                <td style="text-align:center;">× ${qty}</td>
+                <td style="text-align:right; font-weight:700; color:var(--neo-text,#0f172a);">${orderMoney(lineTotal)}</td>
+            </tr>
+        `;
+    }).join('');
+
+    // Inspection section: ONLY show if inspectionNote is provided
+    const inspectionHtml = order.inspectionNote ? `
+        <article class="detail-card-panel">
+            <h2 class="panel-title">
+                <span class="panel-title-icon" aria-hidden="true">📋</span>
+                <span>Ghi chú kiểm tra & Bàn giao</span>
+            </h2>
+            <p style="margin:0; font-size:0.92rem; color:var(--neo-text,#0f172a); line-height:1.5;">${escapeHTML(order.inspectionNote)}</p>
+        </article>
+    ` : '';
+
+    // Reviews section (if completed)
+    const reviewHtml = order.status === 'completed' ? `
+        <article class="detail-card-panel">
+            <h2 class="panel-title">
+                <span class="panel-title-icon" aria-hidden="true">⭐</span>
+                <span>Đánh giá trải nghiệm sản phẩm</span>
+            </h2>
+            <div class="review-prompt-box">
+                <p style="margin:0 0 0.75rem; font-size:0.9rem; color:var(--neo-muted,#64748b);">Đơn hàng đã được giao thành công. Bạn hãy chia sẻ đánh giá về chất lượng sản phẩm và dịch vụ nhé!</p>
+                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                    ${(order.products || []).map(p => {
+                        const pid = p.product?._id || p.product;
+                        const pname = p.product?.name || p.productName || 'Sản phẩm';
+                        return pid ? `<a href="../catalog/product.html?id=${pid}#reviews" class="btn-back-list" style="font-size:0.82rem;">Đánh giá: ${escapeHTML(pname)}</a>` : '';
+                    }).join('')}
+                </div>
+            </div>
+        </article>
+    ` : '';
+
+    const shipperObj = order.shipper;
+    const shipperName = (typeof shipperObj === 'object' && shipperObj?.name) ? shipperObj.name : (order.shipperAssignedByName || '');
+    const shipperPhone = (typeof shipperObj === 'object' && shipperObj?.phone) ? shipperObj.phone : '';
+
+    const shippingStatusMap = {
+        unassigned: 'Chưa phân công',
+        assigned: 'Đã phân công shipper · Chuẩn bị giao',
+        waiting_pickup: 'Shipper đang đến lấy hàng',
+        picked_up: 'Shipper đã nhận hàng từ kho',
+        delivering: 'Shipper đang trên đường giao hàng',
+        delivered: 'Giao hàng thành công',
+        delivery_failed: 'Giao hàng không thành công',
+        returned: 'Đã chuyển hoàn'
+    };
+    const shippingStatusText = shippingStatusMap[order.shippingStatus] || (shipperName ? 'Đã phân công shipper' : 'Đang điều phối');
+    const canCancel = order.status === 'pending' && !shipperName;
+
+    const fullContentHtml = `
+        ${shipperName ? `
+            <aside class="shipper-assigned-banner reveal" style="margin-bottom: 1.5rem; padding: 1.15rem 1.4rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <span style="font-size: 2.2rem;" aria-hidden="true">🛵</span>
+                    <div>
+                        <strong style="color: #047857; font-size: 1.05rem; display: block;">Đơn hàng đã được phân công Shipper</strong>
+                        <p style="margin: 3px 0 0; color: var(--neo-muted, #64748b); font-size: 0.9rem;">
+                            Shipper phụ trách: <strong style="color: var(--neo-text, #0f172a);">${escapeHTML(shipperName)}</strong> · Trạng thái: <strong style="color: #047857;">${escapeHTML(shippingStatusText)}</strong>
+                        </p>
+                    </div>
+                </div>
+                ${shipperPhone ? `
+                    <a href="tel:${escapeHTML(shipperPhone)}" class="btn-primary" style="padding: 0.6rem 1.15rem; font-size: 0.88rem; text-decoration: none; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px;">
+                        <span>📞 Liên hệ Shipper:</span> <strong>${escapeHTML(shipperPhone)}</strong>
+                    </a>
+                ` : ''}
+            </aside>
+        ` : ''}
+
+        <div class="detail-layout-grid">
+            <!-- Left Column: Timeline & Items -->
+            <div class="detail-main-column">
+                <!-- Timeline panel -->
+                <article class="detail-card-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-icon" aria-hidden="true">📍</span>
+                        <span>Hành trình đơn hàng</span>
+                    </h2>
+                    <ol class="timeline-steps-list">
+                        ${timelineHtml}
+                    </ol>
+                </article>
+
+                <!-- Products table panel -->
+                <article class="detail-card-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-icon" aria-hidden="true">🛍️</span>
+                        <span>Sản phẩm trong đơn (${order.products?.length || 0})</span>
+                    </h2>
+                    <div style="overflow-x:auto;">
+                        <table class="order-items-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sản phẩm</th>
+                                    <th scope="col" style="text-align:center;">Đơn giá</th>
+                                    <th scope="col" style="text-align:center;">Số lượng</th>
+                                    <th scope="col" style="text-align:right;">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${productsRowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                ${inspectionHtml}
+                ${reviewHtml}
             </div>
 
-            <aside class="tracking-panel" aria-label="Thông tin nhận hàng">
-                <h2>Thông tin giao nhận</h2>
-                <dl class="tracking-meta">
-                    <div><dt>Người nhận</dt><dd>${escapeHTML(order.recipientName || order.customerName || '')}</dd></div>
-                    <div><dt>Số điện thoại</dt><dd>${escapeHTML(order.recipientPhone || order.customerPhone || '')}</dd></div>
-                    <div><dt>Địa chỉ</dt><dd>${escapeHTML(order.shippingAddress || '')}</dd></div>
-                    <div><dt>Mã vận đơn</dt><dd>${escapeHTML(order.trackingNumber || 'Chờ đơn vị vận chuyển tiếp nhận')}</dd></div>
-                    <div><dt>Thanh toán</dt><dd>${escapeHTML(ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod || '')}</dd></div>
-                    <div><dt>Trạng thái tiền</dt><dd>${escapeHTML(ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus || '')}</dd></div>
-                    <div><dt>Tổng cộng</dt><dd><strong>${orderMoney(order.totalAmount)}</strong></dd></div>
-                </dl>
-                <button type="button" class="btn-customer-invoice" id="btnPrintCustomerInvoice" onclick="printCustomerInvoice()" style="width:100%;margin-top:1.25rem;display:flex;align-items:center;justify-content:center;gap:8px;padding:0.75rem 1rem;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#ffffff;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,0.25);transition:all 0.2s ease;">
-                    <span aria-hidden="true">🖨️</span>
-                    <span>In Hóa Đơn Điện Tử VAT</span>
-                </button>
+            <!-- Right Column: Shipping Info & Payment Breakdown -->
+            <aside class="detail-sidebar-column" aria-label="Tóm tắt giao nhận và thanh toán">
+                <!-- Recipient & Shipping Panel -->
+                <article class="detail-card-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-icon" aria-hidden="true">🚚</span>
+                        <span>Thông tin giao nhận</span>
+                    </h2>
+                    <dl class="info-field-grid">
+                        <div class="info-field-row">
+                            <dt>Người nhận:</dt>
+                            <dd>${escapeHTML(order.recipientName || order.customerName || 'N/A')}</dd>
+                        </div>
+                        <div class="info-field-row">
+                            <dt>Số điện thoại:</dt>
+                            <dd>${escapeHTML(order.recipientPhone || order.customerPhone || 'N/A')}</dd>
+                        </div>
+                        <div class="info-field-row">
+                            <dt>Địa chỉ nhận:</dt>
+                            <dd>${escapeHTML(order.shippingAddress || 'Nhận tại showroom TechEcommerce')}</dd>
+                        </div>
+                        <div class="info-field-row">
+                            <dt>Shipper phụ trách:</dt>
+                            <dd>${shipperName ? `<strong style="color: #047857;">🛵 ${escapeHTML(shipperName)}</strong>` : 'Đang điều phối'}</dd>
+                        </div>
+                        ${shipperPhone ? `
+                            <div class="info-field-row">
+                                <dt>SĐT Shipper:</dt>
+                                <dd><a href="tel:${escapeHTML(shipperPhone)}" style="color: var(--primary, #2563eb); font-weight: 700; text-decoration: underline;">📞 ${escapeHTML(shipperPhone)}</a></dd>
+                            </div>
+                        ` : ''}
+                        <div class="info-field-row">
+                            <dt>Trạng thái giao:</dt>
+                            <dd><span style="color: #047857; font-weight: 600;">${escapeHTML(shippingStatusText)}</span></dd>
+                        </div>
+                        <div class="info-field-row">
+                            <dt>Đơn vị giao:</dt>
+                            <dd>${escapeHTML(order.shippingUnit || (shipperName ? 'Cửa hàng tự giao / Shipper TechEcommerce' : 'Đang điều phối'))}</dd>
+                        </div>
+                        <div class="info-field-row">
+                            <dt>Mã vận đơn:</dt>
+                            <dd>${escapeHTML(order.trackingNumber || 'Chờ đơn vị vận chuyển tiếp nhận')}</dd>
+                        </div>
+                    </dl>
+                </article>
+
+                <!-- Payment Breakdown Panel -->
+                <article class="detail-card-panel">
+                    <h2 class="panel-title">
+                        <span class="panel-title-icon" aria-hidden="true">💳</span>
+                        <span>Chi tiết thanh toán</span>
+                    </h2>
+                    <dl class="financial-breakdown-list">
+                        <div class="financial-row">
+                            <dt>Hình thức:</dt>
+                            <dd>${escapeHTML(ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod || 'COD')}</dd>
+                        </div>
+                        <div class="financial-row">
+                            <dt>Trạng thái tiền:</dt>
+                            <dd>${escapeHTML(ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus || 'Chưa thanh toán')}</dd>
+                        </div>
+                        <div class="financial-row">
+                            <dt>Tạm tính hàng:</dt>
+                            <dd>${orderMoney(subtotal)}</dd>
+                        </div>
+                        <div class="financial-row">
+                            <dt>Phí giao hàng:</dt>
+                            <dd>${shippingFee > 0 ? orderMoney(shippingFee) : 'Miễn phí'}</dd>
+                        </div>
+                        ${discount > 0 ? `
+                            <div class="financial-row discount">
+                                <dt>Giảm giá (${escapeHTML(order.couponCode || 'Voucher')}):</dt>
+                                <dd>- ${orderMoney(discount)}</dd>
+                            </div>
+                        ` : ''}
+                        <div class="financial-total-row">
+                            <dt>Tổng thanh toán:</dt>
+                            <dd>${orderMoney(finalTotal)}</dd>
+                        </div>
+                    </dl>
+
+                    <button type="button" class="btn-invoice-full" onclick="printCustomerInvoice()">
+                        <span aria-hidden="true">🖨️</span>
+                        <span>In Hóa Đơn Điện Tử VAT</span>
+                    </button>
+
+                    ${canCancel ? `
+                        <button type="button" class="btn-cancel-order-large" onclick="cancelCurrentDetailOrder('${order._id}')">
+                            Hủy đơn hàng này
+                        </button>
+                    ` : ''}
+                </article>
             </aside>
         </div>
     `;
 
-    bindReviewActions();
+    document.getElementById('trackingContent').innerHTML = fullContentHtml;
+}
+
+async function cancelCurrentDetailOrder(id) {
+    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) return;
+    try {
+        const res = await fetch(`${API_URL}/orders/${id}/cancel`, {
+            method: 'POST',
+            headers: auth.getHeaders()
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            showOrderToast(data.message || 'Không thể hủy đơn hàng lúc này.', 'error');
+            return;
+        }
+        showOrderToast('Đã hủy đơn hàng thành công.');
+        loadOrderDetail();
+    } catch (err) {
+        showOrderToast('Lỗi kết nối khi gửi yêu cầu hủy đơn.', 'error');
+    }
 }
 
 function printCustomerInvoice() {
@@ -254,13 +501,13 @@ function printCustomerInvoice() {
     const shippingAddress = order.shippingAddress || 'Nhận tại showroom TechEcommerce';
     const orderDateFormatted = orderDate(order.orderDate || order.createdAt);
     const trackingCode = order.trackingNumber || 'CHƯA_TẠO_VẬN_ĐƠN';
-    const shippingUnit = order.shippingUnit || 'Giao Hàng Nhanh / Tiêu Chuẩn';
+    const shippingUnit = order.shippingUnit || 'Giao Hàng Tiêu Chuẩn';
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent('https://techecommerce-shop.vercel.app/pages/account/order-detail.html?id=' + order._id)}`;
 
     const itemsRows = (order.products || []).map((item, idx) => {
         const prodName = item.product?.name || item.productName || 'Sản phẩm công nghệ';
         const qty = item.quantity || 1;
-        const price = item.price || (order.totalAmount / (order.products?.length || 1));
+        const price = item.price || 0;
         const total = price * qty;
         return `
             <tr>
@@ -278,7 +525,7 @@ function printCustomerInvoice() {
         <html lang="vi">
         <head>
             <meta charset="UTF-8">
-            <title>Hóa đơn điện tử VAT & Phiếu đóng gói #${order._id}</title>
+            <title>Hóa đơn điện tử VAT #${order._id}</title>
             <style>
                 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
                 body { background: #fff; color: #1e293b; padding: 24px; font-size: 13px; line-height: 1.5; }
@@ -298,52 +545,38 @@ function printCustomerInvoice() {
                 .inv-totals { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-top: 1px dashed #cbd5e1; padding-top: 12px; }
                 .inv-qr { display: flex; align-items: center; gap: 12px; }
                 .inv-qr img { width: 90px; height: 90px; border: 1px solid #e2e8f0; padding: 4px; border-radius: 4px; }
-                .inv-sum { text-align: right; font-size: 13px; }
-                .inv-sum .total-row { font-size: 16px; color: #dc2626; font-weight: bold; margin-top: 4px; }
-                .inv-signatures { display: grid; grid-template-columns: 1fr 1fr 1fr; text-align: center; margin-top: 32px; padding-top: 16px; }
-                .inv-signatures .sign-role { font-weight: 600; margin-bottom: 48px; }
-                .inv-signatures .sign-note { font-size: 11px; color: #64748b; font-style: italic; }
-                @media print {
-                    body { padding: 0; }
-                    .invoice-box { border: none; padding: 0; }
-                    .no-print { display: none !important; }
-                }
+                .inv-sign { display: grid; grid-template-columns: 1fr 1fr; text-align: center; margin-top: 30px; }
+                .inv-sign h5 { font-size: 12px; color: #334155; margin-bottom: 40px; }
             </style>
         </head>
         <body>
-            <div class="no-print" style="max-width:800px; margin:0 auto 16px auto; display:flex; justify-content:flex-end; gap:8px;">
-                <button onclick="window.print()" style="background:#2563eb; color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">🖨️ In Hóa Đơn / Xuất PDF</button>
-                <button onclick="window.close()" style="background:#64748b; color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:bold; cursor:pointer;">✕ Đóng</button>
-            </div>
             <div class="invoice-box">
                 <div class="inv-header">
                     <div class="inv-company">
-                        <h2>CÔNG TY CỔ PHẦN CÔNG NGHỆ TECHECOMMERCE VIỆT NAM</h2>
-                        <p><strong>Mã số thuế:</strong> 0318992388</p>
-                        <p><strong>Địa chỉ:</strong> Tầng 5, Tòa nhà Innovation, TP. Hồ Chí Minh</p>
-                        <p><strong>Hotline:</strong> 0842.331.606 | <strong>Website:</strong> techecommerce-shop.vercel.app</p>
+                        <h2>HỆ THỐNG BÁN LẺ CÔNG NGHỆ TECHECOMMERCE</h2>
+                        <p>Trụ sở chính: Showroom TechEcommerce, TP. Hồ Chí Minh</p>
+                        <p>Hotline: 1800 2097 | Email: support@techecommerce.vn</p>
                     </div>
                     <div class="inv-meta">
-                        <h1>PHIẾU ĐÓNG GÓI &amp; HÓA ĐƠN VAT</h1>
-                        <span>Mã đơn: <strong>#${order._id}</strong></span>
-                        <span>Mã vận đơn: <strong>${escapeHTML(trackingCode)}</strong></span>
+                        <h1>HÓA ĐƠN ĐIỆN TỬ VAT</h1>
+                        <span>Mã đơn: <strong>#${String(order._id).padStart(4, '0')}</strong></span>
                         <span>Ngày lập: ${orderDateFormatted}</span>
                     </div>
                 </div>
 
                 <div class="inv-grid">
                     <div>
-                        <h4>Thông tin người nhận (Khách hàng)</h4>
+                        <h4>Khách hàng & Nhận hàng</h4>
                         <p><strong>Người nhận:</strong> ${escapeHTML(recipientName)}</p>
                         <p><strong>Điện thoại:</strong> ${escapeHTML(recipientPhone)}</p>
-                        <p><strong>Địa chỉ nhận:</strong> ${escapeHTML(shippingAddress)}</p>
+                        <p><strong>Địa chỉ:</strong> ${escapeHTML(shippingAddress)}</p>
                     </div>
                     <div>
-                        <h4>Thông tin vận chuyển &amp; Thanh toán</h4>
+                        <h4>Thanh toán & Vận chuyển</h4>
+                        <p><strong>Phương thức:</strong> ${ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod || 'COD'}</p>
+                        <p><strong>Trạng thái tiền:</strong> ${ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus}</p>
                         <p><strong>Đơn vị vận chuyển:</strong> ${escapeHTML(shippingUnit)}</p>
-                        <p><strong>Hình thức thanh toán:</strong> ${escapeHTML(ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod)}</p>
-                        <p><strong>Trạng thái thanh toán:</strong> ${escapeHTML(ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus)}</p>
-                        <p><strong>Ghi chú giao hàng:</strong> ${escapeHTML(order.customerNotes || 'Cho xem hàng trước khi nhận')}</p>
+                        <p><strong>Mã vận đơn:</strong> ${escapeHTML(trackingCode)}</p>
                     </div>
                 </div>
 
@@ -351,10 +584,10 @@ function printCustomerInvoice() {
                     <thead>
                         <tr>
                             <th style="width:40px; text-align:center;">STT</th>
-                            <th>Tên sản phẩm / Thiết bị</th>
-                            <th style="width:70px; text-align:center;">Số lượng</th>
-                            <th style="width:110px; text-align:right;">Đơn giá</th>
-                            <th style="width:120px; text-align:right;">Thành tiền</th>
+                            <th>Tên sản phẩm</th>
+                            <th style="width:60px; text-align:center;">Số lượng</th>
+                            <th style="width:120px; text-align:right;">Đơn giá</th>
+                            <th style="width:130px; text-align:right;">Thành tiền</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -364,126 +597,43 @@ function printCustomerInvoice() {
 
                 <div class="inv-totals">
                     <div class="inv-qr">
-                        <img src="${qrUrl}" alt="QR Tra cứu đơn hàng">
+                        <img src="${qrUrl}" alt="Mã QR tra cứu hóa đơn">
                         <div>
-                            <strong style="font-size:12px; display:block;">MÃ QR TRA CỨU ĐƠN HÀNG</strong>
-                            <small style="color:#64748b; display:block;">Quét để kiểm tra bảo hành điện tử &amp; trạng thái vận đơn</small>
+                            <p style="font-weight:700;">Quét mã tra cứu điện tử</p>
+                            <small style="color:#64748b;">Hóa đơn hợp lệ theo quy chuẩn bán lẻ</small>
                         </div>
                     </div>
-                    <div class="inv-sum">
-                        <p>Phí vận chuyển: <strong>Miễn phí (0 đ)</strong></p>
-                        <p>Thuế GTGT (VAT): <strong>Đã bao gồm</strong></p>
-                        <div class="total-row">TỔNG THANH TOÁN: ${orderMoney(order.totalAmount)}</div>
+                    <div style="text-align:right;">
+                        <p style="font-size:14px; margin-bottom:4px;">Tổng tiền thanh toán:</p>
+                        <h2 style="color:#2563eb; font-size:20px;">${orderMoney(order.totalAmount)}</h2>
                     </div>
                 </div>
 
-                <div class="inv-signatures">
+                <div class="inv-sign">
                     <div>
-                        <div class="sign-role">Người lập hóa đơn</div>
-                        <div class="sign-note">(Ký &amp; ghi rõ họ tên)</div>
+                        <h5>NGƯỜI MUA HÀNG</h5>
+                        <p style="color:#94a3b8; font-size:11px;">(Ký, ghi rõ họ tên)</p>
                     </div>
                     <div>
-                        <div class="sign-role">Thủ kho xuất hàng</div>
-                        <div class="sign-note">(Đã kiểm đủ số lượng &amp; niêm phong)</div>
-                    </div>
-                    <div>
-                        <div class="sign-role">Người nhận hàng / Shipper</div>
-                        <div class="sign-note">(Đã nhận nguyên vẹn niêm phong)</div>
+                        <h5>ĐẠI DIỆN TECHECOMMERCE</h5>
+                        <p style="color:#059669; font-weight:700;">ĐÃ KÝ ĐIỆN TỬ HỢP LỆ</p>
                     </div>
                 </div>
             </div>
             <script>
-                window.addEventListener('load', () => {
-                    setTimeout(() => window.print(), 350);
-                });
-            <\/script>
+                window.onload = function() { window.print(); };
+            </script>
         </body>
         </html>
     `;
 
-    const printWin = window.open('', '_blank', 'width=850,height=900,menubar=no,toolbar=no,location=no,status=no');
-    if (!printWin) {
-        showOrderToast('Trình duyệt đã chặn cửa sổ in (popup). Vui lòng cho phép mở popup để xem hóa đơn!', 'error');
-        return;
-    }
-    printWin.document.open();
-    printWin.document.write(invoiceHtml);
-    printWin.document.close();
-}
-
-function bindReviewActions() {
-    document.querySelectorAll('[data-review-toggle]').forEach(button => {
-        button.addEventListener('click', () => {
-            const form = document.querySelector(`[data-review-form="${button.dataset.reviewToggle}"]`);
-            if (!form) return;
-            form.hidden = !form.hidden;
-            button.textContent = form.hidden ? 'Đánh giá' : 'Đóng biểu mẫu';
-        });
-    });
-
-    document.querySelectorAll('[data-review-form]').forEach(form => {
-        form.addEventListener('submit', async event => {
-            event.preventDefault();
-            const productId = form.dataset.reviewForm;
-            const payload = Object.fromEntries(new FormData(form).entries());
-            payload.rating = Number(payload.rating);
-            const button = form.querySelector('button[type="submit"]');
-            button.disabled = true;
-            button.textContent = 'Đang gửi...';
-
-            try {
-                const response = await fetch(`${API_URL}/reviews/product/${productId}`, {
-                    method: 'POST',
-                    headers: auth.getHeaders(),
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.message || 'Không gửi được đánh giá.');
-                showOrderToast('Cảm ơn bạn đã đánh giá sản phẩm.');
-                form.reset();
-                form.hidden = true;
-            } catch (error) {
-                showOrderToast(error.message, 'error');
-            } finally {
-                button.disabled = false;
-                button.textContent = 'Gửi đánh giá';
-            }
-        });
-    });
-}
-
-function showOrderToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    requestAnimationFrame(() => toast.classList.add('show'));
-    setTimeout(() => toast.remove(), 3200);
-}
-
-async function loadOrderTracking() {
-    if (!auth.isLoggedIn()) {
-        window.location.href = '../auth/login.html';
-        return;
-    }
-
-    const orderId = new URLSearchParams(window.location.search).get('id');
-    if (!orderId || !/^\d+$/.test(orderId)) {
-        document.getElementById('trackingContent').innerHTML = '<p class="empty-state">Mã đơn hàng không hợp lệ.</p>';
-        return;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}/orders/${orderId}`, { headers: auth.getHeaders() });
-        const data = await response.json();
-        if (auth.handleApiError(response, data)) return;
-        if (!response.ok) throw new Error(data.message || 'Không tải được đơn hàng.');
-        renderOrder(data);
-    } catch (error) {
-        document.getElementById('trackingContent').innerHTML = `<p class="empty-state">${escapeHTML(error.message)}</p>`;
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+        printWin.document.write(invoiceHtml);
+        printWin.document.close();
+    } else {
+        alert('Trình duyệt đang chặn cửa sổ pop-up. Vui lòng cho phép mở pop-up để in hóa đơn!');
     }
 }
 
-window.printCustomerInvoice = printCustomerInvoice;
-
-document.addEventListener('DOMContentLoaded', loadOrderTracking);
+document.addEventListener('DOMContentLoaded', loadOrderDetail);

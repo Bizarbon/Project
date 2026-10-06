@@ -28,7 +28,7 @@
         if (document.querySelector('link[data-ai-chat-style]')) return;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=mobile-align-20260924-2`;
+        link.href = `${root}assets/css/chatbox.css?v=20260925-v3`;
         link.dataset.aiChatStyle = 'true';
         document.head.appendChild(link);
     }
@@ -43,9 +43,13 @@
         }[char]));
     }
 
+    function humanizeStoreName(value) {
+        return String(value ?? '').replace(/TechEcommerce/gi, 'cửa hàng tụi mình');
+    }
+
     function formatAIMessage(rawText) {
         if (!rawText) return '';
-        const escaped = escapeHTML(rawText);
+        const escaped = escapeHTML(humanizeStoreName(rawText));
         let formatted = escaped
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
@@ -138,7 +142,7 @@
                 <span>AI tư vấn</span>
                 <span class="ai-chat-min-arrow" aria-hidden="true">▲</span>
             </button>
-            <button class="ai-chat-toggle" type="button" aria-label="Mở trợ lý tư vấn" title="Tư vấn mua sắm cùng AI">
+            <button class="ai-chat-toggle rhythmic-pulse-shake-ai" type="button" aria-label="Mở trợ lý tư vấn" title="Tư vấn mua sắm cùng AI">
                 <figure class="ai-chat-toggle-icon" aria-hidden="true">
                     <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="26" height="26" class="ai-toggle-avatar-img">
                 </figure>
@@ -610,10 +614,26 @@
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers.Authorization = `Bearer ${token}`;
 
+        const pageCategory = new URLSearchParams(window.location.search).get('category') || '';
+        const requestContext = { ...(context || {}) };
+        if (pageCategory) {
+            if (requestContext.pageCategory && requestContext.pageCategory !== pageCategory) {
+                delete requestContext.brand;
+                delete requestContext.budget;
+                delete requestContext.budgetType;
+                delete requestContext.useCase;
+                delete requestContext.lastProducts;
+                delete requestContext.currentIntent;
+                delete requestContext.productType;
+            }
+            requestContext.category = pageCategory;
+            requestContext.pageCategory = pageCategory;
+        }
+
         const response = await fetch(`${apiUrl}/chat`, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ message, context })
+            body: JSON.stringify({ message, context: requestContext })
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.message || 'Chatbot chưa phản hồi được.');
@@ -641,6 +661,7 @@
         let consultationContext = {};
         let chatHistory = [];
         let voiceEnabled = localStorage.getItem('chatVoiceEnabled') === 'true';
+        let reengagementTimer = null;
 
         function saveSession() {
             try {
@@ -650,6 +671,41 @@
             } catch (e) {
                 console.warn('Cannot persist AI chat session:', e);
             }
+        }
+
+        function cancelReengagement() {
+            if (!reengagementTimer) return;
+            window.clearTimeout(reengagementTimer);
+            reengagementTimer = null;
+        }
+
+        function buildReengagementMessage() {
+            const products = Array.isArray(consultationContext.lastProducts)
+                ? consultationContext.lastProducts.filter(Boolean)
+                : [];
+            const category = consultationContext.category || 'sản phẩm vừa xem';
+
+            if (products.length >= 2) {
+                return `Mình vẫn ở đây nha 😊 Bạn còn phân vân giữa các mẫu vừa xem ở điểm nào: giá, tính năng hay trải nghiệm sử dụng? Nói mình tiêu chí quan trọng nhất, mình sẽ so sánh thật gọn để bạn dễ chọn hơn.`;
+            }
+            if (products.length === 1) {
+                return `Bạn còn băn khoăn gì về mẫu **${products[0].name || category}** không? Mình có thể kiểm tra thêm giá, tính năng, bảo hành hoặc phương án trả góp giúp bạn nhé.`;
+            }
+            return `Mình vẫn ở đây nếu bạn còn phân vân về **${category}** nhé 😊 Bạn cứ cho mình biết mức giá mong muốn hoặc nhu cầu quan trọng nhất, mình sẽ gợi ý sát hơn cho bạn.`;
+        }
+
+        function scheduleReengagement() {
+            cancelReengagement();
+            reengagementTimer = window.setTimeout(() => {
+                reengagementTimer = null;
+                if (!chat.classList.contains('open') || chat.classList.contains('minimized') || document.hidden || input.value.trim()) return;
+
+                const followUp = buildReengagementMessage();
+                appendMessage(body, 'ai', followUp);
+                chatHistory.push({ role: 'ai', text: followUp, proactive: true });
+                saveSession();
+                speak(followUp);
+            }, 25000);
         }
 
         const updateVoiceButton = () => {
@@ -688,27 +744,31 @@
                 let line = rawLine.trim();
                 if (!line) continue;
 
-                // Bỏ các ký tự đặc biệt / emoji ở đầu dòng để kiểm tra từ khóa
-                const normalized = line.replace(/^[\s•\-\*✨🎁💡👉🛡️🚚🔄💳]+/u, '').trim();
-
-                // Bỏ qua dòng thông số, cấu hình, đánh giá, chính sách, ưu đãi, phụ kiện kèm...
-                if (/^(?:thông số|cấu hình|đánh giá|cpu|ram|bộ nhớ|màn hình|pin|chính sách|ưu đãi|tăng cường trải nghiệm|bạn có muốn xem thêm|quà tặng|hỗ trợ|100%|bạn có thể|lỗi 1 đổi 1)/i.test(normalized)) {
+                // Bỏ qua các dòng bảng markdown, code block hoặc JSON
+                if (line.startsWith('|') || line.includes('| :---') || line.includes('|:---') || line.startsWith('|-') || line.startsWith('```') || line.startsWith('{') || line.startsWith('}')) {
                     continue;
                 }
 
-                // Nhận diện dòng sản phẩm dạng: "1. iPhone 15 Pro Max 256GB - 29.490.000 đ (Còn 40 máy)" hoặc "1. **iPhone...** - **29.490.000 đ**"
+                // Bỏ các ký tự đặc biệt / emoji ở đầu dòng để kiểm tra từ khóa
+                const normalized = line.replace(/^[\s•\-\*✨🎁💡👉🛡️🚚🔄💳⚖️🎯📌🚀💼⭐]+/u, '').trim();
+
+                // Bỏ qua dòng thông số chi tiết, cấu hình dài dòng
+                if (/^(?:thông số|cấu hình|đánh giá|cpu|ram|bộ nhớ|ổ cứng|màn hình|pin|trọng lượng|chính sách|ưu đãi|tăng cường trải nghiệm|bạn có muốn xem thêm|quà tặng|hỗ trợ|100%|bạn có thể|lỗi 1 đổi 1)/i.test(normalized)) {
+                    continue;
+                }
+
+                // Nhận diện dòng sản phẩm dạng: "1. iPhone 15 Pro Max 256GB - 29.490.000 đ"
                 const productMatch = line.match(/^(\d+)[\.\)]\s*(?:\*\*)?(.*?)(?:\*\*)?\s*[-–:]\s*(?:\*\*)?([0-9\.,]+(?:\s*(?:đ|vnd|đồng|₫))?)(?:\*\*)?(.*)$/i);
                 if (productMatch) {
                     const index = productMatch[1];
                     const name = productMatch[2].replace(/\*\*|\*|`/g, '').trim();
                     const priceRaw = productMatch[3].trim();
                     const priceSpeech = formatVndForSpeech(priceRaw);
-                    spokenLines.push(`Sản phẩm ${index}: ${name}, giá ${priceSpeech}.`);
+                    spokenLines.push(`Lựa chọn ${index}: ${name}, giá ${priceSpeech}.`);
                     continue;
                 }
 
-                // Nếu là dòng giới thiệu hoặc văn bản thông thường
-                // Lọc bỏ markdown, emoji và ghi chú tồn kho
+                // Nếu là dòng giới thiệu hoặc phân tích ngắn
                 let cleanLine = line
                     .replace(/\*\*|\*|`|#/g, '')
                     .replace(/^[•\-]\s*/, '')
@@ -716,35 +776,65 @@
                     .replace(/[\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
                     .trim();
 
-                // Chuyển đổi các định dạng tiền trong câu nếu có
                 cleanLine = cleanLine.replace(/(\d{1,3}(?:\.\d{3}){1,3})\s*(?:đ|vnd|đồng|₫)/gi, (m, p) => formatVndForSpeech(p));
 
                 if (cleanLine.length > 2) {
                     spokenLines.push(cleanLine);
                 }
+
+                if (spokenLines.length >= 3) break;
             }
 
             return spokenLines.join(' ');
         };
 
+        const stopSpeaking = () => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            voiceButton.classList.remove('speaking');
+            status.textContent = 'Trực tuyến · Hỗ trợ 24/7';
+        };
+
         const speak = text => {
             if (!voiceEnabled || !('speechSynthesis' in window)) return;
-            window.speechSynthesis.cancel();
-            const cleanText = cleanSpeechText(text);
+            // Dừng micro ngay để tránh thu lại giọng bot
+            if (recognition) {
+                try { recognition.abort(); } catch (e) {}
+            }
+            stopSpeaking();
+
+            const cleanText = cleanSpeechText(humanizeStoreName(text));
             if (!cleanText) return;
+
             const utterance = new SpeechSynthesisUtterance(cleanText);
             utterance.lang = 'vi-VN';
             utterance.rate = 1.05;
             const voices = window.speechSynthesis.getVoices();
             utterance.voice = voices.find(voice => voice.lang?.toLowerCase().startsWith('vi')) || null;
+
+            voiceButton.classList.add('speaking');
+            status.textContent = 'Đang đọc tư vấn... (Bấm loa để dừng)';
+
+            utterance.onend = () => {
+                stopSpeaking();
+            };
+            utterance.onerror = () => {
+                stopSpeaking();
+            };
+
             window.speechSynthesis.speak(utterance);
         };
 
         updateVoiceButton();
         voiceButton.addEventListener('click', () => {
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                stopSpeaking();
+                return;
+            }
             voiceEnabled = !voiceEnabled;
             localStorage.setItem('chatVoiceEnabled', String(voiceEnabled));
-            if (!voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+            if (!voiceEnabled) stopSpeaking();
             updateVoiceButton();
         });
 
@@ -789,6 +879,7 @@
                 if (recognizedText) send(recognizedText);
             };
             micButton.addEventListener('click', () => {
+                stopSpeaking();
                 if (micButton.classList.contains('listening')) recognition.stop();
                 else recognition.start();
             });
@@ -817,18 +908,27 @@
 
                     const typing = appendMessage(body, 'ai ai-typing', 'AI đang phân tích nhận diện thiết bị công nghệ...');
                     try {
+                        const hintText = (input?.value || '').trim();
                         const res = await fetch(`${apiUrl}/chat/visual-search`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ image: base64Data, filename: file.name })
+                            body: JSON.stringify({ image: base64Data, filename: file.name, hint: hintText })
                         });
                         const visualResult = await res.json();
                         typing.remove();
 
                         if (!res.ok) throw new Error(visualResult.message || 'Không thể nhận diện hình ảnh');
 
+                        if (!visualResult.isTech) {
+                            const msg = visualResult.reply || 'Ảnh này chưa cho thấy thiết bị thuộc danh mục cửa hàng hỗ trợ (như điện thoại, laptop, tablet, tai nghe, phụ kiện công nghệ...). Bạn vui lòng gửi ảnh chụp rõ nét hơn của thiết bị cần tìm nhé!';
+                            streamAIMessage(body, msg, () => {
+                                scrollToBottom(body);
+                            });
+                            return;
+                        }
+
                         const detected = visualResult.detectedItem || 'Thiết bị công nghệ';
-                        const reply = `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!\n${visualResult.description || ''}\nDưới đây là các sản phẩm tương thích chính hãng tốt nhất tại TechEcommerce:`;
+                        const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!\n${visualResult.description || ''}\nDưới đây là các sản phẩm tương thích chính hãng tốt nhất tại TechEcommerce:`;
 
                         streamAIMessage(body, reply, () => {
                             if (visualResult.products?.length) {
@@ -838,7 +938,7 @@
                         });
                     } catch (err) {
                         typing.remove();
-                        appendMessage(body, 'ai', 'Rất tiếc, AI chưa thể nhận diện rõ thiết bị trong ảnh này. Bạn hãy thử chụp góc rõ hơn nhé!');
+                        appendMessage(body, 'ai', 'Rất tiếc, AI chưa thể nhận diện rõ thiết bị trong ảnh này. Bạn hãy thử chụp góc rõ hơn hoặc gửi ảnh thiết bị công nghệ khác nhé!');
                     }
                 };
                 reader.readAsDataURL(file);
@@ -847,20 +947,19 @@
         }
 
         function handleAutoNavigation(userMessage, data) {
-            // Không chuyển trang nếu sản phẩm không có trong cửa hàng hoặc không có sản phẩm gợi ý
-            if (data.notFound || !Array.isArray(data.products) || data.products.length === 0) {
+            if (data.notFound) {
                 return;
             }
 
             const userMsgLower = String(userMessage || '').toLowerCase().trim();
+            const isMainShop = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || (!window.location.pathname.includes('/pages/') && !window.location.pathname.includes('/admin/'));
 
-            // 1. Phân tích danh mục mục tiêu (ưu tiên context.category từ AI, rồi đến category của sản phẩm gợi ý)
+            // 1. Phân tích danh mục mục tiêu
             let targetCategory = data.context?.category || null;
             if (!targetCategory && Array.isArray(data.products) && data.products.length > 0) {
                 targetCategory = data.products[0]?.category;
             }
 
-            // Keyword heuristics nếu cần phân loại nhanh từ tin nhắn khách hàng
             if (!targetCategory) {
                 if (/laptop|máy tính xách tay|macbook/i.test(userMsgLower)) targetCategory = 'Laptop';
                 else if (/đồng hồ thông minh|smartwatch|apple watch|garmin/i.test(userMsgLower)) targetCategory = 'Đồng hồ thông minh';
@@ -871,11 +970,6 @@
                 else if (/\b(phụ kiện|củ sạc|dây sạc|cáp sạc|pin dự phòng|sạc dự phòng|chuột|bàn phím|keyboard|hub chuyển đổi|apple pencil|bút cảm ứng)\b/i.test(userMsgLower)) targetCategory = 'Phụ kiện';
             }
 
-            // 2. Yêu cầu của người dùng:
-            // "thứ nhất khi khách hàng muốn mua 1 thứ gì đó nó sẽ nhảy sang sản phẩm thứ đó (danh mục đó)
-            // chứ không phải nhảy [1] sản phẩm đó, ví dụ khách muốn mua laptop nó sẽ nhảy sang trang laptop chứ không nhảy sang 1 sản phẩm laptop nào đó".
-            // Do đó: Khách muốn mua hoặc tìm hiểu dòng máy nào -> Chuyển sang danh mục sản phẩm của dòng đó (trang laptop, trang điện thoại...).
-            // Chỉ khi khách hàng yêu cầu đích danh mở trang chi tiết của 1 sản phẩm cụ thể mới chuyển sang product.html!
             const topProduct = data.products?.[0];
             const isExplicitSingleProductView = Boolean(
                 topProduct && (
@@ -886,6 +980,7 @@
                 )
             );
 
+            // A. Khách hàng yêu cầu đích danh mở trang chi tiết sản phẩm -> chuyển hướng sang product.html
             if (isExplicitSingleProductView && topProduct?._id) {
                 const currentParams = new URLSearchParams(window.location.search);
                 const currentId = currentParams.get('id');
@@ -926,13 +1021,135 @@
                         sessionStorage.removeItem('ai_chat_just_redirected_name');
                     });
                 }
-            } else if (targetCategory) {
-                const isMainShop = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || (!window.location.pathname.includes('/pages/') && !window.location.pathname.includes('/admin/'));
+                return;
+            }
+
+            // B. Khách hàng hỏi chính xác 1 sản phẩm cụ thể ("s25 ultra", "galaxy a55", "iphone 16 pro max")
+            // Yêu cầu: "khi khách hàng hỏi sản phẩm nào đó thì nó chỉ nhảy đúng tên sản phẩm đó thôi không nhảy sản phẩm khác"
+            if (data.context?.currentIntent === 'exact_lookup' && topProduct) {
+                if (isMainShop) {
+                    if (topProduct.category && typeof window.setCategory === 'function') {
+                        window.setCategory(topProduct.category, { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter('all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch(topProduct.name);
+                    }
+                } else if (topProduct._id) {
+                    window.location.href = `${root}pages/catalog/product.html?id=${encodeURIComponent(topProduct._id)}`;
+                }
+                return;
+            }
+
+            // C. Khách hàng hỏi thương hiệu trong danh mục ("samsung", "mình thích samsung", "laptop asus")
+            if (data.context?.currentIntent === 'brand_showcase' && data.context?.brand) {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch('', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter(data.context.brand);
+                    }
+                } else if (targetCategory) {
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                }
+                return;
+            }
+
+            // D1. Khách hàng hỏi ngân sách nhưng thấp hơn mức giá tối thiểu của kho (out_of_budget_scope)
+            // TUYỆT ĐỐI không gán maxPrice thấp vào bộ lọc cửa hàng vì sẽ làm trắng màn hình ("Không tìm thấy sản phẩm phù hợp")
+            if (data.context?.currentIntent === 'out_of_budget_scope') {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch('', { scroll: false });
+                    }
+                } else if (targetCategory) {
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                }
+                return;
+            }
+
+            // D2. Khách hàng hỏi theo tính năng / kiểu dáng (feature_showcase: "không dây", "chống ồn", "chụp tai"...)
+            if (data.context?.currentIntent === 'feature_showcase') {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch(data.context?.featureKeyword || '');
+                    }
+                } else if (targetCategory) {
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                }
+                return;
+            }
+
+            // D3. Khách hàng hỏi ngân sách trong tầm giá hợp lệ ("còn khi khách hàng muốn ngân sách trong tầm giá thì mới nhảy ra để tư vấn khách hàng")
+            if (data.context?.budget > 0) {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch('', { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice(data.context.budget);
+                    }
+                } else if (targetCategory) {
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                }
+                return;
+            }
+
+            // E. Chuyển đổi danh mục sản phẩm chung
+            if (targetCategory) {
                 const currentCategory = new URLSearchParams(window.location.search).get('category');
                 const isAlreadyOnThisCategory = isMainShop && (
                     currentCategory === targetCategory ||
                     (typeof window.activeCategory !== 'undefined' && window.activeCategory === targetCategory)
                 );
+
+                if (isAlreadyOnThisCategory) {
+                    // Nếu đang ở sẵn danh mục nhưng khách hỏi lại danh mục này (hoặc chuyển từ hỏi sản phẩm trước sang)
+                    // thì xóa sạch các bộ lọc tìm kiếm và giá cũ để hiển thị lại đầy đủ sản phẩm
+                    if (typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    } else {
+                        if (typeof window.setShopSearch === 'function') window.setShopSearch('', { scroll: false });
+                        if (typeof window.setShopPrice === 'function') window.setShopPrice('', { scroll: false });
+                        if (typeof window.setBrandFilter === 'function') window.setBrandFilter('all', { scroll: false });
+                    }
+                }
 
                 if (!isAlreadyOnThisCategory) {
                     sessionStorage.setItem('ai_chat_just_redirected_category', targetCategory);
@@ -1002,6 +1219,7 @@
         }
 
         const send = async (value) => {
+            cancelReengagement();
             const message = String(value || input.value || '').trim();
             if (!message) {
                 input.setAttribute('aria-invalid', 'true');
@@ -1038,7 +1256,15 @@
             try {
                 const data = await askAssistant(message, consultationContext);
                 if (data.context && typeof data.context === 'object') {
+                    if (!data.notFound) {
+                        delete consultationContext.notFound;
+                        delete consultationContext.uncarriedBrand;
+                        delete consultationContext.stage;
+                    }
                     consultationContext = { ...consultationContext, ...data.context };
+                    if (!data.context.brand) {
+                        consultationContext.brand = '';
+                    }
                 }
                 if (Array.isArray(data.products) && data.products.length > 0) {
                     consultationContext.lastProducts = data.products;
@@ -1077,6 +1303,7 @@
 
                     renderSuggestions(suggestionsBar, data.suggestions, send);
                     scrollToBottom(body);
+                    scheduleReengagement();
                 });
 
                 speak(reply);
@@ -1092,6 +1319,7 @@
         };
 
         input.addEventListener('input', () => {
+            cancelReengagement();
             if (input.value.trim()) input.removeAttribute('aria-invalid');
             if (panel.dataset.state === 'error' || panel.dataset.state === 'success') {
                 panel.dataset.state = 'default';
@@ -1111,6 +1339,7 @@
         }
 
         function closeChat() {
+            cancelReengagement();
             chat.classList.remove('open');
             chat.classList.remove('minimized');
             document.body.classList.remove('ai-chat-open');
@@ -1123,6 +1352,7 @@
         function minimizeChat() {
             const isMin = chat.classList.toggle('minimized');
             if (isMin) {
+                cancelReengagement();
                 document.body.classList.remove('ai-chat-open');
             } else {
                 document.body.classList.add('ai-chat-open');
@@ -1157,6 +1387,7 @@
         });
 
         function resetChatbox(showNotice = false) {
+            cancelReengagement();
             sessionStorage.removeItem('ai_chat_history');
             sessionStorage.removeItem('ai_chat_context');
             sessionStorage.removeItem('ai_chat_just_redirected_category');
@@ -1164,7 +1395,7 @@
             chatHistory = [];
             consultationContext = {};
             body.innerHTML = '';
-            const welcomeText = 'Xin chào! Mình là Trợ lý Mua sắm AI của TechEcommerce. Mình có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?';
+            const welcomeText = 'Xin chào! Mình là Trợ lý Mua sắm AI của cửa hàng tụi mình. Mình có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?';
             appendMessage(body, 'ai', welcomeText);
             chatHistory.push({ role: 'ai', text: welcomeText });
             saveSession();
@@ -1251,7 +1482,7 @@
                 openChat(false);
             }
         } else {
-            const welcomeText = 'Xin chào! Mình là Trợ lý Mua sắm AI của TechEcommerce. Mình có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?';
+            const welcomeText = 'Xin chào! Mình là Trợ lý Mua sắm AI của cửa hàng tụi mình. Mình có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?';
             appendMessage(body, 'ai', welcomeText);
             chatHistory.push({ role: 'ai', text: welcomeText });
             saveSession();

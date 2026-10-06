@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị câu hỏi, phản hồi và đánh giá sản phẩm của khách hàng trên hệ thống TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/qa.html">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Quản lý Q&amp;A &amp; Đánh giá sản phẩm - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Khu vực Quản trị",
+                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Q&A sản phẩm",
+                "item": "https://techecommerce-shop.vercel.app/admin/qa.html"
+            }
+        ]
+    }
+    </script>
+</head>
+
+<body class="admin-page admin-dashboard-page">
+        <!-- Admin Sidebar Navigation -->
+    <header class="admin-sidebar" aria-label="Khu vực điều hướng quản trị">
+        <nav class="admin-sidebar-nav" aria-label="Menu chức năng hệ thống">
+            <!-- Brand Logo Header & Quick Return Home -->
+            <aside class="sidebar-brand-box" aria-label="Thương hiệu cửa hàng">
+                <a href="../index.html" class="sidebar-brand-link" title="Quay lại trang chủ bán hàng TechEcommerce">
+                    <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce Logo" width="32" height="32" class="sidebar-brand-img">
+                    <div class="sidebar-brand-info">
+                        <strong class="sidebar-brand-title">TechEcommerce</strong>
+                        <span class="sidebar-brand-badge">← Về trang chủ</span>
+                    </div>
+                </a>
+            </aside>
+
+            <p class="sidebar-category-heading">TÍNH NĂNG</p>
+            <ul id="main-navbar" class="admin-nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span class="nav-link-text">Dashboard</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item has-dropdown">
+                    <details class="nav-accordion" >
+                        <summary class="nav-accordion-trigger">
+                            <span class="nav-accordion-title">
+                                <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="nav-link-text">Người dùng</span>
+                            </span>
+                            <svg class="chevron-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </summary>
+                        <ul class="nav-sub-menu">
+                            <li><a href="staff.html" class="sub-link "  id="navSubStaff">Quản lý nhân viên</a></li>
+                            <li><a href="customers.html" class="sub-link "  id="navSubCustomer">Quản lý khách hàng</a></li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span class="nav-link-text">Sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Đơn hàng</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link "  id="navMessagesLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="nav-link-text">Tin nhắn</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            </svg>
+                            <span class="nav-link-text">Blog</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="coupons.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span class="nav-link-text">Khuyến mãi</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <span class="nav-link-text">Tài chính</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="suppliers.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"></rect>
+                                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                            </svg>
+                            <span class="nav-link-text">Nhà cung cấp</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="qa.html" class="nav-link active" aria-current="page" id="navQaLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span class="nav-link-text">Q&amp;A sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link" title="Xem giao diện mua sắm TechEcommerce">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Về trang chủ</span>
+                        </span>
+                        <span class="store-badge-pill">Store ↗</span>
+                    </a>
+                </li>
+
+                <li id="nav-auth-section" class="sidebar-auth-wrapper"></li>
+            </ul>
+        </nav>
+    </header>
+
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main-container">
+        <!-- Header & Breadcrumb with Return Home Button -->
+        <header class="dash-page-header">
+            <div>
+                <h1 class="dash-page-title">Q&amp;A &amp; Đánh giá sản phẩm</h1>
+                <nav class="dash-breadcrumb-nav" aria-label="Đường dẫn trang">
+                    <ol class="dash-breadcrumb-list">
+                        <li><a href="../index.html">Trang chủ</a></li>
+                        <li aria-hidden="true">&rsaquo;</li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li aria-hidden="true">&rsaquo;</li>
+                        <li><a href="qa.html" aria-current="page">Q&amp;A sản phẩm</a></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="dash-header-actions">
+                <a href="../index.html" class="btn-return-home" title="Quay lại giao diện mua sắm TechEcommerce">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Về trang chủ</span>
+                </a>
+            </div>
+        </header>
+
+        <p id="qaError" class="dash-alert-error" role="alert" style="display:none;"></p>
+
+        <!-- KPI Summary Cards -->
+        <section class="dash-kpi-row" aria-label="Các chỉ số đánh giá & câu hỏi">
+            <article class="metric-card glass-card">
+                <header class="metric-card-header">
+                    <h2 class="metric-card-title">Tổng đánh giá &amp; Q&amp;A</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number" id="qaMetricTotal">0</p>
+                <footer class="metric-card-footer">
+                    <span class="metric-footer-text">Phản hồi từ người mua</span>
+                </footer>
+            </article>
+
+            <article class="metric-card glass-card">
+                <header class="metric-card-header">
+                    <h2 class="metric-card-title">Điểm hài lòng TB</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number" id="qaMetricAvgRating">5.0 ★</p>
+                <footer class="metric-card-footer">
+                    <span class="metric-footer-text">Thang điểm 5 sao</span>
+                </footer>
+            </article>
+
+            <article class="metric-card glass-card">
+                <header class="metric-card-header">
+                    <h2 class="metric-card-title">Đang hiển thị</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number" id="qaMetricVisible">0</p>
+                <footer class="metric-card-footer">
+                    <span class="metric-footer-text">Công khai trên gian hàng</span>
+                </footer>
+            </article>
+        </section>
+
+        <!-- Filter & Search Section -->
+        <section class="glass-card" style="padding: 20px 24px; margin-bottom: 24px;" aria-label="Bộ lọc tìm kiếm hỏi đáp">
+            <form id="qaFilterForm" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;" onsubmit="event.preventDefault(); applyQaFilters();">
+                <div style="flex: 1 1 240px; min-width: 220px;">
+                    <label for="qaSearchInput" style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Tìm kiếm</label>
+                    <input type="search" id="qaSearchInput" placeholder="Tìm theo tên sản phẩm, khách hàng, nội dung..." style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                </div>
+
+                <div style="width: 160px;">
+                    <label for="qaRatingSelect" style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Đánh giá sao</label>
+                    <select id="qaRatingSelect" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        <option value="all">Tất cả số sao</option>
+                        <option value="5">5 Sao (Tuyệt vời)</option>
+                        <option value="4">4 Sao (Tốt)</option>
+                        <option value="3">3 Sao (Bình thường)</option>
+                        <option value="2">2 Sao (Chưa hài lòng)</option>
+                        <option value="1">1 Sao (Kém)</option>
+                    </select>
+                </div>
+
+                <div style="width: 160px;">
+                    <label for="qaStatusSelect" style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Trạng thái</label>
+                    <select id="qaStatusSelect" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="visible">Đang hiển thị</option>
+                        <option value="hidden">Đã ẩn</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="button" onclick="resetQaFilters()" style="padding: 10px 18px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: #e2e8f0; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s;">
+                        Đặt lại
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Q&A & Reviews Table -->
+        <section class="dash-operational-orders glass-card" aria-labelledby="qaTableHeading">
+            <header class="orders-section-header">
+                <h2 id="qaTableHeading">Danh sách câu hỏi &amp; đánh giá (<span id="qaTableCount">0</span>)</h2>
+            </header>
+            <div class="table-responsive-wrapper">
+                <table class="dash-orders-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 60px;">Mã</th>
+                            <th scope="col" style="width: 220px;">Sản phẩm</th>
+                            <th scope="col" style="width: 160px;">Người gửi</th>
+                            <th scope="col" style="width: 120px;">Đánh giá</th>
+                            <th scope="col">Nội dung câu hỏi / đánh giá</th>
+                            <th scope="col" style="width: 110px;">Ngày gửi</th>
+                            <th scope="col" style="width: 120px;">Trạng thái</th>
+                            <th scope="col" style="width: 150px; text-align: center;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qaTableBody">
+                        <tr><td colspan="8" class="table-loading-row">Đang tải danh sách câu hỏi &amp; đánh giá...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Reply Modal Dialog -->
+    <dialog id="qaReplyModal" class="dash-modal" aria-labelledby="qaReplyTitle">
+        <article class="dash-modal-content" style="max-width: 520px;">
+            <header class="dash-modal-header">
+                <h3 id="qaReplyTitle">Phản hồi khách hàng</h3>
+                <button type="button" class="btn-close-modal" onclick="closeQaReplyModal()" aria-label="Đóng">✕</button>
+            </header>
+            <div class="dash-modal-body" style="margin-bottom: 16px;">
+                <p style="margin: 0 0 8px; font-size: 0.84rem; color: #94a3b8;">Khách hàng: <strong id="replyCustomerName" style="color: #ffffff;"></strong></p>
+                <p style="margin: 0 0 12px; font-size: 0.84rem; color: #94a3b8;">Sản phẩm: <strong id="replyProductName" style="color: #3b82f6;"></strong></p>
+                <blockquote id="replyQuestionText" style="margin: 0 0 16px; padding: 10px 14px; background: rgba(0, 0, 0, 0.3); border-left: 3px solid #3b82f6; border-radius: 4px; font-size: 0.88rem; color: #cbd5e1; font-style: italic;"></blockquote>
+                
+                <form id="qaReplyForm" onsubmit="event.preventDefault(); submitQaReply();">
+                    <input type="hidden" id="replyReviewId">
+                    <label for="adminReplyInput" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Nội dung phản hồi chính thức từ TechEcommerce:</label>
+                    <textarea id="adminReplyInput" rows="4" required placeholder="Nhập nội dung giải đáp thắc mắc hoặc cảm ơn khách hàng..." style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box; resize: vertical;"></textarea>
+                </form>
+            </div>
+            <footer class="dash-modal-footer" style="gap: 10px;">
+                <button type="button" onclick="closeQaReplyModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: #cbd5e1; font-size: 0.88rem; cursor: pointer;">Hủy</button>
+                <button type="button" class="btn-primary" onclick="submitQaReply()">Gửi phản hồi</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <!-- Footer placeholder strictly at the bottom -->
+    <footer id="site-footer"></footer>
+
+    <script src="../assets/js/admin-qa.js?v=techecommerce-20261001-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+</body>
+
+</html>

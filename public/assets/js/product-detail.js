@@ -24,20 +24,70 @@ function escapeHTML(str) {
         .replace(/'/g, '&#039;');
 }
 
+function resolveProductImage(src, root = '../../') {
+    if (!src || typeof src !== 'string') return `${root}assets/images/product-placeholder.svg`.replace(/\/\//g, '/');
+    const s = src.trim();
+    if (!s) return `${root}assets/images/product-placeholder.svg`.replace(/\/\//g, '/');
+    if (s.startsWith('http://') || s.startsWith('https://') || s.startsWith('data:')) return s;
+    const clean = s.replace(/^(\.\.\/)+/, '').replace(/^\.\//, '').replace(/^\//, '');
+    return `${root}${clean}`.replace(/\/\//g, '/');
+}
+
 function specEntries(p) {
     const specs = p.specs || {};
-    const items = [
-        ['Vi xử lý (CPU/Chip)', specs.cpu],
-        ['Bộ nhớ RAM', specs.ram],
-        ['Bộ nhớ trong (ROM)', specs.storage],
-        ['Màn hình hiển thị', specs.screen],
-        ['Hệ thống Camera', specs.camera],
-        ['Dung lượng Pin & Sạc', specs.battery],
-        ['Hệ điều hành', specs.os],
-        ['Card đồ họa (GPU)', specs.gpu],
-        ['Cổng & Chuẩn kết nối', specs.connectivity],
-        ['Trọng lượng máy', specs.weight]
-    ].filter(([, value]) => value);
+    const labelMap = {
+        cpu: 'Vi xử lý (CPU/Chip)',
+        chip: 'Vi xử lý (Chipset)',
+        ram: 'Bộ nhớ RAM',
+        storage: 'Bộ nhớ lưu trữ (ROM/SSD)',
+        screen: 'Màn hình hiển thị',
+        display: 'Màn hình hiển thị',
+        camera: 'Hệ thống Camera',
+        battery: 'Dung lượng Pin & Sạc',
+        charging: 'Công nghệ sạc',
+        os: 'Hệ điều hành',
+        gpu: 'Card đồ họa (GPU)',
+        connectivity: 'Chuẩn kết nối',
+        weight: 'Trọng lượng máy',
+        capacity: 'Dung lượng pin',
+        power: 'Công suất tối đa',
+        ports: 'Cổng giao tiếp',
+        sensor: 'Cảm biến',
+        resolution: 'Độ phân giải',
+        anc: 'Chống ồn chủ động (ANC)',
+        audio: 'Công nghệ âm thanh',
+        mic: 'Micro thoại',
+        compatibility: 'Khả năng tương thích',
+        features: 'Tính năng nổi bật',
+        dpi: 'Độ nhạy (DPI)',
+        buttons: 'Số nút bấm',
+        switch: 'Loại switch',
+        tracking: 'Công nghệ theo dõi',
+        material: 'Chất liệu'
+    };
+
+    const items = [];
+    const handled = new Set();
+
+    // Preferred order
+    const priorityKeys = [
+        'chip', 'cpu', 'gpu', 'ram', 'storage', 'screen', 'display', 'camera', 'resolution',
+        'battery', 'charging', 'capacity', 'power', 'connectivity', 'ports', 'audio', 'anc',
+        'mic', 'sensor', 'dpi', 'switch', 'compatibility', 'features', 'os', 'weight', 'material'
+    ];
+
+    for (const k of priorityKeys) {
+        if (specs[k]) {
+            items.push([labelMap[k] || k, specs[k]]);
+            handled.add(k);
+        }
+    }
+
+    for (const [k, v] of Object.entries(specs)) {
+        if (!handled.has(k) && v) {
+            items.push([labelMap[k] || k.toUpperCase(), v]);
+        }
+    }
 
     if (items.length) return items;
 
@@ -223,7 +273,7 @@ function renderProduct() {
     const specs = specEntries(product);
     const discount = product.compareAtPrice > product.price ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
     const gallery = [product.image, ...(product.images || [])].filter(Boolean);
-    const uniqueGallery = [...new Set(gallery)];
+    const uniqueGallery = [...new Set(gallery.map(img => resolveProductImage(img, '../../')))];
 
     // 1. Update Title & SEO Meta
     document.title = `${product.name} | Giá Tốt Nhất & Trả Góp 0% - TechEcommerce`;
@@ -300,7 +350,7 @@ function renderProduct() {
                 <figure class="main-image-figure">
                     ${discount > 0 ? `<span class="main-image-badge-tag">GIẢM ${discount}%</span>` : ''}
                     <span class="main-image-genuine-tag">✓ Chính Hãng 100%</span>
-                    <img id="mainProductImage" src="${escapeHTML(uniqueGallery[0] || product.image)}" alt="${escapeHTML(product.name)}" onerror="this.src='https://via.placeholder.com/600x600?text=TechEcommerce'">
+                    <img id="mainProductImage" src="${escapeHTML(resolveProductImage(uniqueGallery[0] || product.image, '../../'))}" alt="${escapeHTML(product.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
                 </figure>
 
                 <!-- Thumbnail Navigation -->
@@ -308,7 +358,7 @@ function renderProduct() {
                 <nav class="gallery-thumbs-nav" aria-label="Danh sách ảnh chi tiết">
                     ${uniqueGallery.map((src, idx) => `
                         <button type="button" class="gallery-thumb-btn ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${escapeHTML(src)}', this)" aria-label="Xem hình ${idx + 1}">
-                            <img src="${escapeHTML(src)}" alt="${escapeHTML(product.name)} góc ${idx + 1}" loading="lazy">
+                            <img src="${escapeHTML(src)}" alt="${escapeHTML(product.name)} góc ${idx + 1}" loading="lazy" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
                         </button>
                     `).join('')}
                 </nav>
@@ -562,7 +612,7 @@ function renderProduct() {
         relatedContainer.innerHTML = relatedProducts.length > 0 ? relatedProducts.map(p => `
             <a class="related-product-card" href="product.html?id=${p._id}">
                 <div class="related-thumb-wrapper">
-                    <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" onerror="this.src='https://via.placeholder.com/260x260?text=TechEcommerce'" loading="lazy">
+                    <img src="${escapeHTML(resolveProductImage(p.image, '../../'))}" alt="${escapeHTML(p.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';" loading="lazy">
                 </div>
                 <span class="related-card-category">${escapeHTML(p.category || 'Công nghệ')}</span>
                 <strong class="related-card-title">${escapeHTML(p.name)}</strong>
@@ -705,7 +755,7 @@ function renderBundleUI() {
                 <!-- Main product card -->
                 <article class="bundle-item main-product is-selected">
                     <figure class="bundle-thumb">
-                        <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" onerror="this.src='https://via.placeholder.com/120?text=TechEcommerce'">
+                        <img src="${escapeHTML(resolveProductImage(product.image, '../../'))}" alt="${escapeHTML(product.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
                         <span class="bundle-main-pill">Sản phẩm chính</span>
                     </figure>
                     <div class="bundle-meta">
@@ -726,7 +776,7 @@ function renderBundleUI() {
                             <span class="bundle-discount-badge">Giảm ${acc.discountPct}%</span>
                         </label>
                         <figure class="bundle-thumb">
-                            <img src="${escapeHTML(acc.image)}" alt="${escapeHTML(acc.name)}" onerror="this.src='https://via.placeholder.com/120?text=TechEcommerce'" loading="lazy">
+                            <img src="${escapeHTML(resolveProductImage(acc.image, '../../'))}" alt="${escapeHTML(acc.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';" loading="lazy">
                         </figure>
                         <div class="bundle-meta">
                             <a href="product.html?id=${acc._id}" class="bundle-name" target="_blank" title="${escapeHTML(acc.name)}">${escapeHTML(acc.name)}</a>
@@ -803,6 +853,68 @@ function buyBundleCombo() {
     showToast(`🎉 Đã thêm trọn bộ ${totalItems} món vào giỏ hàng! Tiết kiệm ${fmt(totalSavings)}!`, 'success');
 }
 
+const RATING_FEEDBACK_TEXTS = {
+    5: 'Tuyệt vời ⭐⭐⭐⭐⭐',
+    4: 'Hài lòng ⭐⭐⭐⭐',
+    3: 'Bình thường ⭐⭐⭐',
+    2: 'Không hài lòng ⭐⭐',
+    1: 'Rất tệ ⭐'
+};
+
+function updateStarDisplay(ratingVal) {
+    const starPicker = document.getElementById('reviewStarPicker');
+    if (!starPicker) return;
+    const btns = starPicker.querySelectorAll('.star-pick-btn');
+    btns.forEach(btn => {
+        const btnRating = Number(btn.dataset.rating) || 0;
+        btn.classList.toggle('active', btnRating <= ratingVal);
+        btn.classList.remove('hover-active');
+    });
+    const feedback = document.getElementById('starRatingFeedback');
+    if (feedback) {
+        feedback.textContent = RATING_FEEDBACK_TEXTS[ratingVal] || `${ratingVal} sao`;
+    }
+}
+
+function initStarRatingPicker() {
+    const starPicker = document.getElementById('reviewStarPicker');
+    const hiddenRating = document.getElementById('reviewRating');
+    if (!starPicker || !hiddenRating || starPicker.dataset.bound === 'true') return;
+    starPicker.dataset.bound = 'true';
+
+    const btns = starPicker.querySelectorAll('.star-pick-btn');
+    const feedback = document.getElementById('starRatingFeedback');
+
+    btns.forEach(btn => {
+        const btnRating = Number(btn.dataset.rating) || 5;
+
+        // Hover preview
+        btn.addEventListener('mouseenter', () => {
+            btns.forEach(b => {
+                const r = Number(b.dataset.rating) || 0;
+                b.classList.toggle('hover-active', r <= btnRating);
+            });
+            if (feedback) {
+                feedback.textContent = RATING_FEEDBACK_TEXTS[btnRating] || `${btnRating} sao`;
+            }
+        });
+
+        // Click to choose
+        btn.addEventListener('click', () => {
+            hiddenRating.value = btnRating;
+            updateStarDisplay(btnRating);
+        });
+    });
+
+    // Reset hover on mouseleave
+    starPicker.addEventListener('mouseleave', () => {
+        const currentVal = Number(hiddenRating.value) || 5;
+        updateStarDisplay(currentVal);
+    });
+
+    updateStarDisplay(Number(hiddenRating.value) || 5);
+}
+
 function renderReviews() {
     const scoreVal = document.getElementById('ratingScoreValue');
     const starsDisp = document.getElementById('ratingStarsDisplay');
@@ -811,18 +923,45 @@ function renderReviews() {
     const loginHint = document.getElementById('reviewLoginHint');
     const list = document.getElementById('reviewList');
 
-    const avgRating = Number(product.rating || 5.0).toFixed(1);
-    const count = product.reviewCount || reviews.length || 68;
+    let avgRating = Number(product.rating || 5.0).toFixed(1);
+    let count = product.reviewCount || reviews.length || 68;
+
+    if (reviews && reviews.length > 0) {
+        const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
+        avgRating = (sum / reviews.length).toFixed(1);
+        count = reviews.length;
+
+        // Render dynamic percentage bars
+        const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        reviews.forEach(r => {
+            const rVal = Math.min(Math.max(Number(r.rating) || 5, 1), 5);
+            counts[rVal] = (counts[rVal] || 0) + 1;
+        });
+        const barsStack = document.getElementById('ratingBarsStack');
+        if (barsStack) {
+            barsStack.innerHTML = [5, 4, 3, 2, 1].map(stars => {
+                const countStars = counts[stars] || 0;
+                const pct = Math.round((countStars / count) * 100);
+                return `
+                    <div class="rating-bar-row">
+                        <span>${stars} ★</span>
+                        <div class="rating-bar-track"><div class="rating-bar-fill" style="width: ${pct}%;"></div></div>
+                        <span class="rating-bar-count">${pct}%</span>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
 
     if (scoreVal) scoreVal.textContent = avgRating;
     if (starsDisp) starsDisp.textContent = '★'.repeat(Math.round(avgRating)) + '☆'.repeat(5 - Math.round(avgRating));
     if (totalReviews) totalReviews.textContent = `Dựa trên ${count} đánh giá thực tế`;
 
-    if (form) form.style.display = auth.isLoggedIn() ? 'grid' : 'none';
+    if (form) form.style.display = auth.isLoggedIn() ? 'flex' : 'none';
     if (loginHint) {
         loginHint.innerHTML = auth.isLoggedIn()
             ? ''
-            : 'Vui lòng <a href="../auth/login.html" style="color:var(--primary-light);font-weight:700">đăng nhập</a> để chia sẻ đánh giá của bạn về sản phẩm này.';
+            : 'Vui lòng <a href="../auth/login.html" style="color:var(--primary);font-weight:700">đăng nhập</a> để chia sẻ đánh giá của bạn về sản phẩm này.';
     }
 
     if (!list) return;
@@ -887,6 +1026,7 @@ function renderReviews() {
 }
 
 function bindReviewForm() {
+    initStarRatingPicker();
     const form = document.getElementById('reviewForm');
     if (!form || form.dataset.bound === 'true') return;
     form.dataset.bound = 'true';
@@ -894,18 +1034,24 @@ function bindReviewForm() {
         event.preventDefault();
         if (!auth.isLoggedIn()) return showToast('Vui lòng đăng nhập để đánh giá!', 'error');
 
-        const rating = Number(document.getElementById('reviewRating').value) || 5;
-        const title = document.getElementById('reviewTitle').value.trim();
-        const comment = document.getElementById('reviewComment').value.trim();
+        const rating = Number(document.getElementById('reviewRating')?.value) || 5;
+        const title = document.getElementById('reviewTitle')?.value.trim() || '';
+        const comment = document.getElementById('reviewComment')?.value.trim() || '';
 
         if (!comment) return showToast('Vui lòng nhập nội dung đánh giá!', 'error');
+
+        const submitBtn = document.getElementById('btnSubmitReview');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang gửi...';
+        }
 
         try {
             const res = await fetch(`${API_URL}/reviews`, {
                 method: 'POST',
                 headers: auth.getHeaders(),
                 body: JSON.stringify({
-                    productId: product._id,
+                    productId: Number(product._id),
                     rating,
                     title,
                     comment
@@ -913,18 +1059,32 @@ function bindReviewForm() {
             });
 
             if (res.ok) {
-                showToast('Cảm ơn bạn đã gửi đánh giá!');
-                document.getElementById('reviewTitle').value = '';
-                document.getElementById('reviewComment').value = '';
+                showToast('Cảm ơn bạn đã gửi đánh giá sản phẩm thành công!', 'success');
+                if (document.getElementById('reviewTitle')) document.getElementById('reviewTitle').value = '';
+                if (document.getElementById('reviewComment')) document.getElementById('reviewComment').value = '';
+                const hiddenRating = document.getElementById('reviewRating');
+                if (hiddenRating) hiddenRating.value = '5';
+                updateStarDisplay(5);
                 await loadReviews();
                 renderReviews();
             } else {
-                const data = await res.json();
+                const data = await res.json().catch(() => ({}));
                 showToast(data.message || 'Không thể gửi đánh giá lúc này', 'error');
             }
         } catch (e) {
             console.error('Review submit error:', e);
             showToast('Lỗi gửi đánh giá, vui lòng thử lại sau', 'error');
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    <span>Gửi nhận xét ngay</span>
+                `;
+            }
         }
     });
 }

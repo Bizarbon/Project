@@ -50,7 +50,8 @@ const allowedOrigins = new Set([
 
 app.use(helmet({
     contentSecurityPolicy: false,
-    crossOriginResourcePolicy: false
+    crossOriginResourcePolicy: false,
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' }
 }));
 app.use(cors((req, callback) => {
     const origin = String(req.get('origin') || '').replace(/\/$/, '');

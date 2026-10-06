@@ -92,7 +92,10 @@ async function normalizeProductPayload(body, existingProduct = null) {
         reviewCount: Math.max(Number(body.reviewCount) || 0, 0),
         soldCount: Math.max(Number(body.soldCount) || 0, 0),
         featured: Boolean(body.featured),
-        active: body.active === undefined ? true : Boolean(body.active)
+        active: body.active === undefined ? true : Boolean(body.active),
+        sourceUrl: compactString(body.sourceUrl || ''),
+        originalImageUrl: compactString(body.originalImageUrl || ''),
+        sourceFetchedAt: body.sourceFetchedAt ? new Date(body.sourceFetchedAt) : null
     };
 
     if (!payload.name) {
@@ -223,7 +226,7 @@ router.get('/', async (req, res) => {
             .populate('supplier', 'name')
             .sort(productSort(req.query.sort));
         if (req.query.limit) {
-            query = query.limit(Math.min(Math.max(Number(req.query.limit) || 10, 1), 100));
+            query = query.limit(Math.min(Math.max(Number(req.query.limit) || 10, 1), 500));
         }
         const products = await query;
         res.json(products);

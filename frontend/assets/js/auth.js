@@ -9,6 +9,7 @@ const ADMIN_CACHE_VERSION = 'v=techecommerce-20260709-2';
 (function applySavedTheme() {
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.dataset.theme = savedTheme;
+    document.documentElement.setAttribute('data-theme', savedTheme);
 })();
 
 function escapeHTML(value) {
@@ -220,7 +221,7 @@ function updateNavbar() {
                     </div>
                 </button>
                 <div class="dropdown-menu" role="menu">
-                    ${isAdmin ? `<a href="${base}admin/dashboard.html?${ADMIN_CACHE_VERSION}" class="dropdown-item" role="menuitem">Tổng quan</a>` : ''}
+                    ${isAdmin ? `<a href="${base}admin/dashboard.html" class="dropdown-item" role="menuitem">📊 Dashboard</a>` : ''}
                     <a href="${base}pages/account/orders.html" class="dropdown-item" role="menuitem">📋 Đơn hàng của tôi</a>
                     <a href="${base}pages/account/profile.html" class="dropdown-item" role="menuitem">👤 Hồ sơ cá nhân</a>
                     <a href="#" class="dropdown-item logout" role="menuitem" onclick="auth.logout()">🚪 Đăng xuất</a>

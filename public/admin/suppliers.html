@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -12,6 +12,7 @@
     <title>Quản lý nhà cung cấp - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
     <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
     <style>
         .policy-badge {
             display: inline-block;
@@ -90,19 +91,178 @@
 </head>
 
 <body class="admin-page">
-    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
-        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
-        <ul id="main-navbar">
-            <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
-            <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
-            <li><a href="orders.html?v=techecommerce-20260709-2">Đơn hàng</a></li>
-            <li><a href="customers.html?v=techecommerce-20260709-2">Khách hàng</a></li>
-            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
-            <li><a href="finance.html?v=techecommerce-20260709-2">Tài chính</a></li>
-            <li><a href="suppliers.html?v=techecommerce-20260709-2" class="active">Nhà cung cấp</a></li>
-            <li id="nav-auth-section" style="margin-left: auto;"></li>
-        </ul>
-    </nav></header>
+        <!-- Admin Sidebar Navigation -->
+    <header class="admin-sidebar" aria-label="Khu vực điều hướng quản trị">
+        <nav class="admin-sidebar-nav" aria-label="Menu chức năng hệ thống">
+            <!-- Brand Logo Header & Quick Return Home -->
+            <aside class="sidebar-brand-box" aria-label="Thương hiệu cửa hàng">
+                <a href="../index.html" class="sidebar-brand-link" title="Quay lại trang chủ bán hàng TechEcommerce">
+                    <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce Logo" width="32" height="32" class="sidebar-brand-img">
+                    <div class="sidebar-brand-info">
+                        <strong class="sidebar-brand-title">TechEcommerce</strong>
+                        <span class="sidebar-brand-badge">← Về trang chủ</span>
+                    </div>
+                </a>
+            </aside>
+
+            <p class="sidebar-category-heading">TÍNH NĂNG</p>
+            <ul id="main-navbar" class="admin-nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span class="nav-link-text">Dashboard</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item has-dropdown">
+                    <details class="nav-accordion" >
+                        <summary class="nav-accordion-trigger">
+                            <span class="nav-accordion-title">
+                                <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="nav-link-text">Người dùng</span>
+                            </span>
+                            <svg class="chevron-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </summary>
+                        <ul class="nav-sub-menu">
+                            <li><a href="staff.html" class="sub-link "  id="navSubStaff">Quản lý nhân viên</a></li>
+                            <li><a href="customers.html" class="sub-link "  id="navSubCustomer">Quản lý khách hàng</a></li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span class="nav-link-text">Sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Đơn hàng</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link "  id="navMessagesLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="nav-link-text">Tin nhắn</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            </svg>
+                            <span class="nav-link-text">Blog</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="coupons.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span class="nav-link-text">Khuyến mãi</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <span class="nav-link-text">Tài chính</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="suppliers.html" class="nav-link active" aria-current="page">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"></rect>
+                                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                            </svg>
+                            <span class="nav-link-text">Nhà cung cấp</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="qa.html" class="nav-link "  id="navQaLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span class="nav-link-text">Q&amp;A sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link" title="Xem giao diện mua sắm TechEcommerce">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Về trang chủ</span>
+                        </span>
+                        <span class="store-badge-pill">Store ↗</span>
+                    </a>
+                </li>
+
+                <li id="nav-auth-section" class="sidebar-auth-wrapper"></li>
+            </ul>
+        </nav>
+    </header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
@@ -161,8 +321,10 @@
             <div id="supplierCards" class="supplier-cards" style="margin-top:2rem;">
                 <div class="empty-state"><p>Đang tải dữ liệu đối tác...</p></div>
             </div>
-        </section>
     </main>
+
+    <!-- Footer placeholder strictly at the bottom -->
+    <footer id="site-footer"></footer>
 
     <script src="../assets/js/suppliers.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>

@@ -16,24 +16,11 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>TechEcommerce - Cửa hàng công nghệ</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=mobile-align-20260924-2" />
-    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=mobile-align-20260924-2" />
-    <link rel="stylesheet" href="assets/css/chatbox.css?v=mobile-align-20260924-2" data-ai-chat-style="true" />
-    <link rel="stylesheet" href="assets/css/checkout.css?v=checkout-cost-20260722-1" />
+    <link rel="stylesheet" href="assets/css/style.css?v=20261004-namethatui-v2" />
+    <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261004-namethatui-v2" />
+    <link rel="stylesheet" href="assets/css/chatbox.css?v=20261004-namethatui-v2" data-ai-chat-style="true" />
+    <link rel="stylesheet" href="assets/css/checkout.css?v=20261004-namethatui-v2" />
     <style>
-      .cart-drawer[aria-hidden='true'] {
-        transform: translateX(calc(100% + 96px)) !important;
-        visibility: hidden;
-      }
-      .cart-overlay[aria-hidden='true'] {
-        opacity: 0 !important;
-        pointer-events: none !important;
-        visibility: hidden;
-      }
-      body.cart-open .cart-drawer[aria-hidden='false'],
-      body.cart-open .cart-overlay[aria-hidden='false'] {
-        visibility: visible;
-      }
       .hero-banner {
         background: linear-gradient(
           135deg,
@@ -314,7 +301,7 @@
         <div class="header-shell header-main-inner">
           <a class="storefront-logo" href="index.html" aria-label="TechEcommerce - Trang chủ">
             <span class="storefront-logo-mark" aria-hidden="true">
-              <img src="assets/images/logo/techecommerce-logo.svg" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
+              <img src="assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
             </span>
             <span class="storefront-logo-text">TechEcommerce</span>
           </a>
@@ -679,212 +666,7 @@
             <div class="product-grid recommendation-grid" id="recommendationGrid"></div>
           </section>
         </section>
-
-        <aside class="cart-drawer" id="cartDrawer" aria-labelledby="cartDrawerTitle" aria-hidden="true" inert>
-          <section class="cart-section reveal glass-card">
-            <div class="cart-drawer-header">
-              <div>
-                <span class="cart-eyebrow">Đơn hàng của bạn</span>
-                <h2 id="cartDrawerTitle">Giỏ hàng</h2>
-              </div>
-              <button
-                type="button"
-                class="cart-close-btn"
-                onclick="closeCartDrawer()"
-                aria-label="Đóng giỏ hàng"
-              >
-                ×
-              </button>
-            </div>
-            <div
-              id="customerSelectionGroup"
-              class="form-group"
-              style="display: none"
-            >
-              <label for="customerSelect">Chọn khách hàng</label>
-              <select id="customerSelect" class="customer-select"></select>
-            </div>
-
-            <div class="cart-wrapper">
-              <div id="cartList"></div>
-            </div>
-
-            <div class="cart-total" id="cartTotal">
-              <div class="cart-total-row">
-                <span>Tạm tính:</span><strong id="cartSubtotal">0 đ</strong>
-              </div>
-              <div class="cart-total-row">
-                <span>Phí ship:</span
-                ><strong id="cartShippingPreview">Theo ô bên dưới</strong>
-              </div>
-              <div
-                class="cart-total-row"
-                id="cartDiscountRow"
-                style="display: none; color: var(--success)"
-              >
-                <span>Giảm giá:</span><strong id="cartDiscount">-0 đ</strong>
-              </div>
-              <div class="cart-total-row" style="font-size: 1.15rem">
-                <span>Tổng cộng:</span
-                ><strong class="amount" id="total">0 đ</strong>
-              </div>
-            </div>
-
-            <section class="guest-checkout-gate" id="guestCheckoutGate" aria-labelledby="guestCheckoutTitle">
-              <strong id="guestCheckoutTitle">Bạn đang mua hàng không cần đăng nhập</strong>
-              <p>Khách vãng lai dùng được chuyển khoản ngân hàng, VNPay và MoMo. Đăng nhập nếu muốn chọn COD hoặc trả góp.</p>
-              <button type="button" class="btn-secondary" onclick="goToLoginForCheckout()">Đăng nhập (không bắt buộc)</button>
-            </section>
-
-            <section class="checkout-panel" id="checkoutPanel" aria-label="Thông tin thanh toán">
-              <div class="form-group">
-                <label for="recipientName">Người nhận</label>
-                <input
-                  id="recipientName"
-                  type="text"
-                  placeholder="Họ tên người nhận"
-                />
-              </div>
-              <div class="form-group">
-                <label for="guestEmail">Email nhận xác nhận đơn hàng</label>
-                <input
-                  id="guestEmail"
-                  type="email"
-                  autocomplete="email"
-                  placeholder="tenkhachhang@gmail.com"
-                />
-              </div>
-              <div class="form-group">
-                <label for="recipientPhone">Số điện thoại</label>
-                <input
-                  id="recipientPhone"
-                  type="tel"
-                  placeholder="09xxxxxxxx"
-                />
-              </div>
-              <fieldset class="delivery-address" id="deliveryAddressFieldset">
-                <legend>Địa chỉ giao hàng</legend>
-                <section class="delivery-address-grid" aria-label="Chọn khu vực giao hàng">
-                  <label for="checkoutProvince">
-                    <span>Tỉnh/Thành</span>
-                    <select id="checkoutProvince" aria-required="true">
-                      <option value="">Chọn Tỉnh/Thành</option>
-                    </select>
-                  </label>
-                  <label for="checkoutWard">
-                    <span>Phường/Xã/Đặc khu</span>
-                    <select id="checkoutWard" aria-required="true" disabled>
-                      <option value="">Chọn Phường/Xã</option>
-                    </select>
-                  </label>
-                </section>
-                <label class="delivery-address-detail" for="shippingAddressDetail">
-                  <span>Số nhà và tên đường</span>
-                  <textarea id="shippingAddressDetail" rows="2" aria-required="true" aria-describedby="shippingAddressHelp" placeholder="Ví dụ: 25 Nguyễn Huệ, tầng 3, căn 3A"></textarea>
-                </label>
-                <p class="delivery-address-help" id="shippingAddressHelp">Ghi rõ số nhà, tên đường, tòa nhà hoặc chỉ dẫn dễ nhận biết. Hệ thống sẽ ghép với Phường/Xã và Tỉnh/Thành bạn đã chọn.</p>
-                <address class="delivery-address-preview" aria-live="polite">
-                  <strong>Địa chỉ sẽ giao đến</strong>
-                  <span id="shippingAddressPreview">Chưa đủ thông tin địa chỉ.</span>
-                </address>
-                <input id="shippingAddress" type="hidden" value="" />
-              </fieldset>
-              <div class="form-group">
-                <label for="shippingFeeDisplay">Phí vận chuyển đề xuất</label>
-                <section class="shipping-quote" aria-live="polite" aria-atomic="true">
-                  <output id="shippingFeeDisplay" for="shippingAddress">Chọn Tỉnh/Thành để tính phí</output>
-                  <small id="shippingFeeHint">Phí sẽ được backend xác định theo khu vực giao hàng.</small>
-                </section>
-                <input id="shippingFee" type="hidden" value="0" />
-              </div>
-              <div class="form-group">
-                <label for="couponCode">Mã giảm giá</label>
-                <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem">
-                  <input id="couponCode" type="text" placeholder="VD: TECH10" />
-                  <button type="button" class="btn-secondary" onclick="applyCoupon()">Áp dụng</button>
-                </div>
-                <div
-                  id="couponHint"
-                  style="margin-top: 0.45rem; font-size: 0.8rem; color: var(--text-muted); min-height: 1.1rem"
-                ></div>
-              </div>
-              <div class="form-group">
-                <label for="paymentMethod">Phương thức thanh toán</label>
-                <select id="paymentMethod">
-                  <option value="cod">Thanh toán khi nhận hàng (COD)</option>
-                  <option value="bank_transfer">Chuyển khoản thủ công</option>
-                  <option value="vnpay">VNPay</option>
-                  <option value="momo">MoMo</option>
-                  <option value="installment">Trả góp</option>
-                </select>
-                <div
-                  id="paymentMethodHint"
-                  style="
-                    margin-top: 0.45rem;
-                    font-size: 0.78rem;
-                    color: var(--warning);
-                    min-height: 1.1rem;
-                  "
-                ></div>
-              </div>
-              <aside class="bank-box" id="bankTransferInfo" aria-label="Thông tin chuyển khoản thủ công">
-                <strong>Thông tin chuyển khoản</strong><br />
-                Ngân hàng: MB Bank<br />
-                Chủ tài khoản: TECHECOMMERCE<br />
-                Số tài khoản, QR, số tiền và nội dung <strong>TECH + mã đơn</strong> sẽ xuất hiện sau khi đặt hàng.
-              </aside>
-              <fieldset class="installment-options" id="installmentOptions" hidden>
-                <legend>Dự tính khoản trả góp</legend>
-                <figure class="installment-table-wrap">
-                  <table class="installment-table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Kỳ hạn</th>
-                        <th scope="col">Trả trước</th>
-                        <th scope="col">Mỗi tháng</th>
-                        <th scope="col">Tổng lãi</th>
-                      </tr>
-                    </thead>
-                    <tbody id="installmentPlanRows"></tbody>
-                  </table>
-                  <figcaption class="installment-caption" id="installmentCaption">
-                    Đang tính dựa trên tổng giỏ hàng và phí vận chuyển.
-                  </figcaption>
-                </figure>
-                <p class="installment-loading" id="installmentLoading" aria-live="polite"></p>
-                <p class="installment-error" id="installmentError" role="alert"></p>
-                <section class="installment-summary" aria-label="Phương án trả góp đã chọn">
-                  <p><span>Cần trả trước</span><output id="selectedDownPayment">—</output></p>
-                  <p><span>Khoản trả mỗi tháng</span><output id="selectedMonthlyPayment">—</output></p>
-                </section>
-                <p class="installment-policy-note">Đây là dự tính theo chính sách nội bộ; hồ sơ chỉ có hiệu lực sau khi cửa hàng thẩm định và xác nhận.</p>
-              </fieldset>
-              <div class="form-group">
-                <label for="orderNote">Ghi chú</label>
-                <textarea
-                  id="orderNote"
-                  placeholder="Lưu ý giao hàng, thời gian nhận..."
-                ></textarea>
-              </div>
-              <button
-                type="button"
-                class="btn-checkout"
-                id="checkoutBtn"
-                onclick="createOrder()"
-              >
-                Đặt hàng
-              </button>
-            </section>
-          </section>
-        </aside>
       </div>
-
-      <div
-        class="cart-overlay"
-        id="cartOverlay"
-        onclick="closeCartDrawer()"
-        aria-hidden="true"
-      ></div>
     </main>
 
     <footer id="site-footer"></footer>
@@ -916,8 +698,356 @@
       </a>
     </nav>
 
-    <script src="assets/js/shop.js?v=mobile-align-20260924-2"></script>
-    <script src="assets/js/footer.js?v=mobile-align-20260924-2"></script>
-    <script src="assets/js/chatbox.js?v=mobile-align-20260924-2"></script>
-  </body>
-</html>
+    <aside class="cart-drawer" id="cartDrawer" aria-labelledby="cartDrawerTitle" aria-hidden="true" inert>
+          <section class="cart-section" id="cartContainer">
+            <header class="cart-drawer-header">
+              <div class="cart-header-title-box">
+                <span class="cart-eyebrow">TechEcommerce Store</span>
+                <h2 id="cartDrawerTitle">Giỏ hàng &amp; Thanh toán</h2>
+              </div>
+              <nav class="cart-step-nav" aria-label="Tiến trình mua hàng">
+                <ol class="cart-step-list">
+                  <li class="cart-step-item active" id="cartStepIndicator1">
+                    <button type="button" class="cart-step-btn" onclick="goToCartStep(1)">
+                      <span class="step-num">1</span>
+                      <span class="step-text">Giỏ hàng</span>
+                    </button>
+                  </li>
+                  <li class="cart-step-divider" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </li>
+                  <li class="cart-step-item" id="cartStepIndicator2">
+                    <button type="button" class="cart-step-btn" onclick="goToCartStep(2)">
+                      <span class="step-num">2</span>
+                      <span class="step-text">Thanh toán</span>
+                    </button>
+                  </li>
+                </ol>
+              </nav>
+              <button
+                type="button"
+                class="cart-close-btn"
+                onclick="closeCartDrawer()"
+                aria-label="Đóng giỏ hàng"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </header>
+
+            <!-- STEP 1: REVIEW CART ITEMS -->
+            <section class="cart-step-view active" id="cartStepReview" aria-label="Xem và chỉnh sửa giỏ hàng">
+              <div class="cart-view-grid">
+                <!-- Left: Product List -->
+                <section class="cart-items-column" aria-label="Danh sách sản phẩm trong giỏ">
+                  <header class="cart-items-header">
+                    <h3 class="cart-column-title">Sản phẩm đã chọn <span class="cart-item-count-badge" id="cartCountBadge">(0)</span></h3>
+                    <button type="button" class="cart-clear-all-btn" onclick="clearEntireCart()">Xóa tất cả</button>
+                  </header>
+                  <section class="cart-items-list" id="cartList" aria-live="polite">
+                    <!-- Dynamic cart items rendered here -->
+                  </section>
+                </section>
+
+                <!-- Right: Order Summary Card -->
+                <aside class="cart-summary-column" aria-label="Tóm tắt đơn hàng">
+                  <section class="cart-summary-card">
+                    <h3 class="cart-summary-heading">Tóm tắt đơn hàng</h3>
+                    
+                    <dl class="cart-price-summary">
+                      <div class="cart-price-row">
+                        <dt>Tạm tính:</dt>
+                        <dd><strong id="cartSubtotal">0 đ</strong></dd>
+                      </div>
+                      <div class="cart-price-row" id="cartDiscountRow" style="display: none; color: var(--success);">
+                        <dt>Giảm giá:</dt>
+                        <dd><strong id="cartDiscount">-0 đ</strong></dd>
+                      </div>
+                      <div class="cart-price-row">
+                        <dt>Phí vận chuyển:</dt>
+                        <dd><span class="shipping-hint-text" id="cartShippingPreview">Tính ở bước thanh toán</span></dd>
+                      </div>
+                      <div class="cart-price-row total-row">
+                        <dt>Tổng thanh toán:</dt>
+                        <dd><strong class="cart-grand-amount" id="total">0 đ</strong></dd>
+                      </div>
+                    </dl>
+
+                    <!-- Coupon Code Input -->
+                    <fieldset class="cart-coupon-fieldset">
+                      <legend class="sr-only">Mã khuyến mãi</legend>
+                      <label for="couponCode" class="coupon-label">Mã giảm giá</label>
+                      <div class="coupon-input-group">
+                        <input id="couponCode" type="text" placeholder="Nhập mã (VD: TECH10)" autocomplete="off" />
+                        <button type="button" class="btn-coupon-apply" onclick="applyCoupon()">Áp dụng</button>
+                      </div>
+                      <p id="couponHint" class="coupon-hint-text" aria-live="polite"></p>
+                    </fieldset>
+
+                    <!-- Proceed to Checkout Button -->
+                    <button type="button" class="btn-proceed-checkout" id="proceedToCheckoutBtn" onclick="goToCartStep(2)">
+                      Tiến hành thanh toán
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+
+                    <button type="button" class="btn-continue-shopping" onclick="closeCartDrawer()">
+                      ← Tiếp tục mua sắm
+                    </button>
+
+                    <!-- Trust badges -->
+                    <ul class="cart-trust-badges" aria-label="Cam kết cửa hàng">
+                      <li><span>🛡️</span> 100% Hàng chính hãng</li>
+                      <li><span>⚡</span> Giao nhanh toàn quốc</li>
+                      <li><span>🔄</span> Đổi trả trong 7 ngày</li>
+                    </ul>
+                  </section>
+                </aside>
+              </div>
+            </section>
+
+            <!-- STEP 2: CHECKOUT DETAILS & CONFIRMATION -->
+            <section class="cart-step-view" id="cartStepCheckout" aria-label="Thông tin thanh toán và đặt hàng" style="display: none;">
+              <header class="checkout-step-header">
+                <button type="button" class="btn-back-to-cart" onclick="goToCartStep(1)">
+                  ← Quay lại giỏ hàng
+                </button>
+                <h3 class="checkout-main-title">Thông tin giao hàng &amp; Thanh toán</h3>
+              </header>
+
+              <div class="checkout-view-grid">
+                <!-- Left: Form inputs -->
+                <section class="checkout-form-column" id="checkoutPanel" aria-label="Thông tin thanh toán">
+                  <!-- Admin Only Customer Selection Collapsible Tool -->
+                  <details id="customerSelectionGroup" class="admin-order-tool" style="display: none;">
+                    <summary class="admin-tool-toggle">
+                      <span class="admin-tool-badge">Admin</span>
+                      <span class="admin-tool-title">Tạo đơn hộ khách hàng</span>
+                      <span class="admin-tool-hint">(Mở rộng/Thu gọn)</span>
+                    </summary>
+                    <div class="admin-tool-body">
+                      <label for="customerSelect" class="admin-tool-label">Chọn tài khoản khách hàng để điền thông tin tự động:</label>
+                      <select id="customerSelect" class="customer-select"></select>
+                    </div>
+                  </details>
+
+                  <!-- Guest Gate -->
+                  <section class="guest-checkout-gate" id="guestCheckoutGate" aria-labelledby="guestCheckoutTitle">
+                    <strong id="guestCheckoutTitle">Bạn đang mua hàng không cần đăng nhập</strong>
+                    <p>Khách vãng lai dùng được chuyển khoản ngân hàng, VNPay và MoMo. Đăng nhập nếu muốn chọn COD hoặc trả góp.</p>
+                    <button type="button" class="btn-secondary" onclick="goToLoginForCheckout()">Đăng nhập (không bắt buộc)</button>
+                  </section>
+
+                  <!-- Recipient Info -->
+                  <fieldset class="checkout-fieldset" aria-labelledby="recipientLegend">
+                    <legend id="recipientLegend">Thông tin người nhận</legend>
+                    <div class="form-grid-2">
+                      <div class="form-group">
+                        <label for="recipientName">Họ tên người nhận <span class="required">*</span></label>
+                        <input id="recipientName" type="text" placeholder="Nguyễn Văn A" required />
+                      </div>
+                      <div class="form-group">
+                        <label for="recipientPhone">Số điện thoại <span class="required">*</span></label>
+                        <input id="recipientPhone" type="tel" placeholder="09xxxxxxxx" required />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="guestEmail">Email nhận xác nhận đơn hàng <span class="required">*</span></label>
+                      <input id="guestEmail" type="email" autocomplete="email" placeholder="email@domain.com" required />
+                    </div>
+                  </fieldset>
+
+                  <!-- Delivery Address -->
+                  <fieldset class="delivery-address checkout-fieldset" id="deliveryAddressFieldset">
+                    <legend>Địa chỉ nhận hàng</legend>
+                    <section class="delivery-address-grid" aria-label="Chọn khu vực giao hàng">
+                      <div class="form-group">
+                        <label for="checkoutProvince">Tỉnh / Thành phố <span class="required">*</span></label>
+                        <select id="checkoutProvince" aria-required="true">
+                          <option value="">Chọn Tỉnh/Thành</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="checkoutWard">Phường / Xã / Đặc khu <span class="required">*</span></label>
+                        <select id="checkoutWard" aria-required="true" disabled>
+                          <option value="">Chọn Phường/Xã</option>
+                        </select>
+                      </div>
+                    </section>
+                    <div class="form-group">
+                      <label class="delivery-address-detail" for="shippingAddressDetail">
+                        <span>Số nhà, tên đường, căn hộ <span class="required">*</span></span>
+                        <textarea id="shippingAddressDetail" rows="2" aria-required="true" aria-describedby="shippingAddressHelp" placeholder="Ví dụ: 25 Nguyễn Huệ, Tầng 3"></textarea>
+                      </label>
+                    </div>
+                    <p class="delivery-address-help" id="shippingAddressHelp">Hệ thống sẽ ghép số nhà với Phường/Xã và Tỉnh/Thành bạn đã chọn.</p>
+                    <address class="delivery-address-preview" aria-live="polite">
+                      <strong>Địa chỉ giao đến:</strong>
+                      <span id="shippingAddressPreview">Chưa đủ thông tin địa chỉ.</span>
+                    </address>
+                    <input id="shippingAddress" type="hidden" value="" />
+                  </fieldset>
+
+                  <!-- Shipping Fee -->
+                  <fieldset class="checkout-fieldset" aria-labelledby="shippingFeeLegend">
+                    <legend id="shippingFeeLegend">Phí vận chuyển đề xuất</legend>
+                    <section class="shipping-quote" aria-live="polite" aria-atomic="true">
+                      <output id="shippingFeeDisplay" for="checkoutProvince checkoutWard shippingAddressDetail">Chọn Tỉnh/Thành để tính phí</output>
+                      <small id="shippingFeeHint">Phí sẽ được backend xác định theo khu vực giao hàng.</small>
+                    </section>
+                    <input id="shippingFee" type="hidden" value="0" />
+                  </fieldset>
+
+                  <!-- Payment Method -->
+                  <fieldset class="checkout-fieldset" aria-labelledby="paymentMethodLegend">
+                    <legend id="paymentMethodLegend">Phương thức thanh toán</legend>
+                    <div class="form-group">
+                      <label for="paymentMethod" class="sr-only">Chọn phương thức thanh toán</label>
+                      <select id="paymentMethod">
+                        <option value="cod">Thanh toán khi nhận hàng (COD)</option>
+                        <option value="bank_transfer">Chuyển khoản ngân hàng (QR Code)</option>
+                        <option value="vnpay">Ví điện tử / Cổng VNPay</option>
+                        <option value="momo">Ví điện tử MoMo</option>
+                        <option value="installment">Mua trả góp (Duyệt hồ sơ nhanh)</option>
+                      </select>
+                      <div id="paymentMethodHint" class="payment-method-hint" aria-live="polite"></div>
+                    </div>
+
+                    <aside class="bank-box" id="bankTransferInfo" aria-label="Thông tin chuyển khoản">
+                      <strong>Thông tin tài khoản cửa hàng:</strong><br />
+                      Ngân hàng: <strong>MB Bank</strong><br />
+                      Chủ tài khoản: <strong>TECHECOMMERCE</strong><br />
+                      Số tài khoản, mã QR và cú pháp <strong>TECH + mã đơn</strong> sẽ xuất hiện sau khi tạo đơn.
+                    </aside>
+
+                    <fieldset class="installment-options" id="installmentOptions" hidden>
+                      <legend>Dự tính phương án trả góp</legend>
+                      <figure class="installment-table-wrap">
+                        <table class="installment-table">
+                          <thead>
+                            <tr>
+                              <th scope="col">Kỳ hạn</th>
+                              <th scope="col">Trả trước</th>
+                              <th scope="col">Mỗi tháng</th>
+                              <th scope="col">Tổng lãi</th>
+                            </tr>
+                          </thead>
+                          <tbody id="installmentPlanRows"></tbody>
+                        </table>
+                        <figcaption class="installment-caption" id="installmentCaption">
+                          Đang tính theo tổng giá trị giỏ hàng và phí vận chuyển.
+                        </figcaption>
+                      </figure>
+                      <p class="installment-loading" id="installmentLoading" aria-live="polite"></p>
+                      <p class="installment-error" id="installmentError" role="alert"></p>
+                      <section class="installment-summary" aria-label="Phương án đã chọn">
+                        <p><span>Cần trả trước:</span> <output id="selectedDownPayment">—</output></p>
+                        <p><span>Khoản trả mỗi tháng:</span> <output id="selectedMonthlyPayment">—</output></p>
+                      </section>
+                      <p class="installment-policy-note">Dự tính theo chính sách nội bộ; hồ sơ có hiệu lực sau khi chuyên viên liên hệ xác nhận.</p>
+                    </fieldset>
+                  </fieldset>
+
+                  <!-- Note -->
+                  <div class="form-group">
+                    <label for="orderNote">Ghi chú đơn hàng (nếu có)</label>
+                    <textarea id="orderNote" rows="2" placeholder="Ghi chú về thời gian nhận hàng, người nhận thay..."></textarea>
+                  </div>
+                </section>
+
+                <!-- Right: Order recap -->
+                <aside class="checkout-recap-column" aria-label="Tóm tắt đơn hàng thanh toán">
+                  <section class="checkout-recap-card">
+                    <h4 class="recap-title">Kiểm tra đơn hàng</h4>
+                    <section class="checkout-mini-list" id="checkoutMiniList" aria-label="Sản phẩm đặt mua">
+                      <!-- Render mini item rows -->
+                    </section>
+                    <dl class="recap-financials">
+                      <div class="recap-row">
+                        <dt>Tạm tính:</dt>
+                        <dd><span id="recapSubtotal">0 đ</span></dd>
+                      </div>
+                      <div class="recap-row" id="recapDiscountRow" style="display: none; color: var(--success);">
+                        <dt>Giảm giá:</dt>
+                        <dd><span id="recapDiscount">-0 đ</span></dd>
+                      </div>
+                      <div class="recap-row">
+                        <dt>Phí vận chuyển:</dt>
+                        <dd><span id="recapShipping">0 đ</span></dd>
+                      </div>
+                      <div class="recap-row total-row">
+                        <dt>Tổng thanh toán:</dt>
+                        <dd><strong class="recap-final-total" id="recapFinalTotal">0 đ</strong></dd>
+                      </div>
+                    </dl>
+                    <button type="button" class="btn-checkout" id="checkoutBtn" onclick="createOrder()">
+                      Xác nhận Đặt hàng
+                    </button>
+                    <p class="checkout-terms-note">Bằng việc đặt hàng, bạn đồng ý với Điều khoản mua sắm và Chính sách bảo hành của TechEcommerce.</p>
+                  </section>
+                </aside>
+              </div>
+            </section>
+          </section>
+        </aside>
+
+      <div
+        class="cart-overlay"
+        id="cartOverlay"
+        onclick="closeCartDrawer()"
+        aria-hidden="true"
+      ></div>
+
+      <!-- Compare Products Bar -->
+      <aside class="compare-bar" id="compareBar" aria-live="polite"></aside>
+
+      <!-- Compare Products Modal -->
+      <aside class="compare-modal" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareTitle" aria-hidden="true">
+        <section class="compare-dialog">
+          <header class="compare-header">
+            <div class="compare-header-left">
+              <span class="compare-eyebrow">TechEcommerce Compare</span>
+              <h2 id="compareTitle">So sánh sản phẩm</h2>
+              <label class="compare-diff-toggle" for="compareDiffToggle">
+                <input type="checkbox" id="compareDiffToggle" onchange="toggleCompareDiffOnly(this.checked)" />
+                <span class="toggle-slider"></span>
+                <span class="toggle-text">Chỉ xem điểm khác biệt</span>
+              </label>
+            </div>
+            <div class="compare-header-right">
+              <div id="compareCategoryBadge" class="compare-cat-badge"></div>
+              <div id="compareToolbarAddSlot" class="compare-toolbar-add-slot"></div>
+              <button type="button" class="btn-compare-clear" onclick="clearCompare()">Xóa tất cả</button>
+              <button type="button" class="compare-close" onclick="closeCompareModal()" aria-label="Đóng bảng so sánh">×</button>
+            </div>
+          </header>
+          <div class="compare-table-wrap" id="compareTableWrap">
+            <!-- Dynamic comparison table or empty/single state rendered here -->
+          </div>
+
+          <!-- Searchable Product Selector Dialog (NameThatUI Dialog / Dropdown) -->
+          <div class="compare-picker-dialog" id="comparePickerOverlay" style="display: none;" aria-hidden="true" role="dialog" aria-labelledby="pickerModalTitle">
+            <div class="compare-picker-backdrop" onclick="closeCompareSearchPicker()"></div>
+            <div class="compare-picker-box">
+              <header class="compare-picker-header">
+                <div class="compare-picker-title-wrap">
+                  <h4 id="pickerModalTitle" class="compare-picker-title">Thêm sản phẩm vào so sánh</h4>
+                  <span class="compare-picker-count" id="comparePickerRemainingBadge">Còn lại 2 vị trí</span>
+                </div>
+                <button type="button" class="compare-picker-close-btn" onclick="closeCompareSearchPicker()" aria-label="Đóng bảng tìm kiếm">×</button>
+              </header>
+              <div class="compare-picker-search-bar">
+                <svg class="picker-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="search" id="comparePickerSearchInput" placeholder="Tìm kiếm theo tên sản phẩm, thương hiệu..." oninput="onComparePickerSearch(this.value)" autocomplete="off" />
+              </div>
+              <div class="compare-picker-list" id="comparePickerResults" role="listbox" aria-label="Danh sách sản phẩm có thể thêm">
+                <!-- Dynamically filled with products -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <script src="assets/js/shop.js?v=20261006-category-brands-v1"></script>
+      <script src="assets/js/footer.js?v=20261004-namethatui-v3"></script>
+      <script src="assets/js/chatbox.js?v=20261006-consultation-v4"></script>
+    </body>
+  </html>

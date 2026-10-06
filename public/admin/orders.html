@@ -1,145 +1,1336 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
-    <meta name="description" content="Quản trị trạng thái xử lý, thanh toán và vận chuyển đơn hàng TechEcommerce.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị trạng thái xử lý, phân công shipper, thanh toán và vận chuyển đơn hàng TechEcommerce.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/orders.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
-    <title>Quản lý đơn hàng - TechEcommerce</title>
+    <title>Quản lý đơn hàng - TechEcommerce Admin</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
     <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
     <style>
-        .order-product-item {
-            font-size: 0.85rem;
-            margin-bottom: 0.25rem;
-            padding-bottom: 0.25rem;
-            border-bottom: 1px solid var(--border);
+        /* Orders Module Modern Dark Theme Enhancements */
+        :root {
+            --badge-pending: #f59e0b;
+            --badge-processing: #3b82f6;
+            --badge-shipping: #8b5cf6;
+            --badge-completed: #10b981;
+            --badge-cancelled: #ef4444;
+            --badge-returned: #ec4899;
         }
-        .order-product-item:last-child { border-bottom: none; }
-        .status-select {
-            border: 1px solid var(--border);
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card.clickable-card {
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+
+        .stat-card.clickable-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .stat-card.clickable-card.active-filter {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary), 0 8px 24px rgba(37, 99, 235, 0.4);
+            background: rgba(37, 99, 235, 0.12);
+        }
+
+        /* Search & Filters Section */
+        .orders-controls-section {
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            border-radius: 12px;
+            background: var(--admin-card-bg);
+            border: 1px solid var(--admin-border);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .search-bar-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .search-icon-svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--admin-text-dim);
+            pointer-events: none;
+        }
+
+        .search-input-main {
+            width: 100%;
+            padding: 0.7rem 2.4rem 0.7rem 2.6rem;
             border-radius: 8px;
-            padding: 0.4rem 0.8rem;
-            width: auto;
-            cursor: pointer;
+            border: 1px solid var(--admin-input-border);
+            background: var(--admin-input-bg);
+            color: var(--admin-input-text);
+            font-size: 0.92rem;
+            transition: all 0.2s ease;
         }
-        .tracking-action {
-            min-height: 44px;
-            padding: 0.45rem 0.65rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--primary);
-            background: var(--bg-card);
+
+        .search-input-main:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: var(--admin-text-dim);
+            cursor: pointer;
+            padding: 4px;
+            display: none;
+        }
+
+        .clear-search-btn.visible {
+            display: block;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .filter-group label {
+            font-size: 0.78rem;
             font-weight: 600;
-            white-space: nowrap;
+            color: var(--admin-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-control {
+            padding: 0.55rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--admin-input-border);
+            background: var(--admin-input-bg);
+            color: var(--admin-input-text);
+            font-size: 0.84rem;
             cursor: pointer;
         }
-        .tracking-action:focus-visible {
-            outline: 3px solid var(--primary);
-            outline-offset: 2px;
+
+        .filter-control:focus {
+            outline: none;
+            border-color: #3b82f6;
         }
-        .btn-print-slip {
+
+        .filter-actions-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-filter-apply {
+            padding: 0.55rem 1rem;
+            background: #2563eb;
+            color: #ffffff;
+            border: 1px solid #3b82f6;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-filter-apply:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-filter-reset {
+            padding: 0.55rem 0.85rem;
+            background: rgba(255, 255, 255, 0.06);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 6px;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-filter-reset:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        .btn-export-csv {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
+            padding: 0.55rem 1rem;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 6px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-export-csv:hover {
+            background: #10b981;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Bulk Toolbar */
+        .bulk-actions-toolbar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            background: rgba(37, 99, 235, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            border-radius: 8px;
+            color: #93c5fd;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .bulk-actions-toolbar.active {
+            display: flex;
+        }
+
+        .bulk-actions-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Enhanced Table Design */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--admin-border);
+            background: var(--admin-card-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        #orderTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            min-width: 1100px;
+            background: var(--admin-table-row-bg);
+            color: var(--admin-text-main);
+        }
+
+        #orderTable th {
+            background: var(--admin-table-head-bg);
+            padding: 0.85rem 0.75rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--admin-table-head-text);
+            border-bottom: 2px solid var(--admin-table-border);
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        #orderTable th.sortable-th {
+            cursor: pointer;
+            transition: color 0.15s ease;
+        }
+
+        #orderTable th.sortable-th:hover {
+            color: #2563eb;
+        }
+
+        #orderTable td {
+            padding: 0.85rem 0.75rem;
+            border-bottom: 1px solid var(--admin-table-border);
+            vertical-align: middle;
+            color: var(--admin-text-main);
+        }
+
+        #orderTable tbody tr:hover {
+            background: var(--admin-table-row-hover);
+        }
+
+        .order-id-link {
+            font-family: monospace;
+            font-weight: 700;
+            color: #60a5fa;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(59, 130, 246, 0.1);
+            transition: all 0.15s ease;
+        }
+
+        .order-id-link:hover {
+            background: rgba(59, 130, 246, 0.25);
+            color: #93c5fd;
+            text-decoration: underline;
+        }
+
+        /* Shipper Column Pill */
+        .shipper-cell-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .btn-assign-shipper {
+            display: inline-flex;
+            align-items: center;
             gap: 4px;
             padding: 0.35rem 0.65rem;
-            background: rgba(37, 99, 235, 0.12);
-            color: #3b82f6;
-            border: 1px solid rgba(59, 130, 246, 0.3);
             border-radius: 6px;
+            border: 1px dashed rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.1);
+            color: #fbbf24;
             font-size: 0.78rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
-        .btn-print-slip:hover {
+
+        .btn-assign-shipper:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #fbbf24;
+        }
+
+        .shipper-assigned-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #34d399;
+            font-size: 0.8rem;
+        }
+
+        .btn-change-shipper-sm {
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-change-shipper-sm:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .status-confirmed { background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); }
+        .status-processing { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .status-ready_to_ship { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .status-shipping { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .status-completed { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-cancelled { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-delivery_failed, .status-boom { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); }
+        .status-returned, .status-return_requested { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+
+        /* Action Menu */
+        .actions-cell-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-detail-action {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .btn-detail-action:hover {
             background: #2563eb;
             color: #ffffff;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+        }
+
+        .dropdown-menu-wrapper {
+            position: relative;
+        }
+
+        .btn-kebab-menu {
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-kebab-menu:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .actions-dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 6px;
+            min-width: 190px;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .actions-dropdown-content.show {
+            display: block;
+        }
+
+        .dropdown-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 7px 10px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.82rem;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .dropdown-menu-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+        }
+
+        .dropdown-menu-item.danger-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        /* Server-side Pagination */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .pagination-info {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .pagination-pages {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-num-btn {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 6px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-num-btn:hover:not(:disabled) {
+            background: rgba(59, 130, 246, 0.2);
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+
+        .page-num-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+            font-weight: 700;
+        }
+
+        .page-num-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Order Detail Modal / Drawer Styles */
+        dialog.admin-modal-overlay {
+            border: none;
+            max-width: 100vw;
+            max-height: 100vh;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        dialog.admin-modal-overlay::backdrop {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+        }
+
+        .admin-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .admin-modal-overlay.open,
+        dialog.admin-modal-overlay[open] {
+            display: flex !important;
+        }
+
+        .admin-modal-dialog {
+            background: var(--admin-modal-bg, var(--admin-surface, #ffffff));
+            border: 1px solid var(--admin-border, #e2e8f0);
+            color: var(--admin-text-main, #0f172a);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideUp 0.25s ease;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-dialog-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--admin-border, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--admin-surface-muted, #f8fafc);
+            color: var(--admin-text-main, #0f172a);
+        }
+
+        .modal-dialog-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex: 1;
+            background: var(--admin-modal-bg, var(--admin-surface, #ffffff));
+            color: var(--admin-text-main, #0f172a);
+        }
+
+        .modal-dialog-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--admin-border, #e2e8f0);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background: var(--admin-surface-muted, #f8fafc);
+        }
+
+        /* Detail Modal Grid */
+        .order-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-card-panel {
+            background: var(--admin-surface-muted, #f8fafc);
+            border: 1px solid var(--admin-border, #e2e8f0);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .detail-card-panel h3 {
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            color: var(--admin-text-muted, #64748b);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 1px solid var(--admin-border, #e2e8f0);
+            padding-bottom: 0.4rem;
+        }
+
+        .detail-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.45rem;
+            font-size: 0.85rem;
+        }
+
+        .detail-info-row span:first-child {
+            color: var(--admin-text-muted, #64748b);
+        }
+
+        .detail-info-row span:last-child {
+            color: var(--admin-text-main, #0f172a);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Detail Products Table */
+        .detail-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.84rem;
+            margin-top: 0.5rem;
+        }
+
+        .detail-products-table th, .detail-products-table td {
+            padding: 0.6rem;
+            border-bottom: 1px solid var(--admin-border, #e2e8f0);
+        }
+
+        .detail-products-table th {
+            color: var(--admin-table-head-text, var(--admin-text-muted, #334155));
+            text-align: left;
+            background: var(--admin-table-head-bg, #f1f5f9);
+        }
+
+        .detail-products-table td {
+            color: var(--admin-text-main, #0f172a);
+        }
+
+        /* Order Timeline Visual Component */
+        .order-timeline-list {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .order-timeline-list::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: var(--admin-border, #e2e8f0);
+        }
+
+        .timeline-event-item {
+            position: relative;
+            margin-bottom: 1.25rem;
+        }
+
+        .timeline-event-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -1.5rem;
+            top: 3px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #3b82f6;
+            border: 2px solid var(--admin-surface, #ffffff);
+        }
+
+        .timeline-dot.green { background: #10b981; }
+        .timeline-dot.red { background: #ef4444; }
+        .timeline-dot.purple { background: #8b5cf6; }
+        .timeline-dot.amber { background: #f59e0b; }
+
+        .timeline-content-card {
+            background: var(--admin-surface, #ffffff);
+            border: 1px solid var(--admin-border, #e2e8f0);
+            border-radius: 8px;
+            padding: 0.6rem 0.85rem;
+            font-size: 0.84rem;
+            color: var(--admin-text-main, #0f172a);
+        }
+
+        .timeline-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .timeline-time-str {
+            font-size: 0.76rem;
+            color: var(--admin-text-muted, #64748b);
+        }
+
+        /* Shipper Selection Radio Card */
+        .shipper-option-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            background: var(--admin-surface-muted, #f8fafc);
+            border: 1px solid var(--admin-border, #e2e8f0);
+            color: var(--admin-text-main, #0f172a);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .shipper-option-card:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .shipper-option-card input[type="radio"]:checked + .shipper-info-box {
+            color: #2563eb;
+        }
+
+        .active-orders-tag {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .active-orders-tag.free {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+        }
+
+        .active-orders-tag.busy {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
         }
     </style>
 </head>
 
 <body class="admin-page">
-    <header class="admin-sidebar"><nav aria-label="Điều hướng quản trị">
-        <p class="admin-brand"><a href="../index.html">TechEcommerce Admin</a></p>
-        <ul id="main-navbar">
-            <li><a href="dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
-            <li><a href="products.html?v=techecommerce-20260709-2">Sản phẩm</a></li>
-            <li><a href="orders.html?v=techecommerce-20260709-2" class="active">Đơn hàng</a></li>
-            <li><a href="customers.html?v=techecommerce-20260709-2">Khách hàng</a></li>
-            <li><a href="coupons.html?v=techecommerce-20260709-2">Mã giảm giá</a></li>
-            <li><a href="finance.html?v=techecommerce-20260709-2">Tài chính</a></li>
-            <li><a href="suppliers.html?v=techecommerce-20260709-2">Nhà cung cấp</a></li>
-            <li id="nav-auth-section" style="margin-left: auto;"></li>
-        </ul>
-    </nav></header>
+        <!-- Admin Sidebar Navigation -->
+    <header class="admin-sidebar" aria-label="Khu vực điều hướng quản trị">
+        <nav class="admin-sidebar-nav" aria-label="Menu chức năng hệ thống">
+            <!-- Brand Logo Header & Quick Return Home -->
+            <aside class="sidebar-brand-box" aria-label="Thương hiệu cửa hàng">
+                <a href="../index.html" class="sidebar-brand-link" title="Quay lại trang chủ bán hàng TechEcommerce">
+                    <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce Logo" width="32" height="32" class="sidebar-brand-img">
+                    <div class="sidebar-brand-info">
+                        <strong class="sidebar-brand-title">TechEcommerce</strong>
+                        <span class="sidebar-brand-badge">← Về trang chủ</span>
+                    </div>
+                </a>
+            </aside>
+
+            <p class="sidebar-category-heading">TÍNH NĂNG</p>
+            <ul id="main-navbar" class="admin-nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span class="nav-link-text">Dashboard</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item has-dropdown">
+                    <details class="nav-accordion" >
+                        <summary class="nav-accordion-trigger">
+                            <span class="nav-accordion-title">
+                                <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="nav-link-text">Người dùng</span>
+                            </span>
+                            <svg class="chevron-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </summary>
+                        <ul class="nav-sub-menu">
+                            <li><a href="staff.html" class="sub-link "  id="navSubStaff">Quản lý nhân viên</a></li>
+                            <li><a href="customers.html" class="sub-link "  id="navSubCustomer">Quản lý khách hàng</a></li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span class="nav-link-text">Sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link active" aria-current="page">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Đơn hàng</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link "  id="navMessagesLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="nav-link-text">Tin nhắn</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            </svg>
+                            <span class="nav-link-text">Blog</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="coupons.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span class="nav-link-text">Khuyến mãi</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <span class="nav-link-text">Tài chính</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="suppliers.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"></rect>
+                                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                            </svg>
+                            <span class="nav-link-text">Nhà cung cấp</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="qa.html" class="nav-link "  id="navQaLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span class="nav-link-text">Q&amp;A sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link" title="Xem giao diện mua sắm TechEcommerce">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Về trang chủ</span>
+                        </span>
+                        <span class="store-badge-pill">Store ↗</span>
+                    </a>
+                </li>
+
+                <li id="nav-auth-section" class="sidebar-auth-wrapper"></li>
+            </ul>
+        </nav>
+    </header>
+
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
     <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
 
     <main class="container fade-in">
         <header class="page-header reveal">
-            <h1>Quản lý đơn hàng</h1>
+            <h1>QUẢN LÝ ĐƠN HÀNG</h1>
             <p>Kiểm tra, cập nhật trạng thái xử lý và vận chuyển đơn hàng.</p>
         </header>
 
-        <div class="stats-grid reveal">
-            <article class="stat-card glass-card">
+        <!-- Statistics Cards (Clickable for Quick Filtering) -->
+        <section class="stats-grid reveal" aria-label="Số liệu thống kê đơn hàng">
+            <article class="stat-card glass-card clickable-card" id="cardTotal" onclick="quickFilterByStatus('all')">
                 <div class="stat-icon">ALL</div>
                 <div class="stat-value" id="statTotal">0</div>
                 <div class="stat-label">Tổng đơn</div>
             </article>
-            <article class="stat-card glass-card">
+            <article class="stat-card glass-card clickable-card" id="cardPending" onclick="quickFilterByStatus('pending')">
                 <div class="stat-icon" style="color:var(--warning)">NEW</div>
                 <div class="stat-value" id="statPending" style="color:var(--warning)">0</div>
                 <div class="stat-label">Chờ xử lý</div>
             </article>
-            <article class="stat-card glass-card">
+            <article class="stat-card glass-card clickable-card" id="cardProcessing" onclick="quickFilterByStatus('processing')">
                 <div class="stat-icon" style="color:var(--info)">RUN</div>
                 <div class="stat-value" id="statProcessing" style="color:var(--info)">0</div>
                 <div class="stat-label">Đang xử lý</div>
             </article>
-            <article class="stat-card glass-card">
+            <article class="stat-card glass-card clickable-card" id="cardShipping" onclick="quickFilterByStatus('shipping')">
                 <div class="stat-icon" style="color:var(--primary-light)">SHIP</div>
                 <div class="stat-value" id="statShipping" style="color:var(--primary-light)">0</div>
                 <div class="stat-label">Đang giao</div>
             </article>
-            <article class="stat-card glass-card">
+            <article class="stat-card glass-card clickable-card" id="cardCompleted" onclick="quickFilterByStatus('completed')">
                 <div class="stat-icon" style="color:var(--success)">DONE</div>
                 <div class="stat-value" id="statCompleted" style="color:var(--success)">0</div>
                 <div class="stat-label">Hoàn tất</div>
             </article>
-        </div>
+            <article class="stat-card glass-card clickable-card" id="cardCancelled" onclick="quickFilterByStatus('cancelled')">
+                <div class="stat-icon" style="color:var(--danger)">CANCEL</div>
+                <div class="stat-value" id="statCancelled" style="color:var(--danger)">0</div>
+                <div class="stat-label">Đã hủy</div>
+            </article>
+            <article class="stat-card glass-card clickable-card" id="cardReturned" onclick="quickFilterByStatus('returned')">
+                <div class="stat-icon" style="color:#ec4899">RETURN</div>
+                <div class="stat-value" id="statReturned" style="color:#ec4899">0</div>
+                <div class="stat-label">Trả hàng / Hoàn tiền</div>
+            </article>
+        </section>
 
-        <section class="table-section glass-card reveal">
-            <h2>Danh sách đơn hàng</h2>
+        <!-- Search & Advanced Filter Controls Section -->
+        <section class="orders-controls-section reveal" aria-label="Bộ lọc và tìm kiếm đơn hàng">
+            <div class="search-bar-row">
+                <div class="search-input-wrap">
+                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="orderSearchInput" class="search-input-main" placeholder="🔍 Tìm mã đơn, khách hàng, SĐT, email, sản phẩm, mã vận đơn..." autocomplete="off">
+                    <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Xóa tìm kiếm">✕</button>
+                </div>
+                <button type="button" class="btn-export-csv" onclick="exportOrdersCsv()" title="Tải xuống file CSV đơn hàng theo bộ lọc hiện tại">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Xuất CSV / Excel</span>
+                </button>
+            </div>
+
+            <form id="orderFilterForm" class="filters-grid" onsubmit="event.preventDefault(); applyFilters();">
+                <div class="filter-group">
+                    <label for="filterStatus">Trạng thái đơn</label>
+                    <select id="filterStatus" class="filter-control">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="confirmed">Đã xác nhận</option>
+                        <option value="processing">Đang chuẩn bị</option>
+                        <option value="ready_to_ship">Chờ lấy hàng</option>
+                        <option value="shipping">Đang giao</option>
+                        <option value="completed">Hoàn tất</option>
+                        <option value="cancelled">Đã hủy</option>
+                        <option value="delivery_failed">Giao thất bại</option>
+                        <option value="returned">Trả hàng</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterPaymentStatus">Thanh toán</label>
+                    <select id="filterPaymentStatus" class="filter-control">
+                        <option value="all">Tất cả thanh toán</option>
+                        <option value="unpaid">Chưa thanh toán</option>
+                        <option value="pending">Chờ xác nhận</option>
+                        <option value="paid">Đã thanh toán</option>
+                        <option value="failed">Thanh toán lỗi</option>
+                        <option value="refunded">Đã hoàn tiền</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterPaymentMethod">Phương thức</label>
+                    <select id="filterPaymentMethod" class="filter-control">
+                        <option value="all">Tất cả phương thức</option>
+                        <option value="cod">COD</option>
+                        <option value="bank_transfer">Chuyển khoản</option>
+                        <option value="vnpay">VNPay</option>
+                        <option value="momo">MoMo</option>
+                        <option value="installment">Trả góp</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterShippingStatus">Vận chuyển</label>
+                    <select id="filterShippingStatus" class="filter-control">
+                        <option value="all">Tất cả vận chuyển</option>
+                        <option value="unassigned">Chưa phân công</option>
+                        <option value="assigned">Đã phân công shipper</option>
+                        <option value="waiting_pickup">Chờ lấy hàng</option>
+                        <option value="delivering">Đang giao</option>
+                        <option value="delivered">Giao thành công</option>
+                        <option value="delivery_failed">Giao thất bại</option>
+                        <option value="returned">Đã hoàn hàng</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterShipper">Shipper</label>
+                    <select id="filterShipper" class="filter-control">
+                        <option value="all">Tất cả shipper</option>
+                        <option value="unassigned">Chưa phân công</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterDateFrom">Từ ngày</label>
+                    <input type="date" id="filterDateFrom" class="filter-control">
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterDateTo">Đến ngày</label>
+                    <input type="date" id="filterDateTo" class="filter-control">
+                </div>
+
+                <div class="filter-actions-group">
+                    <button type="submit" class="btn-filter-apply">Áp dụng</button>
+                    <button type="button" class="btn-filter-reset" onclick="resetFilters()">Đặt lại</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Bulk Actions Floating Bar (Visible when orders checked) -->
+        <aside id="bulkActionsToolbar" class="bulk-actions-toolbar" aria-label="Thao tác hàng loạt">
+            <div>
+                <strong>Đã chọn <span id="selectedOrdersCount">0</span> đơn hàng</strong>
+            </div>
+            <div class="bulk-actions-group">
+                <button type="button" class="btn-detail-action" onclick="openBulkShipperModal()">
+                    🛵 Phân công shipper
+                </button>
+                <button type="button" class="btn-detail-action" onclick="openBulkStatusModal()">
+                    📝 Cập nhật trạng thái
+                </button>
+                <button type="button" class="btn-filter-reset" onclick="clearSelectedOrders()">
+                    Bỏ chọn
+                </button>
+            </div>
+        </aside>
+
+        <!-- Orders Table Section -->
+        <section class="table-section glass-card reveal" aria-label="Bảng danh sách đơn hàng">
             <div class="table-wrapper">
                 <table id="orderTable">
                     <thead>
                         <tr>
-                            <th>Mã đơn</th>
-                            <th>Khách hàng</th>
-                            <th>Sản phẩm</th>
-                            <th>Tổng tiền</th>
-                            <th>Thanh toán</th>
-                            <th>Trạng thái</th>
-                            <th>Vận chuyển</th>
-                            <th>Ngày đặt</th>
-                            <th>Hành động</th>
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" title="Chọn tất cả">
+                            </th>
+                            <th class="sortable-th" onclick="handleSortColumn('orderId')" title="Bấm để sắp xếp theo mã đơn">
+                                MÃ ĐƠN <span id="sortIcon_orderId">↕</span>
+                            </th>
+                            <th>KHÁCH HÀNG</th>
+                            <th>SẢN PHẨM</th>
+                            <th class="sortable-th" onclick="handleSortColumn('totalAmount')" title="Bấm để sắp xếp theo tổng tiền">
+                                TỔNG TIỀN <span id="sortIcon_totalAmount">↕</span>
+                            </th>
+                            <th>THANH TOÁN</th>
+                            <th>TRẠNG THÁI</th>
+                            <th>SHIPPER</th>
+                            <th>VẬN CHUYỂN</th>
+                            <th class="sortable-th" onclick="handleSortColumn('orderDate')" title="Bấm để sắp xếp theo ngày đặt">
+                                NGÀY ĐẶT <span id="sortIcon_orderDate">↕</span>
+                            </th>
+                            <th style="text-align: center;">HÀNH ĐỘNG</th>
                         </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody id="orderTableBody">
+                        <tr>
+                            <td colspan="11" style="text-align:center; padding: 2.5rem; color: #94a3b8;">
+                                Đang tải danh sách đơn hàng...
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
+
+            <!-- Server Pagination Controls -->
+            <nav class="pagination-container" aria-label="Điều hướng phân trang đơn hàng">
+                <div class="pagination-info">
+                    <span>Hiển thị </span>
+                    <select id="pageSizeSelect" class="filter-control" style="padding: 3px 8px; width: auto; display: inline-block;" onchange="changePageSize(this.value)">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <span> / trang. Tổng cộng <strong id="totalOrdersCount">0</strong> đơn hàng.</span>
+                </div>
+                <div class="pagination-pages" id="paginationPagesList">
+                    <!-- Dynamic page numbers rendered here -->
+                </div>
+            </nav>
         </section>
     </main>
 
-    <script src="../assets/js/orders.js?v=techecommerce-20260709-2"></script>
+    <!-- ============================================================== -->
+    <!-- MODAL 1: ORDER DETAIL DRAWER / MODAL -->
+    <!-- ============================================================== -->
+    <dialog id="orderDetailModal" class="admin-modal-overlay" aria-labelledby="detailModalTitle">
+        <div class="admin-modal-dialog">
+            <header class="modal-dialog-header">
+                <div>
+                    <h2 id="detailModalTitle" style="font-size: 1.15rem; color: var(--admin-text-main); margin: 0;">Chi tiết đơn hàng #0000</h2>
+                    <span id="detailOrderDateText" style="font-size: 0.8rem; color: var(--admin-text-muted);">Ngày đặt: --/--/----</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button type="button" class="btn-export-csv" onclick="printCurrentDetailInvoice()" title="In hóa đơn VAT & Phiếu đóng gói">
+                        🖨️ In hóa đơn
+                    </button>
+                    <button type="button" class="btn-filter-reset" onclick="closeOrderDetailModal()" style="font-size: 1.1rem; padding: 4px 10px;">✕</button>
+                </div>
+            </header>
+
+            <div class="modal-dialog-body" id="detailModalBody">
+                <!-- Dynamic Content Loaded by JS -->
+            </div>
+
+            <footer class="modal-dialog-footer">
+                <button type="button" class="btn-filter-reset" onclick="closeOrderDetailModal()">Đóng</button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 2: PROFESSIONAL SHIPPER SELECTION MODAL -->
+    <!-- ============================================================== -->
+    <dialog id="assignShipperModal" class="admin-modal-overlay" aria-labelledby="shipperModalTitle">
+        <div class="admin-modal-dialog shipper-dialog-pro">
+            <header class="shipper-modal-header">
+                <div class="shipper-modal-title-wrap">
+                    <div class="shipper-modal-icon">🛵</div>
+                    <div>
+                        <h2 id="shipperModalTitle" style="font-size: 1.15rem; font-weight: 700; color: var(--admin-text-main); margin: 0;">Điều phối Shipper Giao hàng</h2>
+                        <span id="shipperModalSubtitle" style="font-size: 0.82rem; color: var(--admin-text-muted);">Phân công nhân sự phụ trách vận chuyển đơn</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-filter-reset" onclick="closeShipperModal()" style="font-size: 1.1rem; padding: 4px 10px; border-radius: 8px;">✕</button>
+            </header>
+
+            <!-- Order Context Strip -->
+            <div id="shipperOrderContextBox" class="shipper-order-summary-strip">
+                <div>Đơn hàng: <span id="shipperModalOrderCode" class="order-chip">#----</span></div>
+                <div>Khách hàng: <strong id="shipperModalCustomer">--</strong></div>
+                <div>Giao đến: <span id="shipperModalAddress" style="color: var(--admin-text-muted);">--</span></div>
+            </div>
+
+            <!-- Current Shipper Notice (if reassigning) -->
+            <div id="reassignNoticeBox" style="display: none; margin: 0 20px 12px; padding: 10px 14px; border-radius: 10px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--admin-amber-accent); font-size: 0.84rem;">
+                ⚠️ Đơn hàng này đang được phụ trách bởi: <strong id="currentShipperNameNotice">...</strong>. Chọn shipper khác bên dưới để điều chuyển đơn.
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="shipper-search-wrapper">
+                <input type="text" id="shipperSearchInput" class="search-input-main" placeholder="🔍 Tìm kiếm shipper theo tên, số điện thoại..." oninput="filterShipperListInModal(this.value)">
+                <div class="shipper-filter-tabs">
+                    <button type="button" id="tabShipperAll" class="shipper-tab-btn active" onclick="setShipperFilterTab('all', this)">Tất cả (<span id="countTabAll">0</span>)</button>
+                    <button type="button" id="tabShipperFree" class="shipper-tab-btn" onclick="setShipperFilterTab('free', this)">🟢 Đang rảnh (<span id="countTabFree">0</span>)</button>
+                    <button type="button" id="tabShipperBusy" class="shipper-tab-btn" onclick="setShipperFilterTab('busy', this)">🟡 Đang giao (<span id="countTabBusy">0</span>)</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Shipper Cards List -->
+            <div id="shipperRadioList" class="shipper-list-container">
+                <!-- Shipper cards loaded dynamically -->
+            </div>
+
+            <footer class="modal-dialog-footer" style="padding: 14px 20px; border-top: 1px solid var(--admin-border); background: var(--admin-surface-muted);">
+                <button type="button" class="btn-filter-reset" onclick="closeShipperModal()">Hủy bỏ</button>
+                <button type="button" id="confirmAssignShipperBtn" class="btn-filter-apply" onclick="submitShipperAssignment()" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span>🛵</span> <span id="confirmAssignBtnText">Xác nhận phân công</span>
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 3: CANCEL ORDER MODAL -->
+    <!-- ============================================================== -->
+    <dialog id="cancelOrderModal" class="admin-modal-overlay" aria-labelledby="cancelModalTitle">
+        <div class="admin-modal-dialog" style="max-width: 500px;">
+            <header class="modal-dialog-header">
+                <div>
+                    <h2 id="cancelModalTitle" style="font-size: 1.1rem; color: #ef4444; margin: 0;">Hủy đơn hàng</h2>
+                    <span id="cancelModalSubtitle" style="font-size: 0.8rem; color: var(--admin-text-muted);">Xác nhận hủy và lý do hủy</span>
+                </div>
+                <button type="button" class="btn-filter-reset" onclick="closeCancelModal()" style="font-size: 1.1rem; padding: 4px 10px;">✕</button>
+            </header>
+
+            <div class="modal-dialog-body">
+                <div style="padding: 10px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25); color: #fca5a5; font-size: 0.84rem; margin-bottom: 16px;">
+                    ⚠️ Chú ý: Khi hủy đơn hàng, hệ thống sẽ tự động hoàn lại tồn kho của các sản phẩm và ghi nhận lịch sử audit.
+                </div>
+
+                <div class="filter-group" style="margin-bottom: 14px;">
+                    <label for="cancelReasonSelect">Lý do hủy đơn</label>
+                    <select id="cancelReasonSelect" class="filter-control" onchange="toggleCustomReasonField(this.value)">
+                        <option value="customer_request">Khách yêu cầu hủy</option>
+                        <option value="out_of_stock">Hết hàng / Hết phân loại</option>
+                        <option value="cannot_contact">Không liên hệ được với người nhận</option>
+                        <option value="wrong_info">Sai thông tin nhận hàng</option>
+                        <option value="payment_failed">Thanh toán thất bại / Quá hạn</option>
+                        <option value="other">Lý do khác...</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" id="customReasonWrap" style="display: none; margin-bottom: 14px;">
+                    <label for="cancelCustomReasonInput">Chi tiết lý do khác</label>
+                    <textarea id="cancelCustomReasonInput" class="filter-control" rows="3" placeholder="Nhập lý do cụ thể..."></textarea>
+                </div>
+            </div>
+
+            <footer class="modal-dialog-footer">
+                <button type="button" class="btn-filter-reset" onclick="closeCancelModal()">Quay lại</button>
+                <button type="button" class="btn-filter-apply" style="background: #dc2626; border-color: #ef4444;" onclick="submitCancelOrder()">
+                    Xác nhận hủy đơn
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- ============================================================== -->
+    <!-- MODAL 4: BULK ACTION MODAL (Shipper or Status) -->
+    <!-- ============================================================== -->
+    <dialog id="bulkActionModal" class="admin-modal-overlay" aria-labelledby="bulkModalTitle">
+        <div class="admin-modal-dialog" style="max-width: 520px;">
+            <header class="modal-dialog-header">
+                <h2 id="bulkModalTitle" style="font-size: 1.1rem; color: var(--admin-text-main); margin: 0;">Thao tác hàng loạt</h2>
+                <button type="button" class="btn-filter-reset" onclick="closeBulkModal()" style="font-size: 1.1rem; padding: 4px 10px;">✕</button>
+            </header>
+
+            <div class="modal-dialog-body" id="bulkModalBody">
+                <!-- Dynamic Bulk Controls -->
+            </div>
+
+            <footer class="modal-dialog-footer">
+                <button type="button" class="btn-filter-reset" onclick="closeBulkModal()">Hủy</button>
+                <button type="button" id="confirmBulkActionBtn" class="btn-filter-apply" onclick="submitBulkAction()">
+                    Thực hiện
+                </button>
+            </footer>
+        </div>
+    </dialog>
+
+    <!-- Site Footer -->
+    <footer id="site-footer"></footer>
+
+    <script src="../assets/js/orders.js?v=techecommerce-20261001-v3"></script>
     <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 

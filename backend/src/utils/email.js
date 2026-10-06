@@ -236,10 +236,40 @@ async function sendPasswordChangedEmail(customer) {
     });
 }
 
+async function notifyShipperAssigned(order, shipper) {
+    if (!emailEnabled()) return { configured: false };
+    const customer = order.customer ? await Customer.findById(order.customer) : null;
+    const customerEmail = String(customer?.email || order.guestEmail || '').trim();
+    if (!customerEmail) return { configured: true, skipped: true };
+
+    try {
+        const shipperName = shipper?.name || 'Người giao hàng TechEcommerce';
+        const shipperPhone = shipper?.phone || '';
+        const phoneText = shipperPhone ? ` (Số điện thoại: ${shipperPhone})` : '';
+
+        const result = await sendMessage({
+            to: customerEmail,
+            subject: `[TechEcommerce] Đơn hàng #${order._id} đã được phân công người giao hàng`,
+            html: emailShell(
+                'Đơn hàng đã được phân công Shipper',
+                `Đơn hàng #${order._id} của bạn đã được phân công cho shipper ${escapeHTML(shipperName)}${escapeHTML(phoneText)} phụ trách vận chuyển.`,
+                order,
+                'Shipper sẽ liên hệ trực tiếp với bạn trước khi giao hàng. Bạn có thể theo dõi tiến độ chi tiết trong mục Đơn hàng của tôi.'
+            )
+        });
+        return result;
+    } catch (error) {
+        console.error('Shipper assigned email error:', error.message);
+        return { error: error.message };
+    }
+}
+
 module.exports = {
     emailEnabled,
     notifyOrderCreated,
     notifyPaymentConfirmed,
+    notifyShipperAssigned,
     sendPasswordResetEmail,
     sendPasswordChangedEmail
 };
+

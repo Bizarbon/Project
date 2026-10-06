@@ -13,10 +13,11 @@ async function syncUniformCatalog({ force = false } = {}) {
             { videoUrl: null }
         ]
     }) : 0;
-    const isOutdated = count !== uniformCatalog.length || missingVideoCount > 0;
-
-    // Nếu cơ sở dữ liệu đã có sản phẩm, đủ số lượng chuẩn và không thiếu video, và không yêu cầu cưỡng chế (force: true), giữ nguyên dữ liệu
-    if (!force && count > 0 && !isOutdated) {
+    const hasRelativeImages = count > 0 ? await Product.countDocuments({
+        image: { $regex: '^assets/' }
+    }) : 0;
+    // Nếu cơ sở dữ liệu đã có sản phẩm, đủ số lượng chuẩn và không yêu cầu cưỡng chế (force: true), giữ nguyên dữ liệu
+    if (!force && count >= uniformCatalog.length) {
         return {
             synced: false,
             message: 'Catalog đã có dữ liệu sản phẩm đầy đủ và cập nhật.',

@@ -99,13 +99,13 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'returned', 'boom'],
+        enum: ['pending', 'confirmed', 'processing', 'ready_to_ship', 'shipping', 'completed', 'cancelled', 'delivery_failed', 'returned', 'boom', 'return_requested'],
         default: 'pending'
     },
     statusHistory: [{
         status: {
             type: String,
-            enum: ['pending', 'processing', 'shipping', 'completed', 'cancelled', 'returned', 'boom'],
+            enum: ['pending', 'confirmed', 'processing', 'ready_to_ship', 'shipping', 'completed', 'cancelled', 'delivery_failed', 'returned', 'boom', 'return_requested'],
             required: true
         },
         title: { type: String, default: '' },
@@ -183,6 +183,136 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    shippingStatus: {
+        type: String,
+        enum: ['unassigned', 'assigned', 'waiting_pickup', 'picked_up', 'delivering', 'delivered', 'delivery_failed', 'returned'],
+        default: 'unassigned'
+    },
+    shipper: {
+        type: Number,
+        ref: 'Customer',
+        default: null
+    },
+    shipperAssignedAt: {
+        type: Date,
+        default: null
+    },
+    shipperAssignedBy: {
+        type: Number,
+        ref: 'Customer',
+        default: null
+    },
+    shipperAssignedByName: {
+        type: String,
+        default: ''
+    },
+    // Phân biệt giao thành công với đã thu tiền / đối soát COD
+    codCollected: {
+        type: Boolean,
+        default: false
+    },
+    codCollectedAt: {
+        type: Date,
+        default: null
+    },
+    codCollectedAmount: {
+        type: Number,
+        default: 0
+    },
+    codReconciled: {
+        type: Boolean,
+        default: false
+    },
+    codReconciledAt: {
+        type: Date,
+        default: null
+    },
+    codReconciledBy: {
+        type: Number,
+        ref: 'Customer',
+        default: null
+    },
+    codReconciledByName: {
+        type: String,
+        default: ''
+    },
+    returnStatus: {
+        type: String,
+        enum: ['none', 'requested', 'approved', 'rejected', 'received', 'completed'],
+        default: 'none'
+    },
+    returnReason: {
+        type: String,
+        default: ''
+    },
+    returnRequestedAt: {
+        type: Date,
+        default: null
+    },
+    returnProcessedAt: {
+        type: Date,
+        default: null
+    },
+    refundStatus: {
+        type: String,
+        enum: ['none', 'not_refunded', 'refund_pending', 'partially_refunded', 'refunded', 'refund_failed'],
+        default: 'none'
+    },
+    refundAmount: {
+        type: Number,
+        default: 0,
+        min: 0
+    },
+    refundReason: {
+        type: String,
+        default: ''
+    },
+    refundTransactionId: {
+        type: String,
+        default: ''
+    },
+    refundedAt: {
+        type: Date,
+        default: null
+    },
+    refundedBy: {
+        type: Number,
+        ref: 'Customer',
+        default: null
+    },
+    cancelReason: {
+        type: String,
+        default: ''
+    },
+    cancelledAt: {
+        type: Date,
+        default: null
+    },
+    cancelledBy: {
+        type: Number,
+        ref: 'Customer',
+        default: null
+    },
+    cancelledByName: {
+        type: String,
+        default: ''
+    },
+    adminNotes: [{
+        content: { type: String, required: true },
+        createdBy: { type: Number, ref: 'Customer', default: null },
+        createdByName: { type: String, default: 'Admin' },
+        createdAt: { type: Date, default: Date.now }
+    }],
+    history: [{
+        action: { type: String, required: true },
+        statusFrom: { type: String, default: '' },
+        statusTo: { type: String, default: '' },
+        changedBy: { type: Number, ref: 'Customer', default: null },
+        changedByName: { type: String, default: '' },
+        note: { type: String, default: '' },
+        metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+        createdAt: { type: Date, default: Date.now }
+    }],
     shippingFee: {
         type: Number,
         default: 0,
@@ -229,5 +359,13 @@ orderSchema.pre('save', async function() {
         this._id = counter.seq;
     }
 });
+
+orderSchema.index({ status: 1 });
+orderSchema.index({ paymentStatus: 1 });
+orderSchema.index({ shippingStatus: 1 });
+orderSchema.index({ shipper: 1 });
+orderSchema.index({ orderDate: -1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ totalAmount: 1 });
 
 module.exports = mongoose.model('Order', orderSchema);

@@ -6,124 +6,604 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
-    <meta name="description" content="Theo dõi trạng thái xử lý, thanh toán và vận chuyển đơn hàng TechEcommerce.">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Theo dõi trạng thái xử lý, thanh toán và vận chuyển đơn hàng chính hãng tại TechEcommerce.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/account/orders.html">
     <title>Đơn hàng của tôi - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css?v=prod-20260918-1">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=prod-20260918-1">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=prod-20261002-1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=prod-20261002-1">
     <style>
-        .orders-shell { display: grid; gap: 1rem; }
-        .order-card {
-            padding: 1.4rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+        .customer-orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem 5rem;
         }
-        .order-head {
+
+        .customer-orders-header {
+            margin-bottom: 1.75rem;
+        }
+
+        .customer-orders-header h1 {
+            font-size: 1.85rem;
+            font-weight: 800;
+            color: var(--neo-text, #0f172a);
+            margin: 0 0 0.4rem;
+        }
+
+        .customer-orders-header p {
+            color: var(--neo-muted, #64748b);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* Overview KPI Cards */
+        .orders-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .overview-chip {
+            background: var(--neo-surface, #ffffff);
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
             display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        .overview-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary, #2563eb);
+        }
+
+        .overview-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary, #2563eb);
+        }
+
+        .overview-icon-box svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .overview-icon-box.pending {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706;
+        }
+
+        .overview-icon-box.shipping {
+            background: rgba(139, 92, 246, 0.12);
+            color: #7c3aed;
+        }
+
+        .overview-icon-box.completed {
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+        }
+
+        .overview-details {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .overview-value {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--neo-text, #0f172a);
+            line-height: 1.2;
+        }
+
+        .overview-label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--neo-muted, #64748b);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-top: 2px;
+        }
+
+        /* Filter Controls */
+        .orders-controls-bar {
+            background: var(--neo-surface, #ffffff);
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            align-items: flex-start;
-            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .orders-status-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .status-tab-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--neo-muted, #64748b);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .status-tab-btn:hover {
+            color: var(--primary, #2563eb);
+            background: rgba(37, 99, 235, 0.06);
+        }
+
+        .status-tab-btn.active {
+            background: var(--primary, #2563eb);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+        }
+
+        .orders-search-form {
+            display: flex;
+            align-items: center;
+            position: relative;
+            min-width: 260px;
+        }
+
+        .orders-search-input {
+            width: 100%;
+            padding: 0.5rem 2rem 0.5rem 2.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--neo-border, #cbd5e1);
+            background: var(--neo-bg, #f8fafc);
+            color: var(--neo-text, #0f172a);
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .orders-search-input:focus {
+            border-color: var(--primary, #2563eb);
+            background: var(--neo-surface, #ffffff);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .search-icon-inline {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--neo-muted, #94a3b8);
+            pointer-events: none;
+        }
+
+        /* Order List & Cards */
+        .orders-feed {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .order-item-card {
+            background: var(--neo-surface, #ffffff);
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 14px;
+            padding: 1.4rem 1.6rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .order-item-card:hover {
+            border-color: rgba(37, 99, 235, 0.35);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .order-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--neo-border, #e2e8f0);
             padding-bottom: 1rem;
             margin-bottom: 1rem;
+            flex-wrap: wrap;
         }
-        .order-head h3 { margin: 0; }
-        .order-head p { color: var(--text-muted); margin-top: 0.2rem; }
-        .order-badges {
+
+        .order-code-block {
             display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .order-code-badge {
+            font-family: monospace;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--primary, #2563eb);
+            background: rgba(37, 99, 235, 0.08);
+            padding: 0.25rem 0.65rem;
+            border-radius: 6px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .order-time-text {
+            color: var(--neo-muted, #64748b);
+            font-size: 0.86rem;
+        }
+
+        .order-badges-group {
+            display: flex;
+            align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
-            justify-content: flex-end;
         }
-        .pay-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
+
+        .cust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.32rem 0.75rem;
             border-radius: 50px;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             font-weight: 700;
+            white-space: nowrap;
         }
-        .pay-paid { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-        .pay-failed { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-        .pay-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
-        .order-products-list {
+
+        .cust-badge.status-pending { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+        .cust-badge.status-processing { background: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
+        .cust-badge.status-shipping { background: rgba(139, 92, 246, 0.15); color: #6d28d9; }
+        .cust-badge.status-completed { background: rgba(16, 185, 129, 0.15); color: #047857; }
+        .cust-badge.status-cancelled { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
+
+        .cust-badge.pay-paid { background: rgba(16, 185, 129, 0.12); color: #059669; }
+        .cust-badge.pay-unpaid { background: rgba(245, 158, 11, 0.12); color: #d97706; }
+        .cust-badge.pay-failed { background: rgba(239, 68, 68, 0.12); color: #dc2626; }
+
+        /* Products preview list */
+        .order-products-preview {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.25rem;
             display: grid;
-            gap: 0.45rem;
-            margin-bottom: 1rem;
+            gap: 0.85rem;
         }
-        .order-products-list li,
-        .order-meta-grid div {
+
+        .order-product-row {
             display: flex;
-            justify-content: space-between;
+            align-items: center;
             gap: 1rem;
         }
-        .order-products-list span,
-        .order-meta-grid dd {
-            color: var(--text-secondary);
-            text-align: right;
+
+        .order-product-thumb {
+            width: 58px;
+            height: 58px;
+            border-radius: 8px;
+            border: 1px solid var(--neo-border, #e2e8f0);
+            background: #ffffff;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin: 0;
+            overflow: hidden;
         }
-        .order-meta-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.7rem 1.5rem;
+
+        .order-product-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
-        .order-products-list { list-style: none; padding: 0; }
-        .order-meta-grid dd { margin: 0; }
-        .money { color: var(--primary) !important; font-weight: 800; }
-        .order-actions {
-            margin-top: 1.2rem;
+
+        .order-product-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-product-name {
+            font-size: 0.94rem;
+            font-weight: 600;
+            color: var(--neo-text, #0f172a);
+            margin: 0 0 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .order-product-meta {
+            font-size: 0.84rem;
+            color: var(--neo-muted, #64748b);
             display: flex;
             gap: 0.75rem;
-            flex-wrap: wrap;
-            justify-content: flex-end;
         }
-        .order-tracking-link { text-decoration: none; }
-        @media (max-width: 700px) {
-            .order-head { flex-direction: column; }
-            .order-meta-grid { grid-template-columns: 1fr; }
-            .order-products-list li,
-            .order-meta-grid div { flex-direction: column; gap: 0.2rem; }
-            .order-products-list span,
-            .order-meta-grid dd { text-align: left; }
+
+        .order-product-price {
+            font-weight: 600;
+            color: var(--neo-text, #0f172a);
+        }
+
+        /* Order Card Footer */
+        .order-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border-top: 1px dashed var(--neo-border, #e2e8f0);
+            padding-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .order-shipping-summary {
+            font-size: 0.84rem;
+            color: var(--neo-muted, #64748b);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .order-shipping-summary strong {
+            color: var(--neo-text, #0f172a);
+        }
+
+        .order-total-action-group {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+
+        .order-total-amount {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .order-total-amount span {
+            font-size: 0.84rem;
+            color: var(--neo-muted, #64748b);
+        }
+
+        .order-total-amount strong {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary, #2563eb);
+        }
+
+        .order-action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .btn-view-detail {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.55rem 1.15rem;
+            background: var(--primary, #2563eb);
+            color: #ffffff !important;
+            font-size: 0.88rem;
+            font-weight: 700;
+            border-radius: 8px;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-view-detail:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-cancel-cust {
+            padding: 0.55rem 0.9rem;
+            background: transparent;
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-cancel-cust:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+
+        /* Empty & Loading states */
+        .orders-status-box {
+            text-align: center;
+            padding: 3.5rem 1rem;
+            background: var(--neo-surface, #ffffff);
+            border: 1px dashed var(--neo-border, #cbd5e1);
+            border-radius: 14px;
+        }
+
+        .orders-status-box p {
+            color: var(--neo-muted, #64748b);
+            font-size: 1rem;
+            margin: 0.5rem 0 1.25rem;
+        }
+
+        .orders-status-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .orders-overview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .orders-overview-grid {
+                grid-template-columns: 1fr;
+            }
+            .orders-controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .orders-search-form {
+                width: 100%;
+            }
+            .order-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .order-card-footer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .order-total-action-group {
+                margin-left: 0;
+                width: 100%;
+                justify-content: space-between;
+            }
         }
     </style>
 </head>
 
 <body class="account-page">
-    <nav>
+    <nav class="main-site-nav" aria-label="Điều hướng chính">
         <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
         <ul id="main-navbar">
             <li><a href="../../index.html">Cửa hàng</a></li>
-            <li><a href="orders.html" class="active">Đơn hàng</a></li>
+            <li><a href="orders.html" class="active" aria-current="page">Đơn hàng</a></li>
             <li><a href="profile.html">Hồ sơ</a></li>
             <li class="admin-only"><a href="../../admin/dashboard.html?v=techecommerce-20260709-2">Tổng quan</a></li>
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
     </nav>
     <script src="../../assets/js/animations.js"></script>
-    <script src="../../assets/js/auth.js?v=prod-20260918-1"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/auth.js?v=prod-20261002-1"></script>
+    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20261002-1"></script>
 
-    <main class="container fade-in">
-        <header class="page-header reveal">
+    <main class="customer-orders-container fade-in">
+        <header class="customer-orders-header reveal">
             <h1>Đơn hàng của tôi</h1>
-            <p>Theo dõi trạng thái xử lý, thanh toán và vận chuyển.</p>
+            <p>Theo dõi tiến độ xử lý, thanh toán và hành trình vận chuyển các đơn hàng của bạn.</p>
         </header>
-        <section class="stats-grid reveal" aria-label="Thống kê đơn hàng" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-            <article class="stat-card">
-                <div class="stat-icon">ORD</div>
-                <div class="stat-value" id="orderCount">0</div>
-                <div class="stat-label">Tổng đơn</div>
+
+        <!-- KPI Overview Strip (Replaces old ORD box) -->
+        <section class="orders-overview-grid reveal" aria-label="Tổng quan tình trạng đơn hàng">
+            <article class="overview-chip">
+                <figure class="overview-icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </figure>
+                <div class="overview-details">
+                    <output class="overview-value" id="kpiTotalOrders">0</output>
+                    <span class="overview-label">Tổng đơn hàng</span>
+                </div>
+            </article>
+
+            <article class="overview-chip">
+                <figure class="overview-icon-box pending" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </figure>
+                <div class="overview-details">
+                    <output class="overview-value" id="kpiPendingOrders">0</output>
+                    <span class="overview-label">Chờ xác nhận</span>
+                </div>
+            </article>
+
+            <article class="overview-chip">
+                <figure class="overview-icon-box shipping" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="3" width="15" height="13"></rect>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                    </svg>
+                </figure>
+                <div class="overview-details">
+                    <output class="overview-value" id="kpiShippingOrders">0</output>
+                    <span class="overview-label">Đang vận chuyển</span>
+                </div>
+            </article>
+
+            <article class="overview-chip">
+                <figure class="overview-icon-box completed" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </figure>
+                <div class="overview-details">
+                    <output class="overview-value" id="kpiCompletedOrders">0</output>
+                    <span class="overview-label">Giao thành công</span>
+                </div>
             </article>
         </section>
-        <section id="ordersList" class="orders-shell reveal" aria-label="Danh sách đơn hàng">
-            <div class="empty-state">Đang tải đơn hàng...</div>
+
+        <!-- Controls: Status Tabs & Search Bar -->
+        <section class="orders-controls-bar reveal" aria-label="Bộ lọc và tìm kiếm đơn hàng">
+            <nav aria-label="Lọc theo trạng thái">
+                <ul class="orders-status-nav" id="statusFilterTabs">
+                    <li><button type="button" class="status-tab-btn active" data-status="all">Tất cả</button></li>
+                    <li><button type="button" class="status-tab-btn" data-status="pending">Chờ xử lý</button></li>
+                    <li><button type="button" class="status-tab-btn" data-status="processing">Đang chuẩn bị</button></li>
+                    <li><button type="button" class="status-tab-btn" data-status="shipping">Đang giao</button></li>
+                    <li><button type="button" class="status-tab-btn" data-status="completed">Hoàn thành</button></li>
+                    <li><button type="button" class="status-tab-btn" data-status="cancelled">Đã hủy</button></li>
+                </ul>
+            </nav>
+
+            <form class="orders-search-form" onsubmit="event.preventDefault();" role="search">
+                <svg class="search-icon-inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="search" id="orderSearchInput" class="orders-search-input" placeholder="Tìm theo mã đơn hoặc sản phẩm...">
+            </form>
+        </section>
+
+        <!-- Order List Feed -->
+        <section id="ordersList" class="orders-feed reveal" aria-label="Danh sách đơn hàng" aria-live="polite">
+            <article class="orders-status-box">
+                <span class="orders-status-icon" aria-hidden="true">⏳</span>
+                <p>Đang tải danh sách đơn hàng của bạn...</p>
+            </article>
         </section>
     </main>
 
-    <script src="../../assets/js/my-orders.js?v=order-flow-20260720-1"></script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
+    <script src="../../assets/js/my-orders.js?v=order-flow-20261002-2"></script>
+    <script src="../../assets/js/footer.js?v=navigation-sync-20261002-1"></script>
     <script src="../../assets/js/chatbox.js"></script>
 </body>
 

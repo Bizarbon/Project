@@ -46,9 +46,38 @@ const customerSchema = new mongoose.Schema({
         required: true,
         select: false
     },
+    googleId: {
+        type: String,
+        required: false,
+        unique: true,
+        sparse: true,
+        index: true,
+        trim: true
+    },
+    provider: {
+        type: String,
+        default: 'local',
+        enum: ['local', 'google']
+    },
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    role: {
+        type: String,
+        enum: ['customer', 'admin', 'staff', 'shipper'],
+        default: 'customer',
+        index: true
+    },
+    active: {
+        type: Boolean,
+        default: true,
+        index: true
+    },
+    shipperStatus: {
+        type: String,
+        enum: ['available', 'delivering', 'offline'],
+        default: 'available'
     },
     loginAttempts: {
         type: Number,
@@ -91,6 +120,12 @@ const customerSchema = new mongoose.Schema({
 });
 
 customerSchema.pre('save', async function() {
+    if (this.isAdmin && (!this.role || this.role === 'customer')) {
+        this.role = 'admin';
+    } else if (this.role === 'admin') {
+        this.isAdmin = true;
+    }
+    
     if (this.isNew || this.isModified('password')) {
         if (this.password) {
             const salt = await bcrypt.genSalt(12);

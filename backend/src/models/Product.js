@@ -44,7 +44,7 @@ const productSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        default: 'https://via.placeholder.com/200'
+        default: '/assets/images/product-placeholder.svg'
     },
     images: [{
         type: String,
@@ -67,7 +67,7 @@ const productSchema = new mongoose.Schema({
     },
     warranty: {
         type: String,
-        default: 'Không bảo hành'
+        default: 'Chưa có thông tin'
     },
     specs: {
         cpu: { type: String, default: '' },
@@ -116,6 +116,20 @@ const productSchema = new mongoose.Schema({
     active: {
         type: Boolean,
         default: true
+    },
+    sourceUrl: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    originalImageUrl: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    sourceFetchedAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true

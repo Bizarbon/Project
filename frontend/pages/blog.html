@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Chuyên trang tin tức công nghệ, đánh giá thiết bị, cẩm nang thủ thuật và tư vấn chọn mua điện thoại, laptop, phụ kiện TechEcommerce.">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/blog.html">
+    <title>Blog Tin tức công nghệ &amp; Thủ thuật - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=prod-20260918-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=prod-20260918-1">
+    <style>
+        .blog-hero-section {
+            padding: 30px 0 20px;
+        }
+        .blog-main-title {
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--text-main, #ffffff);
+            line-height: 1.2;
+        }
+        .blog-sub-title {
+            color: var(--text-muted, #94a3b8);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+        .blog-featured-card {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid var(--neo-border, rgba(255, 255, 255, 0.1));
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+        .blog-featured-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .blog-featured-img {
+            width: 100%;
+            height: 100%;
+            min-height: 320px;
+            object-fit: cover;
+            display: block;
+        }
+        .blog-featured-body {
+            padding: 2.5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .blog-category-tag {
+            align-self: flex-start;
+            padding: 4px 12px;
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+        .blog-featured-heading {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+        .blog-featured-desc {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .blog-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        .blog-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .blog-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .blog-tab-btn {
+            padding: 8px 18px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: transparent;
+            color: #cbd5e1;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .blog-tab-btn:hover,
+        .blog-tab-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+        .blog-search-box {
+            position: relative;
+            min-width: 260px;
+        }
+        .blog-search-box input {
+            width: 100%;
+            padding: 9px 16px 9px 36px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            color: #ffffff;
+            font-size: 0.88rem;
+            box-sizing: border-box;
+        }
+        .blog-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        .blog-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .blog-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+        .blog-card-thumb-wrap {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        .blog-card-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .blog-card:hover .blog-card-thumb {
+            transform: scale(1.05);
+        }
+        .blog-card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+        }
+        .blog-card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.4;
+            margin: 0.5rem 0 0.8rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .blog-card-desc {
+            color: #94a3b8;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 1.2rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            flex: 1 1 auto;
+        }
+        .blog-card-footer {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+        @media (max-width: 860px) {
+            .blog-featured-card {
+                grid-template-columns: 1fr;
+            }
+            .blog-featured-img {
+                min-height: 220px;
+                max-height: 260px;
+            }
+        }
+    </style>
+</head>
+
+<body class="blog-storefront-page">
+    <!-- Storefront Global Header -->
+    <header class="storefront-header account-storefront-header">
+        <div class="header-main">
+            <div class="header-shell header-main-inner">
+                <a class="storefront-logo" href="../index.html" aria-label="TechEcommerce - Trang chủ">
+                    <span class="storefront-logo-mark" aria-hidden="true">
+                        <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
+                    </span>
+                    <span class="storefront-logo-text">TechEcommerce</span>
+                </a>
+                <form class="header-search" action="../index.html" method="get" role="search">
+                    <label class="sr-only" for="blogHeaderSearch">Tìm kiếm sản phẩm</label>
+                    <span class="header-search-icon" aria-hidden="true">⌕</span>
+                    <input id="blogHeaderSearch" name="search" type="search" placeholder="Bạn đang tìm sản phẩm gì?">
+                    <button type="submit">Tìm kiếm</button>
+                </form>
+                <div class="header-actions">
+                    <div id="nav-auth-section"></div>
+                    <a class="header-action-btn" href="../index.html?openCart=1">
+                        <span class="header-action-icon" aria-hidden="true">🛒</span>
+                        <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <script src="../assets/js/animations.js"></script>
+    <script src="../assets/js/auth.js?v=prod-20260918-1"></script>
+
+    <!-- Main Content Area -->
+    <main class="container" style="max-width: 1300px; margin: 0 auto; padding: 24px 20px 60px;">
+        <nav aria-label="Đường dẫn trang" style="margin-bottom: 16px;">
+            <ol style="list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; font-size: 0.86rem; color: #94a3b8;">
+                <li><a href="../index.html" style="color: #94a3b8; text-decoration: none;">Trang chủ</a></li>
+                <li aria-hidden="true">&rsaquo;</li>
+                <li style="color: #ffffff;" aria-current="page">Blog &amp; Tin tức công nghệ</li>
+            </ol>
+        </nav>
+
+        <section class="blog-hero-section">
+            <h1 class="blog-main-title">Tin tức công nghệ &amp; Mẹo hay</h1>
+            <p class="blog-sub-title">Cập nhật xu hướng thiết bị mới nhất, bài đánh giá thực tế và hướng dẫn kỹ thuật chuyên sâu từ đội ngũ TechEcommerce.</p>
+
+            <!-- Featured Post Spotlight -->
+            <article class="blog-featured-card" id="featuredArticleBox">
+                <figure style="margin: 0;">
+                    <img id="featuredImg" src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&amp;auto=format&amp;fit=crop&amp;q=80" alt="Đánh giá chi tiết Laptop ASUS TUF Gaming A16" class="blog-featured-img" loading="eager">
+                </figure>
+                <div class="blog-featured-body">
+                    <span class="blog-category-tag" id="featuredCategory">Đánh giá</span>
+                    <h2 class="blog-featured-heading" id="featuredTitle">Đánh giá chi tiết Laptop ASUS TUF Gaming A16 FA607: Cỗ máy gaming đáng mua nhất phân khúc</h2>
+                    <p class="blog-featured-desc" id="featuredDesc">Sở hữu vi xử lý AMD Ryzen thế hệ mới cùng card đồ họa Radeon mạnh mẽ, ASUS TUF A16 mang lại hiệu năng ổn định vượt bậc cho cả game thủ lẫn người làm sáng tạo nội dung.</p>
+                    <div class="blog-meta-row">
+                        <span>✍️ <strong id="featuredAuthor" style="color: #e2e8f0;">Vũ Phi Long</strong></span>
+                        <span>📅 <time id="featuredDate" datetime="2026-07-10">10/07/2026</time></span>
+                        <span>👁️ <span id="featuredViews">1.420</span> lượt đọc</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- Category Filter & Search Bar -->
+        <section class="blog-filter-bar" aria-label="Bộ lọc chuyên mục bài viết">
+            <ul class="blog-tabs" role="tablist">
+                <li><button type="button" class="blog-tab-btn active" onclick="filterBlogByCat('all', this)">Tất cả</button></li>
+                <li><button type="button" class="blog-tab-btn" onclick="filterBlogByCat('Tin tức', this)">Tin tức</button></li>
+                <li><button type="button" class="blog-tab-btn" onclick="filterBlogByCat('Đánh giá', this)">Đánh giá</button></li>
+                <li><button type="button" class="blog-tab-btn" onclick="filterBlogByCat('Thủ thuật', this)">Thủ thuật</button></li>
+                <li><button type="button" class="blog-tab-btn" onclick="filterBlogByCat('Tư vấn', this)">Tư vấn</button></li>
+            </ul>
+
+            <div class="blog-search-box">
+                <span class="blog-search-icon" aria-hidden="true">🔍</span>
+                <input type="search" id="storefrontBlogSearch" placeholder="Tìm kiếm bài viết..." oninput="handleBlogSearch(this.value)">
+            </div>
+        </section>
+
+        <!-- Articles Grid -->
+        <section class="blog-grid" id="storefrontBlogGrid" aria-label="Danh sách các bài viết">
+            <!-- Rendered by JavaScript -->
+        </section>
+    </main>
+
+    <!-- Footer placeholder strictly at the bottom -->
+    <footer id="site-footer"></footer>
+
+    <script>
+        const DEFAULT_POSTS = [
+            {
+                id: 1,
+                title: 'Đánh giá chi tiết Laptop ASUS TUF Gaming A16 FA607: Cỗ máy gaming đáng mua nhất phân khúc',
+                category: 'Đánh giá',
+                author: 'Vũ Phi Long',
+                excerpt: 'Sở hữu vi xử lý AMD Ryzen thế hệ mới cùng card đồ họa Radeon mạnh mẽ, ASUS TUF A16 mang lại hiệu năng ổn định vượt bậc cho cả game thủ lẫn người làm sáng tạo nội dung.',
+                image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80',
+                views: 1420,
+                createdAt: '2026-07-10'
+            },
+            {
+                id: 2,
+                title: 'Top 5 phụ kiện Apple không thể thiếu cho góc làm việc tối giản năm 2026',
+                category: 'Tư vấn',
+                author: 'TechEcommerce Editorial',
+                excerpt: 'Từ củ sạc đa cổng GaN, tai nghe EarPods Lightning tiện lợi đến bàn phím Magic Keyboard và dock sạc MagSafe tiện ích.',
+                image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&auto=format&fit=crop&q=80',
+                views: 980,
+                createdAt: '2026-07-25'
+            },
+            {
+                id: 3,
+                title: 'Hướng dẫn tối ưu hóa Windows 11 giúp tăng tốc độ mở ứng dụng và chơi game không giật lag',
+                category: 'Thủ thuật',
+                author: 'Admin Support',
+                excerpt: 'Tổng hợp các mẹo tinh chỉnh hệ thống, quản lý ứng dụng khởi động và bật chế độ Game Mode chuẩn xác nhất.',
+                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80',
+                views: 2310,
+                createdAt: '2026-08-05'
+            },
+            {
+                id: 4,
+                title: 'Xu hướng chip xử lý AI trên smartphone và máy tính cá nhân trong nửa cuối 2026',
+                category: 'Tin tức',
+                author: 'Vũ Phi Long',
+                excerpt: 'Cuộc đua NPU tích hợp trực tiếp trên vi xử lý di động đang định hình lại toàn bộ hệ sinh thái phần mềm tương lai.',
+                image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80',
+                views: 850,
+                createdAt: '2026-08-18'
+            }
+        ];
+
+        let activeCategory = 'all';
+        let searchQuery = '';
+
+        function getArticles() {
+            try {
+                const stored = localStorage.getItem('techBlogArticles');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed.filter(p => p.status === 'published');
+                    }
+                }
+            } catch (e) {}
+            return DEFAULT_POSTS;
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderBlogList() {
+            const articles = getArticles();
+            const grid = document.getElementById('storefrontBlogGrid');
+            if (!grid) return;
+
+            const filtered = articles.filter(a => {
+                const matchCat = activeCategory === 'all' || a.category === activeCategory;
+                const matchQuery = !searchQuery || (a.title + ' ' + (a.excerpt || '')).toLowerCase().includes(searchQuery);
+                return matchCat && matchQuery;
+            });
+
+            if (!filtered.length) {
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 48px 0; color: #94a3b8; font-size: 1.1rem;">Chưa có bài viết nào trong chuyên mục này.</p>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map(a => `
+                <article class="blog-card">
+                    <figure class="blog-card-thumb-wrap" style="margin: 0;">
+                        <img src="${escapeHTML(a.image)}" alt="${escapeHTML(a.title)}" class="blog-card-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80'">
+                    </figure>
+                    <div class="blog-card-body">
+                        <span class="blog-category-tag" style="font-size: 0.72rem; padding: 2px 10px;">${escapeHTML(a.category)}</span>
+                        <h2 class="blog-card-title">${escapeHTML(a.title)}</h2>
+                        <p class="blog-card-desc">${escapeHTML(a.excerpt || '')}</p>
+                        <footer class="blog-card-footer">
+                            <span>✍️ ${escapeHTML(a.author)}</span>
+                            <span>👁️ ${(Number(a.views) || 0).toLocaleString('vi-VN')}</span>
+                        </footer>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function filterBlogByCat(cat, btn) {
+            activeCategory = cat;
+            document.querySelectorAll('.blog-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderBlogList();
+        }
+
+        function handleBlogSearch(val) {
+            searchQuery = (val || '').trim().toLowerCase();
+            renderBlogList();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBlogList();
+        });
+    </script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+</body>
+
+</html>

@@ -31,8 +31,8 @@
 
     const adminLinks = window.auth?.isAdmin?.()
         ? `
-            <li><a href="${root}admin/dashboard.html?${adminVersion}">Quản trị hệ thống</a></li>
-            <li><a href="${root}admin/finance.html?${adminVersion}">Báo cáo tài chính</a></li>`
+            <li><a href="${root}admin/dashboard.html">Quản trị hệ thống</a></li>
+            <li><a href="${root}admin/finance.html">Báo cáo tài chính</a></li>`
         : '';
 
     const storefrontFooterHTML = `

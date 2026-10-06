@@ -42,7 +42,7 @@
                 <div class="header-shell header-main-inner">
                     <a class="storefront-logo" href="${root}index.html" aria-label="TechEcommerce - Trang chủ">
                         <span class="storefront-logo-mark" aria-hidden="true">
-                            <img src="${root}assets/images/logo/techecommerce-logo.svg" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
+                            <img src="${root}assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
                         </span>
                         <span class="storefront-logo-text">TechEcommerce</span>
                     </a>
@@ -581,6 +581,24 @@ function setupStorefrontLiveSearch(headerEl, root) {
                     });
                     const result = await res.json();
                     if (!res.ok) throw new Error(result.message || 'Không thể tìm kiếm bằng hình ảnh');
+
+                    if (!result.isTech || !result.products?.length) {
+                        dropdown.innerHTML = `
+                            <header class="visual-search-result-badge">
+                                <span class="badge-ai-chip" style="background:rgba(239, 68, 68, 0.15); color:var(--danger, #ef4444);">🔍 AI Phân Loại Ảnh</span>
+                                <div class="visual-detected-title" style="margin-top:0.4rem; font-size:0.9rem; line-height:1.4;">${escapeHTML(result.reply || 'Ảnh này chưa cho thấy thiết bị thuộc danh mục cửa hàng.')}</div>
+                            </header>
+                            <footer class="live-search-footer" style="padding:0.75rem 1rem;">
+                                <small style="color:var(--text-muted, #94a3b8); display:block; margin-bottom:0.5rem;">Gợi ý tìm kiếm:</small>
+                                <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+                                    <a class="filter-chip" href="${root}index.html?category=Điện thoại" style="font-size:0.78rem; text-decoration:none; padding:4px 10px; border-radius:50px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Điện thoại</a>
+                                    <a class="filter-chip" href="${root}index.html?category=Laptop" style="font-size:0.78rem; text-decoration:none; padding:4px 10px; border-radius:50px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Laptop</a>
+                                    <a class="filter-chip" href="${root}index.html?category=Tai nghe" style="font-size:0.78rem; text-decoration:none; padding:4px 10px; border-radius:50px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Tai nghe</a>
+                                </div>
+                            </footer>
+                        `;
+                        return;
+                    }
 
                     const detected = result.detectedItem || 'Thiết bị công nghệ';
                     const products = result.products || [];

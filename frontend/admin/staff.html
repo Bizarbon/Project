@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản trị đội ngũ nhân viên, phân quyền tài khoản quản trị và ca làm việc tại TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/staff.html">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Quản lý nhân viên &amp; Phân quyền - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Khu vực Quản trị",
+                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Người dùng",
+                "item": "https://techecommerce-shop.vercel.app/admin/staff.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Quản lý nhân viên",
+                "item": "https://techecommerce-shop.vercel.app/admin/staff.html"
+            }
+        ]
+    }
+    </script>
+</head>
+
+<body class="admin-page admin-dashboard-page">
+        <!-- Admin Sidebar Navigation -->
+    <header class="admin-sidebar" aria-label="Khu vực điều hướng quản trị">
+        <nav class="admin-sidebar-nav" aria-label="Menu chức năng hệ thống">
+            <!-- Brand Logo Header & Quick Return Home -->
+            <aside class="sidebar-brand-box" aria-label="Thương hiệu cửa hàng">
+                <a href="../index.html" class="sidebar-brand-link" title="Quay lại trang chủ bán hàng TechEcommerce">
+                    <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce Logo" width="32" height="32" class="sidebar-brand-img">
+                    <div class="sidebar-brand-info">
+                        <strong class="sidebar-brand-title">TechEcommerce</strong>
+                        <span class="sidebar-brand-badge">← Về trang chủ</span>
+                    </div>
+                </a>
+            </aside>
+
+            <p class="sidebar-category-heading">TÍNH NĂNG</p>
+            <ul id="main-navbar" class="admin-nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span class="nav-link-text">Dashboard</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item has-dropdown">
+                    <details class="nav-accordion" open>
+                        <summary class="nav-accordion-trigger">
+                            <span class="nav-accordion-title">
+                                <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="nav-link-text">Người dùng</span>
+                            </span>
+                            <svg class="chevron-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </summary>
+                        <ul class="nav-sub-menu">
+                            <li><a href="staff.html" class="sub-link active" aria-current="page" id="navSubStaff">Quản lý nhân viên</a></li>
+                            <li><a href="customers.html" class="sub-link "  id="navSubCustomer">Quản lý khách hàng</a></li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span class="nav-link-text">Sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Đơn hàng</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link "  id="navMessagesLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="nav-link-text">Tin nhắn</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            </svg>
+                            <span class="nav-link-text">Blog</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="coupons.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span class="nav-link-text">Khuyến mãi</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <span class="nav-link-text">Tài chính</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="suppliers.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"></rect>
+                                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                            </svg>
+                            <span class="nav-link-text">Nhà cung cấp</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="qa.html" class="nav-link "  id="navQaLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span class="nav-link-text">Q&amp;A sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link" title="Xem giao diện mua sắm TechEcommerce">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Về trang chủ</span>
+                        </span>
+                        <span class="store-badge-pill">Store ↗</span>
+                    </a>
+                </li>
+
+                <li id="nav-auth-section" class="sidebar-auth-wrapper"></li>
+            </ul>
+        </nav>
+    </header>
+
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main-container">
+        <!-- Header & Breadcrumb with Return Home Button -->
+        <header class="dash-page-header">
+            <div>
+                <h1 class="dash-page-title">Quản lý nhân viên &amp; Phân quyền</h1>
+                <p style="margin: 4px 0 0; color: #94a3b8; font-size: 0.88rem;">Quản lý hồ sơ nhân sự, phân bổ chức vụ, ca trực và quyền hạn truy cập hệ thống TechEcommerce</p>
+                <nav class="dash-breadcrumb-nav" aria-label="Đường dẫn trang" style="margin-top: 6px;">
+                    <ol class="dash-breadcrumb-list">
+                        <li><a href="../index.html">Trang chủ</a></li>
+                        <li aria-hidden="true">&rsaquo;</li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li aria-hidden="true">&rsaquo;</li>
+                        <li><a href="staff.html" aria-current="page">Nhân viên</a></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="dash-header-actions">
+                <a href="../index.html" class="btn-return-home" title="Quay lại giao diện mua sắm TechEcommerce">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span>Về trang chủ</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- KPI Metrics -->
+        <section class="dash-kpi-row" aria-label="Thống kê nhân sự">
+            <article class="metric-card glass-card">
+                <header class="metric-card-header">
+                    <h2 class="metric-card-title">Tổng số nhân sự</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number" id="staffMetricTotal">0</p>
+                <footer class="metric-card-footer">
+                    <span class="metric-footer-text">Nhân sự toàn hệ thống</span>
+                </footer>
+            </article>
+
+            <article class="metric-card glass-card">
+                <header class="metric-card-header">
+                    <h2 class="metric-card-title">Quản trị viên</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number" id="staffMetricAdmin">0</p>
+                <footer class="metric-card-footer">
+                    <span class="metric-footer-text">Toàn quyền kiểm soát</span>
+                </footer>
+            </article>
+
+            <article class="metric-card glass-card">
+                <header class="metric-card-header">
+                    <h2 class="metric-card-title">Đang hoạt động</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number" id="staffMetricActive">0</p>
+                <footer class="metric-card-footer">
+                    <span class="metric-footer-text">Trực ca &amp; làm việc</span>
+                </footer>
+            </article>
+        </section>
+
+        <!-- Actions & Filters Bar -->
+        <section class="glass-card" style="padding: 20px 24px; margin-bottom: 24px;" aria-label="Bộ lọc và thao tác nhân sự">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; align-items: center; margin-bottom: 16px;">
+                <h2 style="margin: 0; font-size: 1.15rem; color: #ffffff;">Danh sách nhân sự &amp; Tài khoản nhân viên</h2>
+                <button type="button" class="btn-primary" onclick="openStaffModal()" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; background: #3b82f6; border: none; border-radius: 8px; color: #ffffff; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Thêm nhân viên mới</span>
+                </button>
+            </div>
+
+            <form id="staffFilterForm" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end;" onsubmit="event.preventDefault(); applyStaffFilters();">
+                <div style="flex: 1 1 240px; min-width: 220px;">
+                    <label for="staffSearchInput" style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Tìm nhân viên</label>
+                    <input type="search" id="staffSearchInput" placeholder="Tìm theo tên, mã NV, email, số điện thoại..." style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                </div>
+
+                <div style="width: 180px;">
+                    <label for="staffDeptSelect" style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Phòng ban</label>
+                    <select id="staffDeptSelect" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        <option value="all">Tất cả phòng ban</option>
+                        <option value="Quản trị">Ban Quản trị</option>
+                        <option value="Bán hàng">Kinh doanh &amp; Bán hàng</option>
+                        <option value="Kỹ thuật">Kỹ thuật &amp; Hỗ trợ</option>
+                        <option value="Kho vận">Kho vận &amp; Giao hàng</option>
+                        <option value="CSKH">Chăm sóc khách hàng</option>
+                    </select>
+                </div>
+
+                <div style="width: 160px;">
+                    <label for="staffStatusSelect" style="display: block; font-size: 0.8rem; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Trạng thái</label>
+                    <select id="staffStatusSelect" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        <option value="all">Tất cả trạng thái</option>
+                        <option value="active">Đang làm việc</option>
+                        <option value="leave">Nghỉ phép</option>
+                        <option value="locked">Tạm khóa</option>
+                    </select>
+                </div>
+
+                <div>
+                    <button type="button" onclick="resetStaffFilters()" style="padding: 10px 18px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: #e2e8f0; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: background 0.15s;">
+                        Đặt lại
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Staff Table -->
+        <section class="dash-operational-orders glass-card" aria-labelledby="staffTableHeading">
+            <header class="orders-section-header">
+                <h2 id="staffTableHeading">Danh sách nhân viên (<span id="staffTableCount">0</span>)</h2>
+            </header>
+            <div class="table-responsive-wrapper">
+                <table class="dash-orders-table">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 75px;">Mã NV</th>
+                            <th scope="col" style="width: 220px;">Họ tên nhân viên</th>
+                            <th scope="col" style="width: 160px;">Chức vụ / Vị trí</th>
+                            <th scope="col" style="width: 140px;">Phòng ban</th>
+                            <th scope="col" style="width: 200px;">Thông tin liên hệ</th>
+                            <th scope="col" style="width: 120px;">Ca làm việc</th>
+                            <th scope="col" style="width: 120px;">Trạng thái</th>
+                            <th scope="col" style="width: 150px; text-align: center;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTableBody">
+                        <tr><td colspan="8" class="table-loading-row">Đang tải danh sách nhân sự...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Dialog: Create / Edit Staff -->
+    <dialog id="staffModal" class="dash-modal" aria-labelledby="staffModalTitle">
+        <article class="dash-modal-content" style="max-width: 580px;">
+            <header class="dash-modal-header">
+                <h3 id="staffModalTitle">Thêm nhân viên mới</h3>
+                <button type="button" class="btn-close-modal" onclick="closeStaffModal()" aria-label="Đóng">✕</button>
+            </header>
+            <form id="staffForm" onsubmit="event.preventDefault(); saveStaffMember();">
+                <input type="hidden" id="editStaffId">
+                <fieldset style="display: flex; flex-direction: column; gap: 14px; margin: 0 0 20px; border: none; padding: 0;">
+                    <legend class="sr-only">Thông tin nhân viên</legend>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <p style="margin: 0;">
+                            <label for="staffFullName" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Họ và tên *</label>
+                            <input type="text" id="staffFullName" required placeholder="Ví dụ: Nguyễn Văn An" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        </p>
+                        <p style="margin: 0;">
+                            <label for="staffCode" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Mã nhân viên *</label>
+                            <input type="text" id="staffCode" required placeholder="NV001..." style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <p style="margin: 0;">
+                            <label for="staffEmail" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Email công ty *</label>
+                            <input type="email" id="staffEmail" required placeholder="nhanvien@techecommerce.vn" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        </p>
+                        <p style="margin: 0;">
+                            <label for="staffPhone" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Số điện thoại *</label>
+                            <input type="tel" id="staffPhone" required placeholder="0912345678" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <p style="margin: 0;">
+                            <label for="staffDepartment" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Phòng ban *</label>
+                            <select id="staffDepartment" required style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                                <option value="Bán hàng">Kinh doanh &amp; Bán hàng</option>
+                                <option value="Quản trị">Ban Quản trị</option>
+                                <option value="Kỹ thuật">Kỹ thuật &amp; Hỗ trợ</option>
+                                <option value="Kho vận">Kho vận &amp; Giao hàng</option>
+                                <option value="CSKH">Chăm sóc khách hàng</option>
+                            </select>
+                        </p>
+                        <p style="margin: 0;">
+                            <label for="staffPosition" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Chức vụ *</label>
+                            <select id="staffPosition" required style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                                <option value="Nhân viên tư vấn">Nhân viên tư vấn</option>
+                                <option value="Quản trị viên">Quản trị viên hệ thống</option>
+                                <option value="Quản lý cửa hàng">Quản lý cửa hàng</option>
+                                <option value="Kỹ thuật viên">Kỹ thuật viên phần cứng</option>
+                                <option value="Thu ngân">Thu ngân &amp; Kế toán</option>
+                                <option value="Thủ kho">Thủ kho vận hành</option>
+                            </select>
+                        </p>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <p style="margin: 0;">
+                            <label for="staffShift" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Ca làm việc *</label>
+                            <select id="staffShift" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                                <option value="Toàn thời gian">Toàn thời gian (Hành chính)</option>
+                                <option value="Ca sáng (8h-16h)">Ca sáng (8h - 16h)</option>
+                                <option value="Ca tối (14h-22h)">Ca tối (14h - 22h)</option>
+                                <option value="Bán thời gian">Bán thời gian (Part-time)</option>
+                            </select>
+                        </p>
+                        <p style="margin: 0;">
+                            <label for="staffStatus" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Trạng thái hoạt động *</label>
+                            <select id="staffStatus" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
+                                <option value="active">Đang làm việc</option>
+                                <option value="leave">Nghỉ phép</option>
+                                <option value="locked">Tạm khóa</option>
+                            </select>
+                        </p>
+                    </div>
+                </fieldset>
+
+                <footer class="dash-modal-footer" style="gap: 10px;">
+                    <button type="button" onclick="closeStaffModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: #cbd5e1; font-size: 0.88rem; cursor: pointer;">Hủy</button>
+                    <button type="submit" class="btn-primary" style="padding: 8px 20px; background: #3b82f6; border: none; border-radius: 8px; color: #ffffff; font-size: 0.88rem; font-weight: 600; cursor: pointer;">Lưu thông tin</button>
+                </footer>
+            </form>
+        </article>
+    </dialog>
+
+    <!-- Footer placeholder strictly at the bottom -->
+    <footer id="site-footer"></footer>
+
+    <script src="../assets/js/admin-staff.js?v=techecommerce-20261001-1"></script>
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+</body>
+
+</html>

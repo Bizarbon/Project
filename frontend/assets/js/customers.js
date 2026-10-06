@@ -1,3 +1,7 @@
+if (new URLSearchParams(window.location.search).get('role') === 'staff') {
+    window.location.replace('staff.html');
+}
+
 const EP = API_URL + '/customers';
 
 function showToast(message, type = 'success') {

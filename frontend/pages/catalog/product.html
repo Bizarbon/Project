@@ -14,7 +14,7 @@
     <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/catalog/product.html">
     <title>Chi tiết sản phẩm - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=mobile-align-20260924-2">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20260925-v3">
     <link rel="stylesheet" href="../../assets/css/product-detail.css?v=20260923-4">
 </head>
 
@@ -130,28 +130,65 @@
                 </div>
 
                 <!-- Review Submission Form -->
-                <div class="review-form-container" id="reviewFormContainer">
+                <section class="review-form-container" id="reviewFormContainer" aria-label="Gửi nhận xét đánh giá sản phẩm">
                     <h3 class="review-form-title">Chia sẻ cảm nhận của bạn về sản phẩm</h3>
-                    <form id="reviewForm" style="display:none;grid-template-columns:120px 1fr;gap:.8rem;margin-bottom:1rem;">
-                        <label class="sr-only" for="reviewRating">Số sao đánh giá</label>
-                        <select id="reviewRating" style="padding:0.6rem;border-radius:var(--radius-sm);background:var(--bg-dark);color:var(--text-primary);border:1px solid var(--border);">
-                            <option value="5">★★★★★ 5 sao</option>
-                            <option value="4">★★★★☆ 4 sao</option>
-                            <option value="3">★★★☆☆ 3 sao</option>
-                            <option value="2">★★☆☆☆ 2 sao</option>
-                            <option value="1">★☆☆☆☆ 1 sao</option>
-                        </select>
-                        <label class="sr-only" for="reviewTitle">Tiêu đề đánh giá</label>
-                        <input id="reviewTitle" type="text" placeholder="Tiêu đề ngắn (ví dụ: Dùng rất mượt, pin trâu)">
-                        <label class="sr-only" for="reviewComment">Nội dung đánh giá</label>
-                        <textarea id="reviewComment" class="full-width" rows="3"
-                            placeholder="Chia sẻ trải nghiệm chi tiết về thiết kế, tính năng và độ hài lòng của bạn..."></textarea>
-                        <div class="form-actions full-width" style="margin-top:0.5rem;">
-                            <button type="submit" class="btn-primary" style="padding:0.75rem 1.5rem;">Gửi nhận xét ngay</button>
+                    <form id="reviewForm" class="review-submission-form" style="display:none;">
+                        <fieldset class="review-rating-fieldset">
+                            <legend class="review-rating-legend">Mức độ hài lòng của bạn:</legend>
+                            <div class="review-star-picker" id="reviewStarPicker" role="radiogroup" aria-label="Đánh giá sao">
+                                <button type="button" class="star-pick-btn active" data-rating="1" aria-label="1 sao: Rất tệ" title="1 sao: Rất tệ">
+                                    <svg viewBox="0 0 24 24" width="28" height="28" class="star-icon" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="star-pick-btn active" data-rating="2" aria-label="2 sao: Không hài lòng" title="2 sao: Không hài lòng">
+                                    <svg viewBox="0 0 24 24" width="28" height="28" class="star-icon" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="star-pick-btn active" data-rating="3" aria-label="3 sao: Bình thường" title="3 sao: Bình thường">
+                                    <svg viewBox="0 0 24 24" width="28" height="28" class="star-icon" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="star-pick-btn active" data-rating="4" aria-label="4 sao: Hài lòng" title="4 sao: Hài lòng">
+                                    <svg viewBox="0 0 24 24" width="28" height="28" class="star-icon" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </button>
+                                <button type="button" class="star-pick-btn active" data-rating="5" aria-label="5 sao: Tuyệt vời" title="5 sao: Tuyệt vời">
+                                    <svg viewBox="0 0 24 24" width="28" height="28" class="star-icon" fill="currentColor">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </button>
+                                <output id="starRatingFeedback" class="star-rating-badge" for="reviewRating">Tuyệt vời ⭐⭐⭐⭐⭐</output>
+                                <input type="hidden" id="reviewRating" name="rating" value="5">
+                            </div>
+                        </fieldset>
+
+                        <div class="review-form-field">
+                            <label for="reviewTitle" class="review-field-label">Tiêu đề đánh giá (không bắt buộc):</label>
+                            <input id="reviewTitle" type="text" class="review-input" placeholder="Tóm tắt ngắn (ví dụ: Dùng rất mượt, pin trâu, máy rất đẹp)...">
+                        </div>
+
+                        <div class="review-form-field">
+                            <label for="reviewComment" class="review-field-label">Nội dung nhận xét <span class="required-asterisk">*</span>:</label>
+                            <textarea id="reviewComment" class="review-textarea" rows="4"
+                                placeholder="Chia sẻ trải nghiệm chi tiết về thiết kế, tính năng, camera, thời lượng pin và độ hài lòng của bạn..."></textarea>
+                        </div>
+
+                        <div class="review-form-actions">
+                            <button type="submit" class="btn-primary review-submit-btn" id="btnSubmitReview">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                                <span>Gửi nhận xét ngay</span>
+                            </button>
                         </div>
                     </form>
-                    <div id="reviewLoginHint" style="color:var(--text-muted);font-size:0.9rem;"></div>
-                </div>
+                    <div id="reviewLoginHint" class="review-login-hint" style="color:var(--text-muted);font-size:0.9rem;"></div>
+                </section>
 
                 <!-- Review List Items -->
                 <div class="review-cards-list" id="reviewList">

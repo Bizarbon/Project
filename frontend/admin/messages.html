@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description" content="Quản lý lịch sử hội thoại khách hàng với Chatbox AI, theo dõi nhu cầu sản phẩm, ngân sách và phân loại tư vấn tại TechEcommerce.">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/messages.html">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <title>Tin nhắn &amp; Lịch sử Chatbox AI - TechEcommerce</title>
+    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Khu vực Quản trị",
+                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Tin nhắn & Tư vấn AI",
+                "item": "https://techecommerce-shop.vercel.app/admin/messages.html"
+            }
+        ]
+    }
+    </script>
+</head>
+
+<body class="admin-page admin-dashboard-page">
+        <!-- Admin Sidebar Navigation -->
+    <header class="admin-sidebar" aria-label="Khu vực điều hướng quản trị">
+        <nav class="admin-sidebar-nav" aria-label="Menu chức năng hệ thống">
+            <!-- Brand Logo Header & Quick Return Home -->
+            <aside class="sidebar-brand-box" aria-label="Thương hiệu cửa hàng">
+                <a href="../index.html" class="sidebar-brand-link" title="Quay lại trang chủ bán hàng TechEcommerce">
+                    <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce Logo" width="32" height="32" class="sidebar-brand-img">
+                    <div class="sidebar-brand-info">
+                        <strong class="sidebar-brand-title">TechEcommerce</strong>
+                        <span class="sidebar-brand-badge">← Về trang chủ</span>
+                    </div>
+                </a>
+            </aside>
+
+            <p class="sidebar-category-heading">TÍNH NĂNG</p>
+            <ul id="main-navbar" class="admin-nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span class="nav-link-text">Dashboard</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item has-dropdown">
+                    <details class="nav-accordion" >
+                        <summary class="nav-accordion-trigger">
+                            <span class="nav-accordion-title">
+                                <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <span class="nav-link-text">Người dùng</span>
+                            </span>
+                            <svg class="chevron-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </summary>
+                        <ul class="nav-sub-menu">
+                            <li><a href="staff.html" class="sub-link "  id="navSubStaff">Quản lý nhân viên</a></li>
+                            <li><a href="customers.html" class="sub-link "  id="navSubCustomer">Quản lý khách hàng</a></li>
+                        </ul>
+                    </details>
+                </li>
+
+                <li class="nav-item">
+                    <a href="products.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span class="nav-link-text">Sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="orders.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Đơn hàng</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="messages.html" class="nav-link active" aria-current="page" id="navMessagesLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span class="nav-link-text">Tin nhắn</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="blog.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            </svg>
+                            <span class="nav-link-text">Blog</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="coupons.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span class="nav-link-text">Khuyến mãi</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="finance.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="12" y1="1" x2="12" y2="23"></line>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                            <span class="nav-link-text">Tài chính</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="suppliers.html" class="nav-link " >
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="1" y="3" width="15" height="13"></rect>
+                                <polygon points="16 8 20 8 23 11 23 16 16 8"></polygon>
+                                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                            </svg>
+                            <span class="nav-link-text">Nhà cung cấp</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="qa.html" class="nav-link "  id="navQaLink">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <span class="nav-link-text">Q&amp;A sản phẩm</span>
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link" title="Xem giao diện mua sắm TechEcommerce">
+                        <span class="nav-accordion-title">
+                            <svg class="nav-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span class="nav-link-text">Về trang chủ</span>
+                        </span>
+                        <span class="store-badge-pill">Store ↗</span>
+                    </a>
+                </li>
+
+                <li id="nav-auth-section" class="sidebar-auth-wrapper"></li>
+            </ul>
+        </nav>
+    </header>
+
+    <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+
+    <!-- Main Content Area -->
+    <main class="dashboard-main-container">
+        <!-- Header & Breadcrumb with Return Home Button -->
+        <header class="dash-page-header">
+            <div>
+                <nav class="dash-breadcrumbs" aria-label="Đường dẫn trang quản trị">
+                    <ol>
+                        <li><a href="dashboard.html">Trang chủ</a></li>
+                        <li class="breadcrumb-separator" aria-hidden="true">&rsaquo;</li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li class="breadcrumb-separator" aria-hidden="true">&rsaquo;</li>
+                        <li aria-current="page">Tin nhắn &amp; Lịch sử Chatbox AI</li>
+                    </ol>
+                </nav>
+                <h1 class="dash-page-main-title">Tin nhắn &amp; Lịch sử Tư vấn Chatbox AI</h1>
+                <p class="dash-page-subtitle">Theo dõi toàn bộ lịch sử tư vấn, nắm bắt nhu cầu mua sắm và thông tin liên hệ của khách hàng</p>
+            </div>
+        </header>
+
+        <!-- KPI Summary Strip -->
+        <section class="dash-kpi-summary-grid" aria-label="Thống kê hội thoại AI">
+            <article class="metric-card">
+                <header class="metric-card-top">
+                    <h2 class="metric-card-label">Tổng cuộc trò chuyện</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number"><output id="statTotalConversations">0</output></p>
+                <footer class="metric-card-footer">
+                    <span>Ghi nhận từ Chatbox AI</span>
+                </footer>
+            </article>
+
+            <article class="metric-card">
+                <header class="metric-card-top">
+                    <h2 class="metric-card-label">Khách hàng thành viên</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number"><output id="statMemberConversations">0</output></p>
+                <footer class="metric-card-footer">
+                    <span>Đã đăng nhập tài khoản</span>
+                </footer>
+            </article>
+
+            <article class="metric-card">
+                <header class="metric-card-top">
+                    <h2 class="metric-card-label">Cần tư vấn viên</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number"><output id="statNeedsAgent">0</output></p>
+                <footer class="metric-card-footer">
+                    <span>Yêu cầu nhân viên can thiệp</span>
+                </footer>
+            </article>
+
+            <article class="metric-card">
+                <header class="metric-card-top">
+                    <h2 class="metric-card-label">Hoạt động trong 24h</h2>
+                    <figure class="metric-icon-box" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </figure>
+                </header>
+                <p class="metric-card-number"><output id="statActiveToday">0</output></p>
+                <footer class="metric-card-footer">
+                    <span>Tương tác gần nhất</span>
+                </footer>
+            </article>
+        </section>
+
+        <!-- Main Messages Workspace -->
+        <section class="messages-workspace" aria-label="Không gian làm việc tin nhắn">
+            <!-- Left Column: Search, Filter Tabs & Scrollable Conversation List -->
+            <aside class="messages-list-panel" aria-label="Danh sách hội thoại khách hàng">
+                <header class="messages-list-header">
+                    <div class="messages-search-box">
+                        <svg class="messages-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="search" id="conversationSearchInput" class="messages-search-input" placeholder="Tìm tên, SĐT, nhu cầu khách...">
+                    </div>
+
+                    <nav class="messages-filters-row" aria-label="Bộ lọc trạng thái">
+                        <button type="button" class="msg-filter-btn active" data-status="all">Tất cả</button>
+                        <button type="button" class="msg-filter-btn" data-status="needs_agent">Cần hỗ trợ</button>
+                        <button type="button" class="msg-filter-btn" data-status="active">Đang trao đổi</button>
+                        <button type="button" class="msg-filter-btn" data-status="resolved">Đã xong</button>
+                    </nav>
+                </header>
+
+                <ul id="conversationsListContainer" class="conversations-scrollable-list">
+                    <!-- Loaded dynamically via admin-messages.js -->
+                    <li class="widget-empty-note" style="padding: 24px; text-align: center;">Đang tải danh sách cuộc trò chuyện...</li>
+                </ul>
+            </aside>
+
+            <!-- Right Column: Active Conversation Detail & Insights -->
+            <article class="messages-detail-panel" aria-label="Chi tiết cuộc trò chuyện và nhu cầu khách hàng">
+                <!-- Customer Quick Profile Header -->
+                <header class="conv-detail-header" id="convDetailHeader">
+                    <div class="conv-header-customer">
+                        <div class="conv-header-avatar" id="activeConvAvatar">KH</div>
+                        <div class="conv-header-meta">
+                            <h2>
+                                <span id="activeConvCustomerName">Chọn một cuộc trò chuyện</span>
+                                <span class="customer-membership-tag" id="activeConvMemberTag">Khách hàng</span>
+                            </h2>
+                            <div class="conv-contact-info-pills">
+                                <span id="activeConvPhone">📞 --</span>
+                                <span id="activeConvEmail">✉️ --</span>
+                                <span id="activeConvTime">🕒 --</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="conv-header-actions">
+                        <button type="button" class="status-switch-btn" id="btnToggleStatus">
+                            <span>Đổi trạng thái</span>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- AI Customer Want & Intent Insight Banner -->
+                <section class="ai-intent-insight-box" id="activeConvInsightBox" aria-label="Phân tích nhu cầu khách hàng từ AI">
+                    <header class="insight-box-title">
+                        <span>🎯 Phân tích nhu cầu khách hàng (AI Insight)</span>
+                        <span class="ai-sparkle-pill">✨ Chatbox AI</span>
+                    </header>
+                    <div class="insight-details-grid">
+                        <div class="insight-item">
+                            <span class="insight-item-label">Nhu cầu trọng tâm:</span>
+                            <span class="insight-item-value" id="activeConvIntent">Chưa chọn cuộc trò chuyện</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-item-label">Ngân sách dự kiến:</span>
+                            <span class="insight-item-value" id="activeConvBudget">--</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-item-label">Danh mục quan tâm:</span>
+                            <span class="insight-item-value" id="activeConvCategory">--</span>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-item-label">Gợi ý hành động:</span>
+                            <span class="insight-item-value" id="activeConvActionNote">Chủ động liên hệ qua điện thoại hoặc hỗ trợ giải đáp trực tiếp</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Scrollable Chat Transcript Timeline -->
+                <section class="chat-timeline-container" id="chatTimelineContainer" aria-label="Lịch sử đối thoại chi tiết">
+                    <p class="widget-empty-note" style="text-align: center; margin-top: 40px;">
+                        Vui lòng nhấp vào một khách hàng ở danh sách bên trái để xem đầy đủ nội dung trao đổi với Chatbox AI.
+                    </p>
+                </section>
+
+                <!-- Admin Action & Quick Note Footer -->
+                <footer class="conv-admin-note-footer">
+                    <input type="text" id="adminNoteInput" class="conv-admin-note-input" placeholder="Ghi chú thêm về nhu cầu khách hàng này...">
+                    <button type="button" id="btnSaveAdminNote" class="conv-save-note-btn">Lưu ghi chú</button>
+                </footer>
+            </article>
+        </section>
+    </main>
+
+    <!-- Admin footer -->
+    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+    <script src="../assets/js/admin-messages.js?v=20261002-1"></script>
+</body>
+
+</html>
