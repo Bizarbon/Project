@@ -617,7 +617,13 @@
         const pageCategory = new URLSearchParams(window.location.search).get('category') || '';
         const requestContext = { ...(context || {}) };
         if (pageCategory) {
-            if (requestContext.pageCategory && requestContext.pageCategory !== pageCategory) {
+            const hasActiveConversationScope = Boolean(
+                requestContext.productType
+                || requestContext.stage === 'qualifying_needs'
+                || requestContext.currentIntent === 'qualifying_needs'
+                || requestContext.currentIntent === 'clarify_needs'
+            );
+            if (!hasActiveConversationScope && requestContext.pageCategory && requestContext.pageCategory !== pageCategory) {
                 delete requestContext.brand;
                 delete requestContext.budget;
                 delete requestContext.budgetType;
@@ -626,7 +632,9 @@
                 delete requestContext.currentIntent;
                 delete requestContext.productType;
             }
-            requestContext.category = pageCategory;
+            if (!hasActiveConversationScope) {
+                requestContext.category = pageCategory;
+            }
             requestContext.pageCategory = pageCategory;
         }
 
@@ -951,6 +959,12 @@
                 return;
             }
 
+            // Đang thu thập nhu cầu thì giữ nguyên trang hiện tại. Chỉ đổi danh mục
+            // khi đã có kết quả/ý định rõ ràng để tránh trang ghi đè ngữ cảnh chat.
+            if (data.context?.currentIntent === 'qualifying_needs') {
+                return;
+            }
+
             const userMsgLower = String(userMessage || '').toLowerCase().trim();
             const isMainShop = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || (!window.location.pathname.includes('/pages/') && !window.location.pathname.includes('/admin/'));
 
@@ -1247,6 +1261,7 @@
             input.removeAttribute('aria-invalid');
             appendMessage(body, 'user', message);
             chatHistory.push({ role: 'user', text: message });
+            renderSuggestions(suggestionsBar, [], send);
             saveSession();
 
             const typing = appendMessage(body, 'ai ai-typing', 'Đang tìm kiếm thông tin tối ưu...');

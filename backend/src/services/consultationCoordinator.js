@@ -87,7 +87,7 @@ const PRODUCT_TYPE_INTENTS = [
     { key: 'camera', label: 'camera bỏ túi', aliases: ['camera bo tui', 'osmo pocket', 'camera vlog'], category: 'Phụ kiện', name: /camera|osmo pocket/i },
     { key: 'speaker', label: 'loa Bluetooth', aliases: ['loa bluetooth', 'loa khong day', 'loa'], category: 'Tai nghe', name: /^loa\b/i },
     { key: 'headphones', label: 'tai nghe', aliases: ['tai nghe', 'airpods', 'headphone', 'earbuds', 'headset', 'galaxy buds'], category: 'Tai nghe', name: /^tai nghe\b/i },
-    { key: 'smartwatch', label: 'đồng hồ thông minh', aliases: ['dong ho thong minh', 'smartwatch', 'apple watch', 'galaxy watch', 'garmin watch', 'vong deo tay thong minh'], category: 'Đồng hồ thông minh' },
+    { key: 'smartwatch', label: 'đồng hồ thông minh', aliases: ['dong ho thong minh', 'smartwatch', 'apple watch', 'galaxy watch', 'garmin watch', 'vong deo tay thong minh', 'dong ho'], category: 'Đồng hồ thông minh' },
     { key: 'console', label: 'máy chơi game', aliases: ['may choi game', 'playstation', 'ps5', 'nintendo switch', 'steam deck', 'rog ally'], category: 'Máy chơi game' },
     { key: 'tablet', label: 'máy tính bảng', aliases: ['may tinh bang', 'tablet', 'ipad', 'galaxy tab', 'matepad'], category: 'Tablet' },
     { key: 'laptop', label: 'laptop', aliases: ['laptop', 'may tinh xach tay', 'macbook', 'notebook'], category: 'Laptop' },
@@ -1050,7 +1050,7 @@ function extractQualificationPreference(text) {
     const preferences = [
         ['camera đẹp', ['camera', 'chup anh', 'quay phim', 'selfie']],
         ['hiệu năng mạnh', ['hieu nang', 'cau hinh', 'manh', 'muot', 'gaming', 'choi game']],
-        ['pin lâu', ['pin trau', 'pin lau', 'dung lau', 'thoi luong pin']],
+        ['pin lâu', ['pin trau', 'pin lau', 'dung lau', 'thoi luong pin', 'uu tien pin']],
         ['mỏng nhẹ, dễ mang theo', ['mong nhe', 'nhe', 'de mang', 'di chuyen']],
         ['không dây', ['khong day', 'bluetooth', 'wireless']],
         ['chống ồn', ['chong on', 'anc', 'cach am']],
