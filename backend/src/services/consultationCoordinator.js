@@ -1173,6 +1173,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     };
     if (productType.name) query.name = productType.name;
     if (brand) query.brand = new RegExp(escapeRegex(brand), 'i');
+    else if (context.excludedBrand) query.brand = { $not: new RegExp(escapeRegex(context.excludedBrand), 'i') };
     if (budget > 0) query.price = { $lte: budget };
 
     const candidates = await Product.find(query)
@@ -1187,6 +1188,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
         };
         if (productType.name) nearestQuery.name = productType.name;
         if (brand) nearestQuery.brand = new RegExp(escapeRegex(brand), 'i');
+        else if (context.excludedBrand) nearestQuery.brand = { $not: new RegExp(escapeRegex(context.excludedBrand), 'i') };
         const nearest = await Product.findOne(nearestQuery).sort({ price: 1 });
 
         const scope = brand ? ` ${brand}` : '';
@@ -2361,12 +2363,41 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
         return await handleCatalogProductTypeQuery(message, switchedContext, requestedProductType);
     }
 
+    // Các nút xử lý sau khi không có kết quả phải thật sự nới điều kiện cũ,
+    // thay vì gửi lại nguyên brand/ngân sách khiến AI lặp cùng một câu trả lời.
+    const activeProductType = PRODUCT_TYPE_INTENTS.find(type => type.key === prev.productType);
+    if (activeProductType && text.includes('doi thuong hieu')) {
+        const previousBrand = prev.brand || prev.qualification?.brand || '';
+        const relaxedContext = {
+            ...prev,
+            stage: 'qualifying_needs',
+            currentIntent: 'qualifying_needs',
+            brand: '',
+            excludedBrand: previousBrand,
+            qualification: { ...(prev.qualification || {}), brand: '' },
+            lastProducts: []
+        };
+        return await handleCatalogProductTypeQuery(message, relaxedContext, activeProductType);
+    }
+    if (activeProductType && text.includes('tang khoang ngan sach') && !extractBudget(message)) {
+        const relaxedContext = {
+            ...prev,
+            stage: 'qualifying_needs',
+            currentIntent: 'qualifying_needs',
+            budget: 0,
+            budgetType: 'unspecified',
+            qualification: { ...(prev.qualification || {}), budget: 0 },
+            lastProducts: []
+        };
+        return await handleCatalogProductTypeQuery(message, relaxedContext, activeProductType);
+    }
+
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở
     // trên, nhánh exact lookup đã ưu tiên trả sản phẩm ngay lập tức.
     if (prev.stage === 'qualifying_needs' && prev.productType) {
-        const activeProductType = PRODUCT_TYPE_INTENTS.find(type => type.key === prev.productType);
-        if (activeProductType) {
-            return await handleCatalogProductTypeQuery(message, prev, activeProductType);
+        const qualifyingProductType = PRODUCT_TYPE_INTENTS.find(type => type.key === prev.productType);
+        if (qualifyingProductType) {
+            return await handleCatalogProductTypeQuery(message, prev, qualifyingProductType);
         }
     }
 

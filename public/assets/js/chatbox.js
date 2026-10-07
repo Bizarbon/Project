@@ -960,8 +960,27 @@
             }
 
             // Đang thu thập nhu cầu thì giữ nguyên trang hiện tại. Chỉ đổi danh mục
-            // khi đã có kết quả/ý định rõ ràng để tránh trang ghi đè ngữ cảnh chat.
+            // và xóa bộ lọc cũ để khách thấy toàn bộ mặt hàng. Chỉ áp bộ lọc cụ thể
+            // sau khi AI đã hỏi đủ nhu cầu và trả kết quả cuối.
             if (data.context?.currentIntent === 'qualifying_needs') {
+                const qualifyingCategory = data.context?.category;
+                const onMainShop = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || (!window.location.pathname.includes('/pages/') && !window.location.pathname.includes('/admin/'));
+                if (onMainShop && qualifyingCategory) {
+                    if (typeof window.setCategory === 'function') {
+                        window.setCategory(qualifyingCategory, { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch('', { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter('all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                } else if (qualifyingCategory) {
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(qualifyingCategory)}#catalogStart`;
+                }
                 return;
             }
 
