@@ -1085,6 +1085,12 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     const productType = forcedProductType || detectProductType(message);
     if (!productType) return null;
 
+    const normalizedMessage = normalizeText(message);
+    const isAvailabilityQuestion = (
+        /\b(co|con)\b.*\b(khong|ko|khong a|khong vay)\b/i.test(normalizedMessage)
+        || /\b(?:ben ban|cua hang|shop)\b.*\b(?:co|con)\b/i.test(normalizedMessage)
+    );
+
     const previousQualification = context.qualification || {};
     const extractedBudget = extractBudget(message);
     const budget = extractedBudget || previousQualification.budget || context.budget || 0;
@@ -1100,6 +1106,20 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     ].filter(Boolean);
 
     if (missingSlots.length) {
+        let availabilityIntro = '';
+        if (isAvailabilityQuestion && !context.availabilityConfirmed) {
+            const availabilityQuery = {
+                category: productType.category,
+                active: { $ne: false },
+                stock: { $gt: 0 }
+            };
+            if (productType.name) availabilityQuery.name = productType.name;
+            const hasAvailableProduct = await Product.exists(availabilityQuery);
+            if (hasAvailableProduct) {
+                availabilityIntro = `Dạ có ạ! Cửa hàng tụi mình hiện có sẵn **${productType.label}** chính hãng. `;
+            }
+        }
+
         const questions = [];
         if (missingSlots.includes('budget')) questions.push('Mức giá tối đa bạn muốn chi khoảng bao nhiêu?');
         if (missingSlots.includes('useCase')) questions.push(`Bạn dùng ${productType.label} chủ yếu cho việc gì và thường dùng trong hoàn cảnh nào?`);
@@ -1115,12 +1135,14 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
         const acknowledgement = confirmedDetails.length
             ? `mình đã ghi nhận ${confirmedDetails.join(', ')}. `
             : '';
-        const qualificationIntro = acknowledgement
+        const qualificationIntro = availabilityIntro
+            ? `Để chọn đúng **${productType.label}** hợp nhất, mình xin hỏi thêm:`
+            : acknowledgement
             ? `Dạ, ${acknowledgement}Để chọn đúng **${productType.label}** hợp nhất, mình chỉ cần hỏi thêm:`
             : `Dạ được ạ! Để chọn đúng **${productType.label}** hợp nhất, mình xin hỏi thêm:`;
 
         return {
-            reply: `${qualificationIntro}\n\n` +
+            reply: `${availabilityIntro}${qualificationIntro}\n\n` +
                 questions.map((question, index) => `${index + 1}. ${question}`).join('\n') +
                 `\n\nBạn trả lời từng ý hoặc gộp trong một tin nhắn đều được nhé. Mình sẽ giữ nguyên các thông tin đã ghi nhận và không hỏi lại. 😊`,
             products: [],
@@ -1137,6 +1159,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                     : (context.budgetType || 'unspecified'),
                 useCase,
                 qualification,
+                availabilityConfirmed: context.availabilityConfirmed || Boolean(availabilityIntro),
                 missingSlots,
                 currentIntent: 'qualifying_needs'
             }
