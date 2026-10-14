@@ -1114,7 +1114,7 @@
                         window.setShopPrice('', { scroll: false });
                     }
                     if (typeof window.setShopSearch === 'function') {
-                        window.setShopSearch('', { scroll: false });
+                        window.setShopSearch(topProduct?.name || '', { scroll: true });
                     }
                 } else if (targetCategory) {
                     window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
@@ -1123,6 +1123,26 @@
             }
 
             // D2. Khách hàng hỏi theo tính năng / kiểu dáng (feature_showcase: "không dây", "chống ồn", "chụp tai"...)
+            if (data.context?.currentIntent === 'product_type_no_match') {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch(topProduct?.name || '', { scroll: true });
+                    }
+                } else if (targetCategory) {
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                }
+                return;
+            }
+
             if (data.context?.currentIntent === 'feature_showcase') {
                 if (isMainShop) {
                     if (targetCategory && typeof window.setCategory === 'function') {

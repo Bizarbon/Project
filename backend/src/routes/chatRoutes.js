@@ -196,8 +196,11 @@ function extractBudget(text) {
         if (match) return Math.round(Number(match[1].replace(',', '.')) * 1000000);
     }
 
-    const rawNumber = text.match(/(?:duoi|toi da|tam|khoang|ngan sach|budget)\s*(\d{6,})/i);
-    if (rawNumber) return Number(rawNumber[1]);
+    const rawNumber = text.match(/(?:duoi|toi da|tam|khoang|ngan sach|budget|tam gia|chi co|khong qua)?\s*(\d[\d.,\s]{4,})\s*(?:d|dong|vnd)?\b/i);
+    if (rawNumber) {
+        const digits = rawNumber[1].replace(/[^\d]/g, '');
+        if (digits.length >= 5) return Number(digits);
+    }
 
     return null;
 }

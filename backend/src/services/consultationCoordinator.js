@@ -482,8 +482,13 @@ function extractBudget(text) {
         if (match) return Math.round(Number(match[1].replace(',', '.')) * 1000000);
     }
 
-    const rawNumber = norm.match(/(?:duoi|toi da|tam|khoang|ngan sach|budget)\s*(\d{6,})/i);
-    if (rawNumber) return Number(rawNumber[1]);
+    // 4. Dang so tien VND viet day du/co dau tach: "duoi 500.000", "500,000",
+    // "500000d". Dat sau nhom trieu de khong lam sai cac cau nhu "1.5 tr".
+    const rawNumber = norm.match(/(?:duoi|toi da|tam|khoang|ngan sach|budget|tam gia|chi co|khong qua)?\s*(\d[\d.,\s]{4,})\s*(?:d|dong|vnd)?\b/i);
+    if (rawNumber) {
+        const digits = rawNumber[1].replace(/[^\d]/g, '');
+        if (digits.length >= 5) return Number(digits);
+    }
 
     return null;
 }
