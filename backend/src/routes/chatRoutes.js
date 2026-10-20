@@ -6,9 +6,11 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
 const ChatSession = require('../models/ChatSession');
-const { optionalAuth } = require('../middleware/auth');
+const KnowledgeArticle = require('../models/KnowledgeArticle');
+const { findKnowledgeArticle } = require('../services/knowledgeService');
+const { optionalAuth, protect, admin } = require('../middleware/auth');
 const { recommendProducts } = require('../utils/recommendations');
-const { coordinateConsultation, checkUnsupportedProduct, buildOutOfCatalogResponse } = require('../services/consultationCoordinator');
+const { coordinateConsultation, checkUnsupportedProduct, buildOutOfCatalogResponse, extractBudget } = require('../services/consultationCoordinator');
 
 const chatLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
@@ -16,6 +18,41 @@ const chatLimiter = rateLimit({
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     message: { message: 'Bạn đã gửi quá nhiều tin nhắn. Vui lòng thử lại sau ít phút.' }
+});
+
+router.get('/knowledge', protect, admin, async (req, res) => {
+    const query = {};
+    if (req.query.type) query.type = String(req.query.type);
+    if (req.query.active !== undefined) query.active = req.query.active === 'true';
+    const articles = await KnowledgeArticle.find(query).sort({ updatedAt: -1 }).limit(200).lean();
+    return res.json({ articles });
+});
+
+router.post('/knowledge', protect, admin, async (req, res) => {
+    const { title, slug, type, category, keywords, answer, source, active } = req.body || {};
+    if (!title || !slug || !answer) return res.status(400).json({ message: 'Thiếu title, slug hoặc answer.' });
+    const article = await KnowledgeArticle.create({
+        title: String(title).trim(), slug: String(slug).trim().toLowerCase(),
+        type: type || 'faq', category: category || 'all',
+        keywords: Array.isArray(keywords) ? keywords.map(item => String(item).trim().toLowerCase()).filter(Boolean) : [],
+        answer: String(answer).trim(), source: source || 'admin', active: active !== false,
+        updatedBy: req.user?._id || null
+    });
+    return res.status(201).json({ article });
+});
+
+router.patch('/knowledge/:id', protect, admin, async (req, res) => {
+    const allowed = ['title', 'slug', 'type', 'category', 'keywords', 'answer', 'source', 'active'];
+    const updates = {};
+    allowed.forEach(key => {
+        if (req.body?.[key] !== undefined) updates[key] = key === 'keywords'
+            ? (Array.isArray(req.body[key]) ? req.body[key].map(item => String(item).trim().toLowerCase()).filter(Boolean) : [])
+            : req.body[key];
+    });
+    updates.updatedBy = req.user?._id || null;
+    const article = await KnowledgeArticle.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+    if (!article) return res.status(404).json({ message: 'Không tìm thấy bài knowledge.' });
+    return res.json({ article });
 });
 
 const STATUS_LABELS = {
@@ -169,41 +206,6 @@ function productLine(product) {
     return `- ${product.name}: ${money(product.price)}${product.stock > 0 ? `, còn ${product.stock}` : ', tạm hết hàng'}${highlights ? ` (${highlights})` : ''}`;
 }
 
-function extractBudget(text) {
-    // 1. Dạng 1tr5, 2tr5
-    const trMatch = text.match(/(\d+)\s*(?:tr|trieu)\s*(\d+)\b/i);
-    if (trMatch) {
-        const millions = Number(trMatch[1]) * 1000000;
-        const sub = Number(trMatch[2]);
-        const fraction = sub < 10 ? sub * 100000 : sub * 10000;
-        return millions + fraction;
-    }
-
-    // 2. Dạng 500k, 800k, 500 nghìn, 500 ngàn
-    const kMatch = text.match(/(?:duoi|tam|khoang|ngan sach|budget)?\s*(\d{2,4})\s*(?:k|ngan|nghin)\b/i);
-    if (kMatch) {
-        return Number(kMatch[1]) * 1000;
-    }
-
-    // 3. Dạng triệu / tr / m
-    const patterns = [
-        /(?:duoi|toi da|tam|khoang|ngan sach|budget)\s*(\d+(?:[.,]\d+)?)\s*(trieu|tr|m)\b/i,
-        /(\d+(?:[.,]\d+)?)\s*(trieu|tr|m)\b/i
-    ];
-
-    for (const pattern of patterns) {
-        const match = text.match(pattern);
-        if (match) return Math.round(Number(match[1].replace(',', '.')) * 1000000);
-    }
-
-    const rawNumber = text.match(/(?:duoi|toi da|tam|khoang|ngan sach|budget|tam gia|chi co|khong qua)?\s*(\d[\d.,\s]{4,})\s*(?:d|dong|vnd)?\b/i);
-    if (rawNumber) {
-        const digits = rawNumber[1].replace(/[^\d]/g, '');
-        if (digits.length >= 5) return Number(digits);
-    }
-
-    return null;
-}
 
 function inferCategory(text) {
     const norm = normalizeText(text);
@@ -1526,8 +1528,15 @@ async function answerVoucherQuestion() {
     }
 }
 
-function answerPolicyQuestion(message) {
+async function answerPolicyQuestion(message) {
     const text = normalizeText(message);
+
+    try {
+        const article = await findKnowledgeArticle(message, { type: 'policy' });
+        if (article?.answer) return article.answer;
+    } catch (error) {
+        console.warn('KnowledgeBase lookup skipped:', error.message);
+    }
 
     if (text.includes('bao hanh')) {
         return '🛡️ **Chính sách bảo hành tại TechEcommerce:**\n- 100% sản phẩm chính hãng, bảo hành từ 12 - 24 tháng theo tiêu chuẩn nhà sản xuất.\n- Lỗi 1 đổi 1 trong 30 ngày đầu nếu phát sinh lỗi phần cứng từ nhà sản xuất.\n- Hỗ trợ tiếp nhận bảo hành tại tất cả chi nhánh hoặc gửi bưu điện miễn phí.';
@@ -1694,6 +1703,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         );
 
         let response;
+        const policyAnswer = await answerPolicyQuestion(message);
         if (!isInConversationFlow && detectGreetingOrSmallTalk(text)) {
             response = detectGreetingOrSmallTalk(text);
         } else if (await handleActionExecution(message, req.body.context)) {
@@ -1704,9 +1714,9 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             response = await answerInstallmentQuestion(message, req.body.context?.lastProducts);
         } else if (['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi'].some(k => text.includes(k))) {
             response = await answerOrderQuestion(req, message);
-        } else if (answerPolicyQuestion(message)) {
+        } else if (policyAnswer) {
             response = {
-                reply: answerPolicyQuestion(message),
+                reply: policyAnswer,
                 suggestions: ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay']
             };
         } else {
