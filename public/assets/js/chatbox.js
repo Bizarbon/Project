@@ -670,6 +670,11 @@
         let chatHistory = [];
         let voiceEnabled = localStorage.getItem('chatVoiceEnabled') === 'true';
         let reengagementTimer = null;
+        let voiceSessionActive = false;
+        let voiceMediaStream = null;
+        let voiceRecognitionRunning = false;
+        let voiceAwaitingReply = false;
+        let voiceRestartTimer = null;
 
         function saveSession() {
             try {
@@ -826,9 +831,20 @@
 
             utterance.onend = () => {
                 stopSpeaking();
+                if (voiceSessionActive && !voiceAwaitingReply) {
+                    window.clearTimeout(voiceRestartTimer);
+                    voiceRestartTimer = window.setTimeout(() => {
+                        if (voiceSessionActive && recognition && !voiceRecognitionRunning) {
+                            try { recognition.start(); } catch (e) {}
+                        }
+                    }, 220);
+                }
             };
             utterance.onerror = () => {
                 stopSpeaking();
+                if (voiceSessionActive && !voiceAwaitingReply) {
+                    try { recognition?.start(); } catch (e) {}
+                }
             };
 
             window.speechSynthesis.speak(utterance);
@@ -852,6 +868,7 @@
             recognition.interimResults = true;
             recognition.onstart = () => {
                 recognizedText = '';
+                voiceRecognitionRunning = true;
                 micButton.classList.add('listening');
                 micButton.setAttribute('aria-label', 'Đang nghe, bấm để dừng');
                 input.placeholder = 'Đang lắng nghe tiếng Việt...';
@@ -880,16 +897,53 @@
             };
             recognition.onend = () => {
                 window.clearTimeout(recognitionSilenceTimer);
+                voiceRecognitionRunning = false;
                 micButton.classList.remove('listening');
                 micButton.setAttribute('aria-label', 'Nhập bằng giọng nói');
                 input.placeholder = 'Hỏi giá, so sánh, mã giảm giá, trả góp...';
                 status.textContent = 'Trực tuyến · Hỗ trợ 24/7';
-                if (recognizedText) send(recognizedText);
+                if (recognizedText) {
+                    voiceAwaitingReply = voiceSessionActive;
+                    send(recognizedText, { fromVoice: voiceSessionActive });
+                } else if (voiceSessionActive) {
+                    window.clearTimeout(voiceRestartTimer);
+                    voiceRestartTimer = window.setTimeout(() => {
+                        if (voiceSessionActive && !voiceAwaitingReply) {
+                            try { recognition.start(); } catch (e) {}
+                        }
+                    }, 180);
+                }
             };
             micButton.addEventListener('click', () => {
-                stopSpeaking();
-                if (micButton.classList.contains('listening')) recognition.stop();
-                else recognition.start();
+                if (voiceSessionActive) {
+                    voiceSessionActive = false;
+                    voiceAwaitingReply = false;
+                    window.clearTimeout(voiceRestartTimer);
+                    try { recognition.abort(); } catch (e) {}
+                    if (voiceMediaStream) {
+                        voiceMediaStream.getTracks().forEach(track => track.stop());
+                        voiceMediaStream = null;
+                    }
+                    micButton.classList.remove('voice-session-active', 'listening');
+                    micButton.setAttribute('aria-pressed', 'false');
+                    micButton.setAttribute('aria-label', 'Bắt đầu trò chuyện bằng giọng nói');
+                    status.textContent = 'Đã tắt microphone';
+                } else if (navigator.mediaDevices?.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }).then(stream => {
+                        voiceMediaStream = stream;
+                        voiceSessionActive = true;
+                        voiceAwaitingReply = false;
+                        micButton.classList.add('voice-session-active');
+                        micButton.setAttribute('aria-pressed', 'true');
+                        micButton.setAttribute('aria-label', 'Kết thúc phiên trò chuyện bằng giọng nói');
+                        status.textContent = 'Sẵn sàng · Phiên giọng nói';
+                        try { recognition.start(); } catch (e) {}
+                    }).catch(error => {
+                        status.textContent = error?.name === 'NotAllowedError' ? 'Microphone bị từ chối quyền' : 'Không thể truy cập microphone';
+                    });
+                } else {
+                    status.textContent = 'Thiết bị không hỗ trợ microphone';
+                }
             });
         } else {
             micButton.disabled = true;
@@ -960,10 +1014,11 @@
             }
 
             // Đang thu thập nhu cầu thì giữ nguyên trang hiện tại. Chỉ đổi danh mục
-            // và xóa bộ lọc cũ để khách thấy toàn bộ mặt hàng. Chỉ áp bộ lọc cụ thể
-            // sau khi AI đã hỏi đủ nhu cầu và trả kết quả cuối.
-            if (data.context?.currentIntent === 'qualifying_needs') {
+            // và xóa từ khóa tìm kiếm để khách thấy toàn bộ mặt hàng. Nếu khách đã cung cấp ngân sách
+            // (ví dụ: dưới 10tr) thì lọc ngay toàn bộ các sản phẩm thỏa mãn mức giá đó trên storefront.
+            if (data.context?.currentIntent === 'qualifying_needs' || data.context?.currentIntent === 'budget_qualified_needs') {
                 const qualifyingCategory = data.context?.category;
+                const qualifyingBudget = Number(data.context?.budget || 0);
                 const onMainShop = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || (!window.location.pathname.includes('/pages/') && !window.location.pathname.includes('/admin/'));
                 if (onMainShop && qualifyingCategory) {
                     if (typeof window.setCategory === 'function') {
@@ -976,10 +1031,11 @@
                         window.setBrandFilter('all', { scroll: false });
                     }
                     if (typeof window.setShopPrice === 'function') {
-                        window.setShopPrice('', { scroll: false });
+                        window.setShopPrice(qualifyingBudget > 0 ? qualifyingBudget : '', { scroll: false });
                     }
                 } else if (qualifyingCategory) {
-                    window.location.href = `${root}index.html?category=${encodeURIComponent(qualifyingCategory)}#catalogStart`;
+                    const priceQuery = qualifyingBudget > 0 ? `&maxPrice=${qualifyingBudget}` : '';
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(qualifyingCategory)}${priceQuery}#catalogStart`;
                 }
                 return;
             }
@@ -1007,8 +1063,9 @@
             const isExplicitSingleProductView = Boolean(
                 topProduct && (
                     userMsgLower.includes('mở trang sản phẩm') ||
-                    userMsgLower.includes('xem chi tiết máy này') ||
+                    userMsgLower.includes('xem chi tiết') ||
                     userMsgLower.includes('chi tiết sản phẩm') ||
+                    (userMsgLower.startsWith('xem ') && topProduct.name.toLowerCase().includes(userMsgLower.replace('xem ', '').trim())) ||
                     (userMsgLower.startsWith('chi tiết ') && topProduct.name.toLowerCase().includes(userMsgLower.replace('chi tiết ', '').trim()))
                 )
             );
@@ -1053,6 +1110,27 @@
                         banner.remove();
                         sessionStorage.removeItem('ai_chat_just_redirected_name');
                     });
+                }
+                return;
+            }
+
+            // A1. Khách hàng đã trả lời đầy đủ 4 câu hỏi tư vấn -> Bây giờ mới sổ sang trang sản phẩm đó!
+            if (data.context?.currentIntent === 'consultation_completed' && topProduct) {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter('all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice('', { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch(topProduct.name, { scroll: true });
+                    }
+                } else if (topProduct._id) {
+                    window.location.href = `${root}pages/catalog/product.html?id=${encodeURIComponent(topProduct._id)}`;
                 }
                 return;
             }
@@ -1122,8 +1200,8 @@
                 return;
             }
 
-            // D2. Khách hàng hỏi theo tính năng / kiểu dáng (feature_showcase: "không dây", "chống ồn", "chụp tai"...)
-            if (data.context?.currentIntent === 'product_type_no_match') {
+            // D2. Khách hàng hỏi giá / ngân sách hoặc sản phẩm có giá gần nhất
+            if (data.context?.currentIntent === 'nearest_price_match' || data.context?.currentIntent === 'product_type_no_match') {
                 if (isMainShop) {
                     if (targetCategory && typeof window.setCategory === 'function') {
                         window.setCategory(targetCategory, { scroll: false });
@@ -1132,13 +1210,38 @@
                         window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
                     }
                     if (typeof window.setShopPrice === 'function') {
+                        // TUYỆT ĐỐI không gán maxPrice thấp hơn sản phẩm vì sẽ làm ẩn sản phẩm gần nhất
                         window.setShopPrice('', { scroll: false });
                     }
                     if (typeof window.setShopSearch === 'function') {
                         window.setShopSearch(topProduct?.name || '', { scroll: true });
                     }
+                } else if (topProduct?._id) {
+                    window.location.href = `${root}pages/catalog/product.html?id=${encodeURIComponent(topProduct._id)}`;
                 } else if (targetCategory) {
                     window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                }
+                return;
+            }
+
+            // D2.1. Khách hàng hỏi theo loại sản phẩm và có sản phẩm phù hợp ngân sách
+            if (data.context?.currentIntent === 'product_type_showcase') {
+                if (isMainShop) {
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { scroll: false });
+                    }
+                    if (typeof window.setBrandFilter === 'function') {
+                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
+                    }
+                    if (typeof window.setShopPrice === 'function') {
+                        window.setShopPrice(data.context?.budget || '', { scroll: false });
+                    }
+                    if (typeof window.setShopSearch === 'function') {
+                        window.setShopSearch('', { scroll: false });
+                    }
+                } else if (targetCategory) {
+                    const priceParam = data.context?.budget ? `&maxPrice=${encodeURIComponent(data.context.budget)}` : '';
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}${priceParam}#catalogStart`;
                 }
                 return;
             }
@@ -1271,7 +1374,7 @@
             }
         }
 
-        const send = async (value) => {
+        const send = async (value, options = {}) => {
             cancelReengagement();
             const message = String(value || input.value || '').trim();
             if (!message) {
@@ -1318,6 +1421,10 @@
                     consultationContext = { ...consultationContext, ...data.context };
                     if (!data.context.brand) {
                         consultationContext.brand = '';
+                    }
+                    if (data.context.currentIntent === 'qualifying_needs' && (!data.products || data.products.length === 0)) {
+                        consultationContext.lastProducts = [];
+                        delete consultationContext.topProduct;
                     }
                 }
                 if (Array.isArray(data.products) && data.products.length > 0) {
@@ -1369,6 +1476,12 @@
             } finally {
                 sendButton.disabled = false;
                 input.focus();
+                if (options.fromVoice) {
+                    voiceAwaitingReply = false;
+                    if (voiceSessionActive && !(window.speechSynthesis && window.speechSynthesis.speaking)) {
+                        try { recognition?.start(); } catch (e) {}
+                    }
+                }
             }
         };
 
@@ -1399,7 +1512,17 @@
             document.body.classList.remove('ai-chat-open');
             sessionStorage.setItem('ai_chat_closed', 'true');
             sessionStorage.setItem('ai_chat_active_open', 'false');
-            if (recognition && micButton.classList.contains('listening')) recognition.abort();
+            if (voiceSessionActive) {
+                voiceSessionActive = false;
+                voiceAwaitingReply = false;
+                window.clearTimeout(voiceRestartTimer);
+                if (recognition) { try { recognition.abort(); } catch (e) {} }
+                if (voiceMediaStream) {
+                    voiceMediaStream.getTracks().forEach(track => track.stop());
+                    voiceMediaStream = null;
+                }
+                micButton.classList.remove('voice-session-active', 'listening');
+            }
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         }
 
@@ -1407,6 +1530,15 @@
             const isMin = chat.classList.toggle('minimized');
             if (isMin) {
                 cancelReengagement();
+                if (voiceSessionActive) {
+                    voiceSessionActive = false;
+                    voiceAwaitingReply = false;
+                    window.clearTimeout(voiceRestartTimer);
+                    try { recognition?.abort(); } catch (e) {}
+                    voiceMediaStream?.getTracks().forEach(track => track.stop());
+                    voiceMediaStream = null;
+                    micButton.classList.remove('voice-session-active', 'listening');
+                }
                 document.body.classList.remove('ai-chat-open');
             } else {
                 document.body.classList.add('ai-chat-open');
@@ -1442,6 +1574,14 @@
 
         function resetChatbox(showNotice = false) {
             cancelReengagement();
+            if (voiceSessionActive) {
+                voiceSessionActive = false;
+                voiceAwaitingReply = false;
+                try { recognition?.abort(); } catch (e) {}
+                voiceMediaStream?.getTracks().forEach(track => track.stop());
+                voiceMediaStream = null;
+                micButton.classList.remove('voice-session-active', 'listening');
+            }
             sessionStorage.removeItem('ai_chat_history');
             sessionStorage.removeItem('ai_chat_context');
             sessionStorage.removeItem('ai_chat_just_redirected_category');

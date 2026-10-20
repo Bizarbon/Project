@@ -1121,6 +1121,16 @@
     animation: aiMicPulse 1s infinite !important;
 }
 
+.ai-chat-mic.voice-session-active {
+    color: var(--color-chat-accent-ink) !important;
+    background: var(--color-chat-accent) !important;
+    box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.18) !important;
+}
+
+.ai-chat[data-voice-state='error'] .ai-chat-mic {
+    color: var(--color-chat-error) !important;
+}
+
 @keyframes aiMicPulse {
     50% { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.3); }
 }
