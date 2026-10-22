@@ -3289,6 +3289,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (catalogSearch) catalogSearch.value = initialSearch;
         if (headerSearch) headerSearch.value = initialSearch;
     }
+    const initialMaxPrice = pageParams.get('maxPrice') || '';
+    if (initialMaxPrice) {
+        const maxEl = document.getElementById('maxPrice');
+        if (maxEl) maxEl.value = initialMaxPrice;
+    }
     setupStorefrontHeader();
     if (pageParams.get('openAddress') === '1') {
         document.getElementById('headerLocationToggle')?.click();

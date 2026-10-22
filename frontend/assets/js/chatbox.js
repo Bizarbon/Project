@@ -675,6 +675,25 @@
         let voiceRecognitionRunning = false;
         let voiceAwaitingReply = false;
         let voiceRestartTimer = null;
+        let suppressRecognitionEnd = false;
+
+        function restartVoiceRecognition(delay = 180) {
+            window.clearTimeout(voiceRestartTimer);
+            voiceRestartTimer = window.setTimeout(() => {
+                if (!voiceSessionActive || voiceAwaitingReply || suppressRecognitionEnd ||
+                    voiceRecognitionRunning || (window.speechSynthesis && window.speechSynthesis.speaking) || !recognition) return;
+                try { recognition.start(); } catch (e) {
+                    // SpeechRecognition can report an already-running state
+                    // asynchronously; retry once after its end callback settles.
+                    window.clearTimeout(voiceRestartTimer);
+                    voiceRestartTimer = window.setTimeout(() => {
+                        if (voiceSessionActive && !voiceAwaitingReply && !voiceRecognitionRunning) {
+                            try { recognition.start(); } catch (ignored) {}
+                        }
+                    }, 260);
+                }
+            }, delay);
+        }
 
         function saveSession() {
             try {
@@ -717,7 +736,15 @@
                 appendMessage(body, 'ai', followUp);
                 chatHistory.push({ role: 'ai', text: followUp, proactive: true });
                 saveSession();
-                speak(followUp);
+                // A proactive reminder is visual-only during hands-free voice
+                // chat. Reading this long prompt aloud would block recognition
+                // and force the customer to wait until speechSynthesis ends.
+                if (!voiceSessionActive) {
+                    speak(followUp);
+                } else if (recognition && !voiceRecognitionRunning && !voiceAwaitingReply) {
+                    status.textContent = 'Äang nghe...';
+                    try { recognition.start(); } catch (e) {}
+                }
             }, 25000);
         }
 
@@ -813,6 +840,9 @@
             if (!voiceEnabled || !('speechSynthesis' in window)) return;
             // Dừng micro ngay để tránh thu lại giọng bot
             if (recognition) {
+                suppressRecognitionEnd = true;
+                recognizedText = '';
+                window.clearTimeout(recognitionSilenceTimer);
                 try { recognition.abort(); } catch (e) {}
             }
             stopSpeaking();
@@ -831,19 +861,18 @@
 
             utterance.onend = () => {
                 stopSpeaking();
+                suppressRecognitionEnd = false;
+                voiceAwaitingReply = false;
                 if (voiceSessionActive && !voiceAwaitingReply) {
-                    window.clearTimeout(voiceRestartTimer);
-                    voiceRestartTimer = window.setTimeout(() => {
-                        if (voiceSessionActive && recognition && !voiceRecognitionRunning) {
-                            try { recognition.start(); } catch (e) {}
-                        }
-                    }, 220);
+                    restartVoiceRecognition(220);
                 }
             };
             utterance.onerror = () => {
                 stopSpeaking();
+                suppressRecognitionEnd = false;
+                voiceAwaitingReply = false;
                 if (voiceSessionActive && !voiceAwaitingReply) {
-                    try { recognition?.start(); } catch (e) {}
+                    restartVoiceRecognition(220);
                 }
             };
 
@@ -875,6 +904,7 @@
                 status.textContent = 'Đang nghe...';
             };
             recognition.onresult = event => {
+                if (!voiceSessionActive || voiceAwaitingReply || suppressRecognitionEnd || (window.speechSynthesis && window.speechSynthesis.speaking)) return;
                 const finalParts = [];
                 const interimParts = [];
                 Array.from(event.results).forEach(result => {
@@ -902,6 +932,11 @@
                 micButton.setAttribute('aria-label', 'Nhập bằng giọng nói');
                 input.placeholder = 'Hỏi giá, so sánh, mã giảm giá, trả góp...';
                 status.textContent = 'Trực tuyến · Hỗ trợ 24/7';
+                if (suppressRecognitionEnd) {
+                    suppressRecognitionEnd = false;
+                    status.textContent = 'Äang tráº£ lá»i...';
+                    return;
+                }
                 if (recognizedText) {
                     voiceAwaitingReply = voiceSessionActive;
                     send(recognizedText, { fromVoice: voiceSessionActive });
