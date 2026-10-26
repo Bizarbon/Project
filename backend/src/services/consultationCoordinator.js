@@ -803,7 +803,7 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['ipad gen 10', 'ipad 10'], match: /ipad gen 10/i },
     { terms: ['tab s9 ultra', 'galaxy tab s9'], match: /tab s9 ultra/i },
     { terms: ['matepad 11.5', 'matepad'], match: /matepad/i },
-    { terms: ['xiaomi pad 8', 'pad 8 pro'], match: /pad 8 pro/i },
+    { terms: ['xiaomi pad 8', 'pad 8 pro', 'pad 8'], match: /xiaomi pad 8 pro/i },
     { terms: ['poco pad', 'xiaomi poco pad'], match: /poco pad/i },
     { terms: ['honor pad 10', 'honor pad'], match: /honor pad 10/i },
     { terms: ['lenovo tab m11', 'tab m11'], match: /tab m11/i },
