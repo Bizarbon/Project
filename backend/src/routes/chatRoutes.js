@@ -1720,8 +1720,36 @@ async function answerPolicyQuestion(message) {
  */
 async function handleActionExecution(message, context = {}) {
     const norm = normalizeText(message);
-    const hasAddIntent = ['them vao gio', 'them vao cart', 'cho vao gio', 'mua ngay', 'dat mua', 'mua mau nay', 'mua san pham nay', 'lay mau nay', 'chon mau nay', 'them mau'].some(k => norm.includes(k));
-    const hasCouponIntent = ['ap ma giam gia', 'ap voucher', 'ma tot nhat', 'ma giam gia tot nhat', 'uu dai tot nhat', 'voucher tot nhat', 'giam gia tot nhat'].some(k => norm.includes(k));
+
+    // 0. BẢO VỆ TUYỆT ĐỐI: Khách đang hỏi han, thắc mắc, phân vân, đánh giá, tìm hiểu ưu/nhược điểm
+    // Tuyệt đối KHÔNG ĐƯỢC kích hoạt nhầm action mua hàng / thêm vào giỏ!
+    const isConsultationOrQuestion = [
+        'tai sao', 'vi sao', 'sao lai', 'ly do', 'co nen', 'co dang',
+        'co gi tot', 'co gi hay', 'co gi noi bat', 'co uu diem gi', 'co diem gi',
+        'uu diem', 'nhuoc diem', 'danh gia', 'review', 'suy nghi', 'phan van',
+        'tot khong', 'on khong', 'muot khong', 'ben khong', 'dung co tot khong',
+        'co nen mua', 'sao lai dat', 'sao lai re', 'tu van', 'cho hoi', 'cho minh hoi',
+        'so sanh', 'khac gi', 'khac nhau gi', 'hoi ve', 'hoi san pham', 'dung the nao',
+        'co dang mua', 'co tot khong', 'co hop khong', 'co on khong', 'co nen lay',
+        'phu hop voi ai', 'nen mua con nao', 'nen mua may nao'
+    ].some(k => norm.includes(k));
+
+    if (isConsultationOrQuestion) {
+        return null;
+    }
+
+    // 1. Phân loại lệnh thêm vào giỏ / đặt mua thực tế
+    // Chỉ kích hoạt khi người dùng ra lệnh hành động dứt khoát
+    const hasAddIntent = [
+        'them vao gio', 'them vao cart', 'cho vao gio', 'bo vao gio',
+        'mua ngay', 'dat mua', 'dat hang', 'thanh toan ngay', 'chot don',
+        'lay con nay', 'lay may nay', 'mua luon', 'dat luon', 'lay san pham nay'
+    ].some(k => norm.includes(k)) || /^(?:mua|lay|chon)\s+(?:san\s+pham|mau|con|may)\s+nay(?:\s+nhe|\s+nha|\s+di)?$/i.test(norm);
+
+    const hasCouponIntent = [
+        'ap ma giam gia', 'ap voucher', 'ap ma', 'dung ma giam gia',
+        'ma tot nhat', 'ma giam gia tot nhat', 'uu dai tot nhat', 'voucher tot nhat', 'giam gia tot nhat'
+    ].some(k => norm.includes(k));
 
     if (!hasAddIntent && !hasCouponIntent) return null;
 
@@ -1745,17 +1773,21 @@ async function handleActionExecution(message, context = {}) {
         }
     }
 
-    // B. Nếu chưa tìm thấy, kiểm tra context sản phẩm gần nhất
+    // B. Nếu chưa tìm thấy, kiểm tra sản phẩm đang xem trên trang hoặc context gần nhất
+    if (!targetProduct && (context?.pageProductId || context?.productId)) {
+        const activePid = context.pageProductId || context.productId;
+        targetProduct = allActive.find(p => String(p._id) === String(activePid) || String(p.id) === String(activePid)) || null;
+    }
     if (!targetProduct && Array.isArray(context?.lastProducts) && context.lastProducts.length > 0) {
         const candidateId = context.lastProducts[0]._id || context.lastProducts[0];
-        targetProduct = allActive.find(p => String(p._id) === String(candidateId)) || null;
+        targetProduct = allActive.find(p => String(p._id) === String(candidateId) || String(p.id) === String(candidateId)) || null;
     }
 
     // C. Tìm kiếm lỏng theo brand hoặc từ khóa công nghệ trong câu
     if (!targetProduct) {
         const matched = sortedCatalog.find(p => {
             const pNorm = normalizeText(p.name + ' ' + (p.brand || '') + ' ' + (p.category || ''));
-            const words = norm.split(/\s+/).filter(w => w.length >= 3 && !['them', 'vao', 'gio', 'cho', 'va', 'ap', 'ma', 'giam', 'gia', 'tot', 'nhat', 'toi'].includes(w));
+            const words = norm.split(/\s+/).filter(w => w.length >= 3 && !['them', 'vao', 'gio', 'hang', 'giup', 'cho', 'va', 'ap', 'ma', 'giam', 'gia', 'tot', 'nhat', 'toi', 'minh', 'ngay', 'luon'].includes(w));
             return words.length > 0 && words.some(w => pNorm.includes(w));
         });
         if (matched) targetProduct = matched;

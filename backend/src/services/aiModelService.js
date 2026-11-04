@@ -17,11 +17,10 @@ const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
 const CANDIDATE_MODELS = Array.from(new Set([
     DEFAULT_MODEL,
     'gemini-flash-lite-latest',
-    'gemini-3-flash-preview',
-    'gemini-3.5-flash',
-    'gemini-3.1-flash-lite-preview'
+    'gemini-3.8-flash',
+    'gemini-flash-latest'
 ]));
-const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 10000);
+const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 15000);
 
 // Bộ nhớ tạm đánh dấu các model đang bị giới hạn quota (429) hoặc không tồn tại (404)
 // để các lượt chat tiếp theo chuyển nhánh tức thì (0ms) mà không phải chờ timeout.
@@ -166,9 +165,14 @@ async function generateGroundedConsultation({
 - Mở đầu bằng 1 - 2 câu dẫn nhập ngắn gọn, tự nhiên (không dùng gạch đầu dòng ở đoạn mở đầu này) để hệ thống phát giọng nói cho khách, sau đó xuống dòng kẻ bảng so sánh chuẩn Markdown Table (| Tiêu chí | Tên Máy 1 | Tên Máy 2 | và dòng phân cách | :--- | :--- | :--- |).
 - Sau bảng, phân tích sâu "ĐIỂM ĐƯỢC & ĐIỂM ĐÁNH ĐỔI" thực tế bằng gạch đầu dòng và đưa ra "KẾT LUẬN CHỌN MUA RÕ RÀNG".`;
     } else if (dialogueAct === 'exact_lookup' || dialogueAct === 'product_qa') {
-        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (TƯ VẤN CHUYÊN SÂU SẢN PHẨM):
-- Mở đầu bằng 1 - 2 câu trả lời trực tiếp, súc tích và tự nhiên vào đúng câu hỏi của khách hàng ("${userMessage}") để hệ thống phát giọng nói, tuyệt đối chưa liệt kê thông số dài dòng ở đoạn mở đầu này.
-- Tiếp theo, xuống dòng dùng danh sách đánh số hoặc gạch đầu dòng để phân tích chi tiết thông số kỹ thuật, giá bán niêm yết, tồn kho và mức trả góp 0% để khách hàng tự nhìn trên màn hình.`;
+        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (TƯ VẤN CHUYÊN SÂU & THUYẾT PHỤC VỀ SẢN PHẨM):
+- Mở đầu bằng 1 - 2 câu trả lời trực tiếp, tự nhiên và giàu tính thuyết phục vào câu hỏi của khách hàng ("${userMessage}"). Nêu bật lý do sản phẩm này rất đáng sở hữu hoặc điểm sáng nổi trội nhất trong phân khúc.
+- Tiếp theo, phân tích bằng gạch đầu dòng rõ ràng:
+  + **Ưu điểm & Hiệu năng thực tế**: Chip xử lý, màn hình, RAM, pin mang lại trải nghiệm mượt mà, bền bỉ 4 - 5 năm ra sao.
+  + **Đối tượng & Nhu cầu phù hợp**: Rất thích hợp cho ai (học tập, làm việc, ghi chú, giải trí, đồ họa, chơi game...).
+  + **Quyền lợi & Giá trị đầu tư**: Nêu bật giá bán ưu đãi, chương trình trả góp 0%, quà tặng hoặc chính sách bảo hành chính hãng lỗi 1 đổi 1 trong 30 ngày.
+  + **Đánh giá khách quan**: Điểm cần lưu ý chân thực để khách an tâm ra quyết định.
+- Kết luận bằng câu gợi mở thân thiện xem khách có muốn xem màu sắc sẵn có, phụ kiện kèm hoặc tính chi tiết bảng góp 0% không.`;
     } else {
         actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (ĐỀ XUẤT & TƯ VẤN THEO NHU CẦU):
 - Mở đầu bằng 1 - 2 đoạn văn ngắn gọn, thân thiện (không dùng số thứ tự hay gạch đầu dòng ở đoạn mở đầu) dẫn dắt vào nhu cầu/ngân sách của khách hàng để hệ thống đọc giọng nói.
@@ -265,7 +269,103 @@ Hãy phản hồi khách hàng một cách thông minh, sắc sảo và hữu í
     };
 }
 
+/**
+ * Tạo câu trả lời tự nhiên, hóm hỉnh cho câu hỏi giao lưu, hỏi vui, toán học,
+ * hoặc khi khách hỏi câu khó/lạ/ngoài phạm vi công nghệ.
+ */
+async function generateConversationalResponse({
+    userMessage,
+    context = {},
+    fallbackText = ''
+}) {
+    const apiKey = (process.env.GEMINI_API_KEY || '').trim();
+    const isKeyConfigured = Boolean(apiKey && apiKey !== 'your_gemini_api_key_here');
+
+    if (!isKeyConfigured) {
+        return {
+            reply: fallbackText,
+            provider: 'deterministic_engine',
+            isFallback: true,
+            model: 'none'
+        };
+    }
+
+    const historyText = formatConversationHistory(context.conversationHistory);
+    const systemInstruction = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của TechEcommerce (cửa hàng bán lẻ công nghệ chính hãng: Laptop, Điện thoại, Tablet, Tai nghe, Đồng hồ thông minh, Máy chơi game).
+TÍNH CÁCH VÀ PHONG CÁCH GIAO TIẾP:
+1. Cực kỳ tự nhiên, hóm hỉnh, ấm áp và gần gũi như một người bạn / chuyên viên tư vấn công nghệ trẻ trung, am hiểu. Tuyệt đối KHÔNG trả lời máy móc như robot, KHÔNG lặp lại các bài quảng cáo bán hàng spam dài dòng.
+2. Khi khách hỏi vui, đố mẹo, hỏi toán (như "1+1 bằng mấy"), hỏi thăm đời thường, trêu đùa: Hãy trả lời trực tiếp, thông minh, đúng đáp án và hóm hỉnh! Sau đó có thể dẫn dắt nhẹ nhàng, tự nhiên sang đồ công nghệ (ví dụ đùa vui về combo thiết bị) nhưng không gượng ép.
+3. Khi khách hỏi câu quá khó, triết lý, ngoài phạm vi hoặc gõ chữ khó hiểu/tối nghĩa: Hãy khiêm tốn, lịch sự phản hồi rằng mình chưa hiểu rõ ý hoặc chưa bắt kịp sóng của khách một cách dễ thương, rồi ân cần hỏi khách đang quan tâm dòng máy hay nhu cầu công nghệ nào để hỗ trợ.
+4. Sử dụng tiếng Việt chuẩn 100% đầy đủ dấu, xưng hô "mình - bạn" hoặc "em - anh/chị" thân thiện, chèn emoji tinh tế. Trả lời súc tích, duyên dáng, từ 2 đến 4 câu hoàn chỉnh.`;
+
+    const promptText = `[LỊCH SỬ TRÒ CHUYỆN GẦN ĐÂY]:
+${historyText}
+
+[NGỮ CẢNH TRANG HIỆN TẠI]:
+- Khách đang xem: ${context.pageCategory || context.category || 'Trang chủ TechEcommerce'}
+${context.pageProductId ? `- Mã sản phẩm đang xem: ${context.pageProductId}` : ''}
+
+[TIN NHẮN CỦA KHÁCH HÀNG]:
+"${userMessage}"
+
+Hãy phản hồi khách hàng một cách thông minh, tự nhiên, hóm hỉnh và chân thành nhất:`;
+
+    const availableModels = CANDIDATE_MODELS.filter(isModelAvailable);
+    const modelsToTry = availableModels.length > 0 ? availableModels : ['gemini-flash-lite-latest'];
+
+    for (const currentModel of modelsToTry) {
+        try {
+            const response = await axios.post(
+                `${GEMINI_API_URL}/${currentModel}:generateContent?key=${apiKey}`,
+                {
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [
+                                { text: `${systemInstruction}\n\n${promptText}` }
+                            ]
+                        }
+                    ],
+                    generationConfig: {
+                        temperature: 0.7,
+                        topP: 0.95,
+                        maxOutputTokens: 1024
+                    }
+                },
+                {
+                    timeout: REQUEST_TIMEOUT_MS,
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+
+            const candidate = response.data?.candidates?.[0];
+            const generatedText = candidate?.content?.parts?.[0]?.text;
+
+            if (generatedText && generatedText.trim()) {
+                return {
+                    reply: generatedText.trim(),
+                    provider: 'gemini',
+                    isFallback: false,
+                    model: currentModel
+                };
+            }
+        } catch (err) {
+            const status = err.response?.status;
+            markModelCooldown(currentModel, status);
+            console.warn(`[aiModelService] Conversational model ${currentModel} failed: ${err.message}`);
+        }
+    }
+
+    return {
+        reply: fallbackText,
+        provider: 'deterministic_engine',
+        isFallback: true,
+        model: 'none'
+    };
+}
+
 module.exports = {
     generateGroundedConsultation,
+    generateConversationalResponse,
     getAiServiceStatus
 };

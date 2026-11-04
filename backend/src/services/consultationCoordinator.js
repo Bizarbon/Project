@@ -2569,18 +2569,29 @@ async function handleContextualFollowUp(message, context = {}) {
         }
     }
 
-    // F. Người dùng hỏi sâu về sản phẩm đang xem / vừa được gợi ý ("máy này pin bao lâu", "chơi game nóng không", "camera chụp đêm tốt không", "ưu nhược điểm")
-    const isDeepProductQuestion = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|pin|sac|man hinh|camera|chup anh|quay phim|choi game|gaming|nong|tan nhiet|nang|mong|nhe|ben|code|lap trinh|do hoa|render|uu diem|nhuoc diem|danh gia|tot khong|on khong|muot khong|bao lau|may tieng|phu hop|co nen mua)\b/i.test(norm);
+    // F. Người dùng hỏi sâu về sản phẩm đang xem / vừa được gợi ý ("máy này pin bao lâu", "chơi game nóng không", "camera chụp đêm tốt không", "ưu nhược điểm", "sản phẩm này có gì tốt", "tại sao tôi nên mua")
+    const isDeepProductQuestion = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|thiet bi nay|em nay|chu nay|pin|sac|man hinh|camera|chup anh|quay phim|choi game|gaming|nong|tan nhiet|nang|mong|nhe|ben|code|lap trinh|do hoa|render|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|tai sao toi nen mua|dung duoc gi|co gi tot|co gi hay|co gi noi bat|tai sao|vi sao|ly do|co nen|co dang)\b/i.test(norm);
     if (lastProducts.length > 0 && isDeepProductQuestion && !catInMsg && !brandInMsg && context.stage !== 'qualifying_needs') {
         const productIds = lastProducts.slice(0, 3).map(item => item?._id || item).filter(Boolean);
         const verifiedDocs = await Product.find({ _id: { $in: productIds }, active: { $ne: false } });
         if (verifiedDocs.length > 0) {
             const primary = verifiedDocs[0];
             const s = primary.specs || {};
-            const fallbackQa = `Dạ về thắc mắc của bạn đối với **${primary.name}** (Giá: **${money(primary.price)}**):\n\n` +
-                `• **Cấu hình thực tế:** ${[s.cpu && `Vi xử lý ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.storage && `Bộ nhớ ${s.storage}`, s.screen && `Màn hình ${s.screen}`, s.battery && `Pin ${s.battery}`].filter(Boolean).join(' • ') || 'Cấu hình chính hãng tiêu chuẩn'}.\n` +
-                `• **Đánh giá sử dụng:** Máy đáp ứng mượt mà các tác vụ học tập, làm việc và giải trí hàng ngày với độ bền cao, bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày).\n\n` +
-                `👉 Bạn có muốn mình tính chi tiết bảng trả góp 0% hoặc hỗ trợ đặt mua mẫu **${primary.name}** này ngay không ạ?`;
+            const isWhyOrStrengths = /\b(tai sao|vi sao|ly do|co gi tot|co gi hay|co gi noi bat|uu diem|co nen mua|nen mua khong|co dang)\b/i.test(norm);
+
+            let fallbackQa;
+            if (isWhyOrStrengths) {
+                fallbackQa = `Dạ về lý do bạn rất nên cân nhắc sở hữu **${primary.name}** (Giá ưu đãi: **${money(primary.price)}**):\n\n` +
+                    `1. 🚀 **Hiệu năng & Trải nghiệm thực tế:** ${[s.cpu && `Trang bị ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.storage && `Bộ nhớ ${s.storage}`, s.screen && `Màn hình ${s.screen}`].filter(Boolean).join(', ') || 'Cấu hình tiêu chuẩn chính hãng'}, vận hành cực kỳ mượt mà, phản hồi nhạy bén và phục vụ tốt nhu cầu trong 3 - 5 năm tới.\n` +
+                    `2. 🔋 **Độ bền & Tính cơ động:** ${s.battery ? `Thời lượng pin ${s.battery}` : 'Thời lượng pin bền bỉ cả ngày dài'}, ${s.weight ? `trọng lượng gọn nhẹ chỉ ${s.weight}` : 'thiết kế hiện đại, cao cấp'} thuận tiện mang theo học tập và làm việc.\n` +
+                    `3. 🛡️ **Quyền lợi mua sắm tại TechEcommerce:** Đảm bảo 100% nguyên seal, bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày đầu), hỗ trợ trả góp 0% chỉ từ ~${money(Math.round(primary.price * 0.7 / 12))}/tháng.\n\n` +
+                    `👉 Nhìn chung, đây là mẫu máy rất đáng tiền trong phân khúc! Bạn có muốn mình tư vấn thêm về màu sắc sẵn hàng hoặc tính bảng trả góp chi tiết không ạ?`;
+            } else {
+                fallbackQa = `Dạ về thắc mắc của bạn đối với **${primary.name}** (Giá: **${money(primary.price)}**):\n\n` +
+                    `• **Cấu hình thực tế:** ${[s.cpu && `Vi xử lý ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.storage && `Bộ nhớ ${s.storage}`, s.screen && `Màn hình ${s.screen}`, s.battery && `Pin ${s.battery}`].filter(Boolean).join(' • ') || 'Cấu hình chính hãng tiêu chuẩn'}.\n` +
+                    `• **Đánh giá sử dụng:** Máy đáp ứng mượt mà các tác vụ học tập, làm việc và giải trí hàng ngày với độ bền cao, bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày).\n\n` +
+                    `👉 Bạn có muốn mình tính chi tiết bảng trả góp 0% hoặc hỗ trợ đặt mua mẫu **${primary.name}** này ngay không ạ?`;
+            }
 
             const groundedQa = await aiModelService.generateGroundedConsultation({
                 userMessage: message,
@@ -3169,10 +3180,30 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
     // Nếu khách đang đứng ở trang chi tiết 1 sản phẩm (pageProductId) và hỏi về "máy này / sản phẩm này"
     if (prev.pageProductId && (!Array.isArray(prev.lastProducts) || prev.lastProducts.length === 0)) {
         try {
-            const pageProd = await Product.findOne({ _id: prev.pageProductId, active: { $ne: false } });
+            const pageProd = await Product.findOne({
+                $or: [
+                    { _id: Number(prev.pageProductId) || 0 },
+                    { _id: prev.pageProductId },
+                    { id: Number(prev.pageProductId) || 0 }
+                ],
+                active: { $ne: false }
+            });
             if (pageProd) {
                 prev.lastProducts = [pageProd];
                 if (!prev.category) prev.category = pageProd.category;
+            }
+        } catch (_) { }
+    }
+
+    if (Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 && (typeof prev.lastProducts[0] === 'number' || typeof prev.lastProducts[0] === 'string')) {
+        try {
+            const loadedProds = await Product.find({
+                _id: { $in: prev.lastProducts.map(id => Number(id) || id) },
+                active: { $ne: false }
+            });
+            if (loadedProds.length > 0) {
+                prev.lastProducts = loadedProds;
+                if (!prev.category) prev.category = loadedProds[0].category;
             }
         } catch (_) { }
     }
@@ -3350,8 +3381,9 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
 
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở
     // trên, nhánh exact lookup đã ưu tiên trả sản phẩm ngay lập tức.
+    const hasDeepQuestionSignal = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|thiet bi nay|em nay|chu nay|tai sao|vi sao|ly do|co nen|co dang|co gi tot|co gi hay|co gi noi bat|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|dung duoc gi|choi game|pin|camera|man hinh|cau hinh)\b/i.test(text);
     if (Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
-        (/may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text) || extractEliminatedBrand(message))) {
+        (/may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text) || extractEliminatedBrand(message) || hasDeepQuestionSignal)) {
         const earlyContextualResponse = await handleContextualFollowUp(message, prev);
         if (earlyContextualResponse) return earlyContextualResponse;
     }
@@ -3481,18 +3513,72 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
         return await handleClarifyNeeds(category, updatedContext, userProficiency);
     }
 
-    // Nếu không xác định được danh mục hay thương hiệu
+    // 8. Nếu không khớp danh mục, sản phẩm hay ngân sách:
+    // Xử lý thông minh câu hỏi giao lưu, hỏi vui, toán học, hoặc phản hồi tự nhiên khi gặp câu khó/chưa rõ ý.
+    // Tuyệt đối KHÔNG trả về câu chào spam danh sách sản phẩm lặp đi lặp lại!
+    return await handleConversationalOrUnclearQuery(message, updatedContext);
+}
+
+/**
+ * Xử lý các câu hỏi vui, toán học, chit-chat hoặc các câu hỏi khó/lạ mà AI chưa hiểu rõ
+ */
+async function handleConversationalOrUnclearQuery(message, context = {}) {
+    const norm = normalizeText(message);
+    const cleanMsg = String(message || '').trim();
+
+    // 1. Phép tính toán học (ví dụ: "1+1", "1 + 1 bằng mấy", "10 * 5", "100 chia 2", "5x5")
+    const mathMatch = cleanMsg.match(/(\d+(?:\.\d+)?)\s*([\+\-\*\/xX×÷]|cong|tru|nhan|chia)\s*(\d+(?:\.\d+)?)/i);
+    let deterministicMathReply = null;
+    if (mathMatch) {
+        const num1 = parseFloat(mathMatch[1]);
+        const opRaw = mathMatch[2].toLowerCase();
+        const num2 = parseFloat(mathMatch[3]);
+        let calcResult = null;
+        if (opRaw === '+' || opRaw === 'cong') calcResult = num1 + num2;
+        else if (opRaw === '-' || opRaw === 'tru') calcResult = num1 - num2;
+        else if (opRaw === '*' || opRaw === 'x' || opRaw === '×' || opRaw === 'nhan') calcResult = num1 * num2;
+        else if (opRaw === '/' || opRaw === '÷' || opRaw === 'chia') calcResult = num2 !== 0 ? (Math.round((num1 / num2) * 100) / 100) : 'vô cực';
+
+        if (calcResult !== null) {
+            const opSymbol = (opRaw === 'cong' || opRaw === '+') ? '+' : (opRaw === 'tru' || opRaw === '-') ? '-' : (opRaw === 'nhan' || opRaw === '*' || opRaw === 'x' || opRaw === '×') ? 'x' : '÷';
+            deterministicMathReply = `Dạ kết quả ${num1} ${opSymbol} ${num2} = **${calcResult}** nè bạn ơi! 😄\n\nBạn đang kiểm tra độ thông minh của AI tụi mình đúng không nè? Nếu bạn đang tính toán ngân sách sắm thiết bị công nghệ hay cần săn combo giảm giá hời thì cứ nói mình hỗ trợ nhé!`;
+        }
+    }
+
+    // 2. Phân loại câu hỏi đùa / hỏi vui / tâm sự đời thường / câu hỏi khó
+    let fallbackText = deterministicMathReply;
+    if (!fallbackText) {
+        const isHumorOrChitChat = /\b(vui khong|buon|chan|met|khoe khong|an com chua|ngu chua|hat|ke chuyen|nguoi yeu|may tuoi|ten gi|ai tao ra|troi dep|troi mua|xinh khong|yeu khong|co nguoi yeu)\b/i.test(norm);
+        if (isHumorOrChitChat) {
+            fallbackText = `Dạ gặp được bạn ghé thăm TechEcommerce là mình thấy rất vui và tràn đầy năng lượng rồi nè! 😊\n\nMình là Trợ lý AI công nghệ luôn sẵn sàng đồng hành cùng bạn. Hôm nay bạn đang có hứng thú ngắm nghía chiếc máy hay thiết bị nào để phục vụ công việc, học tập hay giải trí không? Cứ chia sẻ với mình nhé!`;
+        } else {
+            // Câu hỏi khó, triết lý, lạ hoặc chưa rõ ý
+            fallbackText = `Dạ câu này mình chưa hiểu rõ ý bạn lắm nè 😅\n\nBạn có thể diễn đạt rõ hơn một chút được không, ví dụ như bạn đang cần tìm loại máy nào (Laptop, Điện thoại, Tablet, Tai nghe...), mức ngân sách khoảng bao nhiêu hoặc cần hỗ trợ về tính năng gì để mình tư vấn chuẩn xác nhất nhé!`;
+        }
+    }
+
+    // 3. Tận dụng mô hình AI (Gemini) để trả lời tự nhiên, hóm hỉnh như con người
+    const aiResult = await aiModelService.generateConversationalResponse({
+        userMessage: message,
+        context,
+        fallbackText
+    });
+
     return {
-        reply: `Dạ chào bạn! Mình là Trợ lý Mua sắm của TechEcommerce. Cửa hàng chuyên phân phối chính hãng các sản phẩm: **Laptop**, **Điện thoại**, **Tablet**, **Đồng hồ thông minh**, **Tai nghe** và **Máy chơi game**.\n\n` +
-            `👉 Bạn đang tìm kiếm sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để mình tư vấn vừa vặn nhất cho bạn nhé! 😊`,
+        reply: aiResult.reply || fallbackText,
         products: [],
         suggestions: [
-            'Tư vấn laptop sinh viên',
-            'Tư vấn điện thoại chụp ảnh',
+            'Tư vấn Laptop sinh viên',
+            'Tư vấn Điện thoại chụp ảnh',
             'Xem máy tính bảng học tập',
             'Săn mã giảm giá hôm nay'
         ],
-        context: updatedContext
+        context,
+        meta: {
+            provider: aiResult.provider,
+            model: aiResult.model,
+            isFallback: aiResult.isFallback
+        }
     };
 }
 
