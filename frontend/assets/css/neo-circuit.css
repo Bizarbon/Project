@@ -878,6 +878,47 @@ html[data-theme='dark'] {
     --border-light: var(--neo-border-strong);
 }
 
+/* ===== TechEcommerce High Contrast Theme (WCAG 2.1 AAA Compliant) ===== */
+html[data-theme='high-contrast'] {
+    --neo-bg: #000000;
+    --neo-surface: #050505;
+    --neo-surface-2: #0d0d0d;
+    --neo-panel: rgba(0, 0, 0, 0.98);
+    --neo-panel-solid: #050505;
+    --neo-border: #00ffff;
+    --neo-border-strong: #ffff00;
+    --neo-text: #ffffff;
+    --neo-muted: #f8fafc;
+    --neo-dim: #e2e8f0;
+    --neo-primary: #00ffff;
+    --neo-primary-soft: #a5f3fc;
+    --neo-cyan: #00ffff;
+    --neo-green: #00ff66;
+    --neo-danger: #ff3366;
+    --neo-warning: #ffff00;
+
+    --primary: #00ffff;
+    --primary-dark: #00cccc;
+    --primary-light: #67e8f9;
+    --secondary: #00ffff;
+    --accent: #ffff00;
+    --success: #00ff66;
+    --danger: #ff3366;
+    --warning: #ffff00;
+    --info: #00ffff;
+
+    --bg-body: #000000;
+    --bg-dark: #000000;
+    --bg-card: #050505;
+    --bg-card-hover: #111111;
+    --bg-input: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #f8fafc;
+    --text-muted: #e2e8f0;
+    --border: #00ffff;
+    --border-light: #ffff00;
+}
+
 html,
 html[data-theme='light'] {
     background: var(--neo-bg) !important;
@@ -12177,4 +12218,312 @@ html.visual-reduce-motion .product-card.u251-reveal,
 html.visual-reduce-motion .u079-sk-block,
 html.visual-reduce-motion .u092-mag-group {
     animation: none !important;
+}
+
+/* ==========================================================================
+   FEATURE 1 & FEATURE 2: HIGH CONTRAST THEME, VISUAL HAPTIC BEACON & SKELETON
+   ========================================================================== */
+
+/* ===== High Contrast Theme Elements (WCAG 2.1 AAA) ===== */
+html[data-theme='high-contrast'] body {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme='high-contrast'] body::before {
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.12) 1px, transparent 1px) !important;
+    opacity: 0.8 !important;
+}
+
+html[data-theme='high-contrast'] body:not(.admin-page) > nav {
+    background: #000000 !important;
+    border-bottom: 2px solid #00ffff !important;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3) !important;
+}
+
+html[data-theme='high-contrast'] .stat-card,
+html[data-theme='high-contrast'] .glass-card,
+html[data-theme='high-contrast'] .table-section,
+html[data-theme='high-contrast'] .cart-section,
+html[data-theme='high-contrast'] .shop-toolbar,
+html[data-theme='high-contrast'] .order-card,
+html[data-theme='high-contrast'] .result-card,
+html[data-theme='high-contrast'] .detail-info,
+html[data-theme='high-contrast'] .related-card,
+html[data-theme='high-contrast'] .bio-card,
+html[data-theme='high-contrast'] .settings-card,
+html[data-theme='high-contrast'] .form-section,
+html[data-theme='high-contrast'] .filter-bar,
+html[data-theme='high-contrast'] .product-card,
+html[data-theme='high-contrast'] .auth-card,
+html[data-theme='high-contrast'] .cart-drawer-panel,
+html[data-theme='high-contrast'] .express-checkout-card {
+    background: #050505 !important;
+    border: 2px solid #00ffff !important;
+    box-shadow: 0 0 16px rgba(0, 255, 255, 0.22) !important;
+}
+
+html[data-theme='high-contrast'] .product-card:hover {
+    border-color: #ffff00 !important;
+    box-shadow: 0 0 24px rgba(255, 255, 0, 0.35) !important;
+}
+
+html[data-theme='high-contrast'] .btn-primary,
+html[data-theme='high-contrast'] .btn-installment-plan,
+html[data-theme='high-contrast'] .btn-add-cart {
+    background: #000000 !important;
+    color: #00ffff !important;
+    border: 2px solid #00ffff !important;
+    font-weight: 700 !important;
+}
+
+html[data-theme='high-contrast'] .btn-primary:hover,
+html[data-theme='high-contrast'] .btn-add-cart:hover {
+    background: #00ffff !important;
+    color: #000000 !important;
+    box-shadow: 0 0 16px #00ffff !important;
+}
+
+html[data-theme='high-contrast'] .btn-secondary,
+html[data-theme='high-contrast'] .category-btn,
+html[data-theme='high-contrast'] .price-chip-btn {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffff00 !important;
+}
+
+html[data-theme='high-contrast'] input,
+html[data-theme='high-contrast'] select,
+html[data-theme='high-contrast'] textarea {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #00ffff !important;
+}
+
+html[data-theme='high-contrast'] :focus-visible {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 3px !important;
+}
+
+/* High Contrast Indicator Badge on Theme Switcher */
+.theme-toggle .u021-hc-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ffff00;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 4px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+    line-height: 1;
+    border: 1px solid #000000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ===== Visual Haptic Feedback (Accessibility Beacon for Silent/Deaf) ===== */
+.visual-haptic-beacon {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999999;
+    opacity: 0;
+    box-shadow: inset 0 0 0 0px transparent;
+    transition: opacity 0.1s ease, box-shadow 0.15s ease;
+}
+
+.visual-haptic-beacon.is-flashing-success {
+    opacity: 1;
+    box-shadow: inset 0 0 0 5px #10b981, inset 0 0 38px rgba(16, 185, 129, 0.55);
+    animation: hapticScreenFlash 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.visual-haptic-beacon.is-flashing-warning {
+    opacity: 1;
+    box-shadow: inset 0 0 0 5px #f59e0b, inset 0 0 38px rgba(245, 158, 11, 0.55);
+    animation: hapticScreenFlash 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes hapticScreenFlash {
+    0% {
+        opacity: 0;
+        transform: scale(0.998);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    70% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+/* Cart Radar Wave Ripple */
+.cart-radar-ping {
+    position: absolute;
+    inset: -6px;
+    border-radius: 9999px;
+    border: 2px solid var(--neo-primary);
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+}
+
+.cart-radar-ping.is-active {
+    animation: cartRadarWave 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes cartRadarWave {
+    0% {
+        transform: scale(0.7);
+        opacity: 1;
+        border-color: var(--neo-green);
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+        border-color: var(--neo-primary);
+    }
+}
+
+/* Flying Thumb Glowing Aura */
+.u051-fly-thumb {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #ffffff;
+    border: 2px solid var(--neo-primary);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5), 0 0 15px rgba(125, 211, 252, 0.4);
+    pointer-events: none;
+    z-index: 999999;
+    will-change: transform, opacity;
+}
+
+/* ===== Semantic Skeleton Loading System ===== */
+.skeleton-card {
+    background: var(--neo-panel);
+    border: 1px solid var(--neo-border);
+    border-radius: var(--radius-lg, 14px);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 380px;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+}
+
+.skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(255, 255, 255, 0.14) 50%,
+        rgba(255, 255, 255, 0.04) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmerPulse 1.6s infinite linear;
+}
+
+html[data-theme='light'] .skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        #e2edf8 0%,
+        #f4f8fd 50%,
+        #e2edf8 100%
+    );
+    background-size: 200% 100%;
+}
+
+html[data-theme='high-contrast'] .skeleton-shimmer {
+    background: linear-gradient(
+        90deg,
+        #0a0a0a 0%,
+        #00ffff 50%,
+        #0a0a0a 100%
+    );
+    background-size: 200% 100%;
+    opacity: 0.35;
+}
+
+.skeleton-media {
+    width: 100%;
+    height: 180px;
+    border-radius: var(--radius-md, 10px);
+    margin: 0;
+}
+
+.skeleton-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    flex: 1;
+}
+
+.skeleton-line {
+    display: block;
+    height: 14px;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.skeleton-pill {
+    width: 38%;
+    height: 18px;
+    border-radius: 9999px;
+}
+
+.skeleton-title {
+    height: 18px;
+    width: 85%;
+}
+
+.skeleton-title.skeleton-short {
+    width: 60%;
+}
+
+.skeleton-price {
+    height: 22px;
+    width: 50%;
+    margin-top: 0.5rem;
+}
+
+.skeleton-btn {
+    display: block;
+    height: 38px;
+    border-radius: var(--radius-md, 10px);
+    width: 100%;
+    margin-top: auto;
+}
+
+@keyframes skeletonShimmerPulse {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .visual-haptic-beacon,
+    .skeleton-shimmer,
+    .cart-radar-ping {
+        animation: none !important;
+        transition: none !important;
+    }
 }

@@ -16,7 +16,7 @@
     const categoryLinks = categories.map(([value, label, icon]) => {
         const active = currentCategory === value || (!currentCategory && value === 'all' && /index\.html$|\/$/.test(window.location.pathname));
         return `<li><a href="${root}index.html?category=${encodeURIComponent(value)}#catalogStart"${active ? ' class="active" aria-current="page"' : ''}><img src="${root}assets/icons/${icon}" alt="">${label}</a></li>`;
-    }).join('');
+    }).join('') + `<li><a href="${root}pages/tools/setup-builder.html" class="nav-builder-link" style="color:var(--neo-primary);font-weight:700;"><span style="color:#ef4444;" aria-hidden="true">🔥</span> Setup Builder</a></li>`;
 
     const locVal = localStorage.getItem('shoppingLocation');
     const location = (locVal && locVal !== 'Hồ Chí Minh') ? locVal : 'Thành phố Hồ Chí Minh';

@@ -89,6 +89,160 @@
                 </aside>
             </section>
 
+            <!-- Apple-style Interactive Scrollytelling Showcase -->
+            <section class="product-scrolly-story reveal" id="productScrollyStory" aria-label="Khám phá chi tiết công nghệ đỉnh cao">
+                <header class="scrolly-story-header">
+                    <span class="scrolly-tag-badge">APPLE-STYLE SHOWCASE</span>
+                    <h2 class="scrolly-main-title">Kỹ nghệ chế tác. Sức mạnh bứt phá mọi giới hạn.</h2>
+                    <p class="scrolly-lead-desc">Cuộn trang để chiêm ngưỡng từng tầng kiến trúc phần cứng được bóc tách chân thực theo chuẩn công nghệ tương lai.</p>
+                </header>
+
+                <div class="scrolly-experience-grid">
+                    <!-- Sticky 2.5D Holographic Hardware Stage -->
+                    <figure class="scrolly-viewport-stage" id="scrollyHardwareStage" aria-hidden="true" data-active-chapter="chip">
+                        <!-- Chapter 1 Layer: 3nm Silicon Processor Die -->
+                        <div class="hardware-layer hardware-layer-chip" data-layer-id="chip">
+                            <div class="chip-socket">
+                                <div class="chip-circuit-lines"></div>
+                                <div class="chip-die-core">
+                                    <span class="chip-micro-label">3nm NPU ULTRA</span>
+                                    <strong class="chip-brand-title">BIONIC ARCH</strong>
+                                    <div class="chip-heat-spreader"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 2 Layer: Periscope Lens Array -->
+                        <div class="hardware-layer hardware-layer-optics" data-layer-id="optics">
+                            <div class="lens-exploded-barrel">
+                                <span class="lens-glass-element lens-el-front" title="Front Element"></span>
+                                <span class="lens-glass-element lens-el-prism" title="Prism Assembly"></span>
+                                <span class="lens-glass-element lens-el-sensor" title="1-inch Sensor"></span>
+                                <div class="laser-light-beam"></div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 3 Layer: 120Hz LTPO ProMotion Matrix -->
+                        <div class="hardware-layer hardware-layer-display" data-layer-id="display">
+                            <div class="display-panel-frame">
+                                <div class="display-panel-glass">
+                                    <div class="display-nits-wave"></div>
+                                    <span class="display-rate-badge">120Hz ADAPTIVE</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 4 Layer: Silicon-Carbon Battery Cell -->
+                        <div class="hardware-layer hardware-layer-battery" data-layer-id="battery">
+                            <div class="battery-cell-wrap">
+                                <div class="battery-anode-cap"></div>
+                                <div class="battery-energy-fluid"></div>
+                                <span class="battery-watt-pulse">100W FLASH</span>
+                            </div>
+                        </div>
+                    </figure>
+
+                    <!-- Interactive Story Chapters (Trigger points for IntersectionObserver) -->
+                    <div class="scrolly-story-chapters" id="scrollyChapters">
+                        <!-- Chapter 1 -->
+                        <article class="story-chapter-card is-active" data-chapter="chip" id="chapterChip">
+                            <span class="chapter-step-indicator">01 / HIỆU NĂNG TÍNH TOÁN</span>
+                            <h3 class="chapter-card-title">Bộ vi xử lý 3nm & NPU AI Thế hệ mới</h3>
+                            <p class="chapter-card-text">
+                                Hàng tỷ bóng bán dẫn được khắc quang học siêu nhỏ giúp tăng tốc độ xử lý đồ họa Ray-tracing thời gian thực,
+                                kết hợp nhân xử lý trí tuệ nhân tạo chuyên sâu NPU chạy mô hình suy luận mượt mà ngay trên máy.
+                            </p>
+                            <ul class="chapter-stat-grid" aria-label="Chỉ số xung nhịp và AI">
+                                <li>
+                                    <strong class="scrolly-counter" data-count="4.3" data-decimals="1" data-suffix=" GHz">0</strong>
+                                    <span class="stat-caption">Xung nhịp Turbo Boost</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="45" data-decimals="0" data-suffix=" TOPS">0</strong>
+                                    <span class="stat-caption">NPU Trí tuệ nhân tạo</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="35" data-decimals="0" data-prefix="+" data-suffix="%">0</strong>
+                                    <span class="stat-caption">Tiết kiệm năng lượng</span>
+                                </li>
+                            </ul>
+                        </article>
+
+                        <!-- Chapter 2 -->
+                        <article class="story-chapter-card" data-chapter="optics" id="chapterOptics">
+                            <span class="chapter-step-indicator">02 / QUANG HỌC TIỀM VỌNG</span>
+                            <h3 class="chapter-card-title">Hệ thấu kính 7 lớp phủ Nano Chống lóa</h3>
+                            <p class="chapter-card-text">
+                                Cụm camera quang học cao cấp với lăng kính gập phản xạ ánh sáng 4 lần, đem lại khả năng thu phóng quang học siêu sắc nét
+                                mà không làm tăng độ dày thân máy. Chống rung OIS thế hệ mới giữ khung hình tĩnh lặng như chân máy tripod.
+                            </p>
+                            <ul class="chapter-stat-grid" aria-label="Chỉ số hệ thống quang học">
+                                <li>
+                                    <strong class="scrolly-counter" data-count="5" data-decimals="0" data-suffix="X Quang">0</strong>
+                                    <span class="stat-caption">Zoom tiềm vọng không vỡ nét</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="50" data-decimals="0" data-suffix=" MP">0</strong>
+                                    <span class="stat-caption">Cảm biến thu sáng lớn 1-inch</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="8" data-decimals="0" data-suffix="K 60fps">0</strong>
+                                    <span class="stat-caption">Ghi hình điện ảnh HDR Dolby</span>
+                                </li>
+                            </ul>
+                        </article>
+
+                        <!-- Chapter 3 -->
+                        <article class="story-chapter-card" data-chapter="display" id="chapterDisplay">
+                            <span class="chapter-step-indicator">03 / KHÔNG GIAN HIỂN THỊ</span>
+                            <h3 class="chapter-card-title">Tấm nền Dynamic OLED 2X 120Hz LTPO</h3>
+                            <p class="chapter-card-text">
+                                Đắm chìm vào thế giới thị giác với tần số quét biến thiên từ 1Hz đến 120Hz mượt mà.
+                                Độ sáng cực đại bứt phá giúp màn hình luôn sáng rõ, rực rỡ ngay cả dưới trời nắng gắt giữa trưa.
+                            </p>
+                            <ul class="chapter-stat-grid" aria-label="Chỉ số màn hình hiển thị">
+                                <li>
+                                    <strong class="scrolly-counter" data-count="2600" data-decimals="0" data-suffix=" Nits">0</strong>
+                                    <span class="stat-caption">Độ sáng đỉnh ngoài trời (Peak)</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="120" data-decimals="0" data-suffix=" Hz">0</strong>
+                                    <span class="stat-caption">Tần số quét mượt mà thích ứng</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="100" data-decimals="0" data-suffix="% P3">0</strong>
+                                    <span class="stat-caption">Chuẩn dải màu điện ảnh</span>
+                                </li>
+                            </ul>
+                        </article>
+
+                        <!-- Chapter 4 -->
+                        <article class="story-chapter-card" data-chapter="battery" id="chapterBattery">
+                            <span class="chapter-step-indicator">04 / NĂNG LƯỢNG BỀN BỈ</span>
+                            <h3 class="chapter-card-title">Pin Silicon-Carbon & Sạc siêu tốc</h3>
+                            <p class="chapter-card-text">
+                                Vật liệu điện cực Silicon-Carbon thế hệ mới tích trữ mật độ điện năng kỷ lục.
+                                Kết hợp bộ vi xử lý quản lý dòng sạc GaN thông minh nạp đầy 50% pin chỉ trong một cái chớp mắt giải lao.
+                            </p>
+                            <ul class="chapter-stat-grid" aria-label="Chỉ số dung lượng và công suất sạc">
+                                <li>
+                                    <strong class="scrolly-counter" data-count="5400" data-decimals="0" data-suffix=" mAh">0</strong>
+                                    <span class="stat-caption">Dung lượng pin thực tế</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="100" data-decimals="0" data-suffix="W PD">0</strong>
+                                    <span class="stat-caption">Công suất sạc thần tốc</span>
+                                </li>
+                                <li>
+                                    <strong class="scrolly-counter" data-count="18" data-decimals="0" data-prefix="50% / " data-suffix=" Phút">0</strong>
+                                    <span class="stat-caption">Thời gian nạp điện siêu nhanh</span>
+                                </li>
+                            </ul>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
             <!-- Customer Reviews & Social Proof -->
             <section class="reviews-section-card" id="reviewsSection" aria-label="Đánh giá từ khách hàng">
                 <h2>Đánh giá & Nhận xét từ khách hàng</h2>

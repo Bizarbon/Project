@@ -992,13 +992,16 @@ async function loadProducts() {
         sections.innerHTML = `
             <section class="category-section" aria-busy="true" aria-label="Đang tải danh sách sản phẩm">
                 <section class="product-grid">
-                    ${Array.from({ length: 4 }).map(() => `
-                        <article class="u079-skeleton-card" aria-hidden="true">
-                            <div class="u079-sk-block" style="height: 190px;"></div>
-                            <div class="u079-sk-block" style="height: 16px; width: 45%;"></div>
-                            <div class="u079-sk-block" style="height: 20px; width: 85%;"></div>
-                            <div class="u079-sk-block" style="height: 16px; width: 65%;"></div>
-                            <div class="u079-sk-block" style="height: 38px; margin-top: auto;"></div>
+                    ${Array.from({ length: 8 }).map(() => `
+                        <article class="product-card skeleton-card" aria-busy="true" aria-label="Đang tải dữ liệu sản phẩm...">
+                            <figure class="skeleton-media skeleton-shimmer"></figure>
+                            <header class="skeleton-content">
+                                <span class="skeleton-line skeleton-pill skeleton-shimmer"></span>
+                                <span class="skeleton-line skeleton-title skeleton-shimmer"></span>
+                                <span class="skeleton-line skeleton-title skeleton-short skeleton-shimmer"></span>
+                                <span class="skeleton-line skeleton-price skeleton-shimmer"></span>
+                                <span class="skeleton-btn skeleton-shimmer"></span>
+                            </header>
                         </article>
                     `).join('')}
                 </section>
@@ -3708,8 +3711,21 @@ function animateAddCartFeedback(productId, imgSrc) {
         }, 1250);
     }
 
-    const cartBtn = document.getElementById('headerCartButton') || document.getElementById('headerCartBtn') || document.querySelector('.header-cart-btn, .header-action-btn[href*="openCart"]');
-    const badgeEl = document.getElementById('headerCartBadge') || document.querySelector('.header-cart-badge');
+    let cartBtn = null;
+    let badgeEl = null;
+
+    if (window.innerWidth <= 768) {
+        const mobileCart = document.getElementById('bottomNavCartBtn') || document.querySelector('.cps-bottom-nav-bar a[href*="openCart"]');
+        if (mobileCart && mobileCart.getBoundingClientRect().width > 0) {
+            cartBtn = mobileCart;
+            badgeEl = document.getElementById('bottomNavCartBadge') || mobileCart.querySelector('.cps-nav-badge');
+        }
+    }
+    if (!cartBtn) {
+        cartBtn = document.getElementById('headerCartButton') || document.getElementById('headerCartBtn') || document.querySelector('.header-cart-btn, .header-action-btn[href*="openCart"]');
+        badgeEl = document.getElementById('headerCartBadge') || document.querySelector('.header-cart-badge');
+    }
+
     const cardImg = document.querySelector(`.product-card[data-product-card-id="${productId}"] .product-media img`);
     if (cardImg && cartBtn && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !document.documentElement.classList.contains('visual-reduce-motion')) {
         const sRect = cardImg.getBoundingClientRect();
@@ -3736,12 +3752,37 @@ function animateAddCartFeedback(productId, imgSrc) {
                 cartBtn.classList.remove('u051-cart-bump');
                 void cartBtn.offsetWidth;
                 cartBtn.classList.add('u051-cart-bump');
+
+                let ping = cartBtn.querySelector('.cart-radar-ping');
+                if (!ping) {
+                    ping = document.createElement('span');
+                    ping.className = 'cart-radar-ping';
+                    ping.setAttribute('aria-hidden', 'true');
+                    cartBtn.style.position = cartBtn.style.position || 'relative';
+                    cartBtn.appendChild(ping);
+                }
+                ping.classList.remove('is-active');
+                void ping.offsetWidth;
+                ping.classList.add('is-active');
+                setTimeout(() => ping.remove(), 700);
+
                 if (badgeEl) {
                     badgeEl.classList.remove('u051-badge-pop');
                     void badgeEl.offsetWidth;
                     badgeEl.classList.add('u051-badge-pop');
                 }
+                if (typeof window.triggerVisualHaptic === 'function') {
+                    window.triggerVisualHaptic('success');
+                }
             };
+        } else {
+            if (typeof window.triggerVisualHaptic === 'function') {
+                window.triggerVisualHaptic('success');
+            }
+        }
+    } else {
+        if (typeof window.triggerVisualHaptic === 'function') {
+            window.triggerVisualHaptic('success');
         }
     }
 }

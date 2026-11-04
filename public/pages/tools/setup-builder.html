@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <meta name="description"
+        content="TechDesk Studio — Trải nghiệm xây dựng góc làm việc và Gaming giả lập 2.5D kéo thả. Tự động kiểm tra độ tương thích phần cứng, cổng kết nối và nhận ưu đãi giảm 10% toàn bộ combo tại TechEcommerce.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://techshopvn.vercel.app/pages/tools/setup-builder.html">
+    <title>TechDesk Studio — Xây dựng góc làm việc &amp; Gaming trong mơ | TechEcommerce</title>
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261103-lucian-p1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261103-lucian-p1">
+    <link rel="stylesheet" href="../../assets/css/setup-builder.css?v=20261104-v1">
+</head>
+
+<body>
+    <nav>
+        <p class="legacy-brand"><a href="../../index.html">TechEcommerce</a></p>
+        <ul id="main-navbar">
+            <li><a href="../../index.html">Cửa hàng</a></li>
+            <li><a href="setup-builder.html" class="active" aria-current="page">Setup Builder</a></li>
+            <li><a href="../account/orders.html">Đơn hàng</a></li>
+            <li class="admin-only"><a href="../../admin/dashboard.html">Tổng quan</a></li>
+            <li class="admin-only"><a href="../../admin/products.html">Sản phẩm</a></li>
+            <li id="nav-auth-section" style="margin-left: auto;"></li>
+        </ul>
+    </nav>
+    <script src="../../assets/js/animations.js"></script>
+    <script src="../../assets/js/auth.js?v=20261103-lucian-p1"></script>
+    <script src="../../assets/js/storefront-header.js?v=20261103-lucian-p1"></script>
+
+    <main class="builder-page-container fade-in">
+        <!-- Breadcrumb Navigation -->
+        <nav class="builder-breadcrumb" aria-label="Đường dẫn trang">
+            <ol>
+                <li><a href="../../index.html">Trang chủ</a></li>
+                <li><a href="../../index.html">Công cụ thông minh</a></li>
+                <li aria-current="page">TechDesk Studio (Setup Builder)</li>
+            </ol>
+        </nav>
+
+        <!-- Builder Page Header -->
+        <header class="builder-page-header">
+            <span class="builder-pill-tag">✨ TRẢI NGHIỆM TƯƠNG TÁC 2.5D</span>
+            <h1 class="builder-main-title">TechDesk Studio — Xây Dựng Góc Setup Trong Mơ</h1>
+            <p class="builder-lead-desc">
+                Kéo thả Laptop, Màn hình, Tai nghe và Hub kết nối lên bàn làm việc ảo.
+                Hệ thống AI tự động kiểm tra tương thích cổng xuất hình, công suất nguồn sạc và tặng ngay <strong>Combo Voucher Giảm 10%</strong> khi mua trọn bộ!
+            </p>
+        </header>
+
+        <!-- Workspace & Inventory Split Grid -->
+        <div class="builder-studio-grid">
+            <!-- Left: Virtual Desk Canvas (Drop Zones) -->
+            <section class="studio-desk-section" aria-label="Mặt bàn làm việc trực quan">
+                <header class="desk-controls-bar">
+                    <div class="desk-status-indicator">
+                        <span class="desk-indicator-dot" aria-hidden="true"></span>
+                        <strong id="deskItemsCount">0/4 Thiết bị đã gắn</strong>
+                    </div>
+                    <div class="desk-action-buttons">
+                        <button type="button" class="btn-desk-action" id="btnToggleDeskLed" aria-label="Bật/Tắt đèn LED gầm bàn">
+                            💡 LED Gầm bàn
+                        </button>
+                        <button type="button" class="btn-desk-action btn-reset-desk" id="btnResetDesk" aria-label="Làm mới mặt bàn">
+                            🔄 Làm mới
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Virtual Studio Desk Surface -->
+                <figure class="virtual-desk-canvas" id="virtualDeskCanvas">
+                    <span class="desk-ambient-strip" id="deskAmbientStrip" aria-hidden="true"></span>
+                    <span class="desk-wire-tracks" aria-hidden="true"></span>
+
+                    <!-- Slot 1: Center Monitor -->
+                    <section class="desk-slot slot-center-monitor" id="slot-monitor" data-slot="monitor" tabindex="0" role="region" aria-label="Vị trí đặt Màn hình chính">
+                        <div class="slot-empty-state">
+                            <span class="slot-icon" aria-hidden="true">🖥️</span>
+                            <strong class="slot-title">MÀN HÌNH CHÍNH</strong>
+                            <p class="slot-note">Kéo thả màn hình hoặc bấm [Thêm vào bàn]</p>
+                        </div>
+                        <div class="slot-occupied-card" style="display: none;"></div>
+                    </section>
+
+                    <!-- Slot 2: Left Laptop / PC Workstation -->
+                    <section class="desk-slot slot-left-laptop" id="slot-laptop" data-slot="laptop" tabindex="0" role="region" aria-label="Vị trí đặt Laptop hoặc PC Station">
+                        <div class="slot-empty-state">
+                            <span class="slot-icon" aria-hidden="true">💻</span>
+                            <strong class="slot-title">MÁY TÍNH CHỦ</strong>
+                            <p class="slot-note">MacBook, Laptop Gaming, Mini PC</p>
+                        </div>
+                        <div class="slot-occupied-card" style="display: none;"></div>
+                    </section>
+
+                    <!-- Slot 3: Right Audio / Speakers -->
+                    <section class="desk-slot slot-right-audio" id="slot-audio" data-slot="audio" tabindex="0" role="region" aria-label="Vị trí đặt Tai nghe hoặc Loa">
+                        <div class="slot-empty-state">
+                            <span class="slot-icon" aria-hidden="true">🎧</span>
+                            <strong class="slot-title">THIẾT BỊ ÂM THANH</strong>
+                            <p class="slot-note">Tai nghe Studio, Loa để bàn</p>
+                        </div>
+                        <div class="slot-occupied-card" style="display: none;"></div>
+                    </section>
+
+                    <!-- Slot 4: Front Hub / Dock / Accessories -->
+                    <section class="desk-slot slot-front-hub" id="slot-hub" data-slot="hub" tabindex="0" role="region" aria-label="Vị trí đặt Hub chuyển đổi và Củ sạc">
+                        <div class="slot-empty-state">
+                            <span class="slot-icon" aria-hidden="true">🔌</span>
+                            <strong class="slot-title">HUB &amp; CỔNG KẾT NỐI</strong>
+                            <p class="slot-note">Hub Type-C, Docking Station, Sạc GaN</p>
+                        </div>
+                        <div class="slot-occupied-card" style="display: none;"></div>
+                    </section>
+                </figure>
+            </section>
+
+            <!-- Right: Hardware Inventory Drawer -->
+            <aside class="studio-inventory-aside" aria-label="Ngăn kéo chọn thiết bị công nghệ">
+                <header class="inventory-drawer-header">
+                    <h2>Chọn thiết bị kéo vào bàn</h2>
+                    <nav class="inventory-category-tabs" aria-label="Phân loại thiết bị">
+                        <button type="button" class="inv-tab-btn active" data-category="laptop">💻 Laptop/PC</button>
+                        <button type="button" class="inv-tab-btn" data-category="monitor">🖥️ Màn hình</button>
+                        <button type="button" class="inv-tab-btn" data-category="audio">🎧 Âm thanh</button>
+                        <button type="button" class="inv-tab-btn" data-category="hub">🔌 Hub/Cáp</button>
+                    </nav>
+                </header>
+
+                <!-- Inventory Cards List -->
+                <ul class="inventory-cards-list" id="inventoryItemsList" aria-label="Danh sách thiết bị có thể kéo">
+                    <!-- Populated dynamically by setup-builder.js -->
+                </ul>
+            </aside>
+        </div>
+
+        <!-- Realtime Diagnostic & Combo Pricing Footer Section -->
+        <section class="builder-bottom-summary" aria-label="Chẩn đoán độ tương thích và Đặt hàng combo">
+            <!-- Left: Realtime Compatibility Diagnostic Engine -->
+            <article class="compatibility-diagnostic-card" id="compatibilityPanel">
+                <header class="diagnostic-card-header">
+                    <div class="diagnostic-title-wrap">
+                        <span class="diagnostic-chip-icon" aria-hidden="true">⚙️</span>
+                        <h3>Chẩn đoán tương thích cổng kết nối &amp; Nguồn điện</h3>
+                    </div>
+                    <span class="compatibility-status-badge badge-neutral" id="compatibilityBadge">CHỜ GẮN THIẾT BỊ</span>
+                </header>
+
+                <div class="diagnostic-body" id="diagnosticBody">
+                    <p class="diagnostic-empty-hint">
+                        Hãy kéo ít nhất 2 thiết bị (ví dụ: Laptop và Màn hình) lên mặt bàn để hệ thống AI phân tích độ tương thích cổng kết nối HDMI/USB-C và công suất sạc.
+                    </p>
+                    <ul class="diagnostic-rules-list" id="diagnosticRulesList" style="display: none;">
+                        <!-- Dynamic Diagnostic Items -->
+                    </ul>
+                </div>
+            </article>
+
+            <!-- Right: Combo Calculator & 1-Click Order -->
+            <aside class="combo-pricing-card" aria-label="Bảng tính giá combo">
+                <header class="combo-pricing-header">
+                    <h3>Tổng giá trị Setup</h3>
+                    <span class="combo-discount-badge" id="comboDiscountBadge">COMBO TIẾT KIỆM -10%</span>
+                </header>
+
+                <div class="combo-price-details">
+                    <div class="price-row original-price-row">
+                        <span>Giá gốc từng món:</span>
+                        <del id="comboOriginalPrice">0 ₫</del>
+                    </div>
+                    <div class="price-row discount-row">
+                        <span>Ưu đãi Combo trọn bộ (10%):</span>
+                        <strong class="text-discount" id="comboDiscountAmount">-0 ₫</strong>
+                    </div>
+                    <div class="price-row final-price-row">
+                        <span>Giá trọn gói Combo:</span>
+                        <strong class="text-final-price" id="comboFinalPrice">0 ₫</strong>
+                    </div>
+                </div>
+
+                <div class="combo-action-area">
+                    <button type="button" class="btn-primary btn-add-combo-cart" id="btnAddComboToCart" disabled>
+                        <span>🛒 Thêm trọn bộ Setup vào giỏ hàng</span>
+                    </button>
+                    <small class="combo-guarantee-note">✓ Miễn phí vận chuyển toàn quốc &amp; Bảo hành chính hãng 1 đổi 1</small>
+                </div>
+            </aside>
+        </section>
+    </main>
+
+    <script src="../../assets/js/setup-builder.js?v=20261104-v1"></script>
+</body>
+
+</html>

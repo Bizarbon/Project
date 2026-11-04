@@ -250,7 +250,7 @@ function addToCart(id, shouldRedirect = false) {
 
     /* Lucian UX/UI Prompt #051 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#051 */
     const totalCount = cart.reduce((sum, i) => sum + (Number(i.quantity) || 1), 0);
-    const badgeEl = document.querySelector('.header-cart-badge');
+    let badgeEl = document.querySelector('.header-cart-badge');
     if (badgeEl) {
         badgeEl.textContent = String(totalCount);
         badgeEl.hidden = totalCount < 1;
@@ -260,8 +260,20 @@ function addToCart(id, shouldRedirect = false) {
         clearTimeout(btn._u051Timer);
         btn._u051Timer = setTimeout(() => btn.classList.remove('u051-ok'), 1250);
     });
+
+    let cartBtn = null;
+    if (window.innerWidth <= 768) {
+        const mobileCart = document.getElementById('bottomNavCartBtn') || document.querySelector('.cps-bottom-nav-bar a[href*="openCart"]');
+        if (mobileCart && mobileCart.getBoundingClientRect().width > 0) {
+            cartBtn = mobileCart;
+            badgeEl = document.getElementById('bottomNavCartBadge') || mobileCart.querySelector('.cps-nav-badge') || badgeEl;
+        }
+    }
+    if (!cartBtn) {
+        cartBtn = document.querySelector('.header-action-btn[href*="openCart"]') || document.getElementById('headerCartButton') || document.getElementById('headerCartBtn') || document.querySelector('.header-cart-btn');
+    }
+
     const heroImg = document.getElementById('mainProductImage') || document.getElementById('mainProductImg');
-    const cartBtn = document.querySelector('.header-action-btn[href*="openCart"]');
     if (heroImg && cartBtn && !shouldRedirect && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const sRect = heroImg.getBoundingClientRect();
         const eRect = cartBtn.getBoundingClientRect();
@@ -287,12 +299,37 @@ function addToCart(id, shouldRedirect = false) {
                 cartBtn.classList.remove('u051-cart-bump');
                 void cartBtn.offsetWidth;
                 cartBtn.classList.add('u051-cart-bump');
+
+                let ping = cartBtn.querySelector('.cart-radar-ping');
+                if (!ping) {
+                    ping = document.createElement('span');
+                    ping.className = 'cart-radar-ping';
+                    ping.setAttribute('aria-hidden', 'true');
+                    cartBtn.style.position = cartBtn.style.position || 'relative';
+                    cartBtn.appendChild(ping);
+                }
+                ping.classList.remove('is-active');
+                void ping.offsetWidth;
+                ping.classList.add('is-active');
+                setTimeout(() => ping.remove(), 700);
+
                 if (badgeEl) {
                     badgeEl.classList.remove('u051-badge-pop');
                     void badgeEl.offsetWidth;
                     badgeEl.classList.add('u051-badge-pop');
                 }
+                if (typeof window.triggerVisualHaptic === 'function') {
+                    window.triggerVisualHaptic('success');
+                }
             };
+        } else {
+            if (typeof window.triggerVisualHaptic === 'function') {
+                window.triggerVisualHaptic('success');
+            }
+        }
+    } else {
+        if (typeof window.triggerVisualHaptic === 'function') {
+            window.triggerVisualHaptic('success');
         }
     }
 
@@ -2241,6 +2278,70 @@ window.closeExpressCheckoutModal = closeExpressCheckoutModal;
 window.submitExpressCheckout = submitExpressCheckout;
 window.clearRecentlyViewed = clearRecentlyViewed;
 
+/* ==========================================================================
+   FEATURE 3: APPLE-STYLE SCROLLYTELLING INTERSECTION OBSERVER
+   ========================================================================== */
+function initProductScrollytelling() {
+    const stage = document.getElementById('scrollyHardwareStage');
+    const chapters = document.querySelectorAll('.story-chapter-card');
+    if (!stage || !chapters.length) return;
+
+    function animateCounter(el) {
+        if (el._counted) return;
+        el._counted = true;
+
+        const target = parseFloat(el.getAttribute('data-count') || '0');
+        const decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+        const prefix = el.getAttribute('data-prefix') || '';
+        const suffix = el.getAttribute('data-suffix') || '';
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            el.textContent = `${prefix}${target.toFixed(decimals)}${suffix}`;
+            return;
+        }
+
+        const duration = 1200;
+        const startTime = performance.now();
+
+        function step(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const current = target * ease;
+            el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                el.textContent = `${prefix}${target.toFixed(decimals)}${suffix}`;
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const chapterId = entry.target.getAttribute('data-chapter');
+                if (chapterId) {
+                    stage.setAttribute('data-active-chapter', chapterId);
+                }
+                chapters.forEach(c => c.classList.remove('is-active'));
+                entry.target.classList.add('is-active');
+
+                entry.target.querySelectorAll('.scrolly-counter').forEach(animateCounter);
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: '-20% 0px -40% 0px',
+        threshold: 0.1
+    });
+
+    chapters.forEach(chapter => observer.observe(chapter));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadProduct();
+    initProductScrollytelling();
 });

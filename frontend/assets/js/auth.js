@@ -155,29 +155,64 @@ function getAppBasePath() {
 window.getAppBasePath = getAppBasePath;
 
 function setTheme(theme) {
-    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    const validThemes = ['light', 'dark', 'high-contrast'];
+    const nextTheme = validThemes.includes(theme) ? theme : 'light';
     document.documentElement.dataset.theme = nextTheme;
     document.documentElement.setAttribute('data-theme', nextTheme);
     localStorage.setItem('theme', nextTheme);
     updateThemeToggle();
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: nextTheme } }));
 }
 
 function toggleTheme() {
-    setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+    const current = document.documentElement.dataset.theme || localStorage.getItem('theme') || 'light';
+    let nextTheme = 'dark';
+    if (current === 'light') nextTheme = 'dark';
+    else if (current === 'dark') nextTheme = 'high-contrast';
+    else nextTheme = 'light';
+    setTheme(nextTheme);
 }
 
 /* Lucian UX/UI Prompt #021 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#021 */
 function updateThemeToggle() {
     const button = document.getElementById('themeToggle');
     if (!button) return;
-    const isDark = document.documentElement.dataset.theme === 'dark';
+    const currentTheme = document.documentElement.dataset.theme || 'light';
+    const isDark = currentTheme === 'dark';
+    const isHighContrast = currentTheme === 'high-contrast';
+
     button.classList.toggle('is-dark', isDark);
-    button.setAttribute('aria-checked', isDark ? 'true' : 'false');
-    button.setAttribute('aria-label', isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối');
-    button.title = isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối';
+    button.classList.toggle('is-high-contrast', isHighContrast);
+    button.setAttribute('aria-checked', isDark || isHighContrast ? 'true' : 'false');
+
+    let label = 'Chuyển sang giao diện tối';
+    let title = 'Giao diện: Sáng. Bấm để chuyển sang Tối';
+    if (isDark) {
+        label = 'Chuyển sang giao diện tương phản cao';
+        title = 'Giao diện: Tối. Bấm để chuyển sang Tương phản cao (High Contrast)';
+    } else if (isHighContrast) {
+        label = 'Chuyển sang giao diện sáng';
+        title = 'Giao diện: Tương phản cao (WCAG AAA). Bấm để chuyển sang Sáng';
+    }
+
+    button.setAttribute('aria-label', label);
+    button.title = title;
     const srLabel = button.querySelector('.u021-sr-label');
     if (srLabel) {
-        srLabel.textContent = isDark ? 'Light mode' : 'Dark mode';
+        srLabel.textContent = `Chế độ giao diện: ${currentTheme}`;
+    }
+
+    let hcBadge = button.querySelector('.u021-hc-badge');
+    if (isHighContrast) {
+        if (!hcBadge) {
+            hcBadge = document.createElement('span');
+            hcBadge.className = 'u021-hc-badge';
+            hcBadge.setAttribute('aria-hidden', 'true');
+            hcBadge.textContent = '⚡HC';
+            button.appendChild(hcBadge);
+        }
+    } else if (hcBadge) {
+        hcBadge.remove();
     }
 }
 
@@ -239,6 +274,52 @@ function renderThemeToggle() {
 
 window.setTheme = setTheme;
 window.toggleTheme = toggleTheme;
+
+/* Visual Haptic Feedback Engine for Silent & Deaf/Hard of Hearing UX */
+function triggerVisualHaptic(type = 'success') {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+    let beacon = document.getElementById('visualHapticBeacon');
+    if (!beacon) {
+        beacon = document.createElement('div');
+        beacon.id = 'visualHapticBeacon';
+        beacon.className = 'visual-haptic-beacon';
+        beacon.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(beacon);
+    }
+    const flashClass = type === 'warning' || type === 'error' ? 'is-flashing-warning' : 'is-flashing-success';
+    beacon.classList.remove('is-flashing-success', 'is-flashing-warning');
+    void beacon.offsetWidth;
+    beacon.classList.add(flashClass);
+    clearTimeout(beacon._timer);
+    beacon._timer = setTimeout(() => {
+        beacon.classList.remove(flashClass);
+    }, 450);
+
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        try {
+            if (type === 'warning' || type === 'error') {
+                navigator.vibrate([60, 50, 60]);
+            } else {
+                navigator.vibrate([35, 40, 35]);
+            }
+        } catch (_) {}
+    }
+
+    if (window.TechMascot && typeof window.TechMascot.setState === 'function') {
+        if (type === 'success') {
+            window.TechMascot.setState('happy');
+            clearTimeout(window.__mascotHappyTimer);
+            window.__mascotHappyTimer = setTimeout(() => {
+                if (window.TechMascot.getState?.() === 'happy') {
+                    window.TechMascot.setState('idle');
+                }
+            }, 1800);
+        }
+    }
+}
+window.triggerVisualHaptic = triggerVisualHaptic;
 
 /* Lucian UX/UI Prompt #070 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#070 */
 (function initLucianStackingToasts() {
