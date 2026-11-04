@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Bảng điều khiển quản trị TechEcommerce: tổng quan doanh thu, người dùng, sản phẩm, đơn hàng, lối tắt tính năng và cảnh báo tồn kho.">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="canonical" href="https://techecommerce-shop.vercel.app/admin/dashboard.html">
+    <link rel="canonical" href="https://techshopvn.vercel.app/admin/dashboard.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Dashboard - Bảng điều khiển quản trị TechEcommerce</title>
@@ -26,13 +26,13 @@
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Khu vực Quản trị",
-                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+                "item": "https://techshopvn.vercel.app/admin/dashboard.html"
             },
             {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Dashboard",
-                "item": "https://techecommerce-shop.vercel.app/admin/dashboard.html"
+                "item": "https://techshopvn.vercel.app/admin/dashboard.html"
             }
         ]
     }
@@ -390,6 +390,10 @@
                 <article class="dashboard-card revenue-chart-card" data-dashboard-section="revenue" aria-labelledby="revenueChartTitle">
                     <header class="card-heading-row">
                         <section><p class="card-kicker">Hiệu suất theo kỳ</p><h2 id="revenueChartTitle">Doanh thu theo thời gian</h2></section>
+                        <div class="revenue-chart-view-toggle" role="group" aria-label="Chế độ xem doanh thu">
+                            <button type="button" class="btn-view-mode active" id="btnRevenueDaily" onclick="setRevenueViewMode('daily')">Theo ngày</button>
+                            <button type="button" class="btn-view-mode" id="btnRevenueMonthly" onclick="setRevenueViewMode('monthly')">Theo tháng</button>
+                        </div>
                         <strong id="chartRevenueTotal">0 ₫</strong>
                     </header>
                     <figure class="chart-figure">
@@ -414,7 +418,13 @@
 
             <section class="dashboard-secondary-grid" aria-label="Phân tích vận hành">
                 <article class="dashboard-card status-card" data-dashboard-section="orders" aria-labelledby="statusTitle">
-                    <header class="card-heading-row"><section><p class="card-kicker">Vận hành</p><h2 id="statusTitle">Trạng thái đơn hàng</h2></section></header>
+                    <header class="card-heading-row">
+                        <section><p class="card-kicker">Vận hành & Tỷ lệ giao hàng</p><h2 id="statusTitle">Tỷ lệ giao hàng & Trạng thái</h2></section>
+                        <div class="delivery-rate-badge" id="deliveryRateBadge" title="Tỷ lệ giao hàng thành công">
+                            <span class="delivery-rate-label">Giao thành công:</span>
+                            <strong class="delivery-rate-val" id="deliverySuccessRate">--%</strong>
+                        </div>
+                    </header>
                     <section class="donut-layout">
                         <figure class="donut-figure">
                             <svg id="statusDonut" viewBox="0 0 220 220" role="img" aria-label="Cơ cấu trạng thái đơn hàng"></svg>
@@ -435,6 +445,48 @@
                 <article class="dashboard-card bestseller-card" data-dashboard-section="overview" aria-labelledby="bestsellerTitle">
                     <header class="card-heading-row"><section><p class="card-kicker">Sản phẩm</p><h2 id="bestsellerTitle">Bán chạy trong kỳ</h2></section><a href="products.html">Xem kho</a></header>
                     <ol id="bestSellerList" class="bestseller-list"></ol>
+                </article>
+            </section>
+
+            <!-- Section: Express Dispatch Manager (Quản lý đơn giao 2 giờ hỏa tốc - Group 5 Feature) -->
+            <section class="dashboard-express-section" id="expressDispatchSection" aria-label="Quản lý đơn giao 2 giờ">
+                <article class="dashboard-card express-dispatch-card" aria-labelledby="expressDispatchTitle">
+                    <header class="card-heading-row">
+                        <section class="express-title-box">
+                            <span class="express-fire-badge" aria-hidden="true">⚡ HỎA TỐC GIAO 2H</span>
+                            <h2 id="expressDispatchTitle">Quản Lý Đơn Giao Trong 2 Giờ (Express Dispatch Manager)</h2>
+                            <span class="express-counter-pill" id="expressPendingCount">0 đơn đang chờ giao</span>
+                        </section>
+                        <div class="express-header-actions">
+                            <button type="button" class="btn-sound-switch" id="btnSoundSwitch" onclick="toggleSoundAlert()" title="Bật/Tắt âm thanh chuông báo">
+                                <span id="soundIcon" aria-hidden="true">🔔</span>
+                                <span id="soundStatusText">Chuông: BẬT</span>
+                            </button>
+                            <button type="button" class="btn-sound-ping" onclick="playExpressAlertChime(true)" title="Kiểm tra âm thanh chuông">
+                                <span>🔊 Thử chuông</span>
+                            </button>
+                            <a href="orders.html?search=2H" class="btn-view-express-orders">Tất cả đơn 2H →</a>
+                        </div>
+                    </header>
+                    <div class="dashboard-table-wrap" tabindex="0" aria-label="Bảng đơn giao 2 giờ có thể cuộn ngang">
+                        <table class="commerce-orders-table express-orders-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Mã đơn</th>
+                                    <th scope="col">Khách hàng</th>
+                                    <th scope="col">Số điện thoại</th>
+                                    <th scope="col">Địa chỉ nhận (TP.HCM)</th>
+                                    <th scope="col">Tổng tiền</th>
+                                    <th scope="col">Cam kết giao (Đếm ngược 2H)</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Thao tác hỏa tốc</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expressOrdersBody">
+                                <!-- Dynamic Express Orders -->
+                            </tbody>
+                        </table>
+                    </div>
                 </article>
             </section>
 

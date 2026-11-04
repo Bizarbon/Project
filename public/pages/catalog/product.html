@@ -11,11 +11,11 @@
     <meta name="description"
         content="Xem giá bán tốt nhất, video trải nghiệm, thông số kỹ thuật, đánh giá thực tế và ưu đãi trả góp 0% tại TechEcommerce.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/catalog/product.html">
+    <link rel="canonical" href="https://techshopvn.vercel.app/pages/catalog/product.html">
     <title>Chi tiết sản phẩm - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20260925-v3">
-    <link rel="stylesheet" href="../../assets/css/product-detail.css?v=20260923-4">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261103-lucian-p1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261103-lucian-p1">
+    <link rel="stylesheet" href="../../assets/css/product-detail.css?v=20261103-lucian-p1">
 </head>
 
 <body>
@@ -30,8 +30,8 @@
         </ul>
     </nav>
     <script src="../../assets/js/animations.js"></script>
-    <script src="../../assets/js/auth.js?v=storefront-commerce-20260711-2"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/auth.js?v=20261103-lucian-p1"></script>
+    <script src="../../assets/js/storefront-header.js?v=20261103-lucian-p1"></script>
 
     <main class="product-page-main fade-in">
         <!-- Breadcrumb Navigation - 100% Semantic HTML5 -->
@@ -129,6 +129,21 @@
                     </div>
                 </div>
 
+                <!-- AI Review Summarizer (AI Shopping Intelligence) -->
+                <section class="ai-review-summary-card" id="aiReviewSummaryCard" aria-label="AI Tóm tắt đánh giá sản phẩm">
+                    <header class="ai-summary-header">
+                        <div class="ai-summary-title-wrap">
+                            <span class="ai-sparkle-badge" aria-hidden="true">🤖 AI Intelligence</span>
+                            <h3 class="ai-summary-heading">Phân tích & Tóm tắt đánh giá thực tế</h3>
+                        </div>
+                        <button type="button" class="btn-ai-summarize" id="btnAiSummarizeReviews" onclick="generateAiReviewSummary()">
+                            <span class="ai-btn-icon" aria-hidden="true">✨</span>
+                            <span class="ai-btn-text">AI Tóm tắt ưu/nhược điểm</span>
+                        </button>
+                    </header>
+                    <div class="ai-summary-body" id="aiSummaryBody" style="display: none;" aria-live="polite"></div>
+                </section>
+
                 <!-- Review Submission Form -->
                 <section class="review-form-container" id="reviewFormContainer" aria-label="Gửi nhận xét đánh giá sản phẩm">
                     <h3 class="review-form-title">Chia sẻ cảm nhận của bạn về sản phẩm</h3>
@@ -203,10 +218,133 @@
                     <div class="empty-state">Đang tải sản phẩm tương tự...</div>
                 </div>
             </section>
+
+            <!-- Recently Viewed Section (Sản phẩm vừa xem) -->
+            <section class="recently-viewed-section reveal" id="detailRecentlyViewed" aria-label="Sản phẩm bạn vừa xem" hidden>
+                <header class="recently-viewed-header">
+                    <div class="section-title-wrap">
+                        <span class="section-badge-icon" aria-hidden="true">🕒</span>
+                        <h2>Sản phẩm bạn vừa xem</h2>
+                    </div>
+                    <button type="button" class="btn-clear-recent" id="btnClearDetailRecent" onclick="clearRecentlyViewed()">Xóa lịch sử</button>
+                </header>
+                <div class="recently-viewed-grid" id="detailRecentlyViewedGrid"></div>
+            </section>
         </section>
     </main>
 
-    <script src="../../assets/js/product-detail.js?v=20260923-2"></script>
+    <!-- Mobile Sticky Bottom Action Bar (Thanh mua nhanh ghim đáy trên điện thoại) -->
+    <aside class="mobile-sticky-action-bar" id="mobileStickyBar" aria-label="Thanh mua nhanh trên điện thoại" hidden>
+        <!-- Rendered dynamically by product-detail.js -->
+    </aside>
+
+    <!-- 1-Click Express Checkout Modal -->
+    <dialog class="express-checkout-modal" id="expressCheckoutDialog" aria-labelledby="expressModalTitle">
+        <section class="express-checkout-card">
+            <header class="express-checkout-header">
+                <div class="express-header-title">
+                    <span class="express-bolt-icon" aria-hidden="true">⚡</span>
+                    <h2 id="expressModalTitle">ĐẶT HÀNG NHANH — GIAO TRONG 2 GIỜ</h2>
+                </div>
+                <button type="button" class="express-close-btn" id="closeExpressModalBtn" onclick="closeExpressCheckoutModal()" aria-label="Đóng cửa sổ">×</button>
+            </header>
+
+            <article class="express-product-summary" id="expressProductSummary">
+                <!-- Injected dynamically -->
+            </article>
+
+            <form class="express-form" id="expressCheckoutForm" onsubmit="event.preventDefault(); submitExpressCheckout();">
+                <div class="express-form-grid">
+                    <p class="express-field">
+                        <label for="expressCustomerName">Họ và tên của bạn <span class="required-star">*</span></label>
+                        <input type="text" id="expressCustomerName" name="fullName" required placeholder="Ví dụ: Nguyễn Văn A" autocomplete="name">
+                    </p>
+                    <p class="express-field">
+                        <label for="expressCustomerPhone">Số điện thoại nhận hàng <span class="required-star">*</span></label>
+                        <input type="tel" id="expressCustomerPhone" name="phone" required placeholder="Ví dụ: 0912 345 678" autocomplete="tel" pattern="[0-9]{10,11}">
+                    </p>
+                </div>
+
+                <p class="express-field">
+                    <label for="expressCustomerAddress">Địa chỉ nhận hàng chi tiết <span class="required-star">*</span></label>
+                    <input type="text" id="expressCustomerAddress" name="address" required placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành..." autocomplete="street-address">
+                </p>
+
+                <p class="express-field">
+                    <label for="expressOrderNote">Ghi chú giao hàng (tuỳ chọn):</label>
+                    <input type="text" id="expressOrderNote" name="note" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến...">
+                </p>
+
+                <fieldset class="express-payment-methods">
+                    <legend class="express-payment-legend">Phương thức thanh toán:</legend>
+                    <div class="express-radio-group">
+                        <label class="express-radio-label">
+                            <input type="radio" name="expressPaymentMethod" value="cod" checked>
+                            <span class="radio-custom"></span>
+                            <span class="radio-text">
+                                <strong>💵 Thanh toán tiền mặt khi nhận hàng (COD)</strong>
+                                <small>Được đồng kiểm tra máy, đúng sản phẩm mới thanh toán</small>
+                            </span>
+                        </label>
+                        <label class="express-radio-label">
+                            <input type="radio" name="expressPaymentMethod" value="bank">
+                            <span class="radio-custom"></span>
+                            <span class="radio-text">
+                                <strong>📲 Chuyển khoản QR Siêu Tốc (VNPay / VietQR)</strong>
+                                <small>Tự động xác nhận thanh toán tức thì</small>
+                            </span>
+                        </label>
+                    </div>
+                </fieldset>
+
+                <section class="express-total-summary">
+                    <div class="express-summary-row">
+                        <span>Tạm tính:</span>
+                        <strong id="expressSubtotal">0 đ</strong>
+                    </div>
+                    <div class="express-summary-row">
+                        <span>Phí giao hàng:</span>
+                        <strong style="color:var(--success)">Miễn phí toàn quốc</strong>
+                    </div>
+                    <div class="express-summary-row highlight">
+                        <span>Tổng thanh toán:</span>
+                        <strong class="total-number" id="expressTotalPay">0 đ</strong>
+                    </div>
+                </section>
+
+                <footer class="express-actions">
+                    <button type="submit" class="btn-express-confirm" id="btnSubmitExpressOrder">
+                        <span>⚡ XÁC NHẬN ĐẶT MUA NGAY</span>
+                    </button>
+                    <small class="express-security-note">🔒 Thông tin của bạn được bảo mật tuyệt đối 100%.</small>
+                </footer>
+            </form>
+        </section>
+    </dialog>
+
+    <!-- Lucian UX/UI Prompt #061 · Thumbnail-to-Lightbox Zoom -->
+    <dialog class="ux u061-lightbox" id="u061Lightbox" aria-label="Trình xem ảnh sản phẩm phóng to">
+        <div class="u061-lb-inner" id="u061LbInner">
+            <span class="u061-lb-zoom-pill" id="u061LbZoomPill" hidden>2× Zoom</span>
+            <button type="button" class="u061-lb-close" id="u061LbClose" aria-label="Đóng ảnh phóng to" title="Đóng (Esc)">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            <button type="button" class="u061-lb-nav u061-lb-prev prev" id="u061LbPrev" aria-label="Ảnh trước" title="Ảnh trước (←)">‹</button>
+            <figure class="u061-lb-stage u061-lb-figure">
+                <img id="u061LbImg" src="" alt="" />
+                <figcaption class="u061-lb-caption">
+                    <div>
+                        <small id="u061LbSub">Hình ảnh chính hãng</small>
+                        <strong id="u061LbTitle">Sản phẩm</strong>
+                    </div>
+                    <em id="u061LbCount">1 / 1</em>
+                </figcaption>
+            </figure>
+            <button type="button" class="u061-lb-nav u061-lb-next next" id="u061LbNext" aria-label="Ảnh tiếp theo" title="Ảnh tiếp theo (→)">›</button>
+        </div>
+    </dialog>
+
+    <script src="../../assets/js/product-detail.js?v=20261103-lucian-p1"></script>
     <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
     <script src="../../assets/js/chatbox.js"></script>
 </body>

@@ -18,7 +18,8 @@
         return `<li><a href="${root}index.html?category=${encodeURIComponent(value)}#catalogStart"${active ? ' class="active" aria-current="page"' : ''}><img src="${root}assets/icons/${icon}" alt="">${label}</a></li>`;
     }).join('');
 
-    const location = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
+    const locVal = localStorage.getItem('shoppingLocation');
+    const location = (locVal && locVal !== 'Hồ Chí Minh') ? locVal : 'Thành phố Hồ Chí Minh';
     let cartCount = 0;
     try {
         const cartKey = window.auth?.getCartStorageKey?.() || 'cart:guest';
@@ -50,10 +51,7 @@
                         <label class="sr-only" for="sharedStorefrontSearch">Tìm kiếm sản phẩm</label>
                         <span class="header-search-icon" aria-hidden="true">⌕</span>
                         <input id="sharedStorefrontSearch" name="search" type="search" value="${escapeHTML(currentSearch)}" placeholder="Bạn đang tìm sản phẩm gì?" autocomplete="off">
-                        <button type="button" class="header-search-camera-btn" id="headerVisualSearchBtn" title="Tìm kiếm bằng hình ảnh (AI Visual Search)" aria-label="Tìm kiếm bằng hình ảnh">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                        </button>
-                        <input type="file" id="headerVisualSearchInput" accept="image/*" style="display:none" aria-hidden="true">
+                        <span class="u322-search-ticker" id="sharedTrendingTicker" aria-hidden="true"></span>
                         <button type="submit">Tìm kiếm</button>
                         <section id="sharedLiveSearchResults" class="live-search-dropdown" aria-label="Gợi ý tìm kiếm tức thì" hidden></section>
                     </form>
@@ -199,6 +197,35 @@ function setupCategoryDragScroll(navEl) {
 
     setTimeout(updateArrows, 60);
     setTimeout(updateArrows, 350);
+
+    /* Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 */
+    let pillItem = list.querySelector('.u039-pill-item');
+    if (!pillItem) {
+        pillItem = document.createElement('li');
+        pillItem.className = 'u039-pill-item';
+        pillItem.setAttribute('aria-hidden', 'true');
+        pillItem.setAttribute('role', 'presentation');
+        list.prepend(pillItem);
+    }
+    function syncHeaderPill(targetEl) {
+        const activeBtn = targetEl || list.querySelector('a.active, button.active, [aria-current="page"]');
+        if (!activeBtn || !pillItem) {
+            if (pillItem) pillItem.style.setProperty('--pill-o', '0');
+            return;
+        }
+        const itemLi = activeBtn.closest('li') || activeBtn;
+        pillItem.style.setProperty('--x', `${itemLi.offsetLeft}px`);
+        pillItem.style.setProperty('--y', `${itemLi.offsetTop}px`);
+        pillItem.style.setProperty('--w', `${itemLi.offsetWidth}px`);
+        pillItem.style.setProperty('--h', `${itemLi.offsetHeight}px`);
+        pillItem.style.setProperty('--pill-o', '1');
+    }
+    list.querySelectorAll('a, button').forEach(btn => {
+        btn.addEventListener('pointerenter', () => syncHeaderPill(btn));
+    });
+    list.addEventListener('pointerleave', () => syncHeaderPill(null));
+    window.addEventListener('resize', () => syncHeaderPill(null), { passive: true });
+    setTimeout(() => syncHeaderPill(null), 80);
 }
 window.setupCategoryDragScroll = setupCategoryDragScroll;
 
@@ -212,7 +239,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
 
     if (!form || !input || !dropdown) return;
 
-    const apiUrl = (typeof window !== 'undefined' && window.API_URL) ? window.API_URL : (root.includes('techecommerce-shop.vercel.app') ? 'https://techecommerce-shop.vercel.app/api' : 'http://localhost:5000/api');
+    const apiUrl = (typeof window !== 'undefined' && window.API_URL) ? window.API_URL : (root.includes('techshopvn.vercel.app') ? 'https://techshopvn.vercel.app/api' : 'http://localhost:5000/api');
     function saveRecentSearch(term) {
         if (!term || term.trim().length < 2) return;
         const clean = term.trim();
@@ -220,7 +247,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
             let list = JSON.parse(localStorage.getItem('techecommerce_recent_searches') || '[]');
             list = [clean, ...list.filter(x => x.toLowerCase() !== clean.toLowerCase())].slice(0, 5);
             localStorage.setItem('techecommerce_recent_searches', JSON.stringify(list));
-        } catch (e) {}
+        } catch (e) { }
     }
 
     function getRecentSearches() {
@@ -234,7 +261,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
     function clearRecentSearches() {
         try {
             localStorage.removeItem('techecommerce_recent_searches');
-        } catch (e) {}
+        } catch (e) { }
         renderTrending();
     }
 
@@ -243,18 +270,67 @@ function setupStorefrontLiveSearch(headerEl, root) {
             let list = getRecentSearches();
             list.splice(index, 1);
             localStorage.setItem('techecommerce_recent_searches', JSON.stringify(list));
-        } catch (e) {}
+        } catch (e) { }
         renderTrending();
     }
 
     const trendingList = [
-        { rank: 1, term: 'iPhone 16 Pro Max', tag: 'HOT', tagType: 'hot' },
-        { rank: 2, term: 'MacBook Air M3', tag: 'MỚI', tagType: 'new' },
-        { rank: 3, term: 'Samsung Galaxy S24 Ultra', tag: 'AI', tagType: 'ai' },
-        { rank: 4, term: 'Sony WH-1000XM5', tag: '', tagType: '' },
-        { rank: 5, term: 'Logitech MX Keys S', tag: '', tagType: '' },
+        { rank: 1, term: 'iPhone 17 Pro Max', tag: 'MỚI', tagType: 'new' },
+        { rank: 2, term: 'Samsung Galaxy S24 Ultra', tag: 'AI', tagType: 'ai' },
+        { rank: 3, term: 'Galaxy Z Fold7 5G', tag: 'HOT', tagType: 'hot' },
+        { rank: 4, term: 'MacBook Air M3', tag: 'HOT', tagType: 'hot' },
+        { rank: 5, term: 'OPPO Find X8 Pro', tag: 'MỚI', tagType: 'new' },
         { rank: 6, term: 'Củ sạc Anker 65W GaN', tag: 'SALE', tagType: 'hot' }
     ];
+
+    /* Lucian UX/UI Prompt #322 & #046 · MIT License (c) 2026 Seokwoooo */
+    const sharedTicker = headerEl.querySelector('#sharedTrendingTicker');
+    if (sharedTicker && form) {
+        let tkIdx = 0;
+        let curLine = null;
+        const syncSharedTicker = () => {
+            const show = !input.value && document.activeElement !== input;
+            sharedTicker.classList.toggle('is-active', show);
+            form.classList.toggle('has-ticker', show);
+        };
+        const renderLine = (idx, first) => {
+            const it = trendingList[idx % trendingList.length];
+            const ln = document.createElement('span');
+            ln.className = 'u322-ln' + (first ? '' : ' is-dn');
+            ln.innerHTML = `<b>#${it.rank}</b><span>${escapeHTML(it.term)}</span><em class="${escapeHTML(it.tagType)}">${escapeHTML(it.tag)}</em>`;
+            sharedTicker.appendChild(ln);
+            if (curLine) {
+                const old = curLine;
+                old.classList.add('is-up');
+                setTimeout(() => old.remove(), 480);
+            }
+            if (!first) {
+                void ln.offsetWidth;
+                ln.classList.remove('is-dn');
+            }
+            curLine = ln;
+        };
+        renderLine(0, true);
+        syncSharedTicker();
+        input.addEventListener('focus', syncSharedTicker);
+        input.addEventListener('blur', syncSharedTicker);
+        input.addEventListener('input', syncSharedTicker);
+        setInterval(() => {
+            if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('visual-reduce-motion')) return;
+            if (sharedTicker.classList.contains('is-active')) {
+                tkIdx = (tkIdx + 1) % trendingList.length;
+                renderLine(tkIdx, false);
+            }
+        }, 2600);
+    }
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+            e.preventDefault();
+            input.focus();
+            if (input.value.trim().length >= 2) performSearch(input.value);
+            else renderTrending();
+        }
+    });
 
     let cachedHotProducts = null;
     async function getHotProducts() {
@@ -266,7 +342,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                 cachedHotProducts = Array.isArray(data) ? data.slice(0, 3) : [];
                 return cachedHotProducts;
             }
-        } catch (e) {}
+        } catch (e) { }
         return [];
     }
 
@@ -343,9 +419,9 @@ function setupStorefrontLiveSearch(headerEl, root) {
                     </div>
                     <div class="search-featured-list">
                         ${hotProducts.map(p => {
-                            const discount = p.compareAtPrice && p.compareAtPrice > p.price;
-                            const percent = discount ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
-                            return `
+                const discount = p.compareAtPrice && p.compareAtPrice > p.price;
+                const percent = discount ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
+                return `
                                 <a class="search-featured-card" href="${root}pages/catalog/product.html?id=${p._id}">
                                     <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="search-featured-thumb" loading="lazy" onerror="this.src='${root}assets/images/logo/techecommerce-logo.svg'">
                                     <div class="search-featured-info">
@@ -358,7 +434,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                                     </div>
                                 </a>
                             `;
-                        }).join('')}
+            }).join('')}
                     </div>
                 </div>
             `;
@@ -432,8 +508,8 @@ function setupStorefrontLiveSearch(headerEl, root) {
             </header>
             <ul class="live-search-list">
                 ${products.map(p => {
-                    const discount = p.compareAtPrice > p.price;
-                    return `
+            const discount = p.compareAtPrice > p.price;
+            return `
                         <li class="live-search-item">
                             <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
                                 <figure class="live-search-thumb">
@@ -450,7 +526,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                             </a>
                         </li>
                     `;
-                }).join('')}
+        }).join('')}
             </ul>
             <footer class="live-search-footer">
                 <a class="live-search-view-all" href="${root}index.html?search=${encodeURIComponent(query)}">
@@ -550,7 +626,8 @@ function setupStorefrontLiveSearch(headerEl, root) {
 
     // Camera Visual AI Search
     if (cameraBtn && cameraInput) {
-        cameraBtn.addEventListener('click', () => {
+        cameraBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             cameraInput.click();
         });
 
@@ -563,7 +640,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                 <div class="visual-search-loading">
                     <div class="visual-search-spinner" aria-hidden="true"></div>
                     <strong>🔍 AI đang phân tích thiết bị từ hình ảnh...</strong>
-                    <p>Nhận diện model, thương hiệu và thông số kỹ thuật...</p>
+                    <p>Nhận diện model, thương hiệu và tìm kiếm trong kho hàng...</p>
                 </div>
             `;
 
@@ -582,71 +659,83 @@ function setupStorefrontLiveSearch(headerEl, root) {
                     const result = await res.json();
                     if (!res.ok) throw new Error(result.message || 'Không thể tìm kiếm bằng hình ảnh');
 
-                    if (!result.isTech || !result.products?.length) {
-                        dropdown.innerHTML = `
-                            <header class="visual-search-result-badge">
-                                <span class="badge-ai-chip" style="background:rgba(239, 68, 68, 0.15); color:var(--danger, #ef4444);">🔍 AI Phân Loại Ảnh</span>
-                                <div class="visual-detected-title" style="margin-top:0.4rem; font-size:0.9rem; line-height:1.4;">${escapeHTML(result.reply || 'Ảnh này chưa cho thấy thiết bị thuộc danh mục cửa hàng.')}</div>
-                            </header>
-                            <footer class="live-search-footer" style="padding:0.75rem 1rem;">
-                                <small style="color:var(--text-muted, #94a3b8); display:block; margin-bottom:0.5rem;">Gợi ý tìm kiếm:</small>
-                                <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
-                                    <a class="filter-chip" href="${root}index.html?category=Điện thoại" style="font-size:0.78rem; text-decoration:none; padding:4px 10px; border-radius:50px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Điện thoại</a>
-                                    <a class="filter-chip" href="${root}index.html?category=Laptop" style="font-size:0.78rem; text-decoration:none; padding:4px 10px; border-radius:50px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Laptop</a>
-                                    <a class="filter-chip" href="${root}index.html?category=Tai nghe" style="font-size:0.78rem; text-decoration:none; padding:4px 10px; border-radius:50px; background:rgba(37,99,235,0.1); color:var(--primary, #2563eb);">Tai nghe</a>
-                                </div>
-                            </footer>
-                        `;
-                        return;
-                    }
-
-                    const detected = result.detectedItem || 'Thiết bị công nghệ';
-                    const products = result.products || [];
+                    dropdown.hidden = false;
+                    const prods = Array.isArray(result.products) ? result.products : [];
+                    const isTech = Boolean(result.isTech);
+                    const detected = result.detectedItem || (isTech ? 'Thiết bị công nghệ' : 'Hình ảnh tải lên');
+                    const desc = result.description || (isTech ? 'Đã tìm thấy sản phẩm tương đồng tại kho hàng' : 'Gợi ý sản phẩm nổi bật dành cho bạn');
 
                     dropdown.innerHTML = `
                         <header class="visual-search-result-badge">
-                            <span class="badge-ai-chip">✨ AI Visual Search</span>
-                            <div class="visual-detected-title">Nhận diện: <strong>${escapeHTML(detected)}</strong></div>
-                            <small>${escapeHTML(result.description || '')}</small>
+                            <div class="visual-search-badge-flex">
+                                <img src="${base64Data}" alt="Ảnh vừa quét" class="visual-search-user-thumb" />
+                                <div class="visual-search-meta-col">
+                                    <span class="badge-ai-chip ${isTech ? '' : 'is-warning'}">
+                                        ${isTech ? '✨ AI Visual Search' : '🔍 Gợi ý thông minh'}
+                                    </span>
+                                    <div class="visual-detected-title">
+                                        ${isTech ? `Nhận diện: <strong>${escapeHTML(detected)}</strong>` : `<strong>${escapeHTML(result.reply || 'Gợi ý sản phẩm thịnh hành')}</strong>`}
+                                    </div>
+                                    <small class="visual-detected-desc">${escapeHTML(desc)}</small>
+                                </div>
+                            </div>
                         </header>
-                        <header class="live-search-header" style="margin-top:0.5rem;">
-                            <span class="live-search-title">Sản phẩm tương thích (${products.length})</span>
-                        </header>
-                        <ul class="live-search-list">
-                            ${products.map(p => `
-                                <li class="live-search-item">
-                                    <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
-                                        <figure class="live-search-thumb">
-                                            <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy">
-                                        </figure>
-                                        <div class="live-search-meta">
-                                            <strong class="live-search-name">${escapeHTML(p.name)}</strong>
-                                            <div class="live-search-price-row">
-                                                <span class="live-search-price">${formatVND(p.price)}</span>
-                                                <span class="live-search-stock ${p.stock > 0 ? 'in' : 'out'}">${p.stock > 0 ? '✓ Còn hàng' : 'Tạm hết'}</span>
+                        ${prods.length > 0 ? `
+                            <header class="live-search-header" style="margin-top:0.35rem;">
+                                <span class="live-search-title">⚡ ${isTech ? `Sản phẩm tương thích (${prods.length})` : `Sản phẩm nổi bật đề xuất (${prods.length})`}</span>
+                            </header>
+                            <ul class="live-search-list">
+                                ${prods.slice(0, 6).map(p => `
+                                    <li class="live-search-item">
+                                        <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
+                                            <figure class="live-search-thumb">
+                                                <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy">
+                                            </figure>
+                                            <div class="live-search-meta">
+                                                <strong class="live-search-name">${escapeHTML(p.name)}</strong>
+                                                <div class="live-search-price-row">
+                                                    <span class="live-search-price">${formatVND(p.price)}</span>
+                                                    ${p.compareAtPrice > p.price ? `<del class="live-search-compare">${formatVND(p.compareAtPrice)}</del>` : ''}
+                                                    <span class="live-search-stock ${p.stock > 0 ? 'in' : 'out'}">${p.stock > 0 ? '✓ Còn hàng' : 'Tạm hết'}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            `).join('')}
-                        </ul>
-                        <footer class="live-search-footer">
-                            <a class="live-search-view-all" href="${root}index.html?search=${encodeURIComponent(detected)}">
-                                Xem tất cả dòng máy & phụ kiện liên quan ➔
-                            </a>
-                        </footer>
+                                        </a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            <footer class="live-search-footer">
+                                <a class="live-search-view-all" href="${root}index.html?search=${encodeURIComponent(detected || '')}">
+                                    Xem tất cả dòng máy & phụ kiện liên quan ➔
+                                </a>
+                            </footer>
+                        ` : `
+                            <div class="live-search-empty">
+                                <p>${escapeHTML(result.reply || 'Chưa tìm thấy sản phẩm khớp hoàn toàn.')}</p>
+                            </div>
+                            <footer class="live-search-footer">
+                                <a class="live-search-view-all" href="${root}index.html?category=all">
+                                    Khám phá toàn bộ danh mục sản phẩm ➔
+                                </a>
+                            </footer>
+                        `}
                     `;
                 } catch (err) {
                     console.error('Visual search error:', err);
+                    dropdown.hidden = false;
                     dropdown.innerHTML = `
-                        <div class="live-search-empty">
-                            <p>⚠️ Không thể nhận diện được hình ảnh này. Vui lòng thử lại với ảnh rõ nét hơn!</p>
+                        <div class="visual-search-result-badge" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.08);">
+                            <span class="badge-ai-chip is-warning">⚠️ Thông báo</span>
+                            <div class="visual-detected-title">Không thể nhận diện ảnh lúc này. Vui lòng thử lại với ảnh rõ nét hơn.</div>
                         </div>
+                        <footer class="live-search-footer">
+                            <a class="live-search-view-all" href="${root}index.html?category=all">Khám phá toàn bộ danh mục sản phẩm ➔</a>
+                        </footer>
                     `;
+                } finally {
+                    cameraInput.value = '';
                 }
             };
             reader.readAsDataURL(file);
-            cameraInput.value = '';
         });
     }
 }

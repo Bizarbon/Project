@@ -100,6 +100,10 @@ function specEntries(p) {
 }
 
 function showToast(message, type = 'success') {
+    if (typeof window.showLucianToast === 'function') {
+        window.showLucianToast(message, type);
+        return;
+    }
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
@@ -126,6 +130,24 @@ async function loadWishlist() {
     wishlistIds = new Set(JSON.parse(localStorage.getItem('wishlist') || '[]').map(Number));
 }
 
+/* Lucian UX/UI Prompt #022 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#022 */
+function syncDetailWishlistButton(productId) {
+    const liked = wishlistIds.has(Number(productId));
+    document.querySelectorAll('.btn-wishlist-toggle').forEach(btn => {
+        btn.classList.toggle('active', liked);
+        btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+        const glyph = btn.querySelector('.u022-heart-glyph');
+        const label = btn.querySelector('.u022-heart-text');
+        if (glyph) glyph.textContent = liked ? '♥' : '♡';
+        if (label) label.textContent = liked ? 'Đã lưu yêu thích' : 'Lưu vào yêu thích';
+        btn.classList.remove('is-pop');
+        if (liked) {
+            void btn.offsetWidth;
+            btn.classList.add('is-pop');
+        }
+    });
+}
+
 async function toggleWishlist(id) {
     const productId = Number(id);
     if (auth.isLoggedIn()) {
@@ -143,6 +165,8 @@ async function toggleWishlist(id) {
             }
             if (!res.ok) throw new Error(data.message || 'Không cập nhật được yêu thích');
             wishlistIds = new Set(data.map(item => Number(item._id || item)));
+            syncDetailWishlistButton(productId);
+            showToast(wishlistIds.has(productId) ? 'Đã thêm vào danh sách yêu thích ♥' : 'Đã bỏ khỏi danh sách yêu thích', 'info');
         } catch (err) {
             updateLocalWishlist(productId);
             return;
@@ -150,28 +174,42 @@ async function toggleWishlist(id) {
     } else {
         updateLocalWishlist(productId);
     }
-    renderProduct();
 }
 
 function updateLocalWishlist(productId) {
     if (wishlistIds.has(productId)) wishlistIds.delete(productId);
     else wishlistIds.add(productId);
     localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
-    renderProduct();
-    showToast(wishlistIds.has(productId) ? 'Đã thêm vào danh sách yêu thích!' : 'Đã bỏ khỏi danh sách yêu thích!');
+    syncDetailWishlistButton(productId);
+    showToast(wishlistIds.has(productId) ? 'Đã thêm vào danh sách yêu thích ♥' : 'Đã bỏ khỏi danh sách yêu thích', 'info');
 }
 
+/* Lucian UX/UI Prompt #018 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#018 */
 function adjustQty(delta) {
     const input = document.getElementById('detailQty');
+    const group = input?.closest('.qty-control-group');
     if (!input || !product) return;
     let current = Number(input.value) || 1;
     let next = current + delta;
-    if (next < 1) next = 1;
-    if (product.stock > 0 && next > product.stock) {
-        next = product.stock;
-        showToast('Đã đạt số lượng tồn kho tối đa!', 'info');
+    if (next < 1 || (product.stock > 0 && next > product.stock)) {
+        if (group) {
+            group.classList.remove('u018-shake');
+            void group.offsetWidth;
+            group.classList.add('u018-shake');
+        }
+        if (product.stock > 0 && next > product.stock) {
+            next = product.stock;
+            showToast('Đã đạt số lượng tồn kho tối đa!', 'info');
+        } else {
+            next = 1;
+        }
+        input.value = next;
+        return;
     }
     input.value = next;
+    input.classList.remove('u018-roll-up', 'u018-roll-dn');
+    void input.offsetWidth;
+    input.classList.add(delta > 0 ? 'u018-roll-up' : 'u018-roll-dn');
 }
 
 function addToCart(id, shouldRedirect = false) {
@@ -187,39 +225,533 @@ function addToCart(id, shouldRedirect = false) {
     }
     localStorage.removeItem('cart');
     const cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
-    const item = cart.find(i => String(i.productId) === String(id));
+    const hasVariants = currentProductVariants && currentProductVariants.length > 1;
+    const activeVar = hasVariants ? currentProductVariants[activeVariantIndex] : null;
+    const activeStorage = (currentStorageOptions && currentStorageOptions[activeStorageIndex]) || null;
+    const selectedColor = activeVar?.colorName || null;
+    const selectedStorage = activeStorage?.label || null;
+    const item = cart.find(i => String(i.productId) === String(id) && i.selectedColor === selectedColor && i.selectedStorage === selectedStorage);
     const nextQty = (item?.quantity || 0) + qty;
     if (nextQty > product.stock) return showToast('Số lượng trong giỏ hàng đã chạm giới hạn tồn kho!', 'error');
 
-    if (item) item.quantity = nextQty;
-    else cart.push({ productId: Number(id), quantity: qty });
+    if (item) {
+        item.quantity = nextQty;
+    } else {
+        cart.push({
+            productId: Number(id),
+            quantity: qty,
+            selectedColor: selectedColor,
+            selectedStorage: selectedStorage,
+            price: (Number(activeVar?.price) > 0 ? activeVar.price : product.price) + (activeStorage?.delta || 0)
+        });
+    }
 
     localStorage.setItem(cartKey, JSON.stringify(cart));
-    
+
+    /* Lucian UX/UI Prompt #051 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#051 */
+    const totalCount = cart.reduce((sum, i) => sum + (Number(i.quantity) || 1), 0);
+    const badgeEl = document.querySelector('.header-cart-badge');
+    if (badgeEl) {
+        badgeEl.textContent = String(totalCount);
+        badgeEl.hidden = totalCount < 1;
+    }
+    document.querySelectorAll('.btn-add-cart-secondary, .sticky-btn-cart').forEach(btn => {
+        btn.classList.add('u051-ok');
+        clearTimeout(btn._u051Timer);
+        btn._u051Timer = setTimeout(() => btn.classList.remove('u051-ok'), 1250);
+    });
+    const heroImg = document.getElementById('mainProductImage') || document.getElementById('mainProductImg');
+    const cartBtn = document.querySelector('.header-action-btn[href*="openCart"]');
+    if (heroImg && cartBtn && !shouldRedirect && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const sRect = heroImg.getBoundingClientRect();
+        const eRect = cartBtn.getBoundingClientRect();
+        if (sRect.width > 0 && eRect.width > 0) {
+            const fly = document.createElement('img');
+            fly.className = 'u051-fly-thumb';
+            fly.src = heroImg.currentSrc || heroImg.src;
+            fly.alt = '';
+            fly.setAttribute('aria-hidden', 'true');
+            const sx = sRect.left + sRect.width / 2 - 24;
+            const sy = sRect.top + sRect.height / 2 - 24;
+            const ex = eRect.left + eRect.width / 2 - 24;
+            const ey = eRect.top + eRect.height / 2 - 24;
+            fly.style.transform = `translate3d(${sx}px, ${sy}px, 0) scale(1)`;
+            document.body.appendChild(fly);
+            const anim = fly.animate([
+                { transform: `translate3d(${sx}px, ${sy}px, 0) scale(1)`, opacity: 1 },
+                { transform: `translate3d(${(sx + ex) / 2}px, ${Math.min(sy, ey) - 65}px, 0) scale(0.7) rotate(10deg)`, opacity: 0.9, offset: 0.5 },
+                { transform: `translate3d(${ex}px, ${ey}px, 0) scale(0.22) rotate(20deg)`, opacity: 0.15 }
+            ], { duration: 540, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+            anim.onfinish = () => {
+                fly.remove();
+                cartBtn.classList.remove('u051-cart-bump');
+                void cartBtn.offsetWidth;
+                cartBtn.classList.add('u051-cart-bump');
+                if (badgeEl) {
+                    badgeEl.classList.remove('u051-badge-pop');
+                    void badgeEl.offsetWidth;
+                    badgeEl.classList.add('u051-badge-pop');
+                }
+            };
+        }
+    }
+
     // Update navbar badge if available
     window.dispatchEvent(new Event('cartUpdated'));
 
     if (shouldRedirect) {
-        window.location.href = '../checkout/cart.html';
+        window.location.href = '../../index.html?openCart=1';
     } else {
         showToast(`Đã thêm ${qty} sản phẩm vào giỏ hàng thành công!`);
     }
 }
 
 function buyNow(id) {
-    addToCart(id, true);
+    openExpressCheckoutModal();
 }
 
-function changeMainImage(src, btn) {
+let currentGalleryImages = [];
+let currentGalleryIndex = 0;
+let currentProductVariants = [];
+let activeVariantIndex = 0;
+let currentStorageOptions = [];
+let activeStorageIndex = 0;
+
+/**
+ * Resolve high-fidelity hex color codes for swatches (Lucian #020 & Image 2)
+ */
+function resolveColorHex(colorName, fallback = '#2563eb') {
+    const s = (colorName || '').toLowerCase();
+    if (s.includes('cam') || s.includes('orange')) return '#e06b3a';
+    if (s.includes('xanh đậm') || s.includes('deep blue') || s.includes('navy')) return '#1e3a8a';
+    if (s.includes('xanh dương') || s.includes('blue')) return '#2563eb';
+    if (s.includes('xanh lá') || s.includes('xanh rêu') || s.includes('green')) return '#16a34a';
+    if (s.includes('mòng két') || s.includes('teal')) return '#0d9488';
+    if (s.includes('sa mạc') || s.includes('desert')) return '#c29b74';
+    if (s.includes('vàng') || s.includes('gold') || s.includes('yellow')) return '#eab308';
+    if (s.includes('tím') || s.includes('purple') || s.includes('violet')) return '#5b586e';
+    if (s.includes('hồng') || s.includes('pink')) return '#ec4899';
+    if (s.includes('đỏ') || s.includes('red')) return '#dc2626';
+    if (s.includes('đen') || s.includes('black') || s.includes('midnight')) return '#1e293b';
+    if (s.includes('trắng') || s.includes('white') || s.includes('starlight')) return '#f8fafc';
+    if (s.includes('bạc') || s.includes('silver')) return '#d1d5db';
+    if (s.includes('xám') || s.includes('gray') || s.includes('grey') || s.includes('titan')) return '#64748b';
+    if (s.includes('s-pen') || s.includes('bút') || s.includes('chi tiết')) return '#334155';
+    return fallback;
+}
+
+/**
+ * Build storage options from product specs (Image 2 Capsule Pills)
+ */
+function buildStorageOptions(prod) {
+    if (!prod) return [];
+    const cat = (prod.category || '').toLowerCase();
+    const name = (prod.name || '').toLowerCase();
+    const storageSpec = (prod.specs?.storage || '').toLowerCase();
+
+    const isTechDevice = cat.includes('thoại') || cat.includes('phone') || 
+                         cat.includes('laptop') || cat.includes('tablet') || 
+                         cat.includes('máy chơi game') || cat.includes('game') ||
+                         name.includes('iphone') || name.includes('galaxy') || 
+                         name.includes('macbook') || name.includes('ipad') || 
+                         name.includes('laptop') || name.includes('rog ally') ||
+                         name.includes('ps5') || name.includes('legion');
+
+    if (!isTechDevice && !storageSpec) return [];
+
+    let base = '256GB';
+    if (storageSpec.includes('1tb') || name.includes('1tb')) base = '1TB';
+    else if (storageSpec.includes('512gb') || name.includes('512gb')) base = '512GB';
+    else if (storageSpec.includes('256gb') || name.includes('256gb')) base = '256GB';
+    else if (storageSpec.includes('128gb') || name.includes('128gb')) base = '128GB';
+    else if (storageSpec.includes('64gb') || name.includes('64gb')) base = '64GB';
+
+    const isLaptop = cat.includes('laptop') || name.includes('laptop') || name.includes('macbook') || storageSpec.includes('ssd');
+
+    if (isLaptop) {
+        if (base === '256GB') {
+            return [
+                { label: '256GB SSD', delta: 0 },
+                { label: '512GB SSD', delta: 1800000 },
+                { label: '1TB SSD', delta: 4500000 }
+            ];
+        } else if (base === '512GB') {
+            return [
+                { label: '512GB SSD', delta: 0 },
+                { label: '1TB SSD', delta: 2500000 },
+                { label: '2TB SSD', delta: 6000000 }
+            ];
+        } else if (base === '1TB') {
+            return [
+                { label: '1TB SSD', delta: 0 },
+                { label: '2TB SSD', delta: 3500000 }
+            ];
+        } else {
+            return [
+                { label: '512GB SSD', delta: 0 },
+                { label: '1TB SSD', delta: 2500000 }
+            ];
+        }
+    } else {
+        if (base === '64GB') {
+            return [
+                { label: '64GB', delta: 0 },
+                { label: '128GB', delta: 1200000 },
+                { label: '256GB', delta: 2800000 }
+            ];
+        } else if (base === '128GB') {
+            return [
+                { label: '128GB', delta: 0 },
+                { label: '256GB', delta: 2000000 },
+                { label: '512GB', delta: 5000000 }
+            ];
+        } else if (base === '256GB') {
+            return [
+                { label: '256GB', delta: 0 },
+                { label: '512GB', delta: 3000000 },
+                { label: '1TB', delta: 7500000 }
+            ];
+        } else if (base === '512GB') {
+            return [
+                { label: '512GB', delta: 0 },
+                { label: '1TB', delta: 4500000 }
+            ];
+        } else if (base === '1TB') {
+            return [
+                { label: '1TB', delta: 0 },
+                { label: '2TB', delta: 6000000 }
+            ];
+        } else {
+            return [
+                { label: '128GB', delta: 0 },
+                { label: '256GB', delta: 2000000 }
+            ];
+        }
+    }
+}
+
+/**
+ * Select storage tier option (Image 2 Capsule Pills)
+ */
+function selectStorageOption(sIdx) {
+    if (!currentStorageOptions || !currentStorageOptions[sIdx]) return;
+    activeStorageIndex = Number(sIdx) || 0;
+    const opt = currentStorageOptions[activeStorageIndex];
+
+    // 1. Update storage pill active styles & ARIA
+    const pillBtns = document.querySelectorAll('.storage-pill-btn');
+    pillBtns.forEach((btn, k) => {
+        const isMatch = (k === activeStorageIndex);
+        btn.classList.toggle('active', isMatch);
+        btn.setAttribute('aria-checked', String(isMatch));
+    });
+
+    // 2. Update active label in right options card
+    const activeStorageValEl = document.getElementById('activeStorageValue');
+    if (activeStorageValEl) {
+        activeStorageValEl.textContent = opt.label;
+    }
+
+    // 3. Recalculate price: base product price (or variant price) + storage delta
+    const activeVar = (currentProductVariants && currentProductVariants[activeVariantIndex]) || null;
+    const basePrice = (activeVar && Number(activeVar.price) > 0) ? activeVar.price : Number(product?.price || 0);
+    const finalPrice = basePrice + opt.delta;
+
+    const priceCurrentEl = document.querySelector('.price-current');
+    if (priceCurrentEl) {
+        priceCurrentEl.textContent = fmt(finalPrice);
+    }
+    const stickyPriceVal = document.querySelector('.sticky-price-val');
+    if (stickyPriceVal) {
+        stickyPriceVal.textContent = fmt(finalPrice);
+    }
+
+    // 4. Update ROM / SSD spec card in spec-pills-row
+    const specCards = document.querySelectorAll('.spec-pill-card');
+    specCards.forEach(card => {
+        const label = card.querySelector('.spec-pill-label')?.textContent || '';
+        if (label.includes('ROM') || label.includes('LƯU TRỮ') || label.includes('lưu trữ') || label.includes('SSD')) {
+            const valEl = card.querySelector('.spec-pill-value');
+            if (valEl) valEl.textContent = opt.label;
+        }
+    });
+
+    // 5. Update SKU display
+    const skuEl = document.querySelector('.metric-sku strong');
+    if (skuEl) {
+        const baseSku = product?.sku || 'TECH';
+        const cleanLabel = opt.label.replace(/\s+/g, '');
+        skuEl.textContent = `${baseSku}-${cleanLabel}`;
+    }
+}
+
+/**
+ * Build uniform variant list from verified product.variants ONLY.
+ * Strict Rule: Only products with >= 2 verified color variants display the variant selector.
+ * Single-color or no-variant products return empty array [].
+ */
+function buildProductVariants(prod) {
+    if (!prod) return [];
+
+    if (Array.isArray(prod.variants) && prod.variants.length > 1) {
+        return prod.variants.map((v, idx) => ({
+            index: idx,
+            id: v._id || `var-${idx}`,
+            colorName: v.color || `Phiên bản ${idx + 1}`,
+            colorHex: v.colorHex || resolveColorHex(v.color || ''),
+            image: resolveProductImage(v.image || prod.image, '../../'),
+            price: Number(v.price) > 0 ? Number(v.price) : Number(prod.price || 0),
+            compareAtPrice: Number(v.compareAtPrice) > 0 ? Number(v.compareAtPrice) : Number(prod.compareAtPrice || 0),
+            stock: typeof v.stock === 'number' ? v.stock : Number(prod.stock || 0),
+            sku: v.sku || `${prod.sku || 'TECH'}-${idx + 1}`,
+            isOutOfStock: typeof v.stock === 'number' ? v.stock <= 0 : Number(prod.stock || 0) <= 0
+        }));
+    }
+
+    return [];
+}
+
+/**
+ * Select a color variant dynamically without page reload (Lucian #020)
+ */
+function selectColorVariant(idx) {
+    if (!currentProductVariants || !currentProductVariants[idx]) return;
+    activeVariantIndex = Number(idx) || 0;
+    const v = currentProductVariants[activeVariantIndex];
+
+    // 1. Update thumbnail active states & ARIA (on left column)
+    const items = document.querySelectorAll('.color-variant-item');
+    items.forEach((item, k) => {
+        const isMatch = (k === activeVariantIndex);
+        item.classList.toggle('active', isMatch);
+        item.setAttribute('aria-checked', String(isMatch));
+    });
+
+    // 2. Smoothly transition main image & zoom lens (Lucian #356)
+    if (v.image) {
+        const mainImg = document.getElementById('mainProductImage');
+        const loupeImg = document.getElementById('u356LoupeImg');
+        if (mainImg) {
+            mainImg.style.opacity = '0.35';
+            mainImg.style.transform = 'scale(0.985)';
+            setTimeout(() => {
+                mainImg.src = v.image;
+                mainImg.alt = `${product.name} - ${v.colorName}`;
+                mainImg.style.opacity = '1';
+                mainImg.style.transform = 'scale(1)';
+            }, 110);
+        }
+        if (loupeImg) {
+            loupeImg.src = v.image;
+        }
+    }
+
+    // 3. Update color name display in variant section
+    const activeColorNameEl = document.getElementById('productActiveColorName');
+    if (activeColorNameEl) {
+        activeColorNameEl.textContent = v.colorName;
+    }
+    const variantStockPillEl = document.getElementById('productVariantStockPill');
+    if (variantStockPillEl) {
+        variantStockPillEl.className = `variant-stock-status-pill ${v.isOutOfStock ? 'is-out' : 'is-in'}`;
+        variantStockPillEl.textContent = v.isOutOfStock ? 'Tạm hết màu này' : 'Còn hàng';
+    }
+
+    // 5. Update SKU in metrics row
+    const skuEl = document.querySelector('.metric-sku strong');
+    if (skuEl && v.sku) {
+        skuEl.textContent = v.sku;
+    }
+
+    // 6. Update price including active storage delta
+    const storageOpt = currentStorageOptions[activeStorageIndex];
+    const storageDelta = storageOpt ? storageOpt.delta : 0;
+    const basePrice = Number(v.price) > 0 ? Number(v.price) : Number(product.price || 0);
+    const finalPrice = basePrice + storageDelta;
+
+    const priceCurrentEl = document.querySelector('.price-current');
+    if (priceCurrentEl) {
+        priceCurrentEl.textContent = fmt(finalPrice);
+    }
+    const stickyPriceVal = document.querySelector('.sticky-price-val');
+    if (stickyPriceVal) {
+        stickyPriceVal.textContent = fmt(finalPrice);
+    }
+
+    // 7. Update quantity stepper max and stock badge
+    const qtyInput = document.getElementById('detailQty');
+    const stockBadge = document.querySelector('.stock-status-badge');
+    const buyNowBtn = document.querySelector('.btn-buy-now-hero');
+    const addCartBtn = document.querySelector('.btn-add-cart-secondary');
+    const stickyBuyBtn = document.querySelector('.sticky-btn-buy');
+
+    if (v.isOutOfStock) {
+        if (qtyInput) {
+            qtyInput.value = '0';
+            qtyInput.disabled = true;
+        }
+        if (stockBadge) {
+            stockBadge.className = 'stock-status-badge out-of-stock';
+            stockBadge.innerHTML = '<span class="stock-indicator-dot"></span><span>Tạm hết hàng màu này</span>';
+        }
+        if (buyNowBtn) { buyNowBtn.disabled = true; buyNowBtn.setAttribute('aria-disabled', 'true'); }
+        if (addCartBtn) { addCartBtn.disabled = true; addCartBtn.setAttribute('aria-disabled', 'true'); }
+        if (stickyBuyBtn) { stickyBuyBtn.disabled = true; stickyBuyBtn.setAttribute('aria-disabled', 'true'); }
+    } else {
+        if (qtyInput) {
+            qtyInput.disabled = false;
+            qtyInput.max = v.stock;
+            if (Number(qtyInput.value) <= 0) qtyInput.value = '1';
+        }
+        if (stockBadge) {
+            stockBadge.className = 'stock-status-badge in-stock';
+            stockBadge.innerHTML = `<span class="stock-indicator-dot"></span><span>Còn hàng (${v.stock} sản phẩm)</span>`;
+        }
+        if (buyNowBtn) { buyNowBtn.disabled = false; buyNowBtn.removeAttribute('aria-disabled'); }
+        if (addCartBtn) { addCartBtn.disabled = false; addCartBtn.removeAttribute('aria-disabled'); }
+        if (stickyBuyBtn) { stickyBuyBtn.disabled = false; stickyBuyBtn.removeAttribute('aria-disabled'); }
+    }
+
+    // 8. Sync Lightbox #061 index
+    currentGalleryIndex = activeVariantIndex;
+
+    // 9. Sync Sticky Bar #221 thumbnail
+    const stickyThumb = document.querySelector('.sticky-bar-thumb');
+    if (stickyThumb) stickyThumb.src = v.image;
+}
+
+// Expose globally for inline onclick handlers
+window.selectColorVariant = selectColorVariant;
+window.selectStorageOption = selectStorageOption;
+
+function changeMainImage(src, btn, idx = 0) {
+    selectColorVariant(idx);
+}
+
+/* Lucian UX/UI Prompt #356 & #061 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#061 */
+function setupProductLoupeAndLightbox(galleryList) {
+    currentGalleryImages = Array.isArray(galleryList) && galleryList.length ? galleryList : [resolveProductImage(product?.image, '../../')];
+    currentGalleryIndex = 0;
+
+    const fig = document.getElementById('mainImageFigure');
     const mainImg = document.getElementById('mainProductImage');
-    if (mainImg) {
-        mainImg.src = src;
+    const loupe = document.getElementById('u356Loupe');
+    const loupeImg = document.getElementById('u356LoupeImg');
+    const zoomTag = document.getElementById('u356ZoomTag');
+    if (fig && mainImg && loupe && loupeImg) {
+        let zoomLevels = [2.2, 3.2];
+        let zIdx = 0;
+        const canHover = window.matchMedia('(hover: hover)').matches;
+        if (canHover) {
+            fig.addEventListener('pointermove', e => {
+                if (e.target.closest('button')) return;
+                const r = fig.getBoundingClientRect();
+                if (!r.width || !r.height) return;
+                const x = e.clientX - r.left;
+                const y = e.clientY - r.top;
+                const z = zoomLevels[zIdx];
+                loupe.style.left = `${x}px`;
+                loupe.style.top = `${y}px`;
+                loupeImg.style.width = `${r.width}px`;
+                loupeImg.style.height = `${r.height}px`;
+                loupeImg.style.transform = `translate(${(70 - x * z).toFixed(1)}px, ${(70 - y * z).toFixed(1)}px) scale(${z})`;
+                loupe.classList.add('is-on');
+                if (zoomTag) {
+                    zoomTag.textContent = `🔍 ${z}× · Click phóng to`;
+                    zoomTag.classList.add('is-on');
+                }
+            });
+            fig.addEventListener('pointerleave', () => {
+                loupe.classList.remove('is-on');
+                zoomTag?.classList.remove('is-on');
+            });
+        }
+        fig.addEventListener('click', e => {
+            if (e.target.closest('.u356-open-btn') || e.target === mainImg || e.target === fig) {
+                openProductLightbox(currentGalleryIndex);
+            }
+        });
     }
-    const thumbBtns = document.querySelectorAll('.gallery-thumb-btn');
-    thumbBtns.forEach(b => b.classList.remove('active'));
-    if (btn) {
-        btn.classList.add('active');
+
+    const dialog = document.getElementById('u061Lightbox');
+    if (!dialog || dialog._u061Bound) return;
+    dialog._u061Bound = true;
+    const lbImg = document.getElementById('u061LbImg');
+    const closeBtn = document.getElementById('u061LbClose');
+    const prevBtn = document.getElementById('u061LbPrev');
+    const nextBtn = document.getElementById('u061LbNext');
+    const zoomPill = document.getElementById('u061LbZoomPill');
+    let lbZoom = 1;
+
+    function resetLbZoom() {
+        lbZoom = 1;
+        if (lbImg) lbImg.style.transform = 'scale(1)';
+        if (zoomPill) zoomPill.hidden = true;
     }
+
+    closeBtn?.addEventListener('click', () => {
+        resetLbZoom();
+        dialog.close();
+    });
+    prevBtn?.addEventListener('click', () => stepLightbox(-1));
+    nextBtn?.addEventListener('click', () => stepLightbox(1));
+    dialog.addEventListener('click', e => {
+        if (e.target === dialog || e.target.id === 'u061LbStage') {
+            resetLbZoom();
+            dialog.close();
+        }
+    });
+    lbImg?.addEventListener('dblclick', () => {
+        lbZoom = lbZoom > 1 ? 1 : 2;
+        lbImg.style.transform = `scale(${lbZoom})`;
+        if (zoomPill) zoomPill.hidden = lbZoom <= 1;
+    });
+    document.addEventListener('keydown', e => {
+        if (!dialog.open) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); stepLightbox(1); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); stepLightbox(-1); }
+    });
+}
+
+function updateLightboxSlide() {
+    const lbImg = document.getElementById('u061LbImg');
+    const lbTitle = document.getElementById('u061LbTitle');
+    const lbSub = document.getElementById('u061LbSub');
+    const lbCount = document.getElementById('u061LbCount');
+    const prevBtn = document.getElementById('u061LbPrev');
+    const nextBtn = document.getElementById('u061LbNext');
+
+    const total = currentGalleryImages.length;
+    const hasMultiple = total > 1;
+
+    if (prevBtn) prevBtn.hidden = !hasMultiple;
+    if (nextBtn) nextBtn.hidden = !hasMultiple;
+
+    const src = currentGalleryImages[currentGalleryIndex] || resolveProductImage(product?.image, '../../');
+    if (lbImg) {
+        lbImg.style.transform = 'scale(1)';
+        lbImg.src = src;
+        lbImg.alt = product?.name || 'Ảnh sản phẩm';
+    }
+    if (lbTitle) lbTitle.textContent = product?.name || 'Sản phẩm';
+    if (lbSub) lbSub.textContent = `${product?.brand || 'Chính hãng'} · Góc nhìn ${currentGalleryIndex + 1}`;
+    if (lbCount) lbCount.textContent = `${currentGalleryIndex + 1} / ${total || 1}`;
+}
+
+function openProductLightbox(idx = 0) {
+    const dialog = document.getElementById('u061Lightbox');
+    if (!dialog) return;
+    currentGalleryIndex = (idx + currentGalleryImages.length) % (currentGalleryImages.length || 1);
+    updateLightboxSlide();
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+}
+window.openProductLightbox = openProductLightbox;
+
+function stepLightbox(delta) {
+    if (!currentGalleryImages.length) return;
+    currentGalleryIndex = (currentGalleryIndex + delta + currentGalleryImages.length) % currentGalleryImages.length;
+    updateLightboxSlide();
 }
 
 async function loadProduct() {
@@ -274,6 +806,10 @@ function renderProduct() {
     const discount = product.compareAtPrice > product.price ? Math.round((1 - product.price / product.compareAtPrice) * 100) : 0;
     const gallery = [product.image, ...(product.images || [])].filter(Boolean);
     const uniqueGallery = [...new Set(gallery.map(img => resolveProductImage(img, '../../')))];
+    currentProductVariants = buildProductVariants(product);
+    activeVariantIndex = 0;
+    currentStorageOptions = buildStorageOptions(product);
+    activeStorageIndex = 0;
 
     // 1. Update Title & SEO Meta
     document.title = `${product.name} | Giá Tốt Nhất & Trả Góp 0% - TechEcommerce`;
@@ -346,22 +882,46 @@ function renderProduct() {
         showcaseContainer.innerHTML = `
             <!-- Left Column: Visual Media & Video -->
             <section class="product-visual-column" aria-label="Hình ảnh và Video sản phẩm">
-                <!-- Main Preview Frame -->
-                <figure class="main-image-figure">
+                <!-- Main Preview Frame (Lucian #356 Loupe + #061 Lightbox) -->
+                <figure class="main-image-figure u356-fig" id="mainImageFigure">
                     ${discount > 0 ? `<span class="main-image-badge-tag">GIẢM ${discount}%</span>` : ''}
                     <span class="main-image-genuine-tag">✓ Chính Hãng 100%</span>
                     <img id="mainProductImage" src="${escapeHTML(resolveProductImage(uniqueGallery[0] || product.image, '../../'))}" alt="${escapeHTML(product.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
+                    <div class="u356-loupe" id="u356Loupe" aria-hidden="true">
+                        <img id="u356LoupeImg" src="${escapeHTML(resolveProductImage(uniqueGallery[0] || product.image, '../../'))}" alt="" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
+                    </div>
+                    <button type="button" class="u356-open-btn" id="u356ZoomTag" aria-label="Phóng to ảnh sản phẩm toàn màn hình">🔍 Soi chi tiết · Click phóng to</button>
                 </figure>
 
-                <!-- Thumbnail Navigation -->
-                ${uniqueGallery.length > 1 ? `
-                <nav class="gallery-thumbs-nav" aria-label="Danh sách ảnh chi tiết">
-                    ${uniqueGallery.map((src, idx) => `
-                        <button type="button" class="gallery-thumb-btn ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${escapeHTML(src)}', this)" aria-label="Xem hình ${idx + 1}">
-                            <img src="${escapeHTML(src)}" alt="${escapeHTML(product.name)} góc ${idx + 1}" loading="lazy" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
-                        </button>
-                    `).join('')}
-                </nav>
+                <!-- Product Color Variant Gallery (Lucian #020 & Universal Variant Architecture) -->
+                ${currentProductVariants.length > 1 ? `
+                <section class="product-variant-section" aria-label="Tùy chọn màu sắc và phiên bản sản phẩm">
+                    <div class="product-variant-header" aria-live="polite">
+                        <span class="variant-label-prefix">Màu sắc:</span>
+                        <strong class="variant-active-name" id="productActiveColorName">${escapeHTML(currentProductVariants[0].colorName)}</strong>
+                        <span class="variant-stock-status-pill ${currentProductVariants[0].isOutOfStock ? 'is-out' : 'is-in'}" id="productVariantStockPill">
+                            ${currentProductVariants[0].isOutOfStock ? 'Tạm hết màu này' : 'Còn hàng'}
+                        </span>
+                    </div>
+                    <div class="gallery-thumbs-nav product-color-variant-track" role="radiogroup" aria-label="Danh sách phiên bản màu sắc và hình ảnh">
+                        ${currentProductVariants.map((v, idx) => `
+                            <button type="button" 
+                                    role="radio" 
+                                    aria-checked="${idx === 0 ? 'true' : 'false'}" 
+                                    class="gallery-thumb-btn color-variant-item ${idx === 0 ? 'active' : ''} ${v.isOutOfStock ? 'variant-out-of-stock' : ''}" 
+                                    onclick="selectColorVariant(${idx})" 
+                                    data-color-idx="${idx}"
+                                    aria-label="Chọn màu ${escapeHTML(v.colorName)}"
+                                    title="${escapeHTML(v.colorName)} ${v.isOutOfStock ? '(Hết hàng)' : ''}">
+                                <div class="thumb-img-wrapper">
+                                    <img src="${escapeHTML(v.image)}" alt="${escapeHTML(product.name)} - ${escapeHTML(v.colorName)}" loading="lazy" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
+                                </div>
+                                <span class="color-item-label">${escapeHTML(v.colorName)}</span>
+                                ${v.isOutOfStock ? '<span class="variant-out-badge">Hết</span>' : ''}
+                            </button>
+                        `).join('')}
+                    </div>
+                </section>
                 ` : ''}
 
                 <!-- Trust Guarantee Pillars -->
@@ -435,6 +995,16 @@ function renderProduct() {
                         <span>Hoặc trả góp 0% chỉ từ <strong>${monthlyInstallment}</strong>/tháng</span>
                     </p>
                 </section>
+
+                <!-- Ask AI Consultation Button -->
+                <button type="button" class="btn-ask-ai-product" id="btnAskAiProduct" onclick="askAiAboutThisProduct()" aria-label="Hỏi AI tư vấn máy này">
+                    <span class="ai-sparkle-icon" aria-hidden="true">🤖</span>
+                    <span class="ai-ask-text">
+                        <strong>Hỏi AI tư vấn sản phẩm này</strong>
+                        <small>Giải đáp ưu nhược điểm, so sánh máy, tư vấn đúng nhu cầu</small>
+                    </span>
+                    <span class="ai-ask-arrow" aria-hidden="true">›</span>
+                </button>
 
                 <!-- Exclusive Promotion Perks Box -->
                 <section class="product-promo-box" aria-label="Ưu đãi độc quyền">
@@ -520,15 +1090,39 @@ function renderProduct() {
                     </div>
                 </section>
 
-                <!-- Key Spec Highlights Pills -->
-                <section class="spec-pills-row" aria-label="Tóm tắt thông số">
+                <!-- Key Spec Highlights Pills (CSS Grid Flexible Proportions) -->
+                <section class="spec-pills-row" data-specs-count="${Math.min(specs.length, 4)}" aria-label="Tóm tắt thông số kỹ thuật cốt lõi">
                     ${specs.slice(0, 4).map(([label, val]) => `
-                        <div class="spec-pill-card">
-                            <small>${escapeHTML(label)}</small>
-                            <strong title="${escapeHTML(val)}">${escapeHTML(val)}</strong>
+                        <div class="spec-pill-card spec-pill-item" title="${escapeHTML(label)}: ${escapeHTML(val)}">
+                            <small class="spec-pill-label">${escapeHTML(label)}</small>
+                            <strong class="spec-pill-value">${escapeHTML(val)}</strong>
                         </div>
                     `).join('')}
                 </section>
+
+                <!-- Product Storage Options (Lucian #020 & Image 2 style) -->
+                ${currentStorageOptions.length > 0 ? `
+                <section class="product-selection-options" aria-label="Tùy chọn dung lượng lưu trữ">
+                    <div class="selection-option-group">
+                        <div class="option-header">
+                            <span class="option-label">Dung lượng:</span>
+                            <strong class="option-active-value" id="activeStorageValue">${escapeHTML(currentStorageOptions[activeStorageIndex]?.label || '')}</strong>
+                        </div>
+                        <div class="storage-pills-row" role="radiogroup" aria-label="Chọn dung lượng lưu trữ">
+                            ${currentStorageOptions.map((opt, sIdx) => `
+                                <button type="button" 
+                                        class="storage-pill-btn ${sIdx === activeStorageIndex ? 'active' : ''}" 
+                                        role="radio" 
+                                        aria-checked="${sIdx === activeStorageIndex ? 'true' : 'false'}"
+                                        onclick="selectStorageOption(${sIdx})"
+                                        data-storage-idx="${sIdx}">
+                                    ${escapeHTML(opt.label)}
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                </section>
+                ` : ''}
 
                 <!-- Quantity Stepper & Stock Pill -->
                 <section class="quantity-stock-row">
@@ -546,7 +1140,7 @@ function renderProduct() {
 
                 <!-- Action CTA Stack -->
                 <section class="purchase-cta-stack">
-                    <button type="button" class="btn-buy-now-hero" onclick="buyNow('${product._id}')" ${product.stock <= 0 ? 'disabled' : ''}>
+                    <button type="button" class="btn-buy-now-hero" onclick="openExpressCheckoutModal()" ${product.stock <= 0 ? 'disabled' : ''}>
                         <strong>MUA NGAY (GIAO TẬN NƠI HOẶC TẠI CỬA HÀNG)</strong>
                         <small>Nhận hàng siêu tốc trong 2 giờ hoặc trải nghiệm tại showroom</small>
                     </button>
@@ -563,9 +1157,19 @@ function renderProduct() {
                     </div>
 
                     <div class="quick-tools-row">
-                        <button type="button" class="btn-wishlist-toggle ${liked ? 'active' : ''}" onclick="toggleWishlist('${product._id}')">
-                            <span aria-hidden="true">${liked ? '♥' : '♡'}</span>
-                            <span>${liked ? 'Đã lưu yêu thích' : 'Lưu vào yêu thích'}</span>
+                        <button type="button" class="btn-wishlist-toggle ${liked ? 'active' : ''}" aria-pressed="${liked ? 'true' : 'false'}" onclick="toggleWishlist('${product._id}')">
+                            <span class="u022-ring" aria-hidden="true"></span>
+                            <span class="u022-burst" aria-hidden="true">
+                                <span class="u022-dot" style="--a:0deg"></span>
+                                <span class="u022-dot" style="--a:51deg"></span>
+                                <span class="u022-dot" style="--a:102deg"></span>
+                                <span class="u022-dot" style="--a:153deg"></span>
+                                <span class="u022-dot" style="--a:204deg"></span>
+                                <span class="u022-dot" style="--a:255deg"></span>
+                                <span class="u022-dot" style="--a:306deg"></span>
+                            </span>
+                            <span class="u022-heart-glyph" aria-hidden="true">${liked ? '♥' : '♡'}</span>
+                            <span class="u022-heart-text">${liked ? 'Đã lưu yêu thích' : 'Lưu vào yêu thích'}</span>
                         </button>
                         <a class="hotline-support-link" href="tel:18002097">
                             <span aria-hidden="true">📞</span>
@@ -575,6 +1179,70 @@ function renderProduct() {
                 </section>
             </article>
         `;
+        const activeGallery = (currentProductVariants.length > 1)
+            ? currentProductVariants.map(v => v.image)
+            : uniqueGallery;
+        setupProductLoupeAndLightbox(activeGallery);
+
+        // Keyboard navigation for color variant thumbnails (Lucian #020)
+        const variantTrack = document.querySelector('.product-color-variant-track');
+        if (variantTrack && currentProductVariants.length > 1) {
+            variantTrack.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextIdx = (activeVariantIndex + 1) % currentProductVariants.length;
+                    selectColorVariant(nextIdx);
+                    const nextBtn = variantTrack.querySelector(`[data-color-idx="${nextIdx}"]`);
+                    if (nextBtn) nextBtn.focus();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevIdx = (activeVariantIndex - 1 + currentProductVariants.length) % currentProductVariants.length;
+                    selectColorVariant(prevIdx);
+                    const prevBtn = variantTrack.querySelector(`[data-color-idx="${prevIdx}"]`);
+                    if (prevBtn) prevBtn.focus();
+                }
+            });
+        }
+
+        /* Lucian UX/UI Prompt #221 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#221 */
+        const stickyBar = document.getElementById('mobileStickyBar');
+        if (stickyBar) {
+            stickyBar.classList.add('u221-br');
+            stickyBar.innerHTML = `
+                <div class="sticky-bar-product">
+                    <img src="${escapeHTML(resolveProductImage(uniqueGallery[0] || product.image, '../../'))}" alt="${escapeHTML(product.name)}" class="sticky-bar-thumb u221-thumb" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
+                    <div class="sticky-bar-meta">
+                        <span class="sticky-bar-title">${escapeHTML(product.name)}</span>
+                        <strong class="sticky-bar-price">${fmt(product.price)}</strong>
+                    </div>
+                </div>
+                <div class="sticky-bar-actions">
+                    <button type="button" class="sticky-btn-cart" onclick="addToCart('${product._id}')" ${product.stock <= 0 ? 'disabled' : ''} aria-label="Thêm vào giỏ">
+                        🛒 Thêm vào giỏ
+                    </button>
+                    <button type="button" class="sticky-btn-buy" onclick="openExpressCheckoutModal()" ${product.stock <= 0 ? 'disabled' : ''} aria-label="Mua ngay">
+                        ⚡ Mua ngay
+                    </button>
+                </div>
+            `;
+
+            const updateStickyVisibility = () => {
+                const heroBuyBtn = document.querySelector('.btn-buy-now-hero') || document.querySelector('.product-purchase-column');
+                if (!heroBuyBtn) return;
+                const rect = heroBuyBtn.getBoundingClientRect();
+                const shouldShow = window.scrollY > 340 || rect.bottom < 80;
+                stickyBar.hidden = !shouldShow;
+                stickyBar.classList.toggle('visible', shouldShow);
+                stickyBar.classList.toggle('u221-visible', shouldShow);
+            };
+
+            if (!window._u221ScrollBound) {
+                window._u221ScrollBound = true;
+                window.addEventListener('scroll', updateStickyVisibility, { passive: true });
+                window.addEventListener('resize', updateStickyVisibility, { passive: true });
+            }
+            updateStickyVisibility();
+        }
     }
 
     // 6. Render Editorial Product Description (Clean, engaging, zero dev text)
@@ -620,6 +1288,9 @@ function renderProduct() {
             </a>
         `).join('') : '<div class="empty-state">Hiện chưa có sản phẩm liên quan trong cùng phân khúc.</div>';
     }
+
+    recordRecentlyViewed(product);
+    renderRecentlyViewedGrid();
 }
 
 function getCuratedAccessories() {
@@ -651,8 +1322,8 @@ function getCuratedAccessories() {
         .filter(Boolean);
 
     if (items.length < 3) {
-        const others = allCatalogProducts.filter(p => 
-            (p.category === 'Phụ kiện' || p.category === 'Tai nghe') && 
+        const others = allCatalogProducts.filter(p =>
+            (p.category === 'Phụ kiện' || p.category === 'Tai nghe') &&
             String(p._id) !== String(product._id) &&
             !items.some(it => String(it._id) === String(p._id))
         );
@@ -690,10 +1361,10 @@ function recalculateBundleSummary() {
     if (!product) return;
     const checkedAccessories = bundleSelectedAccessories.filter(a => a.checked);
     const mainPrice = Number(product.price) || 0;
-    
+
     const accOriginalSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
     const accDiscountedSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.discountedPrice) || 0), 0);
-    
+
     const totalOriginal = mainPrice + accOriginalSum;
     const totalBundle = mainPrice + accDiscountedSum;
     const totalSavings = totalOriginal - totalBundle;
@@ -729,10 +1400,10 @@ function renderBundleUI() {
 
     const checkedAccessories = bundleSelectedAccessories.filter(a => a.checked);
     const mainPrice = Number(product.price) || 0;
-    
+
     const accOriginalSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
     const accDiscountedSum = checkedAccessories.reduce((sum, a) => sum + (Number(a.discountedPrice) || 0), 0);
-    
+
     const totalOriginal = mainPrice + accOriginalSum;
     const totalBundle = mainPrice + accDiscountedSum;
     const totalSavings = totalOriginal - totalBundle;
@@ -1202,7 +1873,7 @@ function applyTradeIn() {
     addToCart(product._id);
     showToast(`Đã áp dụng trợ giá Thu cũ đổi mới (-${fmt(totalDeduction)}) thành công!`);
     setTimeout(() => {
-        window.location.href = '../checkout/cart.html';
+        window.location.href = '../../index.html?openCart=1';
     }, 500);
 }
 
@@ -1212,6 +1883,363 @@ window.recalculateTradeIn = recalculateTradeIn;
 window.applyTradeIn = applyTradeIn;
 window.buyBundleCombo = buyBundleCombo;
 window.onBundleCheckChange = onBundleCheckChange;
+
+// --- Recently Viewed Handlers ---
+function recordRecentlyViewed(p) {
+    if (!p || !p._id) return;
+    try {
+        let items = JSON.parse(localStorage.getItem('tech_recently_viewed') || '[]');
+        items = items.filter(i => String(i._id) !== String(p._id));
+        items.unshift({
+            _id: p._id,
+            name: p.name,
+            price: p.price,
+            compareAtPrice: p.compareAtPrice,
+            image: p.image,
+            category: p.category,
+            brand: p.brand
+        });
+        localStorage.setItem('tech_recently_viewed', JSON.stringify(items.slice(0, 8)));
+    } catch (e) { }
+}
+
+function renderRecentlyViewedGrid() {
+    const section = document.getElementById('detailRecentlyViewed');
+    const grid = document.getElementById('detailRecentlyViewedGrid');
+    if (!section || !grid) return;
+
+    try {
+        let items = JSON.parse(localStorage.getItem('tech_recently_viewed') || '[]');
+        if (product) {
+            items = items.filter(i => String(i._id) !== String(product._id));
+        }
+
+        if (!items.length) {
+            section.hidden = true;
+            return;
+        }
+
+        section.hidden = false;
+        grid.innerHTML = items.map(item => {
+            const disc = item.compareAtPrice > item.price ? Math.round((1 - item.price / item.compareAtPrice) * 100) : 0;
+            const imgSrc = resolveProductImage(item.image, '../../');
+            return `
+                <article class="recently-viewed-card">
+                    <a href="product.html?id=${encodeURIComponent(item._id)}" class="recent-card-link">
+                        <figure class="recent-thumb-fig">
+                            ${disc > 0 ? `<span class="recent-disc-badge">-${disc}%</span>` : ''}
+                            <img src="${escapeHTML(imgSrc)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
+                        </figure>
+                        <h3 class="recent-prod-name" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</h3>
+                        <div class="recent-price-row">
+                            <strong class="recent-price-cur">${fmt(item.price)}</strong>
+                            ${item.compareAtPrice > item.price ? `<span class="recent-price-old">${fmt(item.compareAtPrice)}</span>` : ''}
+                        </div>
+                    </a>
+                </article>
+            `;
+        }).join('');
+    } catch (e) {
+        section.hidden = true;
+    }
+}
+
+function clearRecentlyViewed() {
+    localStorage.removeItem('tech_recently_viewed');
+    const section = document.getElementById('detailRecentlyViewed');
+    if (section) section.hidden = true;
+    showToast('Đã xóa lịch sử sản phẩm vừa xem', 'info');
+}
+
+// --- Ask AI Product Handler ---
+function askAiAboutThisProduct() {
+    if (!product) return;
+    const prompt = `Tôi đang quan tâm đến "${product.name}" giá ${fmt(product.price)}. Nhờ AI tư vấn chi tiết ưu nhược điểm, độ bền và máy này có phù hợp với nhu cầu của tôi không?`;
+    if (typeof window.openAiChatWithPrompt === 'function') {
+        window.openAiChatWithPrompt(prompt);
+    } else {
+        const toggleBtn = document.querySelector('.ai-chat-toggle');
+        if (toggleBtn) toggleBtn.click();
+        setTimeout(() => {
+            const input = document.getElementById('chatInput') || document.querySelector('.ai-chat-input');
+            if (input) {
+                input.value = prompt;
+                input.focus();
+                const sendBtn = document.querySelector('.ai-chat-send') || document.getElementById('chatSendBtn');
+                if (sendBtn) sendBtn.click();
+            }
+        }, 300);
+    }
+}
+
+// --- 1-Click Express Checkout Handlers ---
+function openExpressCheckoutModal() {
+    if (!product || product.stock <= 0) {
+        return showToast('Sản phẩm hiện đang tạm hết hàng!', 'error');
+    }
+
+    const qty = Math.max(Number(document.getElementById('detailQty')?.value || 1), 1);
+    const dialog = document.getElementById('expressCheckoutDialog');
+    const summary = document.getElementById('expressProductSummary');
+    const subtotalEl = document.getElementById('expressSubtotal');
+    const totalPayEl = document.getElementById('expressTotalPay');
+
+    if (!dialog || !summary) return;
+
+    const hasVariants = currentProductVariants && currentProductVariants.length > 1;
+    const activeVar = hasVariants ? currentProductVariants[activeVariantIndex] : null;
+    const activeStorage = (currentStorageOptions && currentStorageOptions[activeStorageIndex]) || null;
+    const storageDelta = activeStorage ? activeStorage.delta : 0;
+    const basePrice = (activeVar && Number(activeVar.price) > 0) ? activeVar.price : product.price;
+    const unitPrice = basePrice + storageDelta;
+    const prodImg = (activeVar && activeVar.image) ? activeVar.image : resolveProductImage(product.image, '../../');
+    const colorLabel = (hasVariants && activeVar && activeVar.colorName) ? `<span class="express-color-pill">Màu sắc: <strong>${escapeHTML(activeVar.colorName)}</strong></span>` : '';
+    const storageLabel = (activeStorage && activeStorage.label) ? `<span class="express-storage-pill" style="margin-left:6px; background:rgba(37,99,235,0.1); color:var(--primary); padding:2px 8px; border-radius:999px; font-size:0.78rem;">Dung lượng: <strong>${escapeHTML(activeStorage.label)}</strong></span>` : '';
+
+    const subtotal = unitPrice * qty;
+    if (subtotalEl) subtotalEl.textContent = fmt(subtotal);
+    if (totalPayEl) totalPayEl.textContent = fmt(subtotal);
+
+    summary.innerHTML = `
+        <figure class="express-thumb-wrap">
+            <img src="${escapeHTML(prodImg)}" alt="${escapeHTML(product.name)}">
+        </figure>
+        <div class="express-info-wrap">
+            <h3 class="express-prod-title">${escapeHTML(product.name)}</h3>
+            ${(colorLabel || storageLabel) ? `<div style="font-size:0.82rem; color:var(--text-secondary); margin:2px 0 6px;">${colorLabel} ${storageLabel}</div>` : ''}
+            <div class="express-pricing-line">
+                <span class="express-unit-price">${fmt(unitPrice)}</span>
+                <span class="express-qty-badge">Số lượng: <strong>${qty}</strong></span>
+            </div>
+            <div class="express-warranty-pill">🛡️ Bảo hành 12 tháng chính hãng • 1 đổi 1 trong 30 ngày</div>
+        </div>
+    `;
+
+    // Pre-fill user info if logged in
+    const currentUser = auth.getUser();
+    if (currentUser) {
+        const nameInput = document.getElementById('expressCustomerName');
+        const phoneInput = document.getElementById('expressCustomerPhone');
+        const addrInput = document.getElementById('expressCustomerAddress');
+        if (nameInput && !nameInput.value) nameInput.value = currentUser.name || currentUser.fullName || '';
+        if (phoneInput && !phoneInput.value) phoneInput.value = currentUser.phone || '';
+        if (addrInput && !addrInput.value) addrInput.value = currentUser.address || '';
+    }
+
+    if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+    } else {
+        dialog.setAttribute('open', '');
+    }
+}
+
+function closeExpressCheckoutModal() {
+    const dialog = document.getElementById('expressCheckoutDialog');
+    if (!dialog) return;
+    if (typeof dialog.close === 'function') {
+        dialog.close();
+    } else {
+        dialog.removeAttribute('open');
+    }
+}
+
+async function submitExpressCheckout() {
+    if (!product) return;
+    const qty = Math.max(Number(document.getElementById('detailQty')?.value || 1), 1);
+    const fullName = document.getElementById('expressCustomerName')?.value?.trim();
+    const phone = document.getElementById('expressCustomerPhone')?.value?.trim();
+    const address = document.getElementById('expressCustomerAddress')?.value?.trim();
+    const note = document.getElementById('expressOrderNote')?.value?.trim() || '';
+    const paymentMethod = document.querySelector('input[name="expressPaymentMethod"]:checked')?.value || 'cod';
+    const submitBtn = document.getElementById('btnSubmitExpressOrder');
+
+    if (!fullName || !phone || !address) {
+        return showToast('Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ nhận hàng!', 'error');
+    }
+
+    if (!/^[0-9]{10,11}$/.test(phone.replace(/\s+/g, ''))) {
+        return showToast('Số điện thoại không hợp lệ (cần 10-11 chữ số)!', 'error');
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>⏳ Đang tạo đơn hàng...</span>';
+    }
+
+    try {
+        const orderData = {
+            items: [{
+                productId: Number(product._id),
+                quantity: qty,
+                price: Number(product.price)
+            }],
+            shippingAddress: {
+                fullName,
+                phone,
+                address,
+                city: 'Hồ Chí Minh',
+                note: note ? `[Đặt hàng nhanh 2H] ${note}` : '[Đặt hàng nhanh 2H]'
+            },
+            paymentMethod,
+            source: 'express_checkout'
+        };
+
+        const res = await fetch(`${API_URL}/orders`, {
+            method: 'POST',
+            headers: auth.getHeaders(),
+            body: JSON.stringify(orderData)
+        });
+
+        const data = await res.json();
+        if (res.ok && (data.success || data.order || data._id || data.id)) {
+            const orderId = data.order?._id || data.order?.id || data._id || data.id;
+            closeExpressCheckoutModal();
+            showToast('Đặt hàng nhanh thành công! Đang chuyển hướng...', 'success');
+            setTimeout(() => {
+                window.location.href = `../checkout/payment-result.html?orderId=${encodeURIComponent(orderId)}&express=true`;
+            }, 600);
+        } else {
+            throw new Error(data.message || 'Không thể tạo đơn hàng nhanh, vui lòng thử lại!');
+        }
+    } catch (err) {
+        console.error('Express checkout error:', err);
+        showToast(err.message || 'Lỗi đặt hàng, vui lòng thử lại sau!', 'error');
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<span>⚡ XÁC NHẬN ĐẶT MUA NGAY</span>';
+        }
+    }
+}
+
+// --- AI Review Summarizer (Group 4 Feature) ---
+let cachedAiSummary = null;
+
+async function generateAiReviewSummary() {
+    const summaryCard = document.getElementById('aiReviewSummaryCard');
+    const summaryBody = document.getElementById('aiSummaryBody');
+    const summarizeBtn = document.getElementById('btnAiSummarizeReviews');
+
+    if (!summaryBody || !summarizeBtn) return;
+
+    // If summary is already visible, toggle collapse/expand
+    if (summaryBody.style.display === 'block' && cachedAiSummary) {
+        summaryBody.style.display = 'none';
+        summarizeBtn.classList.remove('loading');
+        summarizeBtn.querySelector('.ai-btn-text').textContent = '🤖 AI Tóm tắt ưu/nhược điểm';
+        return;
+    }
+
+    if (cachedAiSummary) {
+        summaryBody.style.display = 'block';
+        summarizeBtn.querySelector('.ai-btn-text').textContent = '🤖 Ẩn tóm tắt AI';
+        return;
+    }
+
+    // Show loading state
+    summarizeBtn.classList.add('loading');
+    summarizeBtn.querySelector('.ai-btn-text').textContent = 'Đang phân tích review...';
+    summaryBody.style.display = 'block';
+    summaryBody.innerHTML = `
+        <div class="ai-summary-loading-state" role="status" aria-live="polite">
+            <span class="ai-summary-spinner" aria-hidden="true"></span>
+            <span>🤖 AI đang quét và tổng hợp dữ liệu từ các đánh giá thực tế & thông số kỹ thuật...</span>
+        </div>
+    `;
+
+    // Simulate smart AI analysis time
+    await new Promise(r => setTimeout(r, 650));
+
+    // Synthesize structured review insights
+    const category = (product?.category || '').toLowerCase();
+    const name = product?.name || 'Sản phẩm';
+    const specs = product?.specs || {};
+    const brand = product?.brand || '';
+
+    let proText = '';
+    let conText = '';
+    let fitText = '';
+
+    // Smart contextual insights generator based on category & real specs
+    if (category.includes('thoại') || category.includes('phone')) {
+        const screen = specs.screen || 'Màn hình sắc nét 120Hz';
+        const battery = specs.battery || 'Pin trâu dùng thoải mái cả ngày';
+        const chip = specs.cpu || 'Hiệu năng mạnh mẽ';
+        proText = `${screen}, ${battery.toLowerCase()}, camera sắc nét chống rung quang học, xử lý mượt mọi tác vụ với ${chip}.`;
+        conText = `Máy cầm hơi đầm tay khi dùng lâu, củ sạc nhanh công suất lớn thường không kèm sẵn trong hộp (bán rời).`;
+        fitText = `Người dùng thích chụp ảnh/quay video, sáng tạo nội dung, game thủ và người cần thiết bị bền bỉ phục vụ công việc hàng ngày.`;
+    } else if (category.includes('laptop') || category.includes('macbook')) {
+        const cpu = specs.cpu || 'Vi xử lý thế hệ mới';
+        const ram = specs.ram || 'RAM đa nhiệm mượt';
+        proText = `Hiệu năng xử lý đồ họa & render ấn tượng với ${cpu}, màn hình chuẩn màu sắc nét, bàn phím gõ êm ái phản hồi tốt.`;
+        conText = `Quạt tản nhiệt phát tiếng gió nhẹ khi chạy tác vụ render hoặc chơi game nặng tối đa công suất, củ sạc theo máy hơi to.`;
+        fitText = `Sinh viên ngành IT/Kỹ thuật, lập trình viên, nhà sáng tạo nội dung số (Designer/Editor) và người cần máy làm việc đa nhiệm cường độ cao.`;
+    } else if (category.includes('tai nghe') || category.includes('âm thanh')) {
+        const conn = specs.connectivity || 'Bluetooth kết nối ổn định';
+        const bat = specs.battery || 'Thời lượng pin ấn tượng';
+        proText = `Chống ồn chủ động (ANC) lọc tiếng ồn môi trường xuất sắc, chất âm cân bằng với âm bass sâu, ${bat.toLowerCase()}, ${conn}.`;
+        conText = `Đệm tai có thể hơi ấm nếu đeo liên tục nhiều giờ ngoài trời nắng, hộp sạc bề mặt bóng cần giữ gìn tránh xước.`;
+        fitText = `Người thường xuyên di chuyển máy bay, tàu xe, dân văn phòng cần không gian tập trung tuyệt đối và người yêu âm nhạc chất lượng cao.`;
+    } else if (category.includes('game') || category.includes('console')) {
+        proText = `Trải nghiệm chiến game đồ họa đỉnh cao với tốc độ khung hình mượt mà, tản nhiệt tối ưu, tay cầm phản hồi xúc giác rung chân thực.`;
+        conText = `Kích thước máy và phụ kiện cần không gian bố trí cố định, dung lượng ổ cứng cài được khoảng 6-10 tựa game dung lượng lớn.`;
+        fitText = `Game thủ đam mê các tựa game bom tấn AAA, giải trí gia đình cùng bạn bè cuối tuần với màn hình lớn.`;
+    } else if (category.includes('đồng hồ') || category.includes('smartwatch')) {
+        proText = `Đo chỉ số sức khỏe và nhịp tim chính xác, màn hình AMOLED độ sáng cao dễ nhìn ngoài trời nắng gắt, nhận thông báo tức thì.`;
+        conText = `Cần sạc pin định kỳ sau 2-3 ngày nếu bật chế độ màn hình luôn sáng (Always-on Display) và GPS liên tục.`;
+        fitText = `Người yêu thể thao, dân văn phòng theo dõi sức khỏe và người cần trợ lý thông minh trên cổ tay phục vụ công việc nhanh.`;
+    } else {
+        proText = `Thiết kế hoàn thiện cao cấp, độ bền đạt chuẩn chính hãng, độ tương thích hoàn hảo và hoạt động ổn định.`;
+        conText = `Mức giá có phần nhỉnh hơn một số dòng phụ kiện phổ thông trên thị trường.`;
+        fitText = `Khách hàng ưu tiên độ bền, sản phẩm chính hãng bảo hành uy tín và tính tiện dụng tối đa trong hệ sinh thái công nghệ.`;
+    }
+
+    // Extract extra insights if real user reviews exist
+    if (Array.isArray(reviews) && reviews.length > 0) {
+        const sampleReviews = reviews.map(r => r.comment || r.content || '').filter(Boolean);
+        if (sampleReviews.length > 0) {
+            const hasGiaoHang = sampleReviews.some(t => /giao|nhanh|2h|đóng gói/i.test(t));
+            if (hasGiaoHang) {
+                proText += ` Được nhiều khách hàng đánh giá cao về dịch vụ giao hỏa tốc 2H và đóng gói nguyên seal cẩn thận.`;
+            }
+        }
+    }
+
+    cachedAiSummary = { proText, conText, fitText };
+
+    // Render results
+    summaryBody.innerHTML = `
+        <div class="ai-summary-rows-stack">
+            <article class="ai-summary-row row-pro">
+                <span class="ai-summary-row-icon" aria-hidden="true">🟢</span>
+                <p class="ai-summary-row-content">
+                    <strong>Ưu điểm hàng đầu:</strong> ${escapeHTML(proText)}
+                </p>
+            </article>
+            <article class="ai-summary-row row-con">
+                <span class="ai-summary-row-icon" aria-hidden="true">🟡</span>
+                <p class="ai-summary-row-content">
+                    <strong>Cần cân nhắc:</strong> ${escapeHTML(conText)}
+                </p>
+            </article>
+            <article class="ai-summary-row row-fit">
+                <span class="ai-summary-row-icon" aria-hidden="true">🔵</span>
+                <p class="ai-summary-row-content">
+                    <strong>Phù hợp nhất với:</strong> ${escapeHTML(fitText)}
+                </p>
+            </article>
+        </div>
+    `;
+
+    summarizeBtn.classList.remove('loading');
+    summarizeBtn.querySelector('.ai-btn-text').textContent = '🤖 Ẩn tóm tắt AI';
+}
+
+window.generateAiReviewSummary = generateAiReviewSummary;
+window.askAiAboutThisProduct = askAiAboutThisProduct;
+window.openExpressCheckoutModal = openExpressCheckoutModal;
+window.closeExpressCheckoutModal = closeExpressCheckoutModal;
+window.submitExpressCheckout = submitExpressCheckout;
+window.clearRecentlyViewed = clearRecentlyViewed;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadProduct();

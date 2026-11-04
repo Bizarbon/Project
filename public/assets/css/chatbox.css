@@ -86,6 +86,99 @@
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
 }
 
+/* Status dot on toggle */
+.ai-fab-status-dot {
+    position: absolute !important;
+    top: 4px !important;
+    right: 4px !important;
+    width: 10px !important;
+    height: 10px !important;
+    background: #10b981 !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 6px #10b981 !important;
+    animation: aiFabDotPulse 2s infinite ease-in-out !important;
+}
+
+@keyframes aiFabDotPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.25);
+        opacity: 0.8;
+    }
+}
+
+/* Greeting Tooltip */
+.ai-fab-greeting {
+    position: absolute !important;
+    bottom: calc(100% + 12px) !important;
+    right: 0 !important;
+    background: rgba(15, 23, 42, 0.96) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    color: #ffffff !important;
+    padding: 8px 12px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(0, 104, 255, 0.45) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+    opacity: 0 !important;
+    transform: translateY(8px) scale(0.95) !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ai-fab-greeting.show {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+    pointer-events: auto !important;
+}
+
+.ai-fab-greeting::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 100% !important;
+    right: 18px !important;
+    border-width: 6px !important;
+    border-style: solid !important;
+    border-color: rgba(15, 23, 42, 0.96) transparent transparent transparent !important;
+}
+
+.ai-fab-greeting-close {
+    background: transparent !important;
+    border: none !important;
+    color: #94a3b8 !important;
+    font-size: 1.15rem !important;
+    line-height: 1 !important;
+    padding: 0 2px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.ai-fab-greeting-close:hover {
+    color: #ffffff !important;
+}
+
+.ai-chat.open .ai-fab-greeting,
+.ai-chat.minimized .ai-fab-greeting {
+    display: none !important;
+}
+
 /* Chat Panel Modal */
 .ai-chat-panel {
     position: fixed !important;
@@ -122,6 +215,7 @@
         opacity: 0;
         transform: translateY(24px) scale(0.96);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -345,8 +439,17 @@
 }
 
 @keyframes voice-speaking-pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.88; }
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.88;
+    }
 }
 
 /* Chat Body */
@@ -395,6 +498,7 @@
         opacity: 0;
         transform: translateY(6px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -486,8 +590,15 @@
 }
 
 @keyframes aiCursorBlink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
 
 /* Dedicated Suggestions Nav Bar (Scrollable with Drag & Arrow Controls) */
@@ -718,6 +829,22 @@
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
+}
+
+.ai-chat-product-tag.ai-tag-optimal {
+    color: #2563eb !important;
+    font-weight: 700 !important;
+    background: rgba(37, 99, 235, 0.1) !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    display: inline-block !important;
+    white-space: normal !important;
+    line-height: 1.3 !important;
+}
+
+html[data-theme='dark'] .ai-chat-product-tag.ai-tag-optimal {
+    color: #60a5fa !important;
+    background: rgba(59, 130, 246, 0.2) !important;
 }
 
 .ai-chat-product-price {
@@ -1132,7 +1259,9 @@
 }
 
 @keyframes aiMicPulse {
-    50% { box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.3); }
+    50% {
+        box-shadow: 0 0 0 5px rgba(239, 68, 68, 0.3);
+    }
 }
 
 .ai-chat-send {
@@ -1329,12 +1458,21 @@ html[data-theme='dark'] .ai-chat-mic {
     }
 
     .ai-chat-toggle {
-        width: 46px !important;
-        height: 46px !important;
-        min-width: 46px !important;
-        max-width: 46px !important;
+        width: 50px !important;
+        height: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
         padding: 0 !important;
         border-radius: 50% !important;
+        position: relative !important;
+        box-shadow: 0 4px 18px rgba(0, 104, 255, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .ai-fab-status-dot {
+        top: 2px !important;
+        right: 2px !important;
+        width: 12px !important;
+        height: 12px !important;
     }
 
     .ai-chat-toggle-label {
@@ -1402,3 +1540,1262 @@ html[data-theme='dark'] .ai-chat-mic {
         display: none !important;
     }
 }
+
+/* ============================================================
+   AI COMPARISON MATRIX & SMART RECOMMENDATION TABLE
+   ============================================================ */
+
+.ai-bubble:has(.ai-table-wrapper) {
+    max-width: 98% !important;
+    width: 98% !important;
+    padding: 10px 10px !important;
+}
+
+/* Compare Header Callout */
+.ai-compare-header {
+    margin: 4px 0 10px 0 !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, rgba(0, 104, 255, 0.08) 0%, rgba(0, 194, 255, 0.1) 100%) !important;
+    border-left: 4px solid #0068FF !important;
+}
+
+.ai-compare-pill {
+    display: inline-block !important;
+    font-size: 0.64rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+    color: #0068FF !important;
+    margin-bottom: 2px !important;
+}
+
+.ai-compare-title {
+    margin: 0 !important;
+    font-size: 0.88rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.4 !important;
+}
+
+/* Table Wrapper Container */
+.ai-table-wrapper {
+    position: relative !important;
+    width: 100% !important;
+    margin: 10px 0 12px 0 !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+.ai-table-wrapper:focus {
+    outline: 2px solid #0068FF !important;
+    outline-offset: 1px !important;
+}
+
+.ai-table-scroll-hint {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    padding: 5px 10px !important;
+    background: #f8fafc !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    letter-spacing: 0.2px !important;
+}
+
+/* Comparison Table */
+.ai-comparison-table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    font-size: 0.78rem !important;
+    text-align: left !important;
+}
+
+/* Header Cells */
+.ai-comparison-table thead th {
+    padding: 10px 10px !important;
+    vertical-align: top !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+}
+
+.ai-th-criteria {
+    min-width: 110px !important;
+    max-width: 125px !important;
+    background: #f8fafc !important;
+    color: #0068FF !important;
+    font-weight: 700 !important;
+    font-size: 0.78rem !important;
+}
+
+.ai-th-product {
+    min-width: 135px !important;
+    max-width: 170px !important;
+    background: #f8fafc !important;
+    text-align: center !important;
+    border-left: 1px solid #f1f5f9 !important;
+}
+
+.ai-th-badge {
+    display: inline-block !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 9999px !important;
+    margin-bottom: 4px !important;
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+}
+
+.ai-badge-cheaper {
+    background: #ecfdf5 !important;
+    color: #047857 !important;
+    border: 1px solid #a7f3d0 !important;
+}
+
+.ai-badge-premium {
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border: 1px solid #bfdbfe !important;
+}
+
+.ai-th-name {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    color: #0f172a !important;
+    min-height: 34px !important;
+    margin-bottom: 6px !important;
+}
+
+/* Table Buy Buttons */
+.ai-table-btn-buy {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    padding: 6px 10px !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0056cc 0%, #0068FF 100%) !important;
+    box-shadow: 0 2px 6px rgba(0, 104, 255, 0.28) !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.ai-table-btn-buy:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 10px rgba(0, 104, 255, 0.45) !important;
+}
+
+.ai-table-btn-buy:active {
+    transform: translateY(0) !important;
+}
+
+/* Body Rows */
+.ai-comparison-table tbody tr {
+    transition: background 0.15s ease !important;
+}
+
+.ai-comparison-table tbody tr:hover {
+    background: rgba(0, 104, 255, 0.02) !important;
+}
+
+.ai-td-label {
+    padding: 8px 10px !important;
+    font-weight: 600 !important;
+    font-size: 0.76rem !important;
+    color: #475569 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    background: rgba(248, 250, 252, 0.6) !important;
+    white-space: nowrap !important;
+}
+
+.ai-criteria-icon {
+    display: inline-block !important;
+    margin-right: 4px !important;
+    font-size: 0.86rem !important;
+}
+
+.ai-td-val {
+    padding: 8px 10px !important;
+    font-size: 0.76rem !important;
+    line-height: 1.35 !important;
+    color: #1e293b !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    border-left: 1px solid #f1f5f9 !important;
+    text-align: center !important;
+}
+
+/* Row Price */
+.ai-row-price {
+    background: rgba(16, 185, 129, 0.04) !important;
+}
+
+.ai-price-highlight {
+    display: block !important;
+    font-size: 0.86rem !important;
+    font-weight: 800 !important;
+    color: #059669 !important;
+}
+
+.ai-price-diff-tag {
+    display: inline-block !important;
+    font-size: 0.65rem !important;
+    font-weight: 700 !important;
+    color: #047857 !important;
+    background: #d1fae5 !important;
+    padding: 1px 6px !important;
+    border-radius: 4px !important;
+    margin-top: 2px !important;
+}
+
+/* Stock Chips */
+.ai-stock-chip {
+    display: inline-block !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    padding: 2px 7px !important;
+    border-radius: 4px !important;
+}
+
+.ai-stock-chip.instock {
+    background: #ecfdf5 !important;
+    color: #059669 !important;
+    border: 1px solid #a7f3d0 !important;
+}
+
+.ai-stock-chip.outstock {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+    border: 1px solid #fecaca !important;
+}
+
+.ai-warranty-chip {
+    display: inline-block !important;
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    color: #0369a1 !important;
+    background: #e0f2fe !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+}
+
+/* CTA Bottom Row */
+.ai-row-cta {
+    background: rgba(0, 104, 255, 0.03) !important;
+}
+
+.ai-td-cta {
+    padding: 8px 10px !important;
+    border-left: 1px solid #f1f5f9 !important;
+    text-align: center !important;
+}
+
+/* Trust Footer Bar */
+.ai-table-trust {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    gap: 6px !important;
+    padding: 8px 10px !important;
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+}
+
+.ai-trust-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+}
+
+/* Callout Highlights */
+.ai-callout {
+    margin: 10px 0 6px 0 !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+}
+
+.ai-callout-tradeoff {
+    background: rgba(245, 158, 11, 0.08) !important;
+    border-left: 3px solid #f59e0b !important;
+}
+
+.ai-callout-conclusion {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-left: 3px solid #10b981 !important;
+}
+
+.ai-callout-trust {
+    background: rgba(59, 130, 246, 0.08) !important;
+    border-left: 3px solid #3b82f6 !important;
+}
+
+.ai-callout-title {
+    margin: 0 !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    color: #0f172a !important;
+}
+
+.ai-closing-prompt {
+    margin-top: 10px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    color: #0068FF !important;
+}
+
+/* ============================================================
+   DARK THEME OVERRIDES FOR COMPARISON MATRIX
+   ============================================================ */
+
+html[data-theme='dark'] .ai-compare-header {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.35) 0%, rgba(14, 116, 144, 0.35) 100%) !important;
+    border-left-color: #38bdf8 !important;
+}
+
+html[data-theme='dark'] .ai-compare-pill {
+    color: #38bdf8 !important;
+}
+
+html[data-theme='dark'] .ai-compare-title {
+    color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .ai-table-wrapper {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+html[data-theme='dark'] .ai-table-scroll-hint {
+    background: #1e293b !important;
+    border-bottom-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme='dark'] .ai-comparison-table thead th {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-th-criteria {
+    background: #1e293b !important;
+    color: #38bdf8 !important;
+}
+
+html[data-theme='dark'] .ai-th-product {
+    background: #1e293b !important;
+    border-left-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-th-name {
+    color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .ai-badge-cheaper {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+html[data-theme='dark'] .ai-badge-premium {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: #93c5fd !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+html[data-theme='dark'] .ai-td-label {
+    background: rgba(30, 41, 59, 0.6) !important;
+    color: #cbd5e1 !important;
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-td-val {
+    color: #f1f5f9 !important;
+    border-bottom-color: #334155 !important;
+    border-left-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-comparison-table tbody tr:hover {
+    background: rgba(56, 189, 248, 0.05) !important;
+}
+
+html[data-theme='dark'] .ai-row-price {
+    background: rgba(16, 185, 129, 0.08) !important;
+}
+
+html[data-theme='dark'] .ai-price-highlight {
+    color: #34d399 !important;
+}
+
+html[data-theme='dark'] .ai-price-diff-tag {
+    background: rgba(16, 185, 129, 0.25) !important;
+    color: #a7f3d0 !important;
+}
+
+html[data-theme='dark'] .ai-stock-chip.instock {
+    background: rgba(16, 185, 129, 0.2) !important;
+    color: #6ee7b7 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+html[data-theme='dark'] .ai-stock-chip.outstock {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+html[data-theme='dark'] .ai-warranty-chip {
+    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+}
+
+html[data-theme='dark'] .ai-td-cta {
+    border-left-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-table-trust {
+    background: #1e293b !important;
+    border-top-color: #334155 !important;
+    color: #94a3b8 !important;
+}
+
+html[data-theme='dark'] .ai-callout-tradeoff {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-left-color: #fbbf24 !important;
+}
+
+html[data-theme='dark'] .ai-callout-conclusion {
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-left-color: #34d399 !important;
+}
+
+html[data-theme='dark'] .ai-callout-trust {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border-left-color: #60a5fa !important;
+}
+
+html[data-theme='dark'] .ai-closing-prompt {
+    color: #38bdf8 !important;
+}
+
+/* ==========================================================================
+   AI INTERACTIVE PRODUCT VARIANT & FAST PURCHASE CARD
+   ========================================================================== */
+
+.ai-interactive-card {
+    margin: 12px 0 !important;
+    background: #ffffff !important;
+    border: 1.5px solid rgba(0, 104, 255, 0.22) !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+    box-shadow: 0 8px 24px rgba(0, 104, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+    animation: aiCardSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.ai-interactive-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 104, 255, 0.18) !important;
+}
+
+@keyframes aiCardSlideIn {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.ai-icard-header {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: center !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding-bottom: 10px !important;
+}
+
+.ai-icard-fig {
+    width: 68px !important;
+    height: 68px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+}
+
+.ai-icard-fig img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.ai-icard-info {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.ai-icard-badges {
+    display: flex !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 4px !important;
+}
+
+.ai-badge-verified {
+    background: rgba(16, 185, 129, 0.12) !important;
+    color: #059669 !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 7px !important;
+    border-radius: 9999px !important;
+}
+
+.ai-badge-stock {
+    background: rgba(56, 189, 248, 0.12) !important;
+    color: #0284c7 !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 7px !important;
+    border-radius: 9999px !important;
+}
+
+.ai-icard-title {
+    margin: 0 0 4px 0 !important;
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+.ai-icard-title a {
+    color: #0f172a !important;
+    text-decoration: none !important;
+    transition: color 0.2s !important;
+}
+
+.ai-icard-title a:hover {
+    color: #0068FF !important;
+}
+
+.ai-icard-rating {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.72rem !important;
+    color: #64748b !important;
+}
+
+.ai-icard-rating .ai-stars {
+    color: #f59e0b !important;
+    letter-spacing: 1px !important;
+    font-size: 0.75rem !important;
+}
+
+/* Variant Groups */
+.ai-icard-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+.ai-icard-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.ai-group-label {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #475569 !important;
+}
+
+.ai-variant-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+}
+
+.ai-variant-chip {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    line-height: 1 !important;
+}
+
+.ai-variant-chip:hover {
+    border-color: #0068FF !important;
+    background: rgba(0, 104, 255, 0.04) !important;
+    transform: translateY(-1px) !important;
+}
+
+.ai-variant-chip.active {
+    background: rgba(0, 104, 255, 0.1) !important;
+    border-color: #0068FF !important;
+    color: #0068FF !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 0 2px rgba(0, 104, 255, 0.15) !important;
+}
+
+.ai-color-dot {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important;
+    display: inline-block !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+}
+
+.ai-diff-tag {
+    color: #059669 !important;
+    font-weight: 700 !important;
+    font-size: 0.7rem !important;
+}
+
+/* Pricing Section */
+.ai-icard-pricing {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+}
+
+.ai-icard-price-row {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 8px !important;
+}
+
+.ai-icard-price-current {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: #059669 !important;
+}
+
+.ai-icard-price-compare {
+    font-size: 0.8rem !important;
+    color: #94a3b8 !important;
+    text-decoration: line-through !important;
+}
+
+.ai-icard-discount-pill {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    padding: 2px 6px !important;
+    border-radius: 9999px !important;
+}
+
+.ai-icard-installment {
+    font-size: 0.72rem !important;
+    color: #475569 !important;
+}
+
+.ai-icard-installment strong {
+    color: #0284c7 !important;
+}
+
+/* Voucher badge */
+.ai-icard-voucher {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.15) 100%) !important;
+    border: 1px dashed rgba(245, 158, 11, 0.5) !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    font-size: 0.74rem !important;
+    color: #b45309 !important;
+    font-weight: 600 !important;
+}
+
+.ai-icard-voucher strong {
+    color: #d97706 !important;
+}
+
+/* CTAs */
+.ai-icard-footer {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 4px !important;
+}
+
+.ai-icard-btn-buy {
+    flex: 1 1 auto !important;
+    background: linear-gradient(135deg, #0056cc 0%, #0068FF 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    box-shadow: 0 4px 14px rgba(0, 104, 255, 0.3) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ai-icard-btn-buy:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 104, 255, 0.45) !important;
+}
+
+.ai-icard-btn-cart {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ai-icard-btn-cart:hover {
+    background: #e2e8f0 !important;
+    border-color: #94a3b8 !important;
+    transform: translateY(-2px) !important;
+}
+
+.ai-icard-btn-cart.added {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: #10b981 !important;
+    color: #059669 !important;
+}
+
+/* ==========================================================================
+   AI SMART BUNDLE & BARGAIN ENGINE CARD
+   ========================================================================== */
+
+.ai-bundle-card {
+    margin: 12px 0 !important;
+    background: #ffffff !important;
+    border: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+    box-shadow: 0 8px 26px rgba(245, 158, 11, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    animation: aiCardSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.ai-bundle-header {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding-bottom: 8px !important;
+}
+
+.ai-bundle-pill {
+    align-self: flex-start !important;
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%) !important;
+    color: #ffffff !important;
+    font-size: 0.68rem !important;
+    font-weight: 800 !important;
+    padding: 3px 10px !important;
+    border-radius: 9999px !important;
+    letter-spacing: 0.4px !important;
+}
+
+.ai-bundle-title {
+    margin: 2px 0 0 0 !important;
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.3 !important;
+}
+
+.ai-bundle-subtitle {
+    margin: 0 !important;
+    font-size: 0.72rem !important;
+    color: #64748b !important;
+}
+
+.ai-bundle-main-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    background: rgba(0, 104, 255, 0.05) !important;
+    border: 1px solid rgba(0, 104, 255, 0.2) !important;
+    border-radius: 10px !important;
+    padding: 8px 10px !important;
+}
+
+.ai-bundle-main-check {
+    width: 20px !important;
+    height: 20px !important;
+    background: #0068FF !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    flex-shrink: 0 !important;
+}
+
+.ai-bundle-fig {
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 2px !important;
+}
+
+.ai-bundle-fig img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+.ai-bundle-row-info {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.ai-bundle-row-info strong {
+    display: block !important;
+    font-size: 0.82rem !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.ai-bundle-badge-role {
+    font-size: 0.65rem !important;
+    color: #0068FF !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+}
+
+.ai-bundle-price {
+    font-size: 0.85rem !important;
+    color: #059669 !important;
+    font-weight: 800 !important;
+}
+
+/* Addons list */
+.ai-bundle-addons-list {
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+}
+
+.ai-bundle-addon-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 7px 10px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    user-select: none !important;
+}
+
+.ai-bundle-addon-item:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+.ai-bundle-checkbox {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: #0068FF !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+}
+
+.ai-bundle-price-pair {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin-top: 2px !important;
+}
+
+.ai-bundle-addon-price {
+    font-size: 0.82rem !important;
+    color: #059669 !important;
+    font-weight: 800 !important;
+}
+
+.ai-bundle-addon-orig {
+    font-size: 0.72rem !important;
+    color: #94a3b8 !important;
+    text-decoration: line-through !important;
+}
+
+.ai-bundle-discount-tag {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    font-size: 0.65rem !important;
+    font-weight: 800 !important;
+    padding: 1px 5px !important;
+    border-radius: 4px !important;
+}
+
+/* Summary & Submit */
+.ai-bundle-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 10px 12px !important;
+}
+
+.ai-bundle-summary-info {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+}
+
+.ai-bundle-total-row {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 6px !important;
+    font-size: 0.8rem !important;
+    color: #334155 !important;
+}
+
+.ai-bundle-total-price {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: #059669 !important;
+}
+
+.ai-bundle-total-orig {
+    font-size: 0.8rem !important;
+    color: #94a3b8 !important;
+    text-decoration: line-through !important;
+}
+
+.ai-bundle-savings-tag {
+    font-size: 0.75rem !important;
+    color: #ea580c !important;
+    background: rgba(234, 88, 12, 0.1) !important;
+    border: 1px dashed rgba(234, 88, 12, 0.4) !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    font-weight: 700 !important;
+}
+
+.ai-bundle-btn-buy {
+    background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 0.84rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.3) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ai-bundle-btn-buy:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(234, 88, 12, 0.45) !important;
+}
+
+.ai-bundle-btn-buy.added {
+    background: #10b981 !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* ==========================================================================
+   DARK MODE OVERRIDES FOR INTERACTIVE CARDS & BUNDLES
+   ========================================================================== */
+
+html[data-theme='dark'] .ai-interactive-card,
+html[data-theme='dark'] .ai-bundle-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-theme='dark'] .ai-icard-header,
+html[data-theme='dark'] .ai-bundle-header {
+    border-bottom-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-icard-fig,
+html[data-theme='dark'] .ai-bundle-fig {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-icard-title a,
+html[data-theme='dark'] .ai-bundle-title,
+html[data-theme='dark'] .ai-bundle-row-info strong {
+    color: #f8fafc !important;
+}
+
+html[data-theme='dark'] .ai-group-label {
+    color: #94a3b8 !important;
+}
+
+html[data-theme='dark'] .ai-variant-chip {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+}
+
+html[data-theme='dark'] .ai-variant-chip:hover {
+    border-color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.1) !important;
+}
+
+html[data-theme='dark'] .ai-variant-chip.active {
+    background: rgba(56, 189, 248, 0.2) !important;
+    border-color: #38bdf8 !important;
+    color: #38bdf8 !important;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+}
+
+html[data-theme='dark'] .ai-icard-pricing,
+html[data-theme='dark'] .ai-bundle-footer {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-icard-price-current,
+html[data-theme='dark'] .ai-bundle-price,
+html[data-theme='dark'] .ai-bundle-addon-price,
+html[data-theme='dark'] .ai-bundle-total-price {
+    color: #34d399 !important;
+}
+
+html[data-theme='dark'] .ai-icard-installment {
+    color: #94a3b8 !important;
+}
+
+html[data-theme='dark'] .ai-icard-btn-cart {
+    background: #334155 !important;
+    color: #f8fafc !important;
+    border-color: #475569 !important;
+}
+
+html[data-theme='dark'] .ai-icard-btn-cart:hover {
+    background: #475569 !important;
+}
+
+html[data-theme='dark'] .ai-bundle-main-row {
+    background: rgba(0, 104, 255, 0.12) !important;
+    border-color: rgba(0, 104, 255, 0.3) !important;
+}
+
+html[data-theme='dark'] .ai-bundle-addon-item {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme='dark'] .ai-bundle-addon-item:hover {
+    background: #1e293b !important;
+}
+
+html[data-theme='dark'] .ai-bundle-total-row {
+    color: #cbd5e1 !important;
+}
+
+/* ==========================================================================
+   LUCIAN UX/UI PROMPT — PHASE 2 (P1) GROUP 4:
+   AI CHATBOT (#215, #084, #086)
+   ========================================================================== */
+
+/* Lucian UX/UI Prompt #215 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#215 */
+.ai-chat.open .ai-chat-panel {
+    transform-origin: calc(100% - 28px) calc(100% - 20px) !important;
+    animation: u215WgOpen 0.42s cubic-bezier(.3, 1.15, .4, 1) forwards !important;
+}
+
+@keyframes u215WgOpen {
+    0% {
+        opacity: 0;
+        transform: scale(0.18) translateY(16px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.u215-msg-pop {
+    animation: u215MsgIn 0.32s cubic-bezier(.3, 1.35, .5, 1) backwards;
+}
+
+@keyframes u215MsgIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Lucian UX/UI Prompt #084 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#084 */
+.u084-mic-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.u084-voice-dots {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5px;
+    height: 18px;
+}
+
+.u084-mic-btn.listening .u084-mic-svg,
+.u084-mic-btn.voice-session-active .u084-mic-svg {
+    display: none !important;
+}
+
+.u084-mic-btn.listening .u084-voice-dots,
+.u084-mic-btn.voice-session-active .u084-voice-dots {
+    display: inline-flex !important;
+}
+
+.u084-voice-dots i {
+    width: 3px;
+    height: 7px;
+    border-radius: 99px;
+    background: #ffffff;
+    animation: u084WaveBar 0.72s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+.u084-voice-dots i:nth-child(1) { background: #34d399; }
+.u084-voice-dots i:nth-child(2) { background: #60a5fa; }
+.u084-voice-dots i:nth-child(3) { background: #c084fc; }
+.u084-voice-dots i:nth-child(4) { background: #fb7185; }
+.u084-voice-dots i:nth-child(5) { background: #fbbf24; }
+
+@keyframes u084WaveBar {
+    0% { height: 5px; transform: scaleY(0.75); }
+    100% { height: 16px; transform: scaleY(1.2); }
+}
+
+/* Lucian UX/UI Prompt #086 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#086 */
+.u086-thinking-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.u086-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.u086-dots i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-chat-accent, #0068FF);
+    animation: u086Bounce 1.05s ease-in-out infinite;
+}
+
+.u086-dots i:nth-child(2) { animation-delay: 0.15s; }
+.u086-dots i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes u086Bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.u086-caret {
+    display: inline-block;
+    width: 7px;
+    height: 14px;
+    margin-left: 3px;
+    border-radius: 2px;
+    vertical-align: -2px;
+    background: var(--color-chat-accent, #0068FF);
+    animation: u086CaretBlink 0.9s steps(1) infinite;
+}
+
+@keyframes u086CaretBlink {
+    50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ai-chat.open .ai-chat-panel,
+    .u215-msg-pop,
+    .u084-voice-dots i,
+    .u086-dots i,
+    .u086-caret {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+

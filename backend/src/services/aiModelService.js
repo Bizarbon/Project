@@ -1,20 +1,47 @@
 /**
  * aiModelService.js
- * Dịch vụ tích hợp mô hình AI ngôn ngữ lớn (Google Gemini API).
+ * Dịch vụ tích hợp mô hình AI ngôn ngữ lớn (Google Gemini API - Smart Consultant 2.0).
  * 
- * Kiến trúc tách bạch:
- * 1. AI Model: Hỗ trợ sinh ngôn ngữ tự nhiên, giải thích thông số cho người không rành kỹ thuật.
- * 2. Backend Coordinator: Quản lý bối cảnh, tracking slot, truy vấn MongoDB, kiểm tra quyền và tham số.
- * 3. Fallback minh bạch: Nếu không cấu hình GEMINI_API_KEY hoặc xảy ra lỗi mạng/timeout,
- *    hệ thống chuyển sang bộ luật tri thức xác định (deterministic engine) và ghi rõ provider thực tế,
- *    tuyệt đối KHÔNG giả vờ đã gọi AI thành công.
+ * Kiến trúc tách bạch & nâng cấp:
+ * 1. Chuỗi Model thông minh (Multi-Model Failover Chain) + Circuit Breaker chống trễ khi 429/404.
+ * 2. Bộ nhớ hội thoại đa lượt (Multi-turn Conversation History) giúp AI hiểu ngữ cảnh liền mạch.
+ * 3. Nạp 100% thông số kỹ thuật (CPU, GPU, RAM, SSD, Màn hình, Pin, Camera, Trọng lượng, Trả góp 0%).
+ * 4. Fallback minh bạch: Nếu không cấu hình GEMINI_API_KEY hoặc xảy ra lỗi mạng/timeout,
+ *    hệ thống chuyển sang bộ luật tri thức xác định (deterministic engine).
  */
 
 const axios = require('axios');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 8000);
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+const CANDIDATE_MODELS = Array.from(new Set([
+    DEFAULT_MODEL,
+    'gemini-3-flash-preview',
+    'gemini-3.5-flash',
+    'gemini-3.1-flash-lite-preview',
+    'gemini-flash-lite-latest'
+]));
+const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 10000);
+
+// Bộ nhớ tạm đánh dấu các model đang bị giới hạn quota (429) hoặc không tồn tại (404)
+// để các lượt chat tiếp theo chuyển nhánh tức thì (0ms) mà không phải chờ timeout.
+const modelCooldownUntil = new Map();
+
+function isModelAvailable(modelName) {
+    const until = modelCooldownUntil.get(modelName);
+    if (!until) return true;
+    if (Date.now() >= until) {
+        modelCooldownUntil.delete(modelName);
+        return true;
+    }
+    return false;
+}
+
+function markModelCooldown(modelName, status) {
+    // 404: model không khả dụng -> khóa 30 phút; 429: quá tải quota -> khóa 90 giây; lỗi khác -> 20 giây
+    const durationMs = status === 404 ? 30 * 60 * 1000 : (status === 429 ? 90 * 1000 : 20 * 1000);
+    modelCooldownUntil.set(modelName, Date.now() + durationMs);
+}
 
 /**
  * Kiểm tra trạng thái sẵn sàng của dịch vụ AI
@@ -22,19 +49,88 @@ const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 8000);
 function getAiServiceStatus() {
     const apiKey = process.env.GEMINI_API_KEY || '';
     const hasKey = Boolean(apiKey.trim() && apiKey !== 'your_gemini_api_key_here');
+    const activeModels = CANDIDATE_MODELS.filter(isModelAvailable);
     return {
         configured: hasKey,
         provider: hasKey ? 'gemini' : 'deterministic_engine',
-        model: hasKey ? DEFAULT_MODEL : 'none',
+        model: hasKey ? (activeModels[0] || DEFAULT_MODEL) : 'none',
+        candidateModels: CANDIDATE_MODELS,
         timeoutMs: REQUEST_TIMEOUT_MS
     };
+}
+
+/**
+ * Chuẩn hóa đầy đủ thông tin sản phẩm từ MongoDB thành hồ sơ kỹ thuật giàu ngữ cảnh cho AI
+ */
+function formatVerifiedProduct(p, idx) {
+    const s = p.specs || {};
+    const price = Number(p.price || 0);
+    const compareAtPrice = Number(p.compareAtPrice || 0);
+    const discountAmount = compareAtPrice > price ? compareAtPrice - price : 0;
+    const downPayment30 = Math.round(price * 0.3);
+    const monthly12 = Math.round((price * 0.7) / 12);
+
+    const specLines = [
+        s.cpu ? `CPU/Chip: ${s.cpu}` : null,
+        s.gpu ? `GPU/Đồ họa: ${s.gpu}` : null,
+        s.ram ? `RAM: ${s.ram}` : null,
+        s.storage ? `Bộ nhớ/Ổ cứng: ${s.storage}` : null,
+        s.screen ? `Màn hình: ${s.screen}` : null,
+        s.battery ? `Pin & Sạc: ${s.battery}` : null,
+        s.camera ? `Camera: ${s.camera}` : null,
+        s.connectivity ? `Kết nối: ${s.connectivity}` : null,
+        s.weight ? `Trọng lượng: ${s.weight}` : null,
+        s.os ? `Hệ điều hành: ${s.os}` : null
+    ].filter(Boolean);
+
+    // Bổ sung các trường thông số mở rộng khác nếu có trong object specs
+    const knownSpecKeys = new Set(['cpu', 'gpu', 'ram', 'storage', 'screen', 'battery', 'camera', 'connectivity', 'weight', 'os']);
+    Object.entries(s).forEach(([k, v]) => {
+        if (!knownSpecKeys.has(k) && v && typeof v === 'string') {
+            specLines.push(`${k}: ${v}`);
+        }
+    });
+
+    const cleanDesc = String(p.description || '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 260);
+
+    return `[Sản phẩm ${idx + 1}: ${p.name}]
+- Thương hiệu: ${p.brand || 'Chính hãng'} | Danh mục: ${p.category || 'Công nghệ'}
+- Giá bán niêm yết: ${price.toLocaleString('vi-VN')} đ${discountAmount > 0 ? ` (Giá gốc: ${compareAtPrice.toLocaleString('vi-VN')} đ - Đang tiết kiệm: ${discountAmount.toLocaleString('vi-VN')} đ)` : ''}
+- Trả góp 0% ước tính: Trả trước 30% (~${downPayment30.toLocaleString('vi-VN')} đ), góp 12 tháng chỉ ~${monthly12.toLocaleString('vi-VN')} đ/tháng
+- Tồn kho thực tế: ${p.stock > 0 ? `Sẵn hàng (${p.stock} sản phẩm nguyên seal)` : 'Tạm hết hàng (Hỗ trợ đặt trước)'}
+- Đánh giá khách hàng: ${p.rating ? `${p.rating}/5 sao` : '5/5 sao'}${p.soldCount ? ` (${p.soldCount} đã bán)` : ''}
+- Thông số kỹ thuật chi tiết: ${specLines.length > 0 ? specLines.join(' | ') : 'Tiêu chuẩn chính hãng'}
+- Điểm nổi bật / Mô tả: ${cleanDesc || 'Sản phẩm chính hãng nguyên seal, hiệu năng ổn định.'}
+- Chính sách bảo hành: ${p.warranty || 'Bảo hành chính hãng 12 - 24 tháng, lỗi 1 đổi 1 trong 30 ngày đầu'}`;
+}
+
+/**
+ * Định dạng lịch sử hội thoại gần nhất để AI hiểu mạch câu chuyện (Multi-turn Context)
+ */
+function formatConversationHistory(history = []) {
+    if (!Array.isArray(history) || history.length === 0) {
+        return 'Chưa có lịch sử trước đó (đây là câu hỏi mở đầu).';
+    }
+    return history
+        .slice(-6)
+        .filter(item => item && item.text)
+        .map(item => {
+            const speaker = item.role === 'user' ? 'Khách hàng' : 'Trợ lý AI';
+            const cleanText = String(item.text).replace(/\s+/g, ' ').trim().slice(0, 320);
+            return `- ${speaker}: "${cleanText}"`;
+        })
+        .join('\n');
 }
 
 /**
  * Tạo câu trả lời tư vấn có kiểm chứng từ catalog
  * @param {Object} params
  * @param {string} params.userMessage - Câu hỏi của khách hàng
- * @param {string} params.dialogueAct - Loại hành động đối thoại (recommend, clarify, compare, exact_lookup)
+ * @param {string} params.dialogueAct - Loại hành động đối thoại (recommend, clarify, compare, exact_lookup, product_qa, price_objection)
  * @param {Array} params.verifiedProducts - Danh sách sản phẩm thực tế từ MongoDB
  * @param {Object} params.context - Bối cảnh cuộc trò chuyện hiện tại
  * @param {string} params.fallbackText - Câu trả lời mẫu xác định từ consultationCoordinator
@@ -61,105 +157,111 @@ async function generateGroundedConsultation({
         };
     }
 
-    // Chuẩn bị thông tin sản phẩm thực tế đã xác minh
-    const catalogContextText = verifiedProducts.map((p, idx) => {
-        const s = p.specs || {};
-        return `[Sản phẩm ${idx + 1}]
-- Tên: ${p.name}
-- Giá bán niêm yết: ${p.price?.toLocaleString('vi-VN')} đ
-- Tồn kho thực tế: ${p.stock > 0 ? `${p.stock} máy sẵn sàng` : 'Hết hàng'}
-- CPU: ${s.cpu || 'Không có dữ liệu'}
-- RAM: ${s.ram || 'Không có dữ liệu'}
-- Ổ cứng: ${s.storage || 'Không có dữ liệu'}
-- Màn hình: ${s.screen || 'Không có dữ liệu'}
-- Trọng lượng: ${s.weight || 'Không có dữ liệu'}
-- Bảo hành: ${p.warranty || 'Chính hãng'}`;
-    }).join('\n\n');
+    const catalogContextText = verifiedProducts.map((p, idx) => formatVerifiedProduct(p, idx)).join('\n\n');
+    const historyText = formatConversationHistory(context.conversationHistory);
 
-    const systemInstruction = `Bạn là Trợ lý Tư vấn Mua sắm Công nghệ chuyên nghiệp của cửa hàng.
-NGUYÊN TẮC BẮT BUỘC KHÔNG ĐƯỢC VI PHẠM:
-1. Bạn CHỈ ĐƯỢC PHÉP nói về các sản phẩm, giá bán, tồn kho và thông số ĐÃ ĐƯỢC CUNG CẤP trong mục [DỮ LIỆU CATALOG XÁC MINH].
-2. TUYỆT ĐỐI KHÔNG tự bịa ra giá bán, tồn kho, thời lượng pin, benchmark, hoặc chính sách ưu đãi không có trong dữ liệu.
-3. Khi so sánh hoặc đề xuất, phải chỉ rõ:
-   - Ưu điểm của từng lựa chọn
-   - Điểm phải ĐÁNH ĐỔI (ví dụ: máy hiệu năng cao hơn thì nặng hơn / pin ngắn hơn; máy mỏng nhẹ pin trâu thì không tối ưu đồ họa nặng)
-   - Kết luận có điều kiện: "Nếu bạn ưu tiên X thì chọn A, nếu ưu tiên Y thì chọn B".
-4. Nếu khách hàng không rành cấu hình, giải thích ngắn gọn, dễ hiểu, tránh thuật ngữ hàn lâm.
-5. Không chào lại lặp đi lặp lại nếu đang trong mạch hội thoại.
-6. Trả lời bằng tiếng Việt tự nhiên, lịch sự, trọng tâm, không lan man.
-7. Khi nhắc đến nơi bán hàng, chỉ xưng là "cửa hàng tụi mình"; không đọc hoặc viết tên thương hiệu hệ thống.`;
+    let actSpecificInstruction = '';
+    if (dialogueAct === 'compare') {
+        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (SO SÁNH SẢN PHẨM):
+- Mở đầu bằng 1 - 2 câu dẫn nhập ngắn gọn, tự nhiên (không dùng gạch đầu dòng ở đoạn mở đầu này) để hệ thống phát giọng nói cho khách, sau đó xuống dòng kẻ bảng so sánh chuẩn Markdown Table (| Tiêu chí | Tên Máy 1 | Tên Máy 2 | và dòng phân cách | :--- | :--- | :--- |).
+- Sau bảng, phân tích sâu "ĐIỂM ĐƯỢC & ĐIỂM ĐÁNH ĐỔI" thực tế bằng gạch đầu dòng và đưa ra "KẾT LUẬN CHỌN MUA RÕ RÀNG".`;
+    } else if (dialogueAct === 'exact_lookup' || dialogueAct === 'product_qa') {
+        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (TƯ VẤN CHUYÊN SÂU SẢN PHẨM):
+- Mở đầu bằng 1 - 2 câu trả lời trực tiếp, súc tích và tự nhiên vào đúng câu hỏi của khách hàng ("${userMessage}") để hệ thống phát giọng nói, tuyệt đối chưa liệt kê thông số dài dòng ở đoạn mở đầu này.
+- Tiếp theo, xuống dòng dùng danh sách đánh số hoặc gạch đầu dòng để phân tích chi tiết thông số kỹ thuật, giá bán niêm yết, tồn kho và mức trả góp 0% để khách hàng tự nhìn trên màn hình.`;
+    } else {
+        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (ĐỀ XUẤT & TƯ VẤN THEO NHU CẦU):
+- Mở đầu bằng 1 - 2 đoạn văn ngắn gọn, thân thiện (không dùng số thứ tự hay gạch đầu dòng ở đoạn mở đầu) dẫn dắt vào nhu cầu/ngân sách của khách hàng để hệ thống đọc giọng nói.
+- Tiếp theo, xuống dòng dùng danh sách đánh số (1., 2., 3.) và gạch đầu dòng để trình bày từng sản phẩm, ưu điểm và điểm đánh đổi để khách hàng tự quan sát trên màn hình.`;
+    }
 
-    const promptText = `BỐI CẢNH KHÁCH HÀNG:
-- Danh mục quan tâm: ${context.category || 'Chưa rõ'}
-- Ngân sách: ${context.budget ? `${context.budget.toLocaleString('vi-VN')} đ` : 'Chưa nói'} (Loại: ${context.budgetType || 'mềm'})
-- Nhu cầu/ngành học: ${context.useCase || context.major || 'Chưa rõ'}
-- Thương hiệu đã loại: ${(context.eliminatedBrands || []).join(', ') || 'Không có'}
-- Bước hội thoại: ${dialogueAct}
+    const systemInstruction = `Bạn là Chuyên gia Tư vấn Mua sắm Công nghệ cấp cao (AI Smart Consultant) của hệ thống bán lẻ TechEcommerce.
+Phong cách của bạn: Thông minh, am hiểu sâu sắc phần cứng công nghệ, tận tâm, trung thực, nói chuyện tự nhiên và cuốn hút như một chuyên viên tư vấn thực thụ.
 
-[DỮ LIỆU CATALOG XÁC MINH]:
+NGUYÊN TẮC CỐT LÕI BẮT BUỘC:
+1. CHỈ ĐƯỢC PHÉP sử dụng tên sản phẩm, giá bán, tồn kho và thông số kỹ thuật có trong mục [DỮ LIỆU CATALOG XÁC MINH].
+2. TUYỆT ĐỐI KHÔNG tự bịa ra sản phẩm ngoài danh sách, không tự chế giá bán hay tồn kho sai lệch.
+3. Khi giải thích cấu hình (CPU, GPU, RAM, màn hình, pin...), hãy quy đổi sang trải nghiệm thực tế dễ hiểu cho khách hàng (học tập, code, đồ họa, FPS khi chơi game, độ bền 4-5 năm, mang đi lại...).
+4. Bám sát [LỊCH SỬ TRÒ CHUYỆN GẦN ĐÂY] để hiểu mạch hội thoại và các đại từ quy chiếu ("máy này", "mẫu trên", "con thứ 2", "còn pin thì sao"...).
+5. Trình bày bằng tiếng Việt tự nhiên, rõ ràng, có điểm nhấn (in đậm **tên máy**, **giá tiền**), sử dụng gạch đầu dòng gọn gàng và emoji tinh tế. Độ dài khoảng 180 - 350 từ, hoàn chỉnh trọn vẹn câu.
+
+${actSpecificInstruction}`;
+
+    const promptText = `[LỊCH SỬ TRÒ CHUYỆN GẦN ĐÂY]:
+${historyText}
+
+[HỒ SƠ & BỐI CẢNH KHÁCH HÀNG]:
+- Danh mục đang xem: ${context.category || context.pageCategory || 'Tất cả danh mục'}
+- Ngân sách dự kiến: ${context.budget ? `${Number(context.budget).toLocaleString('vi-VN')} đ (${context.budgetType === 'hard' ? 'Ngân sách cứng tối đa' : 'Linh hoạt'})` : 'Chưa giới hạn'}
+- Nhu cầu / Mục đích chính: ${context.useCase || context.major || 'Đang tìm hiểu'}
+- Tiêu chí ưu tiên: ${context.preference || 'Cân bằng hiệu năng & độ bền'}
+- Thương hiệu yêu thích: ${context.brand || 'Mọi thương hiệu chính hãng'}
+- Thương hiệu đã loại trừ: ${(context.eliminatedBrands || []).join(', ') || 'Không có'}
+- Hành động đối thoại (Dialogue Act): ${dialogueAct}
+
+[DỮ LIỆU CATALOG XÁC MINH TỪ KHO TECHECOMMERCE]:
 ${catalogContextText || 'Không có sản phẩm nào.'}
 
-CÂU NÓI CỦA KHÁCH HÀNG:
+[TIN NHẮN HIỆN TẠI CỦA KHÁCH HÀNG]:
 "${userMessage}"
 
-Hãy viết câu trả lời tư vấn hoàn chỉnh dựa trên dữ liệu thật trên.`;
+Hãy phản hồi khách hàng một cách thông minh, sắc sảo và hữu ích nhất dựa trên dữ liệu thật ở trên:`;
 
-    try {
-        const response = await axios.post(
-            `${GEMINI_API_URL}/${DEFAULT_MODEL}:generateContent?key=${apiKey}`,
-            {
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [
-                            { text: `${systemInstruction}\n\n${promptText}` }
-                        ]
+    const availableModels = CANDIDATE_MODELS.filter(isModelAvailable);
+    const modelsToTry = availableModels.length > 0 ? availableModels : [DEFAULT_MODEL, 'gemini-flash-lite-latest'];
+
+    for (const currentModel of modelsToTry) {
+        try {
+            const response = await axios.post(
+                `${GEMINI_API_URL}/${currentModel}:generateContent?key=${apiKey}`,
+                {
+                    contents: [
+                        {
+                            role: 'user',
+                            parts: [
+                                { text: `${systemInstruction}\n\n${promptText}` }
+                            ]
+                        }
+                    ],
+                    generationConfig: {
+                        temperature: 0.35,
+                        topP: 0.88,
+                        maxOutputTokens: 2048
                     }
-                ],
-                generationConfig: {
-                    temperature: 0.3,
-                    topP: 0.8,
-                    maxOutputTokens: 800
+                },
+                {
+                    timeout: REQUEST_TIMEOUT_MS,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
                 }
-            },
-            {
-                timeout: REQUEST_TIMEOUT_MS,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+            );
+
+            const candidate = response.data?.candidates?.[0];
+            const generatedText = candidate?.content?.parts?.[0]?.text;
+
+            if (generatedText && generatedText.trim()) {
+                return {
+                    reply: generatedText.trim(),
+                    provider: 'gemini',
+                    isFallback: false,
+                    model: currentModel
+                };
             }
-        );
-
-        const candidate = response.data?.candidates?.[0];
-        const generatedText = candidate?.content?.parts?.[0]?.text;
-
-        if (generatedText && generatedText.trim()) {
-            return {
-                reply: generatedText.trim(),
-                provider: 'gemini',
-                isFallback: false,
-                model: DEFAULT_MODEL
-            };
+        } catch (err) {
+            const status = err.response?.status;
+            markModelCooldown(currentModel, status);
+            console.warn(`[aiModelService] Model ${currentModel} failed (status=${status || 'timeout'}): ${err.message}. Trying next candidate...`);
         }
-
-        // Nếu model trả về rỗng -> dùng fallback
-        return {
-            reply: fallbackText,
-            provider: 'deterministic_engine',
-            isFallback: true,
-            model: DEFAULT_MODEL,
-            note: 'Model trả về kết quả rỗng, dùng engine xác định'
-        };
-    } catch (err) {
-        console.warn(`[aiModelService] Gemini call failed: ${err.message}. Safely falling back to deterministic engine.`);
-        return {
-            reply: fallbackText,
-            provider: 'deterministic_engine',
-            isFallback: true,
-            model: DEFAULT_MODEL,
-            error: err.message
-        };
     }
+
+    return {
+        reply: fallbackText,
+        provider: 'deterministic_engine',
+        isFallback: true,
+        model: DEFAULT_MODEL,
+        note: 'Tất cả model Gemini đều bận, chuyển sang engine xác định an toàn'
+    };
 }
 
 module.exports = {

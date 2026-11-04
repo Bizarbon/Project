@@ -56,6 +56,71 @@ function normalizeVariants(value = []) {
         .filter(variant => variant.color || variant.ram || variant.storage || variant.sku);
 }
 
+function normalizeHearingAidProfile(value = {}) {
+    const source = value && typeof value === 'object' ? value : {};
+    const docs = Array.isArray(source.requiredDocuments) ? source.requiredDocuments : [];
+    const list = value => Array.isArray(value)
+        ? value.map(item => compactString(item)).filter(Boolean)
+        : splitList(value);
+    return {
+        designType: compactString(source.designType || ''),
+        audioFeatures: list(source.audioFeatures),
+        bluetoothCompatibility: compactString(source.bluetoothCompatibility || ''),
+        batteryCharging: compactString(source.batteryCharging || ''),
+        technicalSpecs: {
+            db: compactString(source.technicalSpecs?.db || ''),
+            khz: compactString(source.technicalSpecs?.khz || ''),
+            channels: compactString(source.technicalSpecs?.channels || '')
+        },
+        manufacturer: compactString(source.manufacturer || ''),
+        responsibleEntity: compactString(source.responsibleEntity || ''),
+        medicalDeviceClassification: compactString(source.medicalDeviceClassification || ''),
+        circulationNumber: compactString(source.circulationNumber || ''),
+        declarationNumber: compactString(source.declarationNumber || ''),
+        requiredDocuments: docs.map(doc => ({
+            name: compactString(doc?.name || ''),
+            reference: compactString(doc?.reference || ''),
+            verified: doc?.verified === true
+        })).filter(doc => doc.name || doc.reference),
+        instructionManualUrl: compactString(source.instructionManualUrl || ''),
+        technicalDocumentUrl: compactString(source.technicalDocumentUrl || ''),
+        verificationStatus: ['not_applicable', 'pending', 'verified', 'rejected'].includes(source.verificationStatus)
+            ? source.verificationStatus : 'not_applicable',
+        verifiedAt: source.verifiedAt ? new Date(source.verifiedAt) : null,
+        verifiedBy: compactString(source.verifiedBy || '')
+    };
+}
+
+function validateProductActivation(payload) {
+    const categoryKey = String(payload.category || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    if (categoryKey === 'may tro thinh' && payload.active === true) {
+        const profile = payload.hearingAidProfile || {};
+        const missing = [];
+        if (!profile.manufacturer) missing.push('manufacturer');
+        if (!profile.responsibleEntity) missing.push('responsibleEntity');
+        if (profile.verificationStatus !== 'verified') missing.push('verificationStatus');
+        if ((profile.requiredDocuments || []).some(doc => !doc.verified)) missing.push('requiredDocuments');
+        if (missing.length) {
+            const error = new Error(`Hearing-aid activation requires verified documentation: ${missing.join(', ')}`);
+            error.statusCode = 400;
+            throw error;
+        }
+        return;
+    }
+    if (payload.category !== 'Máy trợ thính' || payload.active !== true) return;
+    const profile = payload.hearingAidProfile || {};
+    const missing = [];
+    if (!profile.manufacturer) missing.push('nhà sản xuất');
+    if (!profile.responsibleEntity) missing.push('đơn vị chịu trách nhiệm');
+    if (!profile.verificationStatus || profile.verificationStatus !== 'verified') missing.push('trạng thái xác minh hồ sơ');
+    if (profile.requiredDocuments.some(doc => !doc.verified)) missing.push('tài liệu pháp lý chưa xác minh');
+    if (missing.length) {
+        const error = new Error(`Không thể kích hoạt máy trợ thính khi thiếu/xác minh chưa đủ: ${missing.join(', ')}.`);
+        error.statusCode = 400;
+        throw error;
+    }
+}
+
 async function resolveSupplier(supplier) {
     if (!supplier) return null;
     if (typeof supplier === 'object' && supplier._id) return supplier._id;
@@ -78,6 +143,7 @@ async function normalizeProductPayload(body, existingProduct = null) {
         compareAtPrice: Math.max(Number(body.compareAtPrice) || 0, 0),
         description: compactString(body.description || ''),
         category: compactString(body.category),
+        hearingAidProfile: normalizeHearingAidProfile(body.hearingAidProfile),
         stock: Math.max(Number(body.stock) || 0, 0),
         image: compactString(body.image || ''),
         images: splitList(body.images),
@@ -113,6 +179,8 @@ async function normalizeProductPayload(body, existingProduct = null) {
         error.statusCode = 400;
         throw error;
     }
+
+    validateProductActivation(payload);
 
     if (!payload.image && payload.images.length) payload.image = payload.images[0];
     if (payload.image && !payload.images.includes(payload.image)) payload.images.unshift(payload.image);
@@ -303,5 +371,10 @@ router.delete('/:id', protect, admin, async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+// Expose pure payload helpers for regression tests without changing the
+// Express router contract.
+router.normalizeProductPayload = normalizeProductPayload;
+router.validateProductActivation = validateProductActivation;
 
 module.exports = router;

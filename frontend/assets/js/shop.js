@@ -106,6 +106,10 @@ function fmt(n) {
 }
 
 function showToast(message, type = 'success') {
+    if (typeof window.showLucianToast === 'function') {
+        window.showLucianToast(message, type);
+        return;
+    }
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
@@ -218,6 +222,25 @@ async function loadWishlist() {
     wishlistIds = new Set(local.map(Number));
 }
 
+/* Lucian UX/UI Prompt #022 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#022 */
+function updateWishlistButtonsInPlace(productId) {
+    const liked = wishlistIds.has(Number(productId));
+    document.querySelectorAll(`.wishlist-btn[data-wishlist-id="${productId}"]`).forEach(btn => {
+        btn.classList.toggle('active', liked);
+        btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+        const labelEl = btn.querySelector('.u022-heart-glyph');
+        if (labelEl) labelEl.textContent = liked ? '♥' : '♡';
+        btn.classList.remove('is-pop');
+        if (liked) {
+            void btn.offsetWidth;
+            btn.classList.add('is-pop');
+        }
+    });
+    if (document.getElementById('wishlistFilter')?.checked) {
+        renderProducts();
+    }
+}
+
 async function toggleWishlist(id) {
     const productId = Number(id);
     if (auth.isLoggedIn()) {
@@ -233,7 +256,7 @@ async function toggleWishlist(id) {
                 if (wishlistIds.has(productId)) wishlistIds.delete(productId);
                 else wishlistIds.add(productId);
                 localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
-                renderProducts();
+                updateWishlistButtonsInPlace(productId);
                 showToast('Phiên làm việc đã hết hạn. Đã lưu yêu thích trên máy của bạn!', 'info');
                 return;
             }
@@ -245,7 +268,7 @@ async function toggleWishlist(id) {
                 if (wishlistIds.has(productId)) wishlistIds.delete(productId);
                 else wishlistIds.add(productId);
                 localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
-                renderProducts();
+                updateWishlistButtonsInPlace(productId);
                 showToast('Phiên làm việc đã hết hạn. Đã lưu yêu thích trên máy của bạn!', 'info');
                 return;
             }
@@ -256,7 +279,8 @@ async function toggleWishlist(id) {
         else wishlistIds.add(productId);
         localStorage.setItem('wishlist', JSON.stringify([...wishlistIds]));
     }
-    renderProducts();
+    updateWishlistButtonsInPlace(productId);
+    showToast(wishlistIds.has(productId) ? 'Đã thêm vào danh sách yêu thích ♥' : 'Đã bỏ khỏi danh sách yêu thích', 'info');
 }
 
 const activeSpecFacets = new Map();
@@ -368,11 +392,12 @@ function renderFacetedSpecBar() {
                     <div class="faceted-spec-chips">
                         ${group.options.map(opt => {
                             const isSelected = activeSet.has(opt);
+                            /* Lucian UX/UI Prompt #019 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#019 */
                             return `
                                 <button type="button" class="faceted-chip ${isSelected ? 'active' : ''}"
                                     data-facet-key="${group.key}" data-facet-val="${escapeHTML(opt)}"
                                     aria-pressed="${isSelected}">
-                                    ${escapeHTML(opt)}
+                                    <i class="u019-check" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></i><span>${escapeHTML(opt)}</span>
                                 </button>
                             `;
                         }).join('')}
@@ -440,7 +465,10 @@ function filteredProducts() {
         const target = activeCategory.normalize('NFC').trim().toLowerCase();
         products = products.filter(p => (p.category || '').normalize('NFC').trim().toLowerCase() === target);
     }
-    if (filters.brand !== 'all') products = products.filter(p => (p.brand || '') === filters.brand);
+    if (filters.brand !== 'all') {
+        const targetBrand = String(filters.brand).toLowerCase().trim();
+        products = products.filter(p => String(p.brand || '').toLowerCase().trim() === targetBrand);
+    }
     if (filters.search) {
         const queryNorm = normalizeAddressSearch(filters.search);
         const isPromoQuery = queryNorm.includes('khuyen mai') || queryNorm.includes('giam gia') || queryNorm.includes('sale') || queryNorm.includes('deal');
@@ -485,16 +513,21 @@ function filteredProducts() {
         }
     }
 
+    const isNewLaunch = (p) => Array.isArray(p?.tags) && p.tags.includes('Mới ra mắt') ? 1 : 0;
     const sorters = {
         price_asc: (a, b) => a.price - b.price,
         price_desc: (a, b) => b.price - a.price,
         stock_desc: (a, b) => b.stock - a.stock,
-        newest: (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0),
+        newest: (a, b) => (isNewLaunch(b) - isNewLaunch(a)) || (Number(b._id || 0) - Number(a._id || 0)) || (new Date(b.createdAt || 0) - new Date(a.createdAt || 0)),
         rating: (a, b) => (b.rating || 0) - (a.rating || 0) || (b.reviewCount || 0) - (a.reviewCount || 0),
         best_seller: (a, b) => (b.soldCount || 0) - (a.soldCount || 0),
         name: (a, b) => a.name.localeCompare(b.name, 'vi')
     };
-    if (sorters[filters.sort]) products.sort(sorters[filters.sort]);
+    if (sorters[filters.sort]) {
+        products.sort(sorters[filters.sort]);
+    } else {
+        products.sort((a, b) => (isNewLaunch(b) - isNewLaunch(a)) || ((b.featured ? 1 : 0) - (a.featured ? 1 : 0)) || (Number(a._id || 0) - Number(b._id || 0)));
+    }
     return products;
 }
 
@@ -509,8 +542,74 @@ async function loadProductMeta() {
     }
 }
 
+function brandSvgLogo(brand) {
+    const norm = String(brand || '').trim().toLowerCase();
+    switch (norm) {
+        case 'apple':
+            return `<svg class="brand-vector-svg brand-svg-apple" viewBox="0 0 170 170" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.58-7.75-11.64-14.13-5.74-9.02-10.22-19.14-13.43-30.37-3.21-11.22-4.82-21.99-4.82-32.31 0-14.14 3.58-25.74 10.74-34.81 7.16-9.07 16.03-13.68 26.62-13.84 4.89 0 10.27 1.34 16.14 4.02 5.87 2.68 9.77 4.07 11.69 4.19 1.52-.12 5.56-1.55 12.11-4.29 6.55-2.74 12.18-4.01 16.89-3.82 12.63.63 22.51 5.37 29.64 14.22-11.05 6.72-16.46 16.03-16.23 27.93.22 9.53 3.91 17.47 11.07 23.82 7.16 6.35 15.65 10.12 25.47 11.31-2.45 7.16-5.59 14.54-9.42 22.14zM119.22 33.16c0-6.85 2.5-13.27 7.5-18.27 5-5 11.3-8.08 18.9-9.24.2 1.3.3 2.5.3 3.6 0 6.6-2.5 12.9-7.5 18-5 5.1-11.3 8.3-18.9 9.5-.1-1.2-.3-2.4-.3-3.59z"/></svg>`;
+        case 'asus':
+            return `<svg class="brand-vector-svg brand-svg-asus" viewBox="0 0 70 18" width="34" height="12" fill="currentColor" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="14" letter-spacing="1">ASUS</text></svg>`;
+        case 'dell':
+            return `<svg class="brand-vector-svg brand-svg-dell" viewBox="0 0 70 18" width="32" height="12" fill="currentColor" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="14" letter-spacing="0.5">DELL</text></svg>`;
+        case 'hp':
+            return `<svg class="brand-vector-svg brand-svg-hp" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="2"/><text x="12" y="16" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="11" font-style="italic">hp</text></svg>`;
+        case 'lenovo':
+            return `<svg class="brand-vector-svg brand-svg-lenovo" viewBox="0 0 80 20" width="38" height="12" aria-hidden="true"><rect x="0" y="1" width="80" height="18" rx="3" fill="#E2231A"/><text x="40" y="14" text-anchor="middle" fill="#FFF" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="11" letter-spacing="0.3">Lenovo</text></svg>`;
+        case 'acer':
+            return `<svg class="brand-vector-svg brand-svg-acer" viewBox="0 0 70 18" width="32" height="12" fill="#83B81A" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="14" letter-spacing="0.5">acer</text></svg>`;
+        case 'msi':
+            return `<svg class="brand-vector-svg brand-svg-msi" viewBox="0 0 70 18" width="32" height="12" fill="#ED1C24" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="15" letter-spacing="1">msi</text></svg>`;
+        case 'samsung':
+            return `<svg class="brand-vector-svg brand-svg-samsung" viewBox="0 0 84 18" width="40" height="12" fill="currentColor" aria-hidden="true"><text x="42" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="12" letter-spacing="1">SAMSUNG</text></svg>`;
+        case 'xiaomi':
+            return `<svg class="brand-vector-svg brand-svg-xiaomi" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#FF6900"/><path d="M7 8h2.5v8H7zm4 0h2.5v3.5c0 1 .7 1.6 1.6 1.6s1.6-.6 1.6-1.6V8h2.5v3.5c0 2.2-1.8 4-4 4-1.2 0-2.2-.5-3-1.4V16H11z" fill="#FFF"/></svg>`;
+        case 'sony':
+            return `<svg class="brand-vector-svg brand-svg-sony" viewBox="0 0 70 18" width="32" height="12" fill="currentColor" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="14" letter-spacing="1.5">SONY</text></svg>`;
+        case 'nintendo':
+            return `<svg class="brand-vector-svg brand-svg-nintendo" viewBox="0 0 80 20" width="38" height="12" aria-hidden="true"><rect x="0" y="1" width="80" height="18" rx="9" fill="#E60012"/><text x="40" y="13.5" text-anchor="middle" fill="#FFF" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="9" letter-spacing="0.3">Nintendo</text></svg>`;
+        case 'microsoft':
+            return `<svg class="brand-vector-svg brand-svg-microsoft" viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="1" y="1" width="8" height="8" fill="#F25022"/><rect x="11" y="1" width="8" height="8" fill="#7FBA00"/><rect x="1" y="11" width="8" height="8" fill="#00A4EF"/><rect x="11" y="11" width="8" height="8" fill="#FFB900"/></svg>`;
+        case 'logitech':
+            return `<svg class="brand-vector-svg brand-svg-logitech" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#00B8FC"/><text x="12" y="17" text-anchor="middle" fill="#000" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="14">G</text></svg>`;
+        case 'dji':
+            return `<svg class="brand-vector-svg brand-svg-dji" viewBox="0 0 60 18" width="28" height="12" fill="currentColor" aria-hidden="true"><text x="30" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="14" font-style="italic" letter-spacing="1">dji</text></svg>`;
+        case 'garmin':
+            return `<svg class="brand-vector-svg brand-svg-garmin" viewBox="0 0 80 18" width="38" height="12" aria-hidden="true"><path d="M10 3l8 12H2z" fill="#007CC3"/><text x="48" y="13" text-anchor="middle" fill="currentColor" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="12" letter-spacing="0.5">GARMIN</text></svg>`;
+        case 'marshall':
+            return `<svg class="brand-vector-svg brand-svg-marshall" viewBox="0 0 80 18" width="40" height="12" fill="currentColor" aria-hidden="true"><text x="40" y="14" text-anchor="middle" font-family="serif" font-style="italic" font-weight="900" font-size="15">Marshall</text></svg>`;
+        case 'jbl':
+            return `<svg class="brand-vector-svg brand-svg-jbl" viewBox="0 0 60 18" width="30" height="12" aria-hidden="true"><rect x="10" y="1" width="40" height="16" rx="3" fill="#FF3300"/><text x="30" y="13.5" text-anchor="middle" fill="#FFF" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="12">JBL</text></svg>`;
+        case 'anker':
+            return `<svg class="brand-vector-svg brand-svg-anker" viewBox="0 0 70 18" width="34" height="12" fill="#00A0E9" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="13" letter-spacing="0.5">ANKER</text></svg>`;
+        case 'baseus':
+            return `<svg class="brand-vector-svg brand-svg-baseus" viewBox="0 0 70 18" width="34" height="12" aria-hidden="true"><rect x="8" y="1" width="54" height="16" rx="3" fill="#FFD000"/><text x="35" y="13" text-anchor="middle" fill="#000" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="11">Baseus</text></svg>`;
+        case 'oppo':
+            return `<svg class="brand-vector-svg brand-svg-oppo" viewBox="0 0 70 18" width="32" height="12" fill="#008060" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="14" letter-spacing="1">oppo</text></svg>`;
+        case 'poco':
+            return `<svg class="brand-vector-svg brand-svg-poco" viewBox="0 0 70 18" width="32" height="12" aria-hidden="true"><rect x="8" y="1" width="54" height="16" rx="3" fill="#FFDE00"/><text x="35" y="13.5" text-anchor="middle" fill="#000" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="12" letter-spacing="0.5">POCO</text></svg>`;
+        case 'honor':
+            return `<svg class="brand-vector-svg brand-svg-honor" viewBox="0 0 70 18" width="34" height="12" fill="currentColor" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" letter-spacing="1">HONOR</text></svg>`;
+        case 'huawei':
+            return `<svg class="brand-vector-svg brand-svg-huawei" viewBox="0 0 80 18" width="38" height="12" fill="#CF0A2C" aria-hidden="true"><text x="40" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" letter-spacing="0.8">HUAWEI</text></svg>`;
+        case 'dareu':
+            return `<svg class="brand-vector-svg brand-svg-dareu" viewBox="0 0 70 18" width="32" height="12" fill="#FF5E00" aria-hidden="true"><text x="35" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="13" letter-spacing="0.5">DAREU</text></svg>`;
+        case 'ugreen':
+            return `<svg class="brand-vector-svg brand-svg-ugreen" viewBox="0 0 80 18" width="38" height="12" fill="#00B050" aria-hidden="true"><text x="40" y="14" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="12" letter-spacing="0.5">UGREEN</text></svg>`;
+        default:
+            return `<span class="brand-fallback-mark">${escapeHTML(String(brand || '?').slice(0, 2).toUpperCase())}</span>`;
+    }
+}
+
+function brandIconMarkup(brand) {
+    const label = brand || 'TechStore';
+    const key = String(label).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return `<span class="brand-badge-icon brand-badge-${escapeHTML(key)}" aria-hidden="true">${brandSvgLogo(label)}</span>`;
+}
+
 function renderBrandFilter() {
     const select = document.getElementById('brandFilter');
+    const chipBar = document.getElementById('brandQuickFilterBar');
+    const chipList = document.getElementById('brandChipList');
     if (!select) return;
 
     const normalizedCategory = String(activeCategory || 'all').normalize('NFC').trim().toLowerCase();
@@ -523,32 +622,393 @@ function renderBrandFilter() {
         .sort((a, b) => a.localeCompare(b, 'vi'));
     const current = select.value || 'all';
     const categoryName = activeCategory && activeCategory !== 'all' ? ` ${activeCategory.toLowerCase()}` : '';
+
+    // 1. Clean native select without fake letter prefixes (fixes Image 1 duplicate letter issue)
     select.innerHTML = `<option value="all">Tất cả hãng${escapeHTML(categoryName)}</option>` +
-        brands.map(brand => `<option value="${escapeHTML(brand)}">${escapeHTML(brandIconText(brand))} ${escapeHTML(brand)}</option>`).join('');
+        brands.map(brand => `<option value="${escapeHTML(brand)}">${escapeHTML(brand)}</option>`).join('');
     select.value = brands.includes(current) ? current : 'all';
+
+    // 2. Render modern Brand Quick-Filter Bar with genuine SVG logos
+    if (chipBar && chipList) {
+        if (!brands.length) {
+            chipBar.hidden = true;
+        } else {
+            chipBar.hidden = false;
+            const allActive = !current || current === 'all';
+            chipList.innerHTML = `
+                <li>
+                    <button type="button" class="brand-chip-btn ${allActive ? 'active' : ''}" data-brand="all" onclick="selectBrandFilter('all')">
+                        <span class="brand-chip-name">Tất cả</span>
+                    </button>
+                </li>
+            ` + brands.map(b => `
+                <li>
+                    <button type="button" class="brand-chip-btn ${current === b ? 'active' : ''}" data-brand="${escapeHTML(b)}" onclick="selectBrandFilter('${escapeHTML(b)}')" title="Lọc sản phẩm hãng ${escapeHTML(b)}">
+                        ${brandSvgLogo(b)}
+                        <span class="brand-chip-name">${escapeHTML(b)}</span>
+                    </button>
+                </li>
+            `).join('');
+            chipList.querySelectorAll('.brand-chip-btn').forEach(btn => {
+                btn.addEventListener('pointerenter', () => syncListSlidingPill(chipList, btn));
+            });
+            chipList.onpointerleave = () => syncListSlidingPill(chipList, null);
+            chipList.onclick = (e) => {
+                const btn = e.target.closest('.brand-chip-btn');
+                if (btn && btn.dataset.brand) {
+                    selectBrandFilter(btn.dataset.brand);
+                }
+            };
+            setTimeout(() => {
+                syncListSlidingPill(chipList, null);
+                initBrandDragScroll();
+            }, 50);
+        }
+    }
 }
 
-function brandIconText(brand) {
-    const normalized = String(brand || '').trim().toLowerCase();
-    const icons = {
-        apple: '●', samsung: 'S', xiaomi: 'Mi', poco: 'P', oppo: 'O', honor: 'H',
-        asus: 'A', acer: 'A', dell: 'D', hp: 'HP', lenovo: 'L', msi: 'MSI', microsoft: 'M',
-        sony: 'S', jbl: 'JBL', marshall: 'M', logitech: 'G', anker: 'A', ugreen: 'U',
-        baseus: 'B', dareu: 'D', dji: 'DJI', garmin: 'G', huawei: 'H', nintendo: 'N'
-    };
-    return icons[normalized] || String(brand || '?').trim().slice(0, 2).toUpperCase();
+/* Lucian UX/UI Prompt #048 · Mouse Drag-to-Scroll & Navigation Controls */
+function initBrandDragScroll() {
+    const track = document.getElementById('brandScrollTrack') || document.getElementById('brandQuickFilterBar');
+    const shell = document.getElementById('brandScrollShell');
+    const prevBtn = document.getElementById('brandNavPrev');
+    const nextBtn = document.getElementById('brandNavNext');
+    if (!track) return;
+
+    function updateEdges() {
+        const max = track.scrollWidth - track.clientWidth;
+        const canScrollLeft = track.scrollLeft > 6;
+        const canScrollRight = track.scrollLeft < max - 6;
+
+        if (shell) {
+            shell.style.setProperty('--fade-left', canScrollLeft ? '1' : '0');
+            shell.style.setProperty('--fade-right', canScrollRight ? '1' : '0');
+        }
+        if (prevBtn) prevBtn.hidden = !canScrollLeft;
+        if (nextBtn) nextBtn.hidden = !canScrollRight;
+    }
+
+    if (!track._hasDragScroll) {
+        track._hasDragScroll = true;
+
+        track.addEventListener('scroll', updateEdges, { passive: true });
+        window.addEventListener('resize', updateEdges, { passive: true });
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                track.scrollBy({ left: -260, behavior: 'smooth' });
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                track.scrollBy({ left: 260, behavior: 'smooth' });
+            });
+        }
+
+        let isDown = false;
+        let startX = 0;
+        let scrollStart = 0;
+        let didDrag = false;
+        let velX = 0;
+        let lastX = 0;
+        let momentumRaf = null;
+
+        track.addEventListener('pointerdown', (e) => {
+            if (e.pointerType !== 'mouse' || e.button !== 0) return;
+            isDown = true;
+            didDrag = false;
+            startX = e.pageX;
+            lastX = e.pageX;
+            scrollStart = track.scrollLeft;
+            velX = 0;
+            cancelAnimationFrame(momentumRaf);
+        });
+
+        track.addEventListener('pointermove', (e) => {
+            if (!isDown) return;
+            const dx = e.pageX - startX;
+            if (Math.abs(dx) > 6) {
+                if (!didDrag) {
+                    didDrag = true;
+                    track.classList.add('is-dragging');
+                    try { track.setPointerCapture(e.pointerId); } catch (_) {}
+                }
+                velX = e.pageX - lastX;
+                lastX = e.pageX;
+                track.scrollLeft = scrollStart - (dx * 1.3);
+            }
+        });
+
+        function stopDrag(e) {
+            if (!isDown) return;
+            isDown = false;
+            track.classList.remove('is-dragging');
+            try { track.releasePointerCapture(e.pointerId); } catch (_) {}
+
+            if (didDrag) {
+                if (Math.abs(velX) > 2) {
+                    let speed = velX * 1.25;
+                    function glide() {
+                        if (Math.abs(speed) > 0.5) {
+                            track.scrollLeft -= speed;
+                            speed *= 0.88;
+                            momentumRaf = requestAnimationFrame(glide);
+                        } else {
+                            updateEdges();
+                        }
+                    }
+                    momentumRaf = requestAnimationFrame(glide);
+                } else {
+                    updateEdges();
+                }
+
+                const blockClick = (ev) => {
+                    ev.stopPropagation();
+                    ev.preventDefault();
+                    window.removeEventListener('click', blockClick, true);
+                };
+                window.addEventListener('click', blockClick, true);
+                setTimeout(() => window.removeEventListener('click', blockClick, true), 120);
+            } else {
+                updateEdges();
+            }
+        }
+
+        track.addEventListener('pointerup', stopDrag);
+        track.addEventListener('pointercancel', stopDrag);
+    }
+
+    setTimeout(updateEdges, 80);
 }
 
-function brandIconMarkup(brand) {
-    const label = brand || 'TechStore Select';
-    const key = String(label).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    return `<span class="brand-icon brand-icon-${escapeHTML(key)}" aria-hidden="true">${escapeHTML(brandIconText(label))}</span>`;
+function selectBrandFilter(brand) {
+    const select = document.getElementById('brandFilter');
+    if (select) {
+        select.value = brand;
+        select.dispatchEvent(new Event('change'));
+    }
+    syncBrandChipsState(brand);
+    renderProducts();
+    const chipList = document.getElementById('brandChipList');
+    const activeBtn = chipList?.querySelector('.brand-chip-btn.active');
+    if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+}
+window.selectBrandFilter = selectBrandFilter;
+
+/* Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 */
+function syncListSlidingPill(listEl, targetBtn) {
+    if (!listEl) return;
+    let pillItem = listEl.querySelector('.u039-pill-item');
+    if (!pillItem) {
+        pillItem = document.createElement('li');
+        pillItem.className = 'u039-pill-item';
+        pillItem.setAttribute('aria-hidden', 'true');
+        pillItem.setAttribute('role', 'presentation');
+        listEl.prepend(pillItem);
+    }
+    const activeBtn = targetBtn || listEl.querySelector('.active, [aria-current="page"]');
+    if (!activeBtn) {
+        pillItem.style.setProperty('--pill-o', '0');
+        return;
+    }
+    const itemLi = activeBtn.closest('li') || activeBtn;
+    pillItem.style.setProperty('--x', `${itemLi.offsetLeft}px`);
+    pillItem.style.setProperty('--y', `${itemLi.offsetTop}px`);
+    pillItem.style.setProperty('--w', `${itemLi.offsetWidth}px`);
+    pillItem.style.setProperty('--h', `${itemLi.offsetHeight}px`);
+    pillItem.style.setProperty('--pill-o', '1');
+}
+
+function syncBrandChipsState(brand) {
+    const chipList = document.getElementById('brandChipList');
+    if (!chipList) return;
+    const target = String(brand || 'all').toLowerCase().trim();
+    chipList.querySelectorAll('.brand-chip-btn').forEach(btn => {
+        const btnBrand = String(btn.dataset.brand || '').toLowerCase().trim();
+        btn.classList.toggle('active', btnBrand === target);
+    });
+    syncListSlidingPill(chipList, null);
+}
+
+/* Lucian UX/UI Prompt #024 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#024 */
+const U024_MAX_PRICE = 60000000;
+const U024_BINS = 20;
+let u024State = { lo: 0, hi: 100, ci: 0, shownCount: '' };
+
+function syncPriceHistogramUI(matchCount) {
+    const panel = document.getElementById('u024HistogramPanel');
+    const histEl = document.getElementById('u024HistBars');
+    const rangeText = document.getElementById('u024RangeText');
+    const roll = document.getElementById('u024CountRoll');
+    if (!panel || !histEl) return;
+
+    const minVal = Number(document.getElementById('minPrice')?.value || 0);
+    const maxVal = Number(document.getElementById('maxPrice')?.value || 0);
+    u024State.lo = minVal > 0 ? Math.min(96, Math.max(0, Math.round((minVal / U024_MAX_PRICE) * 100))) : 0;
+    u024State.hi = maxVal > 0 ? Math.max(u024State.lo + 4, Math.min(100, Math.round((maxVal / U024_MAX_PRICE) * 100))) : 100;
+
+    const handles = panel.querySelectorAll('.u024-h');
+    if (handles.length === 2) {
+        handles[0].style.setProperty('--pos', u024State.lo);
+        handles[1].style.setProperty('--pos', u024State.hi);
+        handles[0].setAttribute('aria-valuenow', String(u024State.lo));
+        handles[1].setAttribute('aria-valuenow', String(u024State.hi));
+    }
+    panel.style.setProperty('--a', u024State.lo);
+    panel.style.setProperty('--b', u024State.hi);
+
+    if (rangeText) {
+        if (u024State.lo === 0 && u024State.hi === 100 && !minVal && !maxVal) {
+            rangeText.textContent = 'Tất cả mức giá (0 đ – 60.000.000+ đ)';
+        } else {
+            const loVnd = minVal || Math.round((u024State.lo / 100) * U024_MAX_PRICE);
+            const hiVnd = maxVal || Math.round((u024State.hi / 100) * U024_MAX_PRICE);
+            rangeText.textContent = `${fmt(loVnd)} – ${u024State.hi >= 100 && !maxVal ? '60.000.000+ đ' : fmt(hiVnd)}`;
+        }
+    }
+
+    const basePool = activeCategory === 'all'
+        ? allProducts
+        : allProducts.filter(p => (p.category || '').normalize('NFC').trim().toLowerCase() === activeCategory.normalize('NFC').trim().toLowerCase());
+
+    const counts = new Array(U024_BINS).fill(0);
+    basePool.forEach(p => {
+        const idx = Math.min(U024_BINS - 1, Math.max(0, Math.floor((Number(p.price || 0) / U024_MAX_PRICE) * U024_BINS)));
+        counts[idx]++;
+    });
+    const maxBin = Math.max(1, ...counts);
+
+    if (histEl.children.length !== U024_BINS) {
+        histEl.innerHTML = counts.map(() => '<span class="u024-bar"></span>').join('');
+    }
+    Array.from(histEl.children).forEach((bar, i) => {
+        const pct = Math.max(12, Math.round((counts[i] / maxBin) * 100));
+        bar.style.setProperty('--h', pct);
+        const center = ((i + 0.5) / U024_BINS) * 100;
+        bar.classList.toggle('in', center >= u024State.lo && center <= u024State.hi);
+    });
+
+    if (roll && roll.children.length >= 2) {
+        const nextCount = typeof matchCount === 'number' ? matchCount : filteredProducts().length;
+        if (String(nextCount) !== u024State.shownCount) {
+            const up = !u024State.shownCount || nextCount > Number(u024State.shownCount);
+            u024State.shownCount = String(nextCount);
+            const cur = roll.children[u024State.ci];
+            const nxt = roll.children[1 - u024State.ci];
+            nxt.style.transition = 'none';
+            nxt.textContent = String(nextCount);
+            nxt.style.transform = `translateY(${up ? 100 : -100}%)`;
+            nxt.style.opacity = '0';
+            void nxt.offsetWidth;
+            nxt.style.transition = '';
+            nxt.style.transform = 'none';
+            nxt.style.opacity = '1';
+            cur.style.transform = `translateY(${up ? -100 : 100}%)`;
+            cur.style.opacity = '0';
+            u024State.ci = 1 - u024State.ci;
+        }
+    }
+}
+
+function setupPriceHistogramFilter() {
+    const panel = document.getElementById('u024HistogramPanel');
+    const track = document.getElementById('u024Track');
+    const toggleBtn = document.getElementById('u024ToggleBtn');
+    if (!panel || !track || panel._u024Bound) return;
+    panel._u024Bound = true;
+
+    if (window.innerWidth <= 768) {
+        panel.hidden = true;
+        toggleBtn?.setAttribute('aria-expanded', 'false');
+    }
+
+    toggleBtn?.addEventListener('click', () => {
+        const nextOpen = panel.hidden;
+        panel.hidden = !nextOpen;
+        toggleBtn.setAttribute('aria-expanded', String(nextOpen));
+        if (nextOpen) syncPriceHistogramUI();
+    });
+
+    const STEP = 2;
+    const handles = Array.from(panel.querySelectorAll('.u024-h'));
+
+    function applyHandleValuesToInputs() {
+        const minEl = document.getElementById('minPrice');
+        const maxEl = document.getElementById('maxPrice');
+        const loVnd = u024State.lo <= 0 ? '' : String(Math.round((u024State.lo / 100) * U024_MAX_PRICE / 500000) * 500000);
+        const hiVnd = u024State.hi >= 100 ? '' : String(Math.round((u024State.hi / 100) * U024_MAX_PRICE / 500000) * 500000);
+        if (minEl) minEl.value = loVnd;
+        if (maxEl) maxEl.value = hiVnd;
+        document.querySelectorAll('.price-chip-btn').forEach(b => {
+            const bMin = b.dataset.priceMin || '';
+            const bMax = b.dataset.priceMax || '';
+            b.classList.toggle('active', bMin === loVnd && bMax === hiVnd);
+        });
+        renderProducts();
+    }
+
+    function posFromClientX(clientX) {
+        const r = track.getBoundingClientRect();
+        if (!r.width) return 0;
+        return Math.max(0, Math.min(100, Math.round(((clientX - r.left) / r.width) * 100 / STEP) * STEP));
+    }
+
+    handles.forEach(h => {
+        const dragMove = e => {
+            const p = posFromClientX(e.clientX);
+            if (h.dataset.k === 'lo') u024State.lo = Math.min(p, u024State.hi - STEP * 2);
+            else u024State.hi = Math.max(p, u024State.lo + STEP * 2);
+            applyHandleValuesToInputs();
+        };
+        h.addEventListener('pointerdown', e => {
+            try { h.setPointerCapture(e.pointerId); } catch (_) {}
+            h.classList.add('drag');
+            dragMove(e);
+        });
+        h.addEventListener('pointermove', e => {
+            if (h.classList.contains('drag')) dragMove(e);
+        });
+        h.addEventListener('pointerup', () => h.classList.remove('drag'));
+        h.addEventListener('pointercancel', () => h.classList.remove('drag'));
+        h.addEventListener('keydown', e => {
+            const d = (e.key === 'ArrowRight' || e.key === 'ArrowUp') ? STEP : (e.key === 'ArrowLeft' || e.key === 'ArrowDown') ? -STEP : 0;
+            if (!d) return;
+            e.preventDefault();
+            if (h.dataset.k === 'lo') u024State.lo = Math.max(0, Math.min(u024State.lo + d, u024State.hi - STEP * 2));
+            else u024State.hi = Math.min(100, Math.max(u024State.hi + d, u024State.lo + STEP * 2));
+            applyHandleValuesToInputs();
+        });
+    });
 }
 
 async function loadProducts() {
+    /* Lucian UX/UI Prompt #079 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#079 */
+    const sections = document.getElementById('productSections');
+    if (sections && !allProducts.length) {
+        sections.innerHTML = `
+            <section class="category-section" aria-busy="true" aria-label="Đang tải danh sách sản phẩm">
+                <section class="product-grid">
+                    ${Array.from({ length: 4 }).map(() => `
+                        <article class="u079-skeleton-card" aria-hidden="true">
+                            <div class="u079-sk-block" style="height: 190px;"></div>
+                            <div class="u079-sk-block" style="height: 16px; width: 45%;"></div>
+                            <div class="u079-sk-block" style="height: 20px; width: 85%;"></div>
+                            <div class="u079-sk-block" style="height: 16px; width: 65%;"></div>
+                            <div class="u079-sk-block" style="height: 38px; margin-top: auto;"></div>
+                        </article>
+                    `).join('')}
+                </section>
+            </section>
+        `;
+    }
     try {
         const res = await fetch(`${API_URL}/products`);
         allProducts = await res.json();
+        setupPriceHistogramFilter();
         renderBrandFilter();
         renderCategoryNav();
         renderFacetedSpecBar();
@@ -602,11 +1062,23 @@ function updateHeaderCategoryState() {
         button.classList.toggle('active', isActive);
         button.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
+    document.querySelectorAll('.header-category-list').forEach(listEl => {
+        if (!listEl._u039Bound) {
+            listEl._u039Bound = true;
+            listEl.querySelectorAll('a, button').forEach(btn => {
+                btn.addEventListener('pointerenter', () => syncListSlidingPill(listEl, btn));
+            });
+            listEl.addEventListener('pointerleave', () => syncListSlidingPill(listEl, null));
+            window.addEventListener('resize', () => syncListSlidingPill(listEl, null), { passive: true });
+        }
+        syncListSlidingPill(listEl, null);
+    });
 }
 
 function setCategory(category, options = {}) {
     activeCategory = category || 'all';
     activeSpecFacets.clear();
+    expandedHomeCategories.clear();
 
     // Tự động xóa bộ lọc tìm kiếm, thương hiệu và khoảng giá cũ khi chuyển danh mục
     // trừ khi caller yêu cầu giữ lại (options.preserveFilters)
@@ -642,9 +1114,9 @@ window.setCategory = setCategory;
 
 function setBrandFilter(brand, options = {}) {
     const select = document.getElementById('brandFilter');
+    let foundVal = 'all';
     if (select) {
         const targetBrand = String(brand || '').toLowerCase().trim();
-        let foundVal = 'all';
         for (const opt of select.options) {
             if (opt.value.toLowerCase().trim() === targetBrand) {
                 foundVal = opt.value;
@@ -653,6 +1125,7 @@ function setBrandFilter(brand, options = {}) {
         }
         select.value = foundVal;
     }
+    syncBrandChipsState(foundVal);
     renderProducts();
     if (options.scroll !== false) {
         document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -687,6 +1160,16 @@ window.setShopPrice = setShopPrice;
 function setupPromoCarousel() {
     const carousel = document.getElementById('promoCarousel');
     if (!carousel) return;
+
+    /* Lucian UX/UI Prompt #226 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#226 */
+    carousel.addEventListener('pointermove', e => {
+        const rect = carousel.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const mx = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+        const my = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+        carousel.style.setProperty('--mx', `${mx}%`);
+        carousel.style.setProperty('--my', `${my}%`);
+    }, { passive: true });
 
     const slides = [...carousel.querySelectorAll('.hero-slide')];
     const dots = [...carousel.querySelectorAll('.hero-dot')];
@@ -814,13 +1297,64 @@ function setupStorefrontHeader() {
         }
 
         const trendingList = [
-            { rank: 1, term: 'iPhone 16 Pro Max', tag: 'HOT', tagType: 'hot' },
-            { rank: 2, term: 'MacBook Air M3', tag: 'MỚI', tagType: 'new' },
-            { rank: 3, term: 'Samsung Galaxy S24 Ultra', tag: 'AI', tagType: 'ai' },
-            { rank: 4, term: 'Sony WH-1000XM5', tag: '', tagType: '' },
-            { rank: 5, term: 'Logitech MX Keys S', tag: '', tagType: '' },
+            { rank: 1, term: 'iPhone 17 Pro Max', tag: 'MỚI', tagType: 'new' },
+            { rank: 2, term: 'Samsung Galaxy S24 Ultra', tag: 'AI', tagType: 'ai' },
+            { rank: 3, term: 'Galaxy Z Fold7 5G', tag: 'HOT', tagType: 'hot' },
+            { rank: 4, term: 'MacBook Air M3', tag: 'HOT', tagType: 'hot' },
+            { rank: 5, term: 'OPPO Find X8 Pro', tag: 'MỚI', tagType: 'new' },
             { rank: 6, term: 'Củ sạc Anker 65W GaN', tag: 'SALE', tagType: 'hot' }
         ];
+
+        /* Lucian UX/UI Prompt #322 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#322 */
+        const tickerEl = document.getElementById('headerTrendingTicker');
+        if (tickerEl && searchForm) {
+            let tickerIdx = 0;
+            let currentLine = null;
+            const syncTickerVisibility = () => {
+                const show = !headerSearch.value && document.activeElement !== headerSearch;
+                tickerEl.classList.toggle('is-active', show);
+                searchForm.classList.toggle('has-ticker', show);
+            };
+            const showTickerLine = (idx, first) => {
+                const item = trendingList[idx % trendingList.length];
+                const ln = document.createElement('span');
+                ln.className = 'u322-ln' + (first ? '' : ' is-dn');
+                ln.innerHTML = `<b>#${item.rank}</b><span>${escapeHTML(item.term)}</span><em class="${escapeHTML(item.tagType)}">${escapeHTML(item.tag)}</em>`;
+                tickerEl.appendChild(ln);
+                if (currentLine) {
+                    const old = currentLine;
+                    old.classList.add('is-up');
+                    setTimeout(() => old.remove(), 480);
+                }
+                if (!first) {
+                    void ln.offsetWidth;
+                    ln.classList.remove('is-dn');
+                }
+                currentLine = ln;
+            };
+            showTickerLine(0, true);
+            syncTickerVisibility();
+            headerSearch.addEventListener('focus', syncTickerVisibility);
+            headerSearch.addEventListener('blur', syncTickerVisibility);
+            headerSearch.addEventListener('input', syncTickerVisibility);
+            setInterval(() => {
+                if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('visual-reduce-motion')) return;
+                if (tickerEl.classList.contains('is-active')) {
+                    tickerIdx = (tickerIdx + 1) % trendingList.length;
+                    showTickerLine(tickerIdx, false);
+                }
+            }, 2600);
+        }
+
+        /* Lucian UX/UI Prompt #046 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#046 */
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+                e.preventDefault();
+                headerSearch.focus();
+                if (headerSearch.value.trim().length >= 2) performLiveSearch(headerSearch.value);
+                else renderTrending();
+            }
+        });
 
         function renderTrending() {
             const recents = getRecentSearches();
@@ -858,8 +1392,8 @@ function setupStorefrontHeader() {
                         <span class="search-section-badge">PHỔ BIẾN</span>
                     </div>
                     <div class="search-trending-grid">
-                        ${trendingList.map(item => `
-                            <button type="button" class="trending-rank-btn" data-search-term="${escapeHTML(item.term)}">
+                        ${trendingList.map((item, idx) => `
+                            <button type="button" class="trending-rank-btn" style="--i:${idx}" data-search-term="${escapeHTML(item.term)}">
                                 <span class="rank-badge rank-badge-${item.rank <= 3 ? item.rank : 'other'}">${item.rank}</span>
                                 <span class="rank-title">${escapeHTML(item.term)}</span>
                                 ${item.tag ? `<span class="rank-tag rank-tag-${item.tagType}">${item.tag}</span>` : ''}
@@ -902,7 +1436,7 @@ function setupStorefrontHeader() {
             // Section 4: Tip Footer
             html += `
                 <div class="live-search-tip-footer">
-                    <span>💡 <strong>Mẹo:</strong> Gõ từ 2 ký tự để tìm kiếm tức thì</span>
+                    <span>💡 <strong>Mẹo:</strong> Gõ từ 2 ký tự hoặc nhấn <strong>↑ ↓ Enter</strong></span>
                     <span>📷 AI Visual Search</span>
                 </div>
             `;
@@ -961,10 +1495,10 @@ function setupStorefrontHeader() {
                     <span class="live-search-title">Gợi ý sản phẩm (${prods.length})</span>
                 </header>
                 <ul class="live-search-list" role="listbox">
-                    ${prods.map(p => {
+                    ${prods.map((p, idx) => {
                         const discount = p.compareAtPrice && p.compareAtPrice > p.price;
                         return `
-                            <li class="live-search-item" role="option">
+                            <li class="live-search-item" role="option" style="--i:${idx}">
                                 <a class="live-search-link" href="pages/catalog/product.html?id=${p._id}">
                                     <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="live-search-thumb" loading="lazy">
                                     <div class="live-search-meta">
@@ -1027,7 +1561,7 @@ function setupStorefrontHeader() {
         });
 
         headerSearch.addEventListener('keydown', e => {
-            const items = liveDropdown.querySelectorAll('.live-search-link');
+            const items = liveDropdown.querySelectorAll('.live-search-link, .trending-rank-btn, .search-featured-card');
             if (!items.length || liveDropdown.hidden) return;
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
@@ -1048,17 +1582,21 @@ function setupStorefrontHeader() {
         function updateSelection(items) {
             items.forEach((it, idx) => {
                 if (idx === selectedIndex) {
-                    it.classList.add('is-focused');
+                    it.classList.add('is-focused', 'selected');
                     it.scrollIntoView({ block: 'nearest' });
                 } else {
-                    it.classList.remove('is-focused');
+                    it.classList.remove('is-focused', 'selected');
                 }
             });
         }
     }
 
     if (cameraBtn && cameraInput && liveDropdown) {
-        cameraBtn.addEventListener('click', () => cameraInput.click());
+        cameraBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            cameraInput.click();
+        });
+
         cameraInput.addEventListener('change', async (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
@@ -1068,62 +1606,97 @@ function setupStorefrontHeader() {
                 <div class="visual-search-loading">
                     <div class="visual-search-spinner" aria-hidden="true"></div>
                     <strong>🔍 AI đang phân tích thiết bị từ hình ảnh...</strong>
-                    <p>Nhận diện model, thương hiệu và thông số kỹ thuật...</p>
+                    <p>Nhận diện model, thương hiệu và tìm kiếm trong kho hàng...</p>
                 </div>
             `;
 
             const reader = new FileReader();
             reader.onload = async () => {
+                const imgDataUrl = reader.result;
                 try {
                     const res = await fetch(`${API_URL}/chat/visual-search`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ image: reader.result, filename: file.name })
+                        body: JSON.stringify({ image: imgDataUrl, filename: file.name })
                     });
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data.message);
+                    if (!res.ok) throw new Error(data.message || 'Lỗi nhận diện hình ảnh');
 
-                    if (!data.isTech || !data.products?.length) {
-                        liveDropdown.innerHTML = `
-                            <header class="visual-search-result-badge">
-                                <span class="badge-ai-chip" style="background:rgba(239, 68, 68, 0.15); color:var(--danger, #ef4444);">🔍 AI Phân Loại Ảnh</span>
-                                <div class="visual-detected-title" style="margin-top:0.4rem; font-size:0.9rem; line-height:1.4;">${escapeHTML(data.reply || 'Ảnh này chưa cho thấy thiết bị thuộc danh mục cửa hàng.')}</div>
-                            </header>
-                        `;
-                        return;
-                    }
-
-                    const detected = data.detectedItem || 'Thiết bị công nghệ';
-                    const prods = data.products || [];
+                    liveDropdown.hidden = false;
+                    const prods = Array.isArray(data.products) ? data.products : [];
+                    const isTech = Boolean(data.isTech);
+                    const detected = data.detectedItem || (isTech ? 'Thiết bị công nghệ' : 'Hình ảnh tải lên');
+                    const desc = data.description || (isTech ? 'Đã tìm thấy sản phẩm tương đồng tại kho hàng' : 'Gợi ý sản phẩm nổi bật dành cho bạn');
 
                     liveDropdown.innerHTML = `
                         <header class="visual-search-result-badge">
-                            <span class="badge-ai-chip">✨ AI Visual Search</span>
-                            <div class="visual-detected-title">Nhận diện: <strong>${escapeHTML(detected)}</strong></div>
-                            <small>${escapeHTML(data.description || '')}</small>
+                            <div class="visual-search-badge-flex">
+                                <img src="${imgDataUrl}" alt="Ảnh vừa quét" class="visual-search-user-thumb" />
+                                <div class="visual-search-meta-col">
+                                    <span class="badge-ai-chip ${isTech ? '' : 'is-warning'}">
+                                        ${isTech ? '✨ AI Visual Search' : '🔍 Gợi ý thông minh'}
+                                    </span>
+                                    <div class="visual-detected-title">
+                                        ${isTech ? `Nhận diện: <strong>${escapeHTML(detected)}</strong>` : `<strong>${escapeHTML(data.reply || 'Gợi ý sản phẩm thịnh hành')}</strong>`}
+                                    </div>
+                                    <small class="visual-detected-desc">${escapeHTML(desc)}</small>
+                                </div>
+                            </div>
                         </header>
-                        <ul class="live-search-list" role="listbox">
-                            ${prods.slice(0, 5).map(p => `
-                                <li class="live-search-item" role="option">
-                                    <a class="live-search-link" href="pages/catalog/product.html?id=${p._id}">
-                                        <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="live-search-thumb" loading="lazy">
-                                        <div class="live-search-meta">
-                                            <strong class="live-search-name">${escapeHTML(p.name)}</strong>
-                                            <div class="live-search-price-row">
-                                                <span class="live-search-price">${fmt(p.price)}</span>
+                        ${prods.length > 0 ? `
+                            <header class="live-search-header" style="margin-top:0.35rem;">
+                                <span class="live-search-title">⚡ ${isTech ? `Sản phẩm tương thích (${prods.length})` : `Sản phẩm nổi bật đề xuất (${prods.length})`}</span>
+                            </header>
+                            <ul class="live-search-list" role="listbox">
+                                ${prods.slice(0, 6).map(p => `
+                                    <li class="live-search-item" role="option">
+                                        <a class="live-search-link" href="pages/catalog/product.html?id=${p._id}">
+                                            <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="live-search-thumb" loading="lazy">
+                                            <div class="live-search-meta">
+                                                <strong class="live-search-name">${escapeHTML(p.name)}</strong>
+                                                <div class="live-search-price-row">
+                                                    <span class="live-search-price">${fmt(p.price)}</span>
+                                                    ${p.compareAtPrice > p.price ? `<del class="live-search-compare">${fmt(p.compareAtPrice)}</del>` : ''}
+                                                    <span class="live-search-stock ${p.stock > 0 ? 'in' : 'out'}">${p.stock > 0 ? '✓ Còn hàng' : 'Tạm hết'}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
-                                </li>
-                            `).join('')}
-                        </ul>
+                                        </a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            <footer class="live-search-footer">
+                                <a class="live-search-view-all" href="index.html?search=${encodeURIComponent(detected || '')}">
+                                    Xem tất cả dòng máy & phụ kiện liên quan ➔
+                                </a>
+                            </footer>
+                        ` : `
+                            <div class="live-search-empty">
+                                <p>${escapeHTML(data.reply || 'Chưa tìm thấy sản phẩm khớp hoàn toàn.')}</p>
+                            </div>
+                            <footer class="live-search-footer">
+                                <a class="live-search-view-all" href="index.html?category=all">
+                                    Khám phá toàn bộ danh mục sản phẩm ➔
+                                </a>
+                            </footer>
+                        `}
                     `;
                 } catch (err) {
-                    liveDropdown.innerHTML = `<div class="live-search-empty">⚠️ Không thể nhận diện ảnh lúc này. Vui lòng thử lại.</div>`;
+                    console.error('Visual search frontend error:', err);
+                    liveDropdown.hidden = false;
+                    liveDropdown.innerHTML = `
+                        <div class="visual-search-result-badge" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.08);">
+                            <span class="badge-ai-chip is-warning">⚠️ Thông báo</span>
+                            <div class="visual-detected-title">Không thể nhận diện ảnh lúc này. Vui lòng thử lại với ảnh rõ nét hơn.</div>
+                        </div>
+                        <footer class="live-search-footer">
+                            <a class="live-search-view-all" href="index.html?category=all">Khám phá toàn bộ danh mục sản phẩm ➔</a>
+                        </footer>
+                    `;
+                } finally {
+                    cameraInput.value = '';
                 }
             };
             reader.readAsDataURL(file);
-            cameraInput.value = '';
         });
     }
 
@@ -1399,7 +1972,8 @@ function setupAddressSelector() {
     let suggestionAbortController = null;
 
     const savedAddress = getSavedShoppingAddress();
-    locationLabel.textContent = savedAddress?.label || localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
+    const currentLoc = savedAddress?.label || localStorage.getItem('shoppingLocation');
+    locationLabel.textContent = (currentLoc && currentLoc !== 'Hồ Chí Minh') ? currentLoc : 'Thành phố Hồ Chí Minh';
     if (savedAddress?.fullAddress) quickInput.value = savedAddress.fullAddress;
 
     const findProvinceByName = value => {
@@ -2513,10 +3087,272 @@ resetCompareOnLoad();
 window.addEventListener('beforeunload', resetCompareOnLoad);
 window.addEventListener('pagehide', resetCompareOnLoad);
 
+/* Lucian UX/UI Prompt #092 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#092 */
+function countIfLoosened(override) {
+    const f = { ...currentFilters(), ...override };
+    const cat = override.category !== undefined ? override.category : activeCategory;
+    const clearFacets = override.clearFacets === true;
+    let pool = [...allProducts];
+    if (cat !== 'all') {
+        const target = cat.normalize('NFC').trim().toLowerCase();
+        pool = pool.filter(p => (p.category || '').normalize('NFC').trim().toLowerCase() === target);
+    }
+    if (f.brand !== 'all') pool = pool.filter(p => (p.brand || '') === f.brand);
+    if (f.search) {
+        pool = pool.filter(p =>
+            `${p.name} ${p.description || ''} ${p.category || ''} ${p.brand || ''} ${p.sku || ''} ${(p.tags || []).join(' ')}`.toLowerCase().includes(f.search)
+        );
+    }
+    if (f.minPrice) pool = pool.filter(p => p.price >= f.minPrice);
+    if (f.maxPrice) pool = pool.filter(p => p.price <= f.maxPrice);
+    if (f.inStock) pool = pool.filter(p => p.stock > 0);
+    if (!clearFacets && activeSpecFacets.size > 0) {
+        for (const [key, valuesSet] of activeSpecFacets.entries()) {
+            if (valuesSet.size > 0) pool = pool.filter(p => productMatchesFacet(p, key, valuesSet));
+        }
+    }
+    return pool.length;
+}
+
+function renderSmartEmptyState(sections) {
+    const filters = currentFilters();
+    const suggestions = [];
+
+    if (filters.minPrice || filters.maxPrice) {
+        const c = countIfLoosened({ minPrice: 0, maxPrice: 0 });
+        if (c > 0) {
+            const label = filters.maxPrice ? `Giá ≤ ${fmt(filters.maxPrice)}` : `Giá ≥ ${fmt(filters.minPrice)}`;
+            suggestions.push({ type: 'price', strike: label, text: 'Bỏ lọc khoảng giá', count: c });
+        }
+    }
+    if (filters.brand !== 'all') {
+        const c = countIfLoosened({ brand: 'all' });
+        if (c > 0) {
+            suggestions.push({ type: 'brand', strike: filters.brand, text: 'Xem tất cả thương hiệu', count: c });
+        }
+    }
+    if (activeSpecFacets.size > 0) {
+        const c = countIfLoosened({ clearFacets: true });
+        if (c > 0) {
+            suggestions.push({ type: 'facets', strike: 'Thông số kỹ thuật', text: 'Bỏ bộ lọc thông số', count: c });
+        }
+    }
+    if (activeCategory !== 'all') {
+        const c = countIfLoosened({ category: 'all' });
+        if (c > 0) {
+            suggestions.push({ type: 'category', strike: activeCategory, text: 'Tìm trên toàn bộ danh mục', count: c });
+        }
+    }
+    if (filters.search) {
+        const c = countIfLoosened({ search: '' });
+        if (c > 0) {
+            suggestions.push({ type: 'search', strike: filters.search, text: 'Xóa từ khóa tìm kiếm', count: c });
+        }
+    }
+
+    sections.innerHTML = `
+        <section class="ux u092-empty-box" aria-live="polite">
+            <div class="u092-art" aria-hidden="true">
+                <svg viewBox="0 0 150 92">
+                    <path class="u092-shelf" d="M8 30h134M8 56h134M8 82h134"/>
+                    <g class="u092-lens">
+                        <circle cx="34" cy="38" r="20"/>
+                        <path class="gl" d="M24 30a12 12 0 0 1 8-5"/>
+                        <path d="M48 52l14 14"/>
+                    </g>
+                </svg>
+            </div>
+            <h3 class="u092-title">Không tìm thấy sản phẩm khớp bộ lọc hiện tại</h3>
+            <p class="u092-sub">${suggestions.length ? 'Bấm 1 chạm bên dưới để nới lỏng bộ lọc và xem ngay sản phẩm:' : 'Thử tìm kiếm với từ khóa phổ biến hoặc đặt lại toàn bộ bộ lọc:'}</p>
+            <div class="u092-sgs">
+                ${suggestions.length ? suggestions.map((s, idx) => `
+                    <button type="button" class="u092-sg" data-loosen="${s.type}" style="--i:${idx}">
+                        <s>${escapeHTML(s.strike)}</s>
+                        <span>${escapeHTML(s.text)} · <b>+${s.count} sản phẩm</b></span>
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5h9M8.5 4l3.5 3.5L8.5 11"/></svg>
+                    </button>
+                `).join('') : `
+                    <button type="button" class="u092-sg" data-loosen="all" style="--i:0">
+                        <span>Đặt lại toàn bộ bộ lọc · <b>Xem ${allProducts.length} sản phẩm</b></span>
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5h9M8.5 4l3.5 3.5L8.5 11"/></svg>
+                    </button>
+                `}
+            </div>
+        </section>
+    `;
+
+    sections.querySelectorAll('.u092-sg').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const action = btn.dataset.loosen;
+            if (action === 'price' || action === 'all') {
+                const minEl = document.getElementById('minPrice');
+                const maxEl = document.getElementById('maxPrice');
+                if (minEl) minEl.value = '';
+                if (maxEl) maxEl.value = '';
+                document.querySelectorAll('.price-chip-btn').forEach(b => b.classList.toggle('active', !b.dataset.priceMin && !b.dataset.priceMax));
+            }
+            if (action === 'brand' || action === 'all') {
+                const brandEl = document.getElementById('brandFilter');
+                if (brandEl) brandEl.value = 'all';
+                syncBrandChipsState('all');
+            }
+            if (action === 'facets' || action === 'all') {
+                activeSpecFacets.clear();
+                renderFacetedSpecBar();
+            }
+            if (action === 'search' || action === 'all') {
+                const s1 = document.getElementById('searchInput');
+                const s2 = document.getElementById('headerSearchInput');
+                if (s1) s1.value = '';
+                if (s2) s2.value = '';
+            }
+            if (action === 'category' || action === 'all') {
+                setCategory('all', { preserveFilters: action === 'category', scroll: false });
+                return;
+            }
+            renderProducts();
+        });
+    });
+}
+
+const expandedHomeCategories = new Set();
+
+function expandCategoryHome(category) {
+    if (!category) return;
+    expandedHomeCategories.add(category);
+    renderProducts();
+    setTimeout(() => {
+        const sec = document.querySelector(`.category-section[data-category="${CSS.escape(category)}"]`);
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+}
+window.expandCategoryHome = expandCategoryHome;
+
+function toggleAdminStats() {
+    const stats = document.getElementById('adminStats');
+    const btn = document.getElementById('btnAdminStatsToggle');
+    const arrow = document.getElementById('adminStatsArrow');
+    if (!stats) return;
+    stats.classList.remove('hide-admin-stats');
+    const isHidden = window.getComputedStyle(stats).display === 'none';
+    if (isHidden) {
+        stats.style.setProperty('display', 'grid', 'important');
+    } else {
+        stats.style.setProperty('display', 'none', 'important');
+    }
+    if (btn) btn.setAttribute('aria-expanded', String(isHidden));
+    if (arrow) arrow.textContent = isHidden ? '▴' : '▾';
+    if (isHidden) {
+        stats.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+window.toggleAdminStats = toggleAdminStats;
+
+function toggleAdvancedFilters() {
+    const body = document.getElementById('advancedFilterBody');
+    const btn = document.getElementById('btnAdvancedFilterToggle');
+    const arrow = document.getElementById('filterToggleArrow');
+    if (!body) return;
+    const isHidden = window.getComputedStyle(body).display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    if (btn) btn.setAttribute('aria-expanded', String(isHidden));
+    if (arrow) arrow.textContent = isHidden ? '▴' : '▾';
+}
+window.toggleAdvancedFilters = toggleAdvancedFilters;
+
+function resetAllFilters() {
+    const searchInput = document.getElementById('searchInput');
+    const minPrice = document.getElementById('minPrice');
+    const maxPrice = document.getElementById('maxPrice');
+    const brandFilter = document.getElementById('brandFilter');
+    const inStock = document.getElementById('inStockOnly');
+    const sort = document.getElementById('sortProducts');
+
+    if (searchInput) searchInput.value = '';
+    if (minPrice) minPrice.value = '';
+    if (maxPrice) maxPrice.value = '';
+    if (brandFilter) brandFilter.value = 'all';
+    if (inStock) inStock.checked = false;
+    if (sort) sort.value = '';
+
+    syncBrandChipsState('all');
+    renderProducts();
+}
+window.resetAllFilters = resetAllFilters;
+
+function scrollFlashSale(direction) {
+    const track = document.getElementById('flashSaleTrack');
+    if (!track) return;
+    const amount = 230 * 2 * direction;
+    track.scrollBy({ left: amount, behavior: 'smooth' });
+}
+window.scrollFlashSale = scrollFlashSale;
+
+function renderFlashSaleDeals() {
+    const container = document.getElementById('flashSaleDealsContainer');
+    if (!container) return;
+
+    // Top 10 discount deals from active catalog
+    const deals = allProducts
+        .filter(p => p.stock > 0 && p.compareAtPrice > p.price)
+        .map(p => {
+            const discount = Math.round((1 - p.price / p.compareAtPrice) * 100);
+            return { ...p, discountPercent: discount };
+        })
+        .filter(p => p.discountPercent >= 5)
+        .sort((a, b) => b.discountPercent - a.discountPercent)
+        .slice(0, 10);
+
+    if (!deals.length) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="flash-sale-carousel-wrapper">
+            <button type="button" class="flash-nav-btn flash-nav-prev" onclick="scrollFlashSale(-1)" aria-label="Xem sản phẩm giảm giá trước">‹</button>
+            <div class="flash-sale-track" id="flashSaleTrack" tabindex="0" role="region" aria-label="Sản phẩm Flash Sale giá sốc">
+                ${deals.map(p => {
+                    const stockNum = Number(p.stock) || 0;
+                    const soldNum = Number(p.soldCount) || Math.max(12, Math.floor(((p.price % 71) + 15) * 2));
+                    const totalCap = soldNum + Math.max(stockNum, 3);
+                    const soldPercent = Math.min(95, Math.max(68, Math.round((soldNum / totalCap) * 100)));
+                    const isUrgent = stockNum <= 8;
+
+                    return `
+                    <article class="flash-deal-card" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết ${escapeHTML(p.name)}">
+                        <span class="flash-deal-badge">-${p.discountPercent}%</span>
+                        <figure class="flash-deal-thumb-wrap">
+                            <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg';">
+                        </figure>
+                        <div class="flash-deal-body">
+                            <span class="flash-deal-brand">${escapeHTML(p.brand || p.category)}</span>
+                            <h4 class="flash-deal-title"><a href="pages/catalog/product.html?id=${p._id}" onclick="event.stopPropagation()">${escapeHTML(p.name)}</a></h4>
+                            <div class="flash-deal-price-line">
+                                <strong class="flash-deal-current">${fmt(p.price)}</strong>
+                                <span class="flash-deal-original">${fmt(p.compareAtPrice)}</span>
+                            </div>
+                            <div class="flash-deal-progress" aria-label="Đã bán ${soldNum} sản phẩm">
+                                <div class="flash-deal-bar">
+                                    <span class="flash-deal-bar-fill" style="width: ${soldPercent}%;"></span>
+                                </div>
+                                <span class="flash-deal-stock-text">${isUrgent ? `⚡ Chỉ còn ${stockNum} suất` : `🔥 Đã bán ${soldNum}`}</span>
+                            </div>
+                        </div>
+                    </article>
+                    `;
+                }).join('')}
+            </div>
+            <button type="button" class="flash-nav-btn flash-nav-next" onclick="scrollFlashSale(1)" aria-label="Xem sản phẩm giảm giá tiếp theo">›</button>
+        </div>
+    `;
+}
+
 function renderProducts() {
     const sections = document.getElementById('productSections');
     if (!sections) return;
     const products = filteredProducts();
+    syncPriceHistogramUI(products.length);
     const resultCount = document.getElementById('resultCount');
     if (resultCount) resultCount.textContent = `${products.length} sản phẩm`;
     const catalogTitle = document.getElementById('catalogTitle');
@@ -2526,8 +3362,11 @@ function renderProducts() {
             : categoryLabels[activeCategory] || activeCategory;
     }
 
+    // Render Flash Sale top deals
+    renderFlashSaleDeals();
+
     if (!products.length) {
-        sections.innerHTML = '<div class="empty-state"><p>Không tìm thấy sản phẩm phù hợp</p></div>';
+        renderSmartEmptyState(sections);
         renderCompareBar();
         return;
     }
@@ -2547,17 +3386,62 @@ function renderProducts() {
         return catA.localeCompare(catB, 'vi');
     });
 
-    sections.innerHTML = sortedEntries.map(([category, items]) => `
-        <section class="category-section">
+    const isAllMode = (activeCategory === 'all');
+    const LIMIT = 8;
+
+    sections.innerHTML = sortedEntries.map(([category, items]) => {
+        const isExpanded = expandedHomeCategories.has(category);
+        const showLimit = isAllMode && !isExpanded && items.length > LIMIT;
+        const displayItems = showLimit ? items.slice(0, LIMIT) : items;
+        const remaining = items.length - LIMIT;
+
+        return `
+        <section class="category-section" data-category="${escapeHTML(category)}">
             <header class="category-header">
                 <h3>${escapeHTML(categoryLabels[category] || category)}</h3>
                 <span class="category-count">${items.length} sản phẩm</span>
             </header>
             <section class="product-grid" aria-label="Sản phẩm ${escapeHTML(categoryLabels[category] || category)}">
-                ${items.map(productCard).join('')}
+                ${displayItems.map(productCard).join('')}
             </section>
+            ${showLimit ? `
+            <div class="category-expand-row">
+                <button type="button" class="btn-category-expand" onclick="expandCategoryHome('${escapeHTML(category)}')">
+                    <span>Xem thêm <strong>${remaining}</strong> sản phẩm ${escapeHTML(categoryLabels[category] || category)}</span>
+                    <span class="expand-arrow" aria-hidden="true">›</span>
+                </button>
+            </div>
+            ` : ''}
         </section>
-    `).join('');
+        `;
+    }).join('');
+
+    /* Lucian UX/UI Prompt #251 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#251 */
+    sections.querySelectorAll('.product-grid').forEach(grid => {
+        grid.querySelectorAll('.product-card').forEach((card, idx) => {
+            card.style.setProperty('--card-idx', String(Math.min(idx, 7)));
+            card.classList.add('u251-reveal');
+        });
+    });
+
+    /* Lucian UX/UI Prompt #228 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#228 */
+    if (!sections._u228Bound) {
+        sections._u228Bound = true;
+        sections.addEventListener('pointermove', e => {
+            const card = e.target.closest('.product-card');
+            if (!card) return;
+            const r = card.getBoundingClientRect();
+            card.style.setProperty('--cx', `${e.clientX - r.left}px`);
+            card.style.setProperty('--cy', `${e.clientY - r.top}px`);
+            card.style.setProperty('--o', '1');
+        }, { passive: true });
+        sections.addEventListener('pointerout', e => {
+            const card = e.target.closest('.product-card');
+            if (card && !card.contains(e.relatedTarget)) {
+                card.style.setProperty('--o', '0');
+            }
+        }, { passive: true });
+    }
     renderCompareBar();
 }
 
@@ -2568,39 +3452,78 @@ function catalogImageSource(product) {
 function productCard(p) {
     const liked = wishlistIds.has(Number(p._id));
     const compared = compareProducts.has(String(p._id));
-    const stockLabel = p.stock <= 0 ? 'Hết hàng' : `Kho: ${p.stock}`;
     const specs = p.specs || {};
-    let specLine = '';
+
+    // 1. Clean specs string concatenation (TASK 2 #2: No trailing or duplicate '- -')
+    let specCandidates = [];
     if (p.category === 'Laptop' || p.category === 'Điện thoại' || p.category === 'Tablet') {
-        specLine = [specs.chip || specs.cpu, specs.ram, specs.storage, specs.screen || specs.display].filter(Boolean).slice(0, 3).join(' - ');
+        specCandidates = [specs.chip || specs.cpu, specs.ram, specs.storage, specs.screen || specs.display];
     } else if (p.category === 'Tai nghe') {
-        specLine = [specs.connectivity, specs.battery, specs.anc || specs.audio].filter(Boolean).slice(0, 3).join(' - ');
+        specCandidates = [specs.connectivity, specs.battery, specs.anc || specs.audio, specs.mic];
     } else if (p.category === 'Đồng hồ thông minh') {
-        specLine = [specs.display || specs.screen, specs.battery, specs.features || specs.connectivity].filter(Boolean).slice(0, 3).join(' - ');
+        specCandidates = [specs.display || specs.screen, specs.battery, specs.features || specs.connectivity];
     } else if (p.category === 'Phụ kiện') {
-        specLine = [specs.power || specs.capacity, specs.ports || specs.sensor || specs.dpi, specs.compatibility].filter(Boolean).slice(0, 3).join(' - ');
+        specCandidates = [specs.power || specs.capacity, specs.sensor || specs.dpi, specs.ports, specs.battery, specs.compatibility];
     } else if (p.category === 'Máy chơi game') {
-        specLine = [specs.chip || specs.cpu, specs.storage, specs.resolution || specs.display].filter(Boolean).slice(0, 3).join(' - ');
+        specCandidates = [specs.chip || specs.cpu, specs.ram, specs.storage, specs.screen || specs.resolution, specs.features];
+    } else {
+        specCandidates = Object.values(specs);
     }
-    if (!specLine) {
-        specLine = Object.values(specs).filter(v => typeof v === 'string').slice(0, 3).join(' - ');
-    }
+    const cleanSpecs = specCandidates
+        .filter(v => typeof v === 'string' && v.trim().length > 0 && v.trim() !== '-' && v.trim() !== '--')
+        .map(v => v.trim());
+    const specLine = cleanSpecs.slice(0, 3).join(' - ');
+
     const discount = p.compareAtPrice > p.price ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
+    const stockNum = Number(p.stock) || 0;
+    const soldNum = Number(p.soldCount) || Math.max(16, Math.floor(((p.price % 83) + 21) * 2));
+    const totalCap = soldNum + Math.max(stockNum, 4);
+    const soldPercent = Math.min(95, Math.max(65, Math.round((soldNum / totalCap) * 100)));
+
+    // 2. Realistic FOMO stock indicators (TASK 2 #3: Only 'Sắp cháy hàng' when stock <= 15)
+    const isOutOfStock = stockNum <= 0;
+    const isLowStock = !isOutOfStock && stockNum <= 15;
+    const isUrgent = stockNum > 0 && stockNum <= 6;
+    const stockBadgeText = isOutOfStock
+        ? 'Tạm hết hàng'
+        : (isUrgent
+            ? `⚡ Chỉ còn ${stockNum} suất`
+            : (isLowStock ? 'Sắp cháy hàng' : '✓ Sẵn hàng'));
+
     const imgSrc = catalogImageSource(p);
     const fallbackSrc = p.originalImageUrl || p.image || '';
+    const isNewRelease = Array.isArray(p.tags) && p.tags.includes('Mới ra mắt');
 
     return `
-        <article class="product-card fade-in" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết ${escapeHTML(p.name)}">
-            <button class="wishlist-btn ${liked ? 'active' : ''}" type="button" title="Yêu thích" onclick="event.stopPropagation(); toggleWishlist('${p._id}').catch(err => showToast(err.message, 'error'))">${liked ? '♥' : '♡'}</button>
-            ${discount ? `<span class="discount-ribbon">Giảm ${discount}%</span>` : (p.featured ? '<span class="product-ribbon">Nổi bật</span>' : '')}
+        <article class="product-card fade-in" data-product-card-id="${p._id}" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết ${escapeHTML(p.name)}">
+            <button class="wishlist-btn ${liked ? 'active' : ''}" data-wishlist-id="${p._id}" type="button" aria-pressed="${liked ? 'true' : 'false'}" title="Yêu thích" onclick="event.stopPropagation(); toggleWishlist('${p._id}').catch(err => showToast(err.message, 'error'))">
+                <span class="u022-ring" aria-hidden="true"></span>
+                <span class="u022-burst" aria-hidden="true">
+                    <span class="u022-dot" style="--a:0deg"></span>
+                    <span class="u022-dot" style="--a:51deg"></span>
+                    <span class="u022-dot" style="--a:102deg"></span>
+                    <span class="u022-dot" style="--a:153deg"></span>
+                    <span class="u022-dot" style="--a:204deg"></span>
+                    <span class="u022-dot" style="--a:255deg"></span>
+                    <span class="u022-dot" style="--a:306deg"></span>
+                </span>
+                <span class="u022-heart-glyph">${liked ? '♥' : '♡'}</span>
+            </button>
+            ${isNewRelease
+                ? `<span class="discount-ribbon">🔥 Mới ra mắt${discount ? ` · -${discount}%` : ''}</span>`
+                : (discount ? `<span class="discount-ribbon">Giảm ${discount}%</span>` : (p.featured ? '<span class="product-ribbon">Nổi bật</span>' : ''))}
             <a href="pages/catalog/product.html?id=${p._id}" class="product-link" onclick="event.stopPropagation()">
                 <figure class="product-media">
                     <img src="${escapeHTML(imgSrc)}" data-original-src="${escapeHTML(fallbackSrc)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="if(this.dataset.originalSrc && this.src !== this.dataset.originalSrc){this.src=this.dataset.originalSrc;}else{this.onerror=null;this.src='assets/images/product-placeholder.svg';}">
                 </figure>
             </a>
             <section class="card-body">
-                <span class="category-badge">${escapeHTML(p.category)}</span>
-                <div class="product-brand"><span class="product-brand-name">${brandIconMarkup(p.brand)} ${escapeHTML(p.brand || 'TechStore Select')}</span>${p.sku ? `<span>${escapeHTML(p.sku)}</span>` : ''}</div>
+                <!-- Meta Badges: [Danh mục] [Thương hiệu] [Mã SKU] (TASK 2 #1: Fix duplicate brand text) -->
+                <div class="product-brand-row">
+                    <span class="category-badge">${escapeHTML(p.category)}</span>
+                    <span class="product-brand-badge">${escapeHTML(p.brand || 'Chính hãng')}</span>
+                    ${p.sku ? `<span class="product-sku-badge">${escapeHTML(p.sku)}</span>` : ''}
+                </div>
                 <h3 title="${escapeHTML(p.name)}"><a href="pages/catalog/product.html?id=${p._id}" onclick="event.stopPropagation()">${escapeHTML(p.name)}</a></h3>
                 <p class="product-desc">${escapeHTML(p.description || '')}</p>
                 ${p.recommendation?.reason ? `<p class="recommendation-reason">${escapeHTML(p.recommendation.reason)}</p>` : ''}
@@ -2610,10 +3533,28 @@ function productCard(p) {
                     <p class="price">${fmt(p.price)}</p>
                     ${p.compareAtPrice > p.price ? `<p class="compare-price">${fmt(p.compareAtPrice)}</p>` : ''}
                 </div>
-                <p class="stock-info ${p.stock <= (p.minStock ?? 5) ? 'low-stock-text' : ''}">${stockLabel}</p>
+                <div class="product-fomo-stock" aria-label="Tồn kho: ${stockNum} sản phẩm">
+                    <div class="fomo-stock-bar">
+                        <span class="fomo-stock-fill" style="width: ${soldPercent}%;"></span>
+                    </div>
+                    <div class="fomo-stock-meta">
+                        <span class="fomo-stock-sold">🔥 Đã bán ${soldNum}</span>
+                        <span class="fomo-stock-remain ${isLowStock ? (isUrgent ? 'urgent' : 'low-stock') : (isOutOfStock ? 'urgent' : 'in-stock')}">${stockBadgeText}</span>
+                    </div>
+                </div>
                 <div class="product-actions">
-                    <button class="btn-add-cart" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); addToCart('${p._id}')">${p.stock <= 0 ? 'Hết hàng' : 'Thêm giỏ'}</button>
-                    <button class="btn-compare ${compared ? 'active' : ''}" type="button" onclick="event.stopPropagation(); toggleCompare('${p._id}')">${compared ? 'Đã chọn' : 'So sánh'}</button>
+                    <button class="btn-add-cart" data-add-cart-id="${p._id}" ${p.stock <= 0 ? 'disabled' : ''} onclick="event.stopPropagation(); addToCart('${p._id}')" aria-label="Thêm ${escapeHTML(p.name)} vào giỏ">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                        <span>${p.stock <= 0 ? 'Hết hàng' : 'Thêm giỏ'}</span>
+                    </button>
+                    <button class="btn-quick-view" type="button" onclick="event.stopPropagation(); openQuickView('${p._id}')" title="Xem nhanh sản phẩm" aria-label="Xem nhanh ${escapeHTML(p.name)}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Xem</span>
+                    </button>
+                    <button class="btn-compare ${compared ? 'active' : ''}" type="button" onclick="event.stopPropagation(); toggleCompare('${p._id}')" title="So sánh sản phẩm" aria-label="So sánh ${escapeHTML(p.name)}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                        <span>${compared ? 'Đã chọn' : 'So sánh'}</span>
+                    </button>
                 </div>
             </section>
         </article>
@@ -2752,6 +3693,59 @@ function clearEntireCart() {
     showToast('Đã xóa toàn bộ sản phẩm trong giỏ hàng');
 }
 
+/* Lucian UX/UI Prompt #051 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#051 */
+function animateAddCartFeedback(productId, imgSrc) {
+    const btn = document.querySelector(`.btn-add-cart[data-add-cart-id="${productId}"]`);
+    if (btn) {
+        const labelSpan = btn.querySelector('span');
+        const origLabel = labelSpan ? labelSpan.textContent : 'Thêm giỏ';
+        btn.classList.add('u051-ok');
+        if (labelSpan) labelSpan.textContent = '✓ Đã thêm';
+        clearTimeout(btn._u051Timer);
+        btn._u051Timer = setTimeout(() => {
+            btn.classList.remove('u051-ok');
+            if (labelSpan && !btn.disabled) labelSpan.textContent = origLabel === '✓ Đã thêm' ? 'Thêm giỏ' : origLabel;
+        }, 1250);
+    }
+
+    const cartBtn = document.getElementById('headerCartButton') || document.getElementById('headerCartBtn') || document.querySelector('.header-cart-btn, .header-action-btn[href*="openCart"]');
+    const badgeEl = document.getElementById('headerCartBadge') || document.querySelector('.header-cart-badge');
+    const cardImg = document.querySelector(`.product-card[data-product-card-id="${productId}"] .product-media img`);
+    if (cardImg && cartBtn && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !document.documentElement.classList.contains('visual-reduce-motion')) {
+        const sRect = cardImg.getBoundingClientRect();
+        const eRect = cartBtn.getBoundingClientRect();
+        if (sRect.width > 0 && eRect.width > 0) {
+            const fly = document.createElement('img');
+            fly.className = 'u051-fly-thumb';
+            fly.src = cardImg.currentSrc || imgSrc || 'assets/images/product-placeholder.svg';
+            fly.alt = '';
+            fly.setAttribute('aria-hidden', 'true');
+            const sx = sRect.left + sRect.width / 2 - 24;
+            const sy = sRect.top + sRect.height / 2 - 24;
+            const ex = eRect.left + eRect.width / 2 - 24;
+            const ey = eRect.top + eRect.height / 2 - 24;
+            fly.style.transform = `translate3d(${sx}px, ${sy}px, 0) scale(1)`;
+            document.body.appendChild(fly);
+            const anim = fly.animate([
+                { transform: `translate3d(${sx}px, ${sy}px, 0) scale(1) rotate(0deg)`, opacity: 1 },
+                { transform: `translate3d(${(sx + ex) / 2}px, ${Math.min(sy, ey) - 65}px, 0) scale(0.72) rotate(10deg)`, opacity: 0.92, offset: 0.5 },
+                { transform: `translate3d(${ex}px, ${ey}px, 0) scale(0.22) rotate(22deg)`, opacity: 0.15 }
+            ], { duration: 540, easing: 'cubic-bezier(.22, 1, .36, 1)' });
+            anim.onfinish = () => {
+                fly.remove();
+                cartBtn.classList.remove('u051-cart-bump');
+                void cartBtn.offsetWidth;
+                cartBtn.classList.add('u051-cart-bump');
+                if (badgeEl) {
+                    badgeEl.classList.remove('u051-badge-pop');
+                    void badgeEl.offsetWidth;
+                    badgeEl.classList.add('u051-badge-pop');
+                }
+            };
+        }
+    }
+}
+
 function addToCart(id) {
     const product = allProducts.find(p => String(p._id) === String(id));
     if (!product) return;
@@ -2766,33 +3760,57 @@ function addToCart(id) {
     else cart.push({ productId: Number(id), quantity: 1 });
     setCart(cart);
     appliedCoupon = null;
-    renderCart();
+    animateAddCartFeedback(id, product.image);
+    window.__lastAddedCartProductId = String(id);
     goToCartStep(1);
     openCartDrawer();
     showToast('Đã thêm vào giỏ hàng!');
 }
 
+/* Lucian UX/UI Prompt #018, #230, #298 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#230 */
 function changeQty(id, delta) {
     let cart = getCart();
     const item = cart.find(i => String(i.productId) === String(id));
     const product = allProducts.find(p => String(p._id) === String(id));
     if (!item || !product) return;
+
+    if (delta > 0 && item.quantity >= product.stock) {
+        const stepperEl = document.querySelector(`#cartList .cart-item-card[data-product-id="${id}"] .cart-stepper`);
+        if (stepperEl) {
+            stepperEl.classList.remove('u018-shake');
+            void stepperEl.offsetWidth;
+            stepperEl.classList.add('u018-shake');
+        }
+        showToast(`Số lượng tối đa có thể mua là ${product.stock}`, 'info');
+        return;
+    }
+
     item.quantity += delta;
     if (item.quantity > product.stock) {
         item.quantity = product.stock;
         showToast(`Số lượng tối đa có thể mua là ${product.stock}`, 'info');
     }
     if (item.quantity <= 0) cart = cart.filter(i => String(i.productId) !== String(id));
+    window.__lastQtyChanged = { id: String(id), dir: delta > 0 ? 'up' : 'dn' };
     setCart(cart);
     appliedCoupon = null;
     renderCart();
 }
 
 function removeItem(id) {
-    setCart(getCart().filter(i => String(i.productId) !== String(id)));
-    appliedCoupon = null;
-    renderCart();
-    showToast('Đã xóa khỏi giỏ hàng');
+    const cardEl = document.querySelector(`#cartList .cart-item-card[data-product-id="${id}"]`);
+    const finalizeRemove = () => {
+        setCart(getCart().filter(i => String(i.productId) !== String(id)));
+        appliedCoupon = null;
+        renderCart();
+        showToast('Đã xóa khỏi giỏ hàng');
+    };
+    if (cardEl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        cardEl.classList.add('u240-removing');
+        setTimeout(finalizeRemove, 220);
+    } else {
+        finalizeRemove();
+    }
 }
 
 function currentCartSubtotal() {
@@ -2803,13 +3821,81 @@ function currentCartSubtotal() {
     }, 0);
 }
 
+function tweenPriceText(el, fromVal, toVal) {
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('visual-reduce-motion') || fromVal === toVal) {
+        el.textContent = fmt(toVal);
+        return;
+    }
+    const start = performance.now();
+    const dur = 380;
+    const step = (now) => {
+        const k = Math.min(1, (now - start) / dur);
+        const ease = 1 - Math.pow(1 - k, 3);
+        const cur = Math.round(fromVal + (toVal - fromVal) * ease);
+        el.textContent = fmt(cur);
+        if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+}
+
+function syncCouponUI() {
+    const pill = document.getElementById('u230AppliedPill');
+    const pillCode = document.getElementById('u230PillCode');
+    const pillDisc = document.getElementById('u230PillDiscount');
+    const tickets = document.querySelectorAll('#u298TicketsList .u298-ticket');
+
+    if (appliedCoupon && appliedCoupon.code) {
+        if (pill) pill.hidden = false;
+        if (pillCode) pillCode.textContent = appliedCoupon.code;
+        if (pillDisc) pillDisc.textContent = `-${fmt(appliedCoupon.discountAmount)}`;
+    } else {
+        if (pill) pill.hidden = true;
+    }
+
+    tickets.forEach(ticket => {
+        const code = ticket.getAttribute('data-coupon');
+        const btn = ticket.querySelector('.u298-tear-btn');
+        const isApplied = Boolean(appliedCoupon && appliedCoupon.code === code);
+        ticket.classList.toggle('is-got', isApplied);
+        if (btn) {
+            const lbl = btn.querySelector('.u298-btn-txt');
+            if (lbl) lbl.textContent = isApplied ? 'Đã dùng' : 'Lấy mã';
+        }
+    });
+}
+
+function tearAndApplyCoupon(code, btnEl) {
+    const input = document.getElementById('couponCode');
+    const ticket = btnEl?.closest('.u298-ticket');
+    if (ticket && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        ticket.classList.add('is-tearing');
+        setTimeout(() => ticket.classList.remove('is-tearing'), 360);
+    }
+    if (input) input.value = code;
+    applyCoupon();
+}
+
+function removeAppliedCoupon() {
+    appliedCoupon = null;
+    const input = document.getElementById('couponCode');
+    const hint = document.getElementById('couponHint');
+    if (input) input.value = '';
+    if (hint) hint.textContent = 'Nhập mã giảm giá hoặc bấm Lấy mã trên vé ưu đãi.';
+    syncCouponUI();
+    renderCart();
+}
+
 async function applyCoupon() {
     const input = document.getElementById('couponCode');
+    const wrap = document.getElementById('u230InputWrap');
+    const btn = document.getElementById('applyCouponBtn');
     const hint = document.getElementById('couponHint');
     const code = input?.value.trim().toUpperCase();
     if (!code) {
         appliedCoupon = null;
         if (hint) hint.textContent = 'Nhập mã giảm giá để áp dụng.';
+        syncCouponUI();
         renderCart();
         return;
     }
@@ -2817,8 +3903,16 @@ async function applyCoupon() {
     const subtotal = currentCartSubtotal();
     if (subtotal <= 0) {
         if (hint) hint.textContent = 'Giỏ hàng đang trống.';
+        if (wrap) {
+            wrap.classList.remove('u230-bad');
+            void wrap.offsetWidth;
+            wrap.classList.add('u230-bad');
+        }
         return;
     }
+
+    const prevTotal = Math.max(subtotal - Math.min(Number(appliedCoupon?.discountAmount) || 0, subtotal), 0);
+    if (btn) btn.classList.add('is-busy');
 
     try {
         const res = await fetch(`${API_URL}/coupons/validate`, {
@@ -2831,12 +3925,23 @@ async function applyCoupon() {
         appliedCoupon = data;
         if (hint) hint.textContent = `${data.name}: giảm ${fmt(data.discountAmount)}`;
         showToast(`Áp dụng mã giảm giá thành công: -${fmt(data.discountAmount)}!`);
+        syncCouponUI();
         renderCart();
+        const nextTotal = Math.max(subtotal - Math.min(Number(data.discountAmount) || 0, subtotal), 0);
+        tweenPriceText(document.getElementById('total'), prevTotal, nextTotal);
     } catch (error) {
         appliedCoupon = null;
         if (hint) hint.textContent = error.message;
+        if (wrap) {
+            wrap.classList.remove('u230-bad');
+            void wrap.offsetWidth;
+            wrap.classList.add('u230-bad');
+        }
         showToast(error.message, 'error');
+        syncCouponUI();
         renderCart();
+    } finally {
+        if (btn) btn.classList.remove('is-busy');
     }
 }
 
@@ -2931,6 +4036,8 @@ function renderCart() {
         const discountRow = document.getElementById('cartDiscountRow');
         if (discountRow) discountRow.style.display = 'none';
         if (currentCartStep === 2) goToCartStep(1);
+        updateFreeshipProgress(0);
+        syncCouponUI();
         return;
     }
 
@@ -2943,13 +4050,21 @@ function renderCart() {
     }
 
     let subtotal = 0;
+    const flashId = window.__lastAddedCartProductId ? String(window.__lastAddedCartProductId) : '';
+    window.__lastAddedCartProductId = '';
+    const lastQtyChange = window.__lastQtyChanged || null;
+    window.__lastQtyChanged = null;
     cartDiv.innerHTML = cart.map(item => {
         const lineTotal = item.product.price * item.quantity;
         subtotal += lineTotal;
         const isMaxStock = item.quantity >= item.product.stock;
+        const isFlashed = flashId && String(item.productId) === flashId;
+        const rollCls = lastQtyChange && lastQtyChange.id === String(item.productId)
+            ? (lastQtyChange.dir === 'up' ? ' u018-roll-up' : ' u018-roll-dn')
+            : '';
 
         return `
-            <article class="cart-item-card" data-product-id="${item.productId}">
+            <article class="cart-item-card${isFlashed ? ' u240-fl' : ''}" data-product-id="${item.productId}">
                 <figure class="cart-item-thumb">
                     <img src="${escapeHTML(item.product.image)}" alt="${escapeHTML(item.product.name)}" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg'" />
                 </figure>
@@ -2962,7 +4077,7 @@ function renderCart() {
                 <div class="cart-item-actions">
                     <div class="cart-stepper">
                         <button type="button" class="stepper-btn minus" onclick="changeQty('${item.productId}', -1)" aria-label="Giảm">-</button>
-                        <span class="stepper-val">${item.quantity}</span>
+                        <span class="stepper-val${rollCls}">${item.quantity}</span>
                         <button type="button" class="stepper-btn plus" onclick="changeQty('${item.productId}', 1)" ${isMaxStock ? 'disabled' : ''} aria-label="Tăng">+</button>
                     </div>
                     <strong class="cart-item-line-total">${fmt(lineTotal)}</strong>
@@ -2995,8 +4110,136 @@ function renderCart() {
     if (currentCartStep === 2) {
         renderCheckoutRecap();
     }
+    syncCouponUI();
+    updateFreeshipProgress(subtotal);
     scheduleInstallmentQuote();
 }
+
+function updateFreeshipProgress(subtotal) {
+    const banner = document.getElementById('cartFreeshipBanner');
+    const msg = document.getElementById('freeshipMsg');
+    const fill = document.getElementById('freeshipFill');
+    const track = document.getElementById('freeshipProgressBar');
+    if (!banner || !msg || !fill) return;
+
+    const threshold = 500000;
+    const current = Math.max(0, Number(subtotal) || 0);
+
+    if (current === 0) {
+        banner.classList.remove('achieved');
+        msg.innerHTML = `Mua thêm <strong>${fmt(threshold)}</strong> để nhận <strong>FREESHIP TOÀN QUỐC!</strong>`;
+        fill.style.width = '0%';
+        if (track) track.setAttribute('aria-valuenow', '0');
+    } else if (current >= threshold) {
+        banner.classList.add('achieved');
+        msg.innerHTML = `🎉 <strong>Tuyệt vời!</strong> Đơn hàng đã đạt điều kiện <strong>MIỄN PHÍ VẬN CHUYỂN TOÀN QUỐC!</strong>`;
+        fill.style.width = '100%';
+        if (track) track.setAttribute('aria-valuenow', '100');
+    } else {
+        banner.classList.remove('achieved');
+        const remain = threshold - current;
+        const percent = Math.min(99, Math.max(8, Math.round((current / threshold) * 100)));
+        msg.innerHTML = `Mua thêm <strong>${fmt(remain)}</strong> để được <strong>FREESHIP TOÀN QUỐC!</strong>`;
+        fill.style.width = `${percent}%`;
+        if (track) track.setAttribute('aria-valuenow', String(percent));
+    }
+}
+
+function openQuickView(productId) {
+    const p = allProducts.find(item => String(item._id) === String(productId));
+    const dialog = document.getElementById('quickViewDialog');
+    const container = document.getElementById('quickViewContainer');
+    if (!p || !dialog || !container) return;
+
+    const discount = p.compareAtPrice > p.price
+        ? Math.round(((p.compareAtPrice - p.price) / p.compareAtPrice) * 100)
+        : 0;
+    const monthly = fmt(Math.round(p.price / 12));
+    const isUrgent = p.stock > 0 && p.stock <= 5;
+
+    let specPills = [];
+    if (p.specs) {
+        if (p.specs.ram) specPills.push(`RAM ${p.specs.ram}`);
+        if (p.specs.storage) specPills.push(`Ổ cứng ${p.specs.storage}`);
+        if (p.specs.screen) specPills.push(`Màn hình ${p.specs.screen}`);
+        if (p.specs.cpu) specPills.push(`Chip ${p.specs.cpu}`);
+        if (p.specs.battery) specPills.push(`Pin ${p.specs.battery}`);
+    }
+    if (!specPills.length) {
+        specPills = ['Chính hãng 100%', 'Bảo hành 12 tháng', 'Đổi mới 30 ngày'];
+    }
+
+    container.innerHTML = `
+        <header class="quick-view-header">
+            <div class="quick-view-brand-pill">
+                ${brandSvgLogo(p.brand)}
+                <span>${escapeHTML(p.brand || 'TechEcommerce')}</span>
+            </div>
+            <button type="button" class="quick-view-close-btn" onclick="closeQuickView()" aria-label="Đóng cửa sổ xem nhanh">✕</button>
+        </header>
+        <section class="quick-view-body">
+            <figure class="quick-view-media">
+                <img id="quickViewImg" src="${escapeHTML(catalogImageSource(p))}" alt="${escapeHTML(p.name)}" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg'">
+                ${discount > 0 ? `<span class="quick-view-discount-ribbon">-${discount}%</span>` : ''}
+            </figure>
+            <div class="quick-view-info">
+                <span class="quick-view-cat-badge">${escapeHTML(p.category)}</span>
+                <h3 id="quickViewTitle" class="quick-view-title">${escapeHTML(p.name)}</h3>
+                <div class="quick-view-meta">
+                    <span class="quick-view-rating">★ ${Number(p.rating || 5.0).toFixed(1)}</span>
+                    <span class="quick-view-reviews">(${p.reviewCount || 38} đánh giá)</span>
+                    <span class="quick-view-stock ${isUrgent ? 'urgent' : (p.stock > 0 ? 'in-stock' : 'out-of-stock')}">
+                        ${p.stock > 0 ? (isUrgent ? `⚡ Chỉ còn ${p.stock} máy` : '✓ Sẵn sàng giao ngay') : 'Hết hàng'}
+                    </span>
+                </div>
+                <div class="quick-view-price-box">
+                    <span class="quick-view-price">${fmt(p.price)}</span>
+                    ${p.compareAtPrice > p.price ? `<span class="quick-view-compare">${fmt(p.compareAtPrice)}</span>` : ''}
+                    <span class="quick-view-installment">💳 Trả góp 0% chỉ từ <strong>${monthly}</strong>/tháng</span>
+                </div>
+                <div class="quick-view-spec-pills">
+                    ${specPills.map(s => `<span class="spec-pill">${escapeHTML(s)}</span>`).join('')}
+                </div>
+                <p class="quick-view-desc">${escapeHTML(p.description || 'Sản phẩm công nghệ cao cấp chính hãng, phân phối bởi TechEcommerce kèm bảo hành 12 tháng 1 đổi 1 toàn quốc.')}</p>
+                <div class="quick-view-actions">
+                    <button type="button" class="quick-view-btn-add" ${p.stock <= 0 ? 'disabled' : ''} onclick="addToCart('${p._id}'); closeQuickView();">
+                        + Thêm vào giỏ
+                    </button>
+                    <button type="button" class="quick-view-btn-buy" ${p.stock <= 0 ? 'disabled' : ''} onclick="quickViewBuyNow('${p._id}')">
+                        ⚡ Mua ngay
+                    </button>
+                    <a href="pages/catalog/product.html?id=${p._id}" class="quick-view-detail-link">
+                        Xem chi tiết & video mở hộp →
+                    </a>
+                </div>
+            </div>
+        </section>
+    `;
+
+    if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+    } else {
+        dialog.setAttribute('open', '');
+    }
+}
+window.openQuickView = openQuickView;
+
+function closeQuickView() {
+    const dialog = document.getElementById('quickViewDialog');
+    if (dialog) {
+        if (typeof dialog.close === 'function') dialog.close();
+        else dialog.removeAttribute('open');
+    }
+}
+window.closeQuickView = closeQuickView;
+
+function quickViewBuyNow(productId) {
+    addToCart(productId);
+    closeQuickView();
+    goToCartStep(1);
+    openCartDrawer();
+}
+window.quickViewBuyNow = quickViewBuyNow;
 
 async function loadStats() {
     try {
@@ -3232,11 +4475,30 @@ async function createOrder() {
         return showToast('Khách chưa đăng nhập chỉ dùng được chuyển khoản thủ công, VNPay hoặc MoMo.', 'error');
     }
 
+    /* Lucian UX/UI Prompt #081 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#081 */
     const btn = document.getElementById('checkoutBtn');
+    const wrap081 = document.getElementById('u081CheckoutWrap');
+    const steps081 = document.getElementById('u081StepsBar');
+    const ringFg = document.querySelector('#u081RingSvg .u081-fg');
+    const checkoutLabel = btn.querySelector('.u081-btn-label') || btn;
     btn.disabled = true;
-    btn.textContent = 'Đang tạo đơn...';
+    checkoutLabel.textContent = 'Đang xác thực đơn...';
+    if (wrap081) {
+        wrap081.classList.remove('is-ok');
+        wrap081.classList.add('is-run');
+    }
+    if (steps081) {
+        steps081.hidden = false;
+        steps081.querySelectorAll('.u081-step').forEach((s, idx) => s.classList.toggle('is-on', idx === 0));
+    }
+    if (ringFg) ringFg.style.strokeDashoffset = '50';
 
     try {
+        if (steps081) {
+            steps081.querySelectorAll('.u081-step').forEach((s, idx) => s.classList.toggle('is-on', idx <= 1));
+        }
+        if (ringFg) ringFg.style.strokeDashoffset = '22';
+
         const res = await fetch(`${API_URL}/orders`, {
             method: 'POST',
             headers: auth.getHeaders(),
@@ -3244,6 +4506,16 @@ async function createOrder() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Lỗi đặt hàng');
+
+        if (ringFg) ringFg.style.strokeDashoffset = '0';
+        if (steps081) {
+            steps081.querySelectorAll('.u081-step').forEach(s => s.classList.add('is-on'));
+        }
+        if (wrap081) {
+            wrap081.classList.remove('is-run');
+            wrap081.classList.add('is-ok');
+        }
+        checkoutLabel.textContent = 'Đặt hàng thành công!';
 
         setCart([]);
         appliedCoupon = null;
@@ -3267,9 +4539,14 @@ async function createOrder() {
         if (!auth.isAdmin()) setTimeout(() => window.location.href = 'pages/account/orders.html', 900);
     } catch (err) {
         showToast(err.message, 'error');
+        if (wrap081) wrap081.classList.remove('is-run', 'is-ok');
+        if (steps081) steps081.hidden = true;
     } finally {
-        btn.disabled = false;
-        btn.textContent = 'Đặt hàng';
+        setTimeout(() => {
+            btn.disabled = false;
+            checkoutLabel.textContent = 'Xác nhận đặt hàng ✓';
+            if (wrap081) wrap081.classList.remove('is-run');
+        }, 700);
     }
 }
 
@@ -3278,6 +4555,60 @@ function subscribeNewsletter() {
     if (!email.includes('@')) return alert('Vui lòng nhập email hợp lệ!');
     alert('Đăng ký nhận ưu đãi thành công!');
     document.getElementById('newsletterEmail').value = '';
+}
+
+/* Lucian UX/UI Prompt #100 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#100 */
+function setupFlashSaleCountdown() {
+    const hoursEl = document.getElementById('fsHours');
+    const minutesEl = document.getElementById('fsMinutes');
+    const secondsEl = document.getElementById('fsSeconds');
+    const timerEl = document.getElementById('flashSaleTimer');
+    if (!hoursEl || !minutesEl || !secondsEl) return;
+
+    [hoursEl, minutesEl, secondsEl].forEach(el => el.classList.add('u100-fl'));
+
+    function setFlipUnit(el, nextVal) {
+        if (el.textContent !== nextVal) {
+            el.textContent = nextVal;
+            el.classList.remove('is-flipping');
+            void el.offsetWidth;
+            el.classList.add('is-flipping');
+        }
+    }
+
+    function updateTimer() {
+        const now = new Date();
+        const currentHour = now.getHours();
+        let targetHour;
+        if (currentHour < 12) targetHour = 12;
+        else if (currentHour < 18) targetHour = 18;
+        else targetHour = 24;
+
+        const targetTime = new Date(now);
+        if (targetHour === 24) {
+            targetTime.setHours(23, 59, 59, 999);
+        } else {
+            targetTime.setHours(targetHour, 0, 0, 0);
+        }
+
+        let diff = targetTime.getTime() - now.getTime();
+        if (diff <= 0) diff = 3600000;
+
+        const h = Math.floor(diff / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+        setFlipUnit(hoursEl, String(h).padStart(2, '0'));
+        setFlipUnit(minutesEl, String(m).padStart(2, '0'));
+        setFlipUnit(secondsEl, String(s).padStart(2, '0'));
+
+        if (timerEl) {
+            timerEl.setAttribute('datetime', `PT${h}H${m}M${s}S`);
+        }
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -3305,13 +4636,89 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('headerLocationToggle')?.click();
     });
     setupPromoCarousel();
+    setupFlashSaleCountdown();
+
+    // Quick Price Preset Filter Chips
+    const priceChips = document.querySelectorAll('.price-chip-btn');
+    priceChips.forEach(btn => {
+        btn.addEventListener('click', () => {
+            priceChips.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const min = btn.dataset.priceMin || '';
+            const max = btn.dataset.priceMax || '';
+            const minEl = document.getElementById('minPrice');
+            const maxEl = document.getElementById('maxPrice');
+            if (minEl) minEl.value = min;
+            if (maxEl) maxEl.value = max;
+            renderProducts();
+        });
+    });
+
+    // Render Recently Viewed on Homepage
+    function renderHomeRecentlyViewed() {
+        const section = document.getElementById('homepageRecentlyViewed');
+        const grid = document.getElementById('homepageRecentlyViewedGrid');
+        if (!section || !grid) return;
+        try {
+            const items = JSON.parse(localStorage.getItem('tech_recently_viewed') || '[]');
+            if (!items.length) {
+                section.hidden = true;
+                return;
+            }
+            section.hidden = false;
+            grid.innerHTML = items.map(item => {
+                const disc = item.compareAtPrice > item.price ? Math.round((1 - item.price / item.compareAtPrice) * 100) : 0;
+                return `
+                    <article class="recently-viewed-card">
+                        <a href="pages/catalog/product.html?id=${encodeURIComponent(item._id)}" class="recent-card-link">
+                            <figure class="recent-thumb-fig">
+                                ${disc > 0 ? `<span class="recent-disc-badge">-${disc}%</span>` : ''}
+                                <img src="${escapeHTML(item.image || 'assets/images/product-placeholder.svg')}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg';">
+                            </figure>
+                            <h3 class="recent-prod-name" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</h3>
+                            <div class="recent-price-row">
+                                <strong class="recent-price-cur">${fmt(item.price)}</strong>
+                                ${item.compareAtPrice > item.price ? `<span class="recent-price-old">${fmt(item.compareAtPrice)}</span>` : ''}
+                            </div>
+                        </a>
+                    </article>
+                `;
+            }).join('');
+        } catch (e) {
+            section.hidden = true;
+        }
+    }
+    renderHomeRecentlyViewed();
+
+    window.clearRecentlyViewedHome = function() {
+        localStorage.removeItem('tech_recently_viewed');
+        const section = document.getElementById('homepageRecentlyViewed');
+        if (section) section.hidden = true;
+        showToast('Đã xóa lịch sử sản phẩm vừa xem', 'info');
+    };
+
     document.querySelectorAll('[data-product-filter]').forEach(el => {
-        el.addEventListener('input', renderProducts);
-        el.addEventListener('change', renderProducts);
+        el.addEventListener('input', () => {
+            if (el.id === 'brandFilter') syncBrandChipsState(el.value);
+            renderProducts();
+        });
+        el.addEventListener('change', () => {
+            if (el.id === 'brandFilter') syncBrandChipsState(el.value);
+            renderProducts();
+        });
     });
     document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') closeCartDrawer();
+        if (event.key === 'Escape') {
+            closeCartDrawer();
+            closeQuickView();
+        }
     });
+    const qvModal = document.getElementById('quickViewDialog');
+    if (qvModal) {
+        qvModal.addEventListener('click', (e) => {
+            if (e.target === qvModal) closeQuickView();
+        });
+    }
     document.getElementById('paymentMethod')?.addEventListener('change', updatePaymentInfo);
     window.addEventListener('shopping-address-change', async () => {
         await applySavedAddressToCheckout();
@@ -3324,9 +4731,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     document.getElementById('customerSelectionGroup').style.display = auth.isAdmin() ? 'block' : 'none';
-    if (!auth.isAdmin()) {
-        document.getElementById('adminStats')?.classList.add('hide-admin-stats');
-    }
 
     await loadWishlist();
     await loadPaymentProviders();

@@ -1,18 +1,35 @@
 (() => {
     const page = document.body.dataset.authPage || '';
 
+    /* Lucian UX/UI Prompt #025, #036, #062, #066 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#062 */
+    function shakeAuthCard() {
+        const card = document.querySelector('.auth-form-card');
+        if (!card || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        card.classList.remove('u062-shake');
+        void card.offsetWidth;
+        card.classList.add('u062-shake');
+    }
+
     function setStatus(message, state = '') {
         const status = document.getElementById('authFormStatus');
         if (!status) return;
         status.textContent = message;
         status.dataset.state = state;
+        if (state === 'error') shakeAuthCard();
     }
 
-    function setButtonLoading(button, loading, idleLabel, loadingLabel) {
+    function setButtonLoading(button, loading, idleLabel, loadingLabel, isSuccess = false) {
         if (!button) return;
         button.disabled = loading;
-        button.dataset.state = loading ? 'loading' : 'default';
-        button.textContent = loading ? loadingLabel : idleLabel;
+        button.dataset.state = isSuccess ? 'success' : (loading ? 'loading' : 'default');
+        button.classList.toggle('is-busy', Boolean(loading && !isSuccess));
+        button.classList.toggle('is-ok', Boolean(isSuccess));
+        const txtSpan = button.querySelector('.u062-btn-txt');
+        if (txtSpan) {
+            txtSpan.textContent = loading ? loadingLabel : idleLabel;
+        } else {
+            button.textContent = loading ? loadingLabel : idleLabel;
+        }
     }
 
     function showSuccess(title, message, linkLabel = 'Đăng nhập ngay', linkHref = 'login.html') {
@@ -35,9 +52,20 @@
 
     function setFieldError(input, message = '') {
         if (!input) return;
+        const fieldWrap = input.closest('.auth-field-cellphones, .auth-field');
         const help = document.getElementById(input.getAttribute('aria-describedby'));
+        const isOk = !message && Boolean(input.value.trim());
         input.setAttribute('aria-invalid', message ? 'true' : 'false');
-        input.dataset.state = message ? 'error' : (input.value ? 'success' : 'default');
+        input.dataset.state = message ? 'error' : (isOk ? 'success' : 'default');
+        if (fieldWrap) {
+            fieldWrap.classList.toggle('is-bad', Boolean(message));
+            fieldWrap.classList.toggle('is-ok', isOk);
+            if (message && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                fieldWrap.classList.remove('u025-shake');
+                void fieldWrap.offsetWidth;
+                fieldWrap.classList.add('u025-shake');
+            }
+        }
         if (help) {
             help.textContent = message || help.dataset.defaultText || '';
             help.dataset.state = message ? 'error' : '';
@@ -54,29 +82,102 @@
         return '';
     }
 
+    function initializePasswordStrengthMeter() {
+        const pwInput = document.getElementById('registerPassword');
+        const pwGroup = pwInput?.closest('.u036-pw-group');
+        const lvlText = document.getElementById('u036StrengthText');
+        const rulesList = document.getElementById('u036RulesList');
+        if (!pwInput || !pwGroup || !rulesList) return;
+
+        const LABELS = ['Chưa nhập', 'Yếu', 'Trung bình', 'Khá mạnh', 'Rất mạnh'];
+        const updateStrength = () => {
+            const v = pwInput.value || '';
+            const checks = {
+                len: v.length >= 8,
+                up: /[A-Z]/.test(v),
+                low: /[a-z]/.test(v),
+                num: /\d/.test(v)
+            };
+            let score = 0;
+            Object.keys(checks).forEach(key => {
+                const ok = checks[key];
+                if (ok) score++;
+                const li = rulesList.querySelector(`[data-r="${key}"]`);
+                if (li) li.classList.toggle('is-ok', ok);
+            });
+            const lvl = v.length === 0 ? 0 : Math.max(1, score);
+            pwGroup.setAttribute('data-lvl', String(lvl));
+            if (lvlText) lvlText.textContent = LABELS[lvl];
+        };
+
+        pwInput.addEventListener('input', updateStrength);
+        updateStrength();
+    }
+
     function initializeTouchedValidation() {
-        document.querySelectorAll('.auth-field input').forEach(input => {
+        document.querySelectorAll('.auth-field-cellphones input, .auth-field input').forEach(input => {
+            const fieldWrap = input.closest('.auth-field-cellphones, .auth-field');
             const help = document.getElementById(input.getAttribute('aria-describedby'));
-            if (help) help.dataset.defaultText = help.textContent;
+            if (help && !help.dataset.defaultText) help.dataset.defaultText = help.textContent;
+
+            input.addEventListener('focus', () => {
+                if (fieldWrap) fieldWrap.classList.add('is-focus');
+            });
+
             input.addEventListener('blur', () => {
+                if (fieldWrap) fieldWrap.classList.remove('is-focus');
+                if (!input.value.trim() && input.getAttribute('aria-invalid') !== 'true') {
+                    if (fieldWrap) fieldWrap.classList.remove('is-ok', 'is-bad');
+                    return;
+                }
                 let message = '';
                 if (!input.checkValidity()) {
                     message = input.validity.typeMismatch
                         ? 'Địa chỉ email chưa đúng định dạng.'
                         : 'Thông tin này chưa hợp lệ. Hãy kiểm tra lại.';
                 }
-                if (input.type === 'password' && input.id !== 'loginPassword') {
+                if (input.id === 'registerPassword') {
                     message = validatePassword(input);
+                } else if (input.id === 'confirmPassword') {
+                    const regPw = document.getElementById('registerPassword');
+                    if (regPw && input.value !== regPw.value) {
+                        message = 'Mật khẩu nhập lại chưa trùng khớp.';
+                    }
                 }
                 setFieldError(input, message);
             });
+
             input.addEventListener('input', () => {
-                if (input.getAttribute('aria-invalid') !== 'true') return;
-                const message = input.type === 'password' && input.id !== 'loginPassword'
-                    ? validatePassword(input)
-                    : (input.checkValidity() ? '' : 'Thông tin này chưa hợp lệ. Hãy kiểm tra lại.');
+                if (input.getAttribute('aria-invalid') !== 'true') {
+                    if (fieldWrap && input.value.trim() && input.checkValidity() && input.type !== 'password') {
+                        fieldWrap.classList.add('is-ok');
+                    } else if (fieldWrap && !input.value.trim()) {
+                        fieldWrap.classList.remove('is-ok');
+                    }
+                    return;
+                }
+                let message = '';
+                if (input.id === 'registerPassword') {
+                    message = validatePassword(input);
+                } else if (input.id === 'confirmPassword') {
+                    const regPw = document.getElementById('registerPassword');
+                    message = regPw && input.value !== regPw.value ? 'Mật khẩu nhập lại chưa trùng khớp.' : '';
+                } else {
+                    message = input.checkValidity() ? '' : 'Thông tin này chưa hợp lệ. Hãy kiểm tra lại.';
+                }
                 setFieldError(input, message);
             });
+
+            if (input.type === 'password') {
+                const capsHint = document.getElementById('loginCapsHint');
+                if (capsHint) {
+                    input.addEventListener('keyup', (e) => {
+                        if (e.getModifierState) {
+                            capsHint.classList.toggle('is-on', e.getModifierState('CapsLock'));
+                        }
+                    });
+                }
+            }
         });
     }
 
@@ -88,6 +189,7 @@
                 const shouldShow = input.type === 'password';
                 input.type = shouldShow ? 'text' : 'password';
                 button.setAttribute('aria-label', shouldShow ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+                button.setAttribute('aria-pressed', String(shouldShow));
                 button.dataset.visible = shouldShow ? 'true' : 'false';
                 const hasSvg = button.querySelector('svg');
                 if (!hasSvg) {
@@ -101,7 +203,8 @@
     function initializeStorefrontContext() {
         const locationLabel = document.querySelector('[data-auth-location]');
         if (locationLabel) {
-            locationLabel.textContent = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
+            const curL = localStorage.getItem('shoppingLocation');
+            locationLabel.textContent = (curL && curL !== 'Hồ Chí Minh') ? curL : 'Thành phố Hồ Chí Minh';
         }
 
         const cartBadge = document.querySelector('[data-auth-cart-badge]');
@@ -176,7 +279,22 @@
         if (!form) return;
         form.addEventListener('submit', async event => {
             event.preventDefault();
+            const idInput = document.getElementById('identifier');
+            const pwInput = document.getElementById('loginPassword');
+            if (!idInput.value.trim()) {
+                setFieldError(idInput, 'Vui lòng nhập số điện thoại hoặc email.');
+                shakeAuthCard();
+                idInput.focus();
+                return;
+            }
+            if (!pwInput.value) {
+                setFieldError(pwInput, 'Vui lòng nhập mật khẩu.');
+                shakeAuthCard();
+                pwInput.focus();
+                return;
+            }
             if (!form.checkValidity()) {
+                shakeAuthCard();
                 form.reportValidity();
                 return;
             }
@@ -185,15 +303,17 @@
             setButtonLoading(button, true, 'Đăng nhập', 'Đang xác thực…');
             try {
                 const data = await request('/auth/login', {
-                    identifier: document.getElementById('identifier').value.trim(),
-                    password: document.getElementById('loginPassword').value
+                    identifier: idInput.value.trim(),
+                    password: pwInput.value
                 });
+                setButtonLoading(button, true, 'Đăng nhập', 'Thành công ✓', true);
                 setStatus('Đăng nhập thành công. Đang mở tài khoản của bạn…', 'success');
                 auth.saveAuth(data.token, data.user);
                 window.setTimeout(() => {
                     handleLoginSuccessRedirect(data.user);
                 }, 600);
             } catch (error) {
+                setFieldError(pwInput, error.message);
                 setStatus(error.message, 'error');
                 setButtonLoading(button, false, 'Đăng nhập', 'Đang xác thực…');
             }
@@ -203,9 +323,11 @@
     function initializeRegister() {
         const form = document.getElementById('registerForm');
         if (!form) return;
+        initializePasswordStrengthMeter();
         form.addEventListener('submit', async event => {
             event.preventDefault();
             if (!form.checkValidity()) {
+                shakeAuthCard();
                 form.reportValidity();
                 return;
             }
@@ -214,18 +336,20 @@
             const passwordError = validatePassword(password);
             if (passwordError) {
                 setFieldError(password, passwordError);
+                shakeAuthCard();
                 password.focus();
                 return;
             }
             if (password.value !== confirmation.value) {
                 setFieldError(confirmation, 'Mật khẩu nhập lại chưa trùng khớp.');
+                shakeAuthCard();
                 confirmation.focus();
                 return;
             }
 
             const button = document.getElementById('submitBtn');
             setStatus('');
-            setButtonLoading(button, true, 'Tạo tài khoản', 'Đang tạo tài khoản…');
+            setButtonLoading(button, true, 'Đăng ký', 'Đang tạo tài khoản…');
             try {
                 await request('/auth/register', {
                     name: document.getElementById('name').value.trim(),
@@ -234,13 +358,14 @@
                     username: document.getElementById('username').value.trim(),
                     password: password.value
                 });
+                setButtonLoading(button, true, 'Đăng ký', 'Hoàn tất ✓', true);
                 showSuccess(
                     'Tài khoản đã sẵn sàng',
                     'Bạn có thể đăng nhập để lưu sản phẩm, theo dõi đơn hàng và quản lý địa chỉ giao hàng.'
                 );
             } catch (error) {
                 setStatus(error.message, 'error');
-                setButtonLoading(button, false, 'Tạo tài khoản', 'Đang tạo tài khoản…');
+                setButtonLoading(button, false, 'Đăng ký', 'Đang tạo tài khoản…');
             }
         });
     }
@@ -547,7 +672,7 @@
         } catch (e) {
             console.warn('Cannot fetch Google client ID from server:', e.message);
         }
-        return '';
+        return '209752916771-2971mlsgd9gbmgpg666ff21e6guf3nb6.apps.googleusercontent.com';
     }
 
     function initializeGoogleAuth() {
@@ -560,6 +685,8 @@
         // Custom fallback click handler when official button is loading or prompt fallback
         googleBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            googleBtn.classList.add('is-busy');
+            setTimeout(() => googleBtn.classList.remove('is-busy'), 1400);
             if (window.google?.accounts?.id) {
                 window.google.accounts.id.prompt();
             } else {

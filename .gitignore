@@ -39,8 +39,11 @@ __pycache__/
 *.pyc
 
 # Temporary scratch & test files
+scratch/
 scratch_*
 test_*
+backend/backups/
+backend/scripts/*.json
 
 # Legacy duplicate directories
 Web/

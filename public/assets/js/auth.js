@@ -4,6 +4,7 @@ const API_URL = LOCAL_HOSTS.has(window.location.hostname) && STATIC_DEV_PORTS.ha
     ? 'http://localhost:5000/api'
     : `${window.location.origin}/api`;
 window.API_URL = API_URL;
+window.GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '209752916771-2971mlsgd9gbmgpg666ff21e6guf3nb6.apps.googleusercontent.com';
 const ADMIN_CACHE_VERSION = 'v=techecommerce-20260709-2';
 
 (function applySavedTheme() {
@@ -165,13 +166,19 @@ function toggleTheme() {
     setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
 }
 
+/* Lucian UX/UI Prompt #021 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#021 */
 function updateThemeToggle() {
     const button = document.getElementById('themeToggle');
     if (!button) return;
     const isDark = document.documentElement.dataset.theme === 'dark';
-    button.textContent = isDark ? 'Light mode' : 'Dark mode';
+    button.classList.toggle('is-dark', isDark);
+    button.setAttribute('aria-checked', isDark ? 'true' : 'false');
     button.setAttribute('aria-label', isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối');
     button.title = isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối';
+    const srLabel = button.querySelector('.u021-sr-label');
+    if (srLabel) {
+        srLabel.textContent = isDark ? 'Light mode' : 'Dark mode';
+    }
 }
 
 function renderThemeToggle() {
@@ -182,8 +189,49 @@ function renderThemeToggle() {
     }
     const button = document.createElement('button');
     button.id = 'themeToggle';
-    button.className = 'theme-toggle';
+    button.className = 'theme-toggle u021-sw-host';
     button.type = 'button';
+    button.setAttribute('role', 'switch');
+    button.setAttribute('aria-checked', document.documentElement.dataset.theme === 'dark' ? 'true' : 'false');
+    button.innerHTML = `
+        <span class="sr-only u021-sr-label">${document.documentElement.dataset.theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+        <span class="u021-stage" aria-hidden="true">
+            <span class="u021-halo">
+                <span class="u021-r u021-r1"></span>
+                <span class="u021-r u021-r2"></span>
+                <span class="u021-r u021-r3"></span>
+            </span>
+            <span class="u021-stars">
+                <span class="u021-sp u021-p1"></span>
+                <span class="u021-sp u021-p2"></span>
+                <span class="u021-sp u021-p3"></span>
+                <span class="u021-sd u021-d1"></span>
+                <span class="u021-sd u021-d2"></span>
+                <span class="u021-sd u021-d3"></span>
+                <span class="u021-sd u021-d4"></span>
+                <span class="u021-sd u021-d5"></span>
+                <span class="u021-sd u021-d6"></span>
+            </span>
+            <span class="u021-clouds">
+                <span class="u021-cl u021-cb u021-cb1"></span>
+                <span class="u021-cl u021-cb u021-cb2"></span>
+                <span class="u021-cl u021-cb u021-cb3"></span>
+                <span class="u021-cl u021-cb u021-cb4"></span>
+                <span class="u021-cl u021-cf u021-cf1"></span>
+                <span class="u021-cl u021-cf u021-cf2"></span>
+                <span class="u021-cl u021-cf u021-cf3"></span>
+                <span class="u021-cl u021-cf u021-cf4"></span>
+                <span class="u021-cl u021-cf u021-cf5"></span>
+            </span>
+            <span class="u021-knob">
+                <span class="u021-moon">
+                    <span class="u021-cr u021-cr1"></span>
+                    <span class="u021-cr u021-cr2"></span>
+                    <span class="u021-cr u021-cr3"></span>
+                </span>
+            </span>
+        </span>
+    `;
     button.addEventListener('click', toggleTheme);
     document.body.appendChild(button);
     updateThemeToggle();
@@ -191,6 +239,200 @@ function renderThemeToggle() {
 
 window.setTheme = setTheme;
 window.toggleTheme = toggleTheme;
+
+/* Lucian UX/UI Prompt #070 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#070 */
+(function initLucianStackingToasts() {
+    const TOAST_MAX = 4;
+    const TOAST_TTL = 4200;
+    const TOAST_META = {
+        success: {
+            title: 'Thành công',
+            icon: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.3 5 8.8 9.5 3.6"/></svg>'
+        },
+        error: {
+            title: 'Thông báo lỗi',
+            icon: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="round" aria-hidden="true"><path d="M3 3l6 6M9 3 3 9"/></svg>'
+        },
+        warning: {
+            title: 'Lưu ý',
+            icon: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3v3.8"/><circle cx="6" cy="9.2" r=".6" fill="currentColor"/></svg>'
+        },
+        info: {
+            title: 'Thông tin',
+            icon: '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="6" cy="3.2" r=".6" fill="currentColor"/><path d="M6 5.6V9"/></svg>'
+        }
+    };
+
+    let zoneEl = null;
+    let listEl = null;
+    let hoverZone = false;
+
+    function ensureToastZone() {
+        if (listEl && document.body.contains(listEl)) return listEl;
+        zoneEl = document.getElementById('lucianToastZone');
+        if (!zoneEl) {
+            zoneEl = document.createElement('aside');
+            zoneEl.id = 'lucianToastZone';
+            zoneEl.className = 'u070-zone';
+            zoneEl.setAttribute('aria-label', 'Thông báo hệ thống');
+            zoneEl.innerHTML = '<ol class="u070-list" aria-live="polite" aria-relevant="additions"></ol>';
+            document.body.appendChild(zoneEl);
+        }
+        listEl = zoneEl.querySelector('.u070-list');
+        if (!zoneEl._u070Bound) {
+            zoneEl._u070Bound = true;
+            zoneEl.addEventListener('pointerenter', (e) => {
+                if (e.pointerType && e.pointerType !== 'mouse') return;
+                hoverZone = true;
+                zoneEl.classList.add('is-hover');
+                pauseAllToasts();
+                restackToasts();
+            });
+            zoneEl.addEventListener('pointerleave', () => {
+                hoverZone = false;
+                zoneEl.classList.remove('is-hover');
+                resumeAllToasts();
+                restackToasts();
+            });
+        }
+        return listEl;
+    }
+
+    function activeToasts() {
+        if (!listEl) return [];
+        return [...listEl.children].filter(el => !el.classList.contains('is-out'));
+    }
+
+    function restackToasts() {
+        const items = activeToasts();
+        let offset = 0;
+        items.forEach((el, idx) => {
+            el.style.setProperty('--i', idx);
+            el.style.setProperty('--stack-y', offset + 'px');
+            offset += (el.offsetHeight || 68) + 10;
+        });
+        if (listEl) {
+            listEl.style.height = hoverZone && items.length
+                ? Math.max(offset - 10, 74) + 'px'
+                : (items[0]?.offsetHeight || 74) + 'px';
+        }
+    }
+
+    function dismissToast(el) {
+        if (!el || el.classList.contains('is-out')) return;
+        clearTimeout(el._timer);
+        el.classList.add('is-out');
+        restackToasts();
+        setTimeout(() => {
+            el.remove();
+            restackToasts();
+        }, 280);
+    }
+
+    function startToastTimer(el, ms) {
+        el._remain = ms;
+        el._start = performance.now();
+        const bar = el.querySelector('.u070-bar > i');
+        if (bar) {
+            bar.style.transition = 'none';
+            bar.style.transform = `scaleX(${Math.max(0, Math.min(1, ms / TOAST_TTL))})`;
+            void bar.offsetWidth;
+            bar.style.transition = `transform ${ms}ms linear`;
+            bar.style.transform = 'scaleX(0)';
+        }
+        el._timer = setTimeout(() => dismissToast(el), ms);
+    }
+
+    function pauseAllToasts() {
+        activeToasts().forEach(el => {
+            if (!el._timer) return;
+            clearTimeout(el._timer);
+            el._timer = null;
+            const elapsed = performance.now() - (el._start || performance.now());
+            el._remain = Math.max(450, (el._remain || TOAST_TTL) - elapsed);
+            const bar = el.querySelector('.u070-bar > i');
+            if (bar) {
+                const ratio = Math.max(0, Math.min(1, el._remain / TOAST_TTL));
+                bar.style.transition = 'none';
+                bar.style.transform = `scaleX(${ratio})`;
+            }
+        });
+    }
+
+    function resumeAllToasts() {
+        activeToasts().forEach(el => startToastTimer(el, el._remain || 2200));
+    }
+
+    function showLucianToast(message, type = 'success') {
+        if (!document.body) return;
+        const list = ensureToastZone();
+        const normType = TOAST_META[type] ? type : 'success';
+        const meta = TOAST_META[normType];
+        const li = document.createElement('li');
+        li.className = `u070-t toast toast-${normType} show is-enter`;
+        li.dataset.type = normType;
+        li.setAttribute('role', normType === 'error' ? 'alert' : 'status');
+        li.innerHTML = `
+            <span class="u070-ic">${meta.icon}</span>
+            <div class="u070-tx">
+                <p class="u070-ti">${meta.title}</p>
+                <p class="u070-de toast-msg">${escapeHTML(String(message ?? ''))}</p>
+            </div>
+            <button type="button" class="u070-x" aria-label="Đóng thông báo">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3 3 9"/></svg>
+            </button>
+            <span class="u070-bar" aria-hidden="true"><i></i></span>
+        `;
+        li.querySelector('.u070-x').addEventListener('click', (e) => {
+            e.stopPropagation();
+            dismissToast(li);
+        });
+
+        let startX = null;
+        li.addEventListener('pointerdown', e => {
+            if (e.target.closest('.u070-x')) return;
+            startX = e.clientX;
+        });
+        li.addEventListener('pointermove', e => {
+            if (startX === null) return;
+            const dx = Math.max(0, e.clientX - startX);
+            li.style.transform = `translate3d(${dx}px, 0, 0)`;
+            li.style.opacity = String(Math.max(0.2, 1 - dx / 180));
+        });
+        const endDrag = e => {
+            if (startX === null) return;
+            const dx = (e.clientX || startX) - startX;
+            startX = null;
+            li.style.transform = '';
+            li.style.opacity = '';
+            if (dx > 85) dismissToast(li);
+        };
+        li.addEventListener('pointerup', endDrag);
+        li.addEventListener('pointercancel', endDrag);
+
+        list.prepend(li);
+        requestAnimationFrame(() => {
+            li.classList.remove('is-enter');
+            restackToasts();
+        });
+
+        const items = activeToasts();
+        if (items.length > TOAST_MAX) {
+            items.slice(TOAST_MAX).forEach(dismissToast);
+        }
+
+        if (!hoverZone) {
+            startToastTimer(li, TOAST_TTL);
+        } else {
+            li._remain = TOAST_TTL;
+        }
+    }
+
+    window.showLucianToast = showLucianToast;
+    if (typeof window.showToast !== 'function') {
+        window.showToast = showLucianToast;
+    }
+})();
 
 function updateNavbar() {
     const authSection = document.getElementById('nav-auth-section');

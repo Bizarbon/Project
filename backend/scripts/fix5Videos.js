@@ -13,8 +13,8 @@ const fixMap = {
     },
     "TECH-00013": {
         id: 13,
-        name: "Samsung Galaxy S26 Ultra 5G 256GB",
-        videoId: "xsHhWU3Uvjw", // Trên Tay Samsung Galaxy S26 Ultra - Vật Vờ Studio
+        name: "Samsung Galaxy S24 Ultra 5G 256GB",
+        videoId: "S0vldC2uLfw", // Trên Tay Samsung Galaxy S26 Ultra - Vật Vờ Studio
     },
     "TECH-00015": {
         id: 15,

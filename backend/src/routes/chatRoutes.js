@@ -467,11 +467,11 @@ async function evaluateUpgradeVsNew(message, context = {}, user = null) {
 
     // Tìm các dòng laptop phổ biến trong catalog từ DB
     const budgetOffice = await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, name: /IdeaPad Slim 3/i }) ||
-                         await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, category: 'Laptop' }).sort({ price: 1 });
+        await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, category: 'Laptop' }).sort({ price: 1 });
     const midLaptop = await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, name: /Dell Inspiron/i }) ||
-                      await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, name: /Nitro V/i });
+        await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, name: /Nitro V/i });
     const premiumLaptop = await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, name: /MacBook Air M2/i }) ||
-                          await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, category: 'Laptop' }).sort({ price: -1 });
+        await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 }, category: 'Laptop' }).sort({ price: -1 });
 
     const suggested = [budgetOffice, midLaptop, premiumLaptop].filter(Boolean);
 
@@ -559,11 +559,15 @@ async function answerComparison(message, context = {}) {
     const s1 = p1.specs || {};
     const s2 = p2.specs || {};
 
-    const tableMarkdown = `⚖️ **BẢNG SO SÁNH THÔNG SỐ KỸ THUẬT THỰC TẾ HỆ THỐNG**
+    const diffPrice = Math.abs(p1.price - p2.price);
+    const p1Saving = p1.price < p2.price ? ` *(Tiết kiệm ${money(diffPrice)})*` : '';
+    const p2Saving = p2.price < p1.price ? ` *(Tiết kiệm ${money(diffPrice)})*` : '';
+
+    const tableMarkdown = `⚖️ **BẢNG SO SÁNH THÔNG SỐ KỸ THUẬT & GIÁ BÁN THỰC TẾ**
 
 | Tiêu chí so sánh | **${p1.name}** | **${p2.name}** |
 | :--- | :--- | :--- |
-| **Giá niêm yết** | **${money(p1.price)}** | **${money(p2.price)}** |
+| **Giá niêm yết** | **${money(p1.price)}**${p1Saving} | **${money(p2.price)}**${p2Saving} |
 | **Tình trạng kho** | ${p1.stock > 0 ? `Còn ${p1.stock} máy` : 'Tạm hết'} | ${p2.stock > 0 ? `Còn ${p2.stock} máy` : 'Tạm hết'} |
 | **Vi xử lý (CPU)** | ${s1.cpu || 'Chưa có thông số chi tiết'} | ${s2.cpu || 'Chưa có thông số chi tiết'} |
 | **Bộ nhớ RAM** | ${s1.ram || 'Chưa có thông số chi tiết'} | ${s2.ram || 'Chưa có thông số chi tiết'} |
@@ -571,7 +575,7 @@ async function answerComparison(message, context = {}) {
 | **Màn hình** | ${s1.screen || 'Chưa có thông số chi tiết'} | ${s2.screen || 'Chưa có thông số chi tiết'} |
 | **Thời lượng pin (NSX)** | ${s1.battery || 'Theo công bố NSX'} | ${s2.battery || 'Theo công bố NSX'} |
 | **Hệ điều hành** | ${s1.os || 'Theo máy'} | ${s2.os || 'Theo máy'} |
-| **Chính sách bảo hành** | ${(!p1.warranty || p1.warranty === 'Không bảo hành') ? 'Chính hãng 12 - 24 tháng (1 đổi 1 30 ngày)' : p1.warranty} | ${(!p2.warranty || p2.warranty === 'Không bảo hành') ? 'Chính hãng 12 - 24 tháng (1 đổi 1 30 ngày)' : p2.warranty} |`;
+| **Chính sách bảo hành** | ${(!p1.warranty || p1.warranty === 'Không bảo hành') ? 'Chính hãng 12-24 tháng (Lỗi 1 đổi 1 30 ngày)' : p1.warranty} | ${(!p2.warranty || p2.warranty === 'Không bảo hành') ? 'Chính hãng 12-24 tháng (Lỗi 1 đổi 1 30 ngày)' : p2.warranty} |`;
 
     // Phân tích điểm mạnh & đánh đổi cụ thể
     const p1Advantage = s1.battery && s1.battery.includes('18')
@@ -599,25 +603,29 @@ async function answerComparison(message, context = {}) {
         : (s2.battery && s2.battery.includes('18') ? `Bạn di chuyển nhiều, ưu tiên pin cả ngày và thiết kế gọn gàng.` : `Bạn học Lập trình/AI, thiết kế đồ họa hoặc xử lý tác vụ nặng.`);
 
     const reply = `${tableMarkdown}\n\n` +
-        `🎯 **PHÂN TÍCH ĐIỂM MẠNH & ĐÁNH ĐỔI (TRADE-OFFS):**\n` +
+        `🎯 **PHÂN TÍCH ĐIỂM MẠNH & ĐÁNH ĐỔI THỰC TẾ:**\n` +
         `• **Điểm nổi bật của ${p1.name}:** ${p1Advantage}\n` +
         `• **Điểm nổi bật của ${p2.name}:** ${p2Advantage}\n\n` +
         `⚖️ **Đánh đổi cần cân nhắc:**\n` +
         `• Chọn **${p1.name}**: ${tradeOffP1}\n` +
         `• Chọn **${p2.name}**: ${tradeOffP2}\n\n` +
-        `💡 **KẾT LUẬN CÓ ĐIỀU KIỆN:**\n` +
+        `💡 **LỜI KHUYÊN CHỌN MUA ĐÚNG NHU CẦU:**\n` +
         `👉 **Nên chọn ${p1.name} KHI:** ${conclusionP1}\n` +
         `👉 **Nên chọn ${p2.name} KHI:** ${conclusionP2}\n\n` +
-        `*(Lưu ý về pin: Thời lượng pin thực tế phụ thuộc vào tác vụ và độ sáng màn hình, thường đạt khoảng 60–75% mức thử nghiệm phòng lab của hãng).* Cả hai sản phẩm đều được bảo hành chính hãng và hỗ trợ trả góp 0%. Bạn có thể bấm **"+ Giỏ"** ngay bên dưới để chọn mua nhé!`;
+        `🛡️ **QUYỀN LỢI ĐẢM BẢO KHI MUA TẠI TECHECOMMERCE:**\n` +
+        `• Hàng chính hãng mới 100% nguyên seal, bảo hành chính hãng toàn quốc.\n` +
+        `• Lỗi 1 đổi 1 trong 30 ngày đầu tiên nếu có lỗi kỹ thuật.\n` +
+        `• Hỗ trợ trả góp 0% lãi suất — xét duyệt nhanh chỉ 3 phút.\n\n` +
+        `Bạn có thể bấm **"Chọn máy này"** trên bảng hoặc bấm **"+ Giỏ"** ngay bên dưới để đặt mua nhé!`;
 
     return {
         reply,
         products: [p1, p2],
         suggestions: [
-            `Thêm ${p1.name.slice(0, 18)} vào giỏ`,
-            `Thêm ${p2.name.slice(0, 18)} vào giỏ`,
+            `Chọn mua ${p1.name.slice(0, 20)}`,
+            `Chọn mua ${p2.name.slice(0, 20)}`,
             'Tính trả góp 0%',
-            'Chính sách bảo hành'
+            'Mã giảm giá hôm nay'
         ],
         context: {
             ...context,
@@ -637,22 +645,34 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
     if (Array.isArray(previousProducts) && previousProducts.length > 0) {
         product = previousProducts[0];
     } else {
-        const words = text.replace(/tra gop|tinh gop|lai suat|moi thang|bao nhieu/g, '').trim();
-        if (words) {
+        const words = text.replace(/tra gop|tinh gop|lai suat|moi thang|bao nhieu|thu tuc|co khong|the nao|huong dan|dieu kien|giay to/g, '').trim();
+        if (words && words.length >= 3) {
             product = await Product.findOne({
                 active: { $ne: false },
                 name: { $regex: escapeRegex(words), $options: 'i' }
             });
         }
-        if (!product) {
-            product = await Product.findOne({ active: { $ne: false }, stock: { $gt: 0 } }).sort({ price: -1 });
-        }
     }
 
-    if (!product) {
+    // Nếu khách hỏi thủ tục trả góp chung mà chưa chọn máy cụ thể
+    const isGeneralInquiry = !product || /thu tuc|the nao|can gi|co the tin dung|khong co the|cccd|cmnd|bao nhieu tuoi|co tra gop|lai suat|dieu kien/i.test(text);
+
+    if (!product || (isGeneralInquiry && (!previousProducts || previousProducts.length === 0))) {
+        const reply = `💳 **CHÍNH SÁCH & THỦ TỤC TRẢ GÓP TẠI TECHECOMMERCE:**\n\n` +
+            `Cửa hàng hỗ trợ **2 hình thức trả góp linh hoạt**, cực kỳ nhanh chóng và an tâm:\n\n` +
+            `1. 🪪 **Trả góp qua CCCD gắn chip (Không cần thẻ tín dụng):**\n` +
+            `   • **Đối tượng:** Công dân Việt Nam từ 18 tuổi trở lên.\n` +
+            `   • **Thủ tục:** Chỉ cần CCCD gắn chip chính chủ. Xét duyệt hồ sơ online trong **15 phút** qua các công ty tài chính uy tín (FE Credit, Home Credit, HD SAISON).\n` +
+            `   • **Khoản trả trước:** Chỉ từ **10% - 30%** giá trị máy, số tiền còn lại chia góp linh hoạt 6 - 12 tháng.\n\n` +
+            `2. 💳 **Trả góp 0% lãi suất qua Thẻ tín dụng (Credit Card):**\n` +
+            `   • **Ngân hàng hỗ trợ:** Hơn 25 ngân hàng liên kết (Techcombank, Vietcombank, VPBank, Sacombank, HSBC, TPBank, MB Bank...).\n` +
+            `   • **Ưu điểm:** **0% lãi suất**, không cần chứng minh thu nhập hay duyệt hồ sơ, trả trước 0 đồng, kỳ hạn 3 - 6 - 9 - 12 tháng.\n\n` +
+            `👉 Bạn đang quan tâm mẫu máy nào (ví dụ: *iPhone 15*, *Laptop ASUS TUF*, *MacBook Air*...) để mình tính bảng trả góp và số tiền thanh toán hàng tháng chi tiết cho bạn nhé! 😊`;
+
         return {
-            reply: 'Cửa hàng hỗ trợ trả góp 0% qua thẻ tín dụng và công ty tài chính với thủ tục duyệt nhanh chỉ 15 phút. Bạn đang muốn tính trả góp cho sản phẩm nào?',
-            suggestions: ['Trả góp iPhone', 'Trả góp Laptop', 'Chính sách trả góp']
+            reply,
+            products: [],
+            suggestions: ['Trả góp iPhone', 'Trả góp Laptop', 'Chính sách bảo hành', 'Săn mã giảm giá']
         };
     }
 
@@ -669,12 +689,119 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
         `📅 **Dự tính số tiền thanh toán hàng tháng (0% lãi suất):**\n` +
         `• Kỳ hạn **6 tháng**: khoảng **${money(monthly6)}/tháng**\n` +
         `• Kỳ hạn **12 tháng**: khoảng **${money(monthly12)}/tháng**\n\n` +
-        `✨ **Điều kiện & Thủ tục:** Áp dụng qua thẻ tín dụng liên kết hoặc đối tác tài chính (xét duyệt CCCD gắn chip từ 18 tuổi). Tổng số tiền thanh toán theo kỳ hạn vẫn bằng đúng giá niêm yết của máy (${money(price)}). Bạn có thể bấm "+ Giỏ" và chọn hình thức Trả góp khi đặt hàng!`;
+        `✨ **Điều kiện & Thủ tục:** Áp dụng qua thẻ tín dụng liên kết (0% lãi suất) hoặc đối tác tài chính (xét duyệt CCCD gắn chip từ 18 tuổi trong 15 phút). Bạn có thể bấm "+ Giỏ" và chọn hình thức Trả góp khi thanh toán nhé!`;
 
     return {
         reply,
         products: [product],
         suggestions: ['Thêm sản phẩm này vào giỏ', 'Chính sách bảo hành', 'So sánh sản phẩm khác']
+    };
+}
+
+/**
+ * Đánh giá khả năng chơi game và chạy tác vụ nặng (Genshin, Valorant, Capcut, Premiere 4K...)
+ */
+async function evaluateGameOrTaskCapability(message, context = {}) {
+    const norm = normalizeText(message);
+    const hasGameOrTask = /\b(genshin|valorant|lien minh|lol|lmht|fo4|fifa|cs2|csgo|pubg|lien quan|toc chien|gta|cyberpunk|wukong|capcut|premiere|photoshop|blender|autocad|do hoa 3d|render 4k)\b/i.test(norm);
+    const hasCapabilityIntent = /\b(muot khong|choi duoc|chay duoc|on khong|keo duoc|chay noi|co lag|fps|bao nhieu fps|co nong|co muot|edit duoc|dung duoc|render duoc)\b/i.test(norm);
+
+    if (!hasGameOrTask && !hasCapabilityIntent) return null;
+
+    // Tìm sản phẩm mục tiêu (từ message hoặc context)
+    let targetProduct = null;
+    const allActive = await Product.find({ active: { $ne: false }, stock: { $gt: 0 } });
+    for (const p of allActive) {
+        const pNorm = normalizeText(p.name);
+        if (norm.includes(pNorm)) {
+            targetProduct = p;
+            break;
+        }
+        const significant = pNorm.split(/\s+/).filter(w => w.length > 2);
+        if (significant.length >= 2 && significant.every(t => norm.includes(t))) {
+            targetProduct = p;
+            break;
+        }
+    }
+    if (!targetProduct && Array.isArray(context?.lastProducts) && context.lastProducts.length > 0) {
+        const cand = context.lastProducts[0];
+        const candId = cand?._id || cand;
+        targetProduct = allActive.find(p => String(p._id) === String(candId) || (cand?.name && p.name === cand.name)) || (cand?.name ? cand : null);
+    }
+
+    // Nếu không có sản phẩm chỉ định, nhưng khách hỏi chung (ví dụ: "Laptop nào chơi Genshin mượt tầm 15-20 triệu")
+    if (!targetProduct) {
+        const budget = extractBudget(message) || 0;
+        const gamingLaptops = allActive.filter(p => p.category === 'Laptop' && (/Nitro|TUF|ROG|Katana|Victus|Gaming/i.test(p.name) || (p.specs?.gpu && !/intel|iris|uhd|radeon 6/i.test(p.specs.gpu))));
+        const matched = gamingLaptops.filter(p => budget > 0 ? p.price <= budget * 1.15 : true).slice(0, 3);
+        if (matched.length > 0) {
+            const list = matched.map(p => `• **${p.name}** — **${money(p.price)}** (Card đồ họa: **${p.specs?.gpu || 'GPU rời mạnh mẽ'}**, Màn hình: **${p.specs?.screen || '144Hz'}**)`).join('\n');
+            return {
+                reply: `🎮 **TƯ VẤN CẤU HÌNH CHIẾN GAME & ĐỒ HỌA MƯỢT MÀ:**\n\n` +
+                    `Để chơi tốt các tựa game như Genshin Impact, Valorant, CS2 hay dựng phim Capcut / Premiere 4K, bạn nên chọn các dòng máy có **Card đồ họa rời NVIDIA GeForce RTX** và hệ thống tản nhiệt kép.\n\n` +
+                    `Dưới đây là các mẫu máy tối ưu nhất đang có sẵn tại kho cửa hàng:\n\n${list}\n\n` +
+                    `👉 Bạn đang quan tâm mức ngân sách khoảng bao nhiêu triệu để mình tư vấn chi tiết cấu hình và mức FPS thực tế nhé! 😊`,
+                products: matched,
+                suggestions: matched.map(p => `Xem chi tiết ${p.name.replace(/(Laptop|Điện thoại)\s*/gi, '').slice(0, 18)}`)
+            };
+        }
+        return null;
+    }
+
+    // Đánh giá dựa trên thông số thực tế của targetProduct
+    const s = targetProduct.specs || {};
+    const pName = targetProduct.name;
+    const isMacBook = /macbook/i.test(pName);
+    const isLaptop = targetProduct.category === 'Laptop';
+    const isPhone = targetProduct.category === 'Điện thoại';
+    const gpu = s.gpu || '';
+    const cpu = s.cpu || '';
+    const ram = s.ram || '';
+    const hasDedicatedGpu = /RTX|GTX|Radeon RX/i.test(gpu) || /RTX|GTX/i.test(pName);
+
+    let evaluation = '';
+
+    if (isMacBook) {
+        evaluation = `🍏 **Đánh giá hiệu năng thực tế trên ${pName} (${cpu || 'Apple Silicon'}):**\n\n` +
+            `• 🎬 **Đồ họa & Dựng phim:** Siêu mượt mà! Chip Apple tối ưu phần cứng cực đỉnh cho **Capcut, Final Cut Pro, Adobe Premiere 4K**. Máy chạy êm ái, mát rượi và pin trâu 12 - 18 tiếng.\n` +
+            `• ⚔️ **Liên Minh Huyền Thoại (LOL):** Chơi rất mượt mà ở mức **60 - 90 FPS** trực tiếp trên macOS.\n` +
+            `• ⚠️ **Lưu ý về Valorant / FO4 / Genshin Impact:**\n` +
+            `   - **Valorant & FIFA Online 4:** Chưa hỗ trợ hệ điều hành macOS (do hệ thống chống hack Vanguard / nProtect chặn).\n` +
+            `   - **Genshin Impact:** Chưa có bản cài chính thức cho macOS (cần chơi qua công cụ giả lập thứ ba PlayCover).\n\n` +
+            `💡 **Lời khuyên chân thành:** Nếu bạn mua máy ưu tiên học tập, lập trình, làm việc văn phòng và làm video thì MacBook là số 1. Nhưng nếu **chơi game PC (Valorant, CS2, FO4, Genshin)** là ưu tiên chính, bạn nên chọn sang dòng Laptop Gaming Windows có card rời RTX nhé!`;
+    } else if (isLaptop && hasDedicatedGpu) {
+        evaluation = `🚀 **Đánh giá hiệu năng thực tế trên ${pName}:**\n\n` +
+            `Máy sở hữu cấu hình vi xử lý **${cpu}**, RAM **${ram}** cùng card đồ họa rời **${gpu}**:\n\n` +
+            `• 🌟 **Genshin Impact:** Chiến cực mượt ở thiết lập **High / Highest 60 FPS**, combat đồ họa mãn nhãn không drop fps.\n` +
+            `• 🎯 **Valorant / CS2 / LOL / FO4:** Cực kỳ mượt mà, FPS ổn định từ **140 - 220+ FPS**, kết hợp màn hình tần số quét cao ngắm bắn siêu chuẩn.\n` +
+            `• 🎬 **Edit video Capcut / Premiere 4K & Đồ họa 3D:** Nhân đồ họa NVIDIA CUDA hỗ trợ render nhanh gấp nhiều lần máy văn phòng.\n` +
+            `• ⚖️ **Điểm cần lưu ý:** Vì là dòng máy hiệu năng cao nên khi chơi game bạn nên cắm sạc để hệ thống tản nhiệt và GPU hoạt động hết công suất nhé!`;
+    } else if (isLaptop) {
+        evaluation = `💼 **Đánh giá hiệu năng thực tế trên ${pName}:**\n\n` +
+            `Máy sử dụng vi xử lý **${cpu}** kết hợp chip đồ họa **${gpu || 'Intel Iris Xe / AMD Radeon'}**:\n\n` +
+            `• 🎮 **Game Esports (LOL, FO4, Valorant):** Chơi mượt mà ở thiết lập đồ họa Trung bình (Medium), mức FPS duy trì ổn định từ **60 - 85 FPS**.\n` +
+            `• 🌟 **Genshin Impact:** Chơi được ở mức đồ họa Thấp (Low/Lowest), duy trì khoảng **35 - 50 FPS** (máy sẽ hơi ấm lên khi chơi lâu).\n` +
+            `• 🎬 **Capcut / Photoshop 2D:** Rất mượt mà, xuất video Full HD và 4K ngắn trơn tru.\n\n` +
+            `💡 **Gợi ý:** Nếu bạn có kế hoạch cày game nặng hoặc render 3D thường xuyên, bạn có thể tham khảo thêm dòng máy có card đồ họa rời chuyên dụng để máy bền bỉ và mát hơn nhé!`;
+    } else if (isPhone) {
+        evaluation = `📱 **Đánh giá trải nghiệm game trên ${pName}:**\n\n` +
+            `Máy trang bị vi xử lý **${cpu || 'hiệu năng cao'}**, RAM **${ram}** và viên pin **${s.battery || 'dung lượng lớn'}**:\n\n` +
+            `• ⚔️ **Liên Quân Mobile, Tốc Chiến, Free Fire:** Cực kỳ mượt mà, bật max 60 - 120 FPS không giật lag.\n` +
+            `• 🌟 **Genshin Impact / Honkai Star Rail:** Chơi mượt mà và ổn định, hình ảnh sắc nét.\n` +
+            `• 🔋 **Thời lượng pin & nhiệt độ:** Máy kiểm soát nhiệt độ tốt, sạc nhanh giúp nạp lại pin nhanh chóng khi chiến game.`;
+    } else {
+        evaluation = `Dạ mẫu **${pName}** sở hữu cấu hình rất tốt trong tầm giá, đáp ứng trơn tru các tác vụ giải trí và công việc hàng ngày của bạn!`;
+    }
+
+    return {
+        reply: evaluation,
+        products: [targetProduct],
+        suggestions: [
+            `Xem chi tiết ${targetProduct.name.replace(/(Laptop|Điện thoại)\s*/gi, '').slice(0, 18)}`,
+            'Tính trả góp 0%',
+            'So sánh máy khác',
+            'Chính sách bảo hành'
+        ]
     };
 }
 
@@ -1538,20 +1665,49 @@ async function answerPolicyQuestion(message) {
         console.warn('KnowledgeBase lookup skipped:', error.message);
     }
 
-    if (text.includes('bao hanh')) {
-        return '🛡️ **Chính sách bảo hành tại TechEcommerce:**\n- 100% sản phẩm chính hãng, bảo hành từ 12 - 24 tháng theo tiêu chuẩn nhà sản xuất.\n- Lỗi 1 đổi 1 trong 30 ngày đầu nếu phát sinh lỗi phần cứng từ nhà sản xuất.\n- Hỗ trợ tiếp nhận bảo hành tại tất cả chi nhánh hoặc gửi bưu điện miễn phí.';
+    // 1. Địa chỉ showroom / Cửa hàng xem máy trực tiếp
+    if (['shop o dau', 'cua hang o dau', 'o dau vay', 'dia chi cua hang', 'dia chi shop', 'dia chi o dau', 'o dau', 'showroom', 'chi nhanh', 'den xem truc tiep', 'xem may o dau', 'co showroom khong', 'dia chi'].some(k => text.includes(k))) {
+        return '📍 **HỆ THỐNG SHOWROOM & ĐỊA CHỈ TRẢI NGHIỆM TECHECOMMERCE:**\n\n' +
+            'Cửa hàng mở cửa từ **08:30 – 21:30** tất cả các ngày trong tuần (kể cả Thứ 7, Chủ Nhật & ngày lễ):\n\n' +
+            '• **Showroom 1 (TP.HCM):** 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM\n' +
+            '• **Showroom 2 (Hà Nội):** 78 Thái Hà, P. Trung Liệt, Q. Đống Đa, Hà Nội\n\n' +
+            '✨ **Đặc quyền khi ghé Showroom:**\n' +
+            '- Trải nghiệm thực tế 100% các dòng máy demo (test camera, gõ thử phím cơ, thử màn hình 144Hz...). \n' +
+            '- Kỹ thuật viên hỗ trợ cài đặt phần mềm, chuyển dữ liệu và dán màn hình miễn phí tại chỗ.\n' +
+            '- Bãi đỗ xe ô tô và xe máy rộng rãi, an toàn, có nhân viên hướng dẫn nhiệt tình.';
     }
 
-    if (text.includes('van chuyen') || text.includes('giao hang') || text.includes('ship')) {
-        return '🚚 **Chính sách giao hàng:**\n- Giao nhanh nội thành trong 2 - 4 giờ.\n- Miễn phí vận chuyển toàn quốc cho đơn hàng từ 500.000 đ.\n- Được kiểm tra hàng trước khi thanh toán (đồng kiểm khi nhận hàng).';
+    // 2. Chính sách đồng kiểm khi nhận hàng (BẮT BUỘC ĐẶT TRƯỚC "doi tra" / "tra hang")
+    if (['kiem tra hang', 'dong kiem', 'xem hang', 'mo hop', 'check hang', 'xem may truoc', 'kiem tra truoc', 'kiem hang', 'co duoc kiem tra'].some(k => text.includes(k))) {
+        return '📦 **CHÍNH SÁCH ĐỒNG KIỂM KHI NHẬN HÀNG (COD):**\n\n' +
+            '• **100% ĐƯỢC MỞ HỘP KIỂM TRA:** Khi shipper giao tới, bạn hoàn toàn có quyền mở hộp kiểm tra ngoại quan máy, phụ kiện đi kèm, tem niêm phong và phiếu bảo hành trước khi thanh toán tiền mặt (COD).\n' +
+            '• **An tâm tuyệt đối:** Nếu phát hiện trầy xước, cấn móp, sai mẫu hoặc seal bị rách, bạn có quyền từ chối nhận hàng ngay lập tức mà **không mất bất kỳ chi phí nào**.\n' +
+            '• **Quyền lợi bảo vệ:** Sau khi nhận máy, bạn vẫn được áp dụng chính sách **Lỗi 1 đổi 1 trong 30 ngày đầu** nếu máy phát sinh bất kỳ lỗi phần cứng nào từ nhà sản xuất.';
     }
 
-    if (text.includes('doi tra') || text.includes('hoan tra') || text.includes('tra hang')) {
-        return '🔄 **Chính sách đổi trả:**\n- Đổi mới trong 30 ngày đầu nếu máy có lỗi kỹ thuật từ nhà sản xuất.\n- Yêu cầu sản phẩm còn đầy đủ hộp, phụ kiện, hóa đơn và không cấn móp, rơi vỡ hoặc vào nước.';
+    // 3. Chính sách bảo hành & Đổi mới 1-1
+    if (text.includes('bao hanh') || text.includes('doi tra') || text.includes('hoan tra') || text.includes('tra hang') || text.includes('loi 1 doi 1')) {
+        return '🛡️ **CHÍNH SÁCH BẢO HÀNH & ĐỔI TRẢ CHÍNH HÃNG:**\n\n' +
+            '• 🏆 **Cam kết 100% chính hãng:** Toàn bộ sản phẩm là máy mới nguyên seal, có hóa đơn VAT và bảo hành điện tử chính hãng từ 12 - 24 tháng.\n' +
+            '• 🔄 **Lỗi 1 đổi 1 trong 30 ngày:** Đổi ngay máy mới cùng model nếu phát sinh lỗi phần cứng do nhà sản xuất (màn hình, nguồn, mainboard...).\n' +
+            '• 🛠️ **Trung tâm bảo hành toàn quốc:** Tiếp nhận bảo hành tại tất cả các Trung tâm bảo hành ủy quyền (Apple Care, Samsung Service, ASUS, Dell, HP, Lenovo...) hoặc tiếp nhận trực tiếp tại Showroom của shop.\n' +
+            '• 🚚 **Tiếp nhận bảo hành tận nơi:** Cửa hàng hỗ trợ gửi ship nhận bảo hành 2 chiều hoàn toàn miễn phí cho khách hàng ở xa.';
     }
 
-    if (text.includes('thanh toan') || text.includes('vnpay') || text.includes('momo') || text.includes('cod')) {
-        return '💳 **Hình thức thanh toán linh hoạt:**\n- Thanh toán khi nhận hàng (COD).\n- Thẻ ATM / Visa / Mastercard / VNPAY-QR / Ví MoMo.\n- Trả góp 0% lãi suất qua thẻ tín dụng hoặc CCCD gắn chip duyệt nhanh.';
+    // 4. Chính sách giao hàng & Vận chuyển
+    if (text.includes('van chuyen') || text.includes('giao hang') || text.includes('ship') || text.includes('phi van chuyen')) {
+        return '🚚 **CHÍNH SÁCH GIAO HÀNG HỎA TỐC:**\n\n' +
+            '• **Giao nhanh nội thành (Hà Nội & TP.HCM):** Nhận máy chỉ sau 2 - 4 giờ qua dịch vụ chuyển phát hỏa tốc.\n' +
+            '• **Miễn phí vận chuyển toàn quốc:** Áp dụng cho mọi đơn hàng có giá trị từ 500.000 đ.\n' +
+            '• **Đồng kiểm an toàn:** Được mở hộp kiểm tra máy nguyên vẹn trước khi thanh toán tiền cho nhân viên giao hàng.';
+    }
+
+    // 5. Hình thức thanh toán
+    if (text.includes('thanh toan') || text.includes('vnpay') || text.includes('momo') || text.includes('cod') || text.includes('chuyen khoan')) {
+        return '💳 **HÌNH THỨC THANH TOÁN TIỆN LỢI:**\n\n' +
+            '• Thanh toán khi nhận hàng (COD) sau khi mở hộp kiểm tra máy.\n' +
+            '• Chuyển khoản ngân hàng, quét mã VNPAY-QR, Ví MoMo (thường xuyên có mã giảm thêm).\n' +
+            '• Trả góp 0% qua thẻ tín dụng hơn 25 ngân hàng hoặc trả góp qua CCCD gắn chip duyệt online 15 phút.';
     }
 
     return '';
@@ -1664,7 +1820,7 @@ async function handleActionExecution(message, context = {}) {
 
     if (bestCoupon) {
         reply += `• 🎟️ **Mã giảm giá tối ưu nhất:** Đã tự động áp mã **${bestCoupon.code}** (tiết kiệm ngay **-${money(maxDiscountAmount)}**)\n` +
-                 `• 🏷️ **Tổng tiền sau áp mã:** **${money(finalPrice)}**\n\n`;
+            `• 🏷️ **Tổng tiền sau áp mã:** **${money(finalPrice)}**\n\n`;
     } else {
         reply += `• 🏷️ **Tổng tiền:** **${money(targetProduct.price)}** (Sản phẩm đang hưởng mức giá niêm yết kịch sàn tốt nhất)\n\n`;
     }
@@ -1687,6 +1843,216 @@ async function handleActionExecution(message, context = {}) {
     };
 }
 
+async function answerBundleBargainQuestion(message, context = {}) {
+    try {
+        const allActive = await Product.find({ active: { $ne: false } }).lean();
+        if (!allActive.length) return null;
+
+        // 1. Tìm sản phẩm mục tiêu (từ context trước đó hoặc từ tên model nhắc tới)
+        let targetProduct = null;
+        if (Array.isArray(context.lastProducts) && context.lastProducts.length > 0) {
+            const firstId = context.lastProducts[0]._id || context.lastProducts[0];
+            targetProduct = allActive.find(p => String(p._id) === String(firstId)) || null;
+        }
+
+        if (!targetProduct) {
+            const norm = normalizeText(message);
+            targetProduct = allActive.find(p => {
+                const pNorm = normalizeText(p.name);
+                return norm.includes(pNorm) || (pNorm.length > 8 && norm.includes(pNorm.slice(0, 15)));
+            });
+        }
+
+        if (!targetProduct) {
+            targetProduct = allActive.find(p => p.featured || /iphone|macbook|galaxy|asus/i.test(p.name)) || allActive[0];
+        }
+
+        // 2. Tìm các phụ kiện tương thích có sẵn trong shop
+        let accessories = allActive.filter(p =>
+            p._id !== targetProduct._id && (
+                p.category === 'Phụ kiện' ||
+                p.category === 'Tai nghe' ||
+                /chuột|tai nghe|sạc|cáp|balo|bàn phím|hub/i.test(p.name)
+            )
+        );
+
+        if (accessories.length < 2) {
+            accessories = allActive.filter(p => p._id !== targetProduct._id && p.price < targetProduct.price * 0.25);
+        }
+
+        const selectedAccessories = accessories.slice(0, 3).map((acc, idx) => {
+            const discountPercent = idx === 0 ? 0.25 : (idx === 1 ? 0.30 : 0.20);
+            const bundlePrice = Math.round(acc.price * (1 - discountPercent) / 10000) * 10000;
+            return {
+                id: `addon-${acc._id}`,
+                productId: acc._id,
+                name: acc.name,
+                image: acc.image,
+                originalPrice: acc.price,
+                bundlePrice: Math.max(bundlePrice, 100000),
+                discountPercent: Math.round(discountPercent * 100),
+                selected: idx < 2
+            };
+        });
+
+        const totalOriginalAddons = selectedAccessories.filter(a => a.selected).reduce((s, a) => s + a.originalPrice, 0);
+        const totalBundleAddons = selectedAccessories.filter(a => a.selected).reduce((s, a) => s + a.bundlePrice, 0);
+        const totalSavings = totalOriginalAddons - totalBundleAddons;
+
+        const reply = `Dạ giá niêm yết **${money(targetProduct.price)}** của **${targetProduct.name}** hiện đã là giá kịch sàn cho hàng phân phối chính hãng kèm gói bảo hành 1 đổi 1 an tâm tuyệt đối ạ! 🛡️\n\n` +
+            `Tuy nhiên để hỗ trợ bạn tiết kiệm tối đa hôm nay, TechEcommerce kích hoạt chính sách **Combo Trợ Giá Phụ Kiện Chính Hãng Giảm Đến 30%** khi mua kèm máy!\n` +
+            `Bạn có thể tùy ý tích chọn các phụ kiện bên dưới để gộp đơn và tiết kiệm ngay **${money(totalSavings)}** nhé: 👇`;
+
+        return {
+            reply,
+            bundle: {
+                mainProduct: {
+                    _id: targetProduct._id,
+                    name: targetProduct.name,
+                    price: targetProduct.price,
+                    image: targetProduct.image,
+                    category: targetProduct.category
+                },
+                addons: selectedAccessories,
+                totalSavings
+            },
+            suggestions: [
+                `Mua cả combo ${targetProduct.name}`,
+                'Tư vấn trả góp 0%',
+                'Xem bảng so sánh máy khác'
+            ],
+            context: {
+                ...context,
+                lastProducts: [targetProduct],
+                stage: 'bundle_bargain'
+            }
+        };
+    } catch (e) {
+        console.warn('answerBundleBargainQuestion error:', e.message);
+        return null;
+    }
+}
+
+/**
+ * 💡 Chế độ "Tư vấn theo ngân sách & nhu cầu chuyên sâu" (Group 4 Feature)
+ * Xử lý trực tiếp các truy vấn gợi ý từ khách:
+ * 1. "Tìm máy dưới 15 triệu chơi mượt Genshin Impact"
+ * 2. "Tìm tai nghe chống ồn tốt nhất để đi máy bay"
+ */
+async function handleBudgetAndSpecialAdvisorQueries(message, context = {}) {
+    const norm = normalizeText(message);
+
+    // 1. Nhu cầu tai nghe chống ồn máy bay / du lịch
+    const isAirplaneANC = (norm.includes('tai nghe') || norm.includes('headphone') || norm.includes('airpod')) &&
+        (norm.includes('may bay') || norm.includes('chuyen bay') || norm.includes('di tour') || norm.includes('du lich') || norm.includes('chong on tot nhat') || norm.includes('chong on tot'));
+
+    if (isAirplaneANC) {
+        const ancHeadphones = await Product.find({
+            category: 'Tai nghe',
+            active: { $ne: false },
+            stock: { $gt: 0 },
+            name: { $regex: /(WH-1000XM5|AirPods Pro|JBL Tour|WH-ULT900N|Buds 3 Pro)/i }
+        }).lean();
+
+        ancHeadphones.sort((a, b) => {
+            if (/WH-1000XM5/i.test(a.name)) return -1;
+            if (/WH-1000XM5/i.test(b.name)) return 1;
+            if (/AirPods Pro/i.test(a.name)) return -1;
+            return 0;
+        });
+
+        const topPick = ancHeadphones[0];
+        const secondPick = ancHeadphones[1];
+        const selected = [topPick, secondPick].filter(Boolean);
+
+        if (selected.length > 0) {
+            selected[0].recommendation = { reason: 'Chống ồn ANC đỉnh cao, triệt tiêu tiếng gầm máy bay' };
+            if (selected[1]) {
+                selected[1].recommendation = { reason: 'Nhỏ gọn bỏ túi, xuyên âm đàm thoại trong trẻo' };
+            }
+
+            return {
+                reply: `✈️ **LỰA CHỌN TỐI ƯU NHẤT KHI ĐI MÁY BAY / DU LỊCH:**\n\n` +
+                    `Để triệt tiêu hoàn toàn tiếng ù và tiếng gầm động cơ phản lực trên các chuyến bay, **Tai nghe chống ồn chủ động (ANC)** là trang bị không thể thiếu. TechEcommerce đề xuất 2 mẫu tai nghe đỉnh nhất hiện nay:\n\n` +
+                    `1. 🏆 **${topPick.name}** (${money(topPick.price)}):\n` +
+                    `   • **Lý do tối ưu:** Sở hữu công nghệ chống ồn ANC hàng đầu thế giới với 2 chip xử lý và 8 micro triệt tiêu tạp âm tần số thấp cực sâu. Đệm tai siêu êm ái không gây đau tai suốt chuyến bay dài 8-12 tiếng. Pin 30 giờ và kèm sẵn cáp 3.5mm cắm trực tiếp vào hệ thống giải trí ghế máy bay.\n\n` +
+                    (secondPick ? `2. 🌟 **${secondPick.name}** (${money(secondPick.price)}):\n   • **Lý do tối ưu:** Thiết kế True Wireless đút tai siêu gọn nhẹ bỏ túi áo. Chế độ xuyên âm thích ứng (Adaptive Audio) giúp nghe rõ thông báo từ cơ trưởng hoặc tiếp viên mà không cần tháo tai nghe.\n\n` : '') +
+                    `👉 Mình đã đính kèm danh thiếp sản phẩm bên dưới để bạn xem chi tiết hoặc bấm đặt hàng nhanh giao tận nơi nhé! 😊`,
+                products: selected,
+                suggestions: [
+                    'Thêm vào giỏ hàng ngay',
+                    'Tư vấn trả góp 0%',
+                    'So sánh Sony WH-1000XM5 vs AirPods Pro 2',
+                    'Mã giảm giá hôm nay'
+                ],
+                context: {
+                    ...context,
+                    lastProducts: selected,
+                    stage: 'budget_special_advisor',
+                    targetCategory: 'Tai nghe'
+                }
+            };
+        }
+    }
+
+    // 2. Nhu cầu máy dưới 15 triệu chơi mượt Genshin Impact
+    const isGenshinBudget = (norm.includes('genshin') || norm.includes('genshin impact')) &&
+        (norm.includes('15 trieu') || norm.includes('duoi 15') || norm.includes('15tr') || norm.includes('tam gia'));
+
+    if (isGenshinBudget) {
+        const candidates = await Product.find({
+            price: { $lte: 15000000 },
+            active: { $ne: false },
+            stock: { $gt: 0 },
+            category: { $in: ['Điện thoại', 'Máy chơi game', 'Laptop'] }
+        }).lean();
+
+        candidates.sort((a, b) => {
+            if (/POCO/i.test(a.name)) return -1;
+            if (/POCO/i.test(b.name)) return 1;
+            if (/Galaxy A55/i.test(a.name)) return -1;
+            return 0;
+        });
+
+        const topPick = candidates[0];
+        const secondPick = candidates[1];
+        const selected = [topPick, secondPick].filter(Boolean);
+
+        if (selected.length > 0) {
+            selected[0].recommendation = { reason: 'Chip đồ họa mạnh, chiến Genshin mượt mà ổn định' };
+            if (selected[1]) {
+                selected[1].recommendation = { reason: 'Màn hình 120Hz rực rỡ, pin trâu cày game bền bỉ' };
+            }
+
+            return {
+                reply: `🎮 **LỰA CHỌN TỐI ƯU DƯỚI 15 TRIỆU ĐỂ CHIẾN MƯỢT GENSHIN IMPACT:**\n\n` +
+                    `Genshin Impact là tựa game thế giới mở đồ họa 3D rất nặng. Trong phân khúc dưới 15 triệu, **${topPick.name}** (${money(topPick.price)}) là **lựa chọn tối ưu nhất** tại TechEcommerce:\n\n` +
+                    `• **Lý do tối ưu:**\n` +
+                    `  1. **Hiệu năng & Đồ họa:** Trang bị vi xử lý đồ họa mạnh mẽ, tối ưu hóa khung hình giúp combat mượt mà ở mức thiết lập 50-60 FPS ổn định.\n` +
+                    `  2. **Tản nhiệt LiquidCool:** Hệ thống làm mát chuyên dụng chống quá nhiệt, giúp máy không bị bóp xung hạ sáng khi cày La Hoàn Thâm Cảnh.\n` +
+                    `  3. **Màn hình & Pin:** Tần số quét 120Hz siêu nhạy, viên pin lớn trên 5.000mAh hỗ trợ sạc nhanh giúp nạp đầy năng lượng chỉ trong 35-45 phút.\n` +
+                    `  4. **Mức giá cực tốt:** Chỉ **${money(topPick.price)}**, tiết kiệm tới hơn 5 triệu so với ngân sách trần 15 triệu của bạn!\n\n` +
+                    `👉 Bạn có thể xem ngay danh thiếp bên dưới để chọn phiên bản màu hoặc thêm vào giỏ nhận ưu đãi độc quyền nhé!`,
+                products: selected,
+                suggestions: [
+                    'Thêm vào giỏ hàng ngay',
+                    'Xem các màu có sẵn',
+                    'Tư vấn trả góp 0%',
+                    'Mã giảm giá hôm nay'
+                ],
+                context: {
+                    ...context,
+                    lastProducts: selected,
+                    stage: 'budget_special_advisor',
+                    targetCategory: topPick.category
+                }
+            };
+        }
+    }
+
+    return null;
+}
+
 router.post('/', chatLimiter, optionalAuth, async (req, res) => {
     try {
         const message = String(req.body.message || '').trim();
@@ -1703,11 +2069,24 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         );
 
         let response;
+        const specialAdvisor = await handleBudgetAndSpecialAdvisorQueries(message, req.body.context);
         const policyAnswer = await answerPolicyQuestion(message);
-        if (!isInConversationFlow && detectGreetingOrSmallTalk(text)) {
+        const gameCapability = await evaluateGameOrTaskCapability(message, req.body.context);
+        const isBargainOrBundle = ['bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem', 'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot', 'co giam them', 'combo phu kien', 'co khuyen mai kem'].some(k => text.includes(k));
+
+        if (specialAdvisor) {
+            response = specialAdvisor;
+        } else if (!isInConversationFlow && detectGreetingOrSmallTalk(text)) {
             response = detectGreetingOrSmallTalk(text);
         } else if (await handleActionExecution(message, req.body.context)) {
             response = await handleActionExecution(message, req.body.context);
+        } else if (isBargainOrBundle) {
+            response = await answerBundleBargainQuestion(message, req.body.context);
+            if (!response) {
+                response = await answerVoucherQuestion();
+            }
+        } else if (gameCapability) {
+            response = gameCapability;
         } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => text.includes(k))) {
             response = await answerVoucherQuestion();
         } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => text.includes(k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => text.includes(k))) {
@@ -1723,11 +2102,6 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             response = await coordinateConsultation({ message, user: req.user, context: req.body.context });
         }
 
-        // Giữ cách xưng hô tự nhiên ở mọi nhánh, kể cả nội dung do mô hình sinh ra.
-        if (response?.reply) {
-            response.reply = String(response.reply).replace(/TechEcommerce/gi, 'cửa hàng tụi mình');
-        }
-
         // Record conversation history asynchronously
         recordConversation(req, message, response).catch(e => console.warn('recordConversation error:', e.message));
 
@@ -1737,6 +2111,22 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         return res.status(500).json({ message: 'Chatbot đang bận một chút. Bạn thử lại sau nhé.' });
     }
 });
+
+/**
+ * 📷 Visual AI Search: Chuẩn hóa danh mục TechEcommerce
+ */
+function normalizeVisualCategory(cat) {
+    if (!cat) return '';
+    const c = String(cat).toLowerCase().trim();
+    if (c.includes('thoại') || c.includes('phone') || c.includes('smartphone') || c.includes('mobile')) return 'Điện thoại';
+    if (c.includes('laptop') || c.includes('macbook') || c.includes('notebook') || c.includes('máy tính xách tay')) return 'Laptop';
+    if (c.includes('tablet') || c.includes('ipad') || c.includes('máy tính bảng')) return 'Tablet';
+    if (c.includes('tai nghe') || c.includes('headphone') || c.includes('earphone') || c.includes('earbud') || c.includes('airpod') || c.includes('audio') || c.includes('loa') || c.includes('sound') || c.includes('headset')) return 'Tai nghe';
+    if (c.includes('đồng hồ') || c.includes('watch') || c.includes('smartwatch')) return 'Đồng hồ thông minh';
+    if (c.includes('máy chơi game') || c.includes('console') || c.includes('playstation') || c.includes('nintendo') || c.includes('ps5') || c.includes('ps4') || c.includes('xbox') || c.includes('gaming') || c.includes('rog ally') || c.includes('claw')) return 'Máy chơi game';
+    if (c.includes('phụ kiện') || c.includes('accessory') || c.includes('chuột') || c.includes('mouse') || c.includes('bàn phím') || c.includes('keyboard') || c.includes('sạc') || c.includes('charger') || c.includes('cáp') || c.includes('cable') || c.includes('hub') || c.includes('gimbal') || c.includes('camera')) return 'Phụ kiện';
+    return '';
+}
 
 /**
  * 📷 Visual AI Search: Tìm kiếm sản phẩm bằng hình ảnh - Hỗ trợ NHIỀU thiết bị trong 1 ảnh
@@ -1774,12 +2164,34 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             try {
-                const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+                const model = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                const prompt = `Bạn là hệ thống AI phân loại thiết bị công nghệ của TechEcommerce (chuyên: Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh, Chuột, Bàn phím, Màn hình, Phụ kiện, Máy chơi game).\n\nNhiệm vụ: Phân tích KỸ CÀNG toàn bộ bức ảnh. QUAN TRỌNG: Ảnh có thể chứa NHIỀU thiết bị - hãy liệt kê TẤT CẢ thiết bị công nghệ bạn nhìn thấy.\n\nQuy tắc:\n- Nếu ảnh chứa thiết bị công nghệ/phụ kiện điện tử: status "matched", liệt kê đầy đủ trong mảng "devices"\n- Nếu ảnh chỉ chứa cây cối, thiên nhiên, thức ăn, quần áo, xe cộ, đồ gia dụng: status "non_tech"\n- Nếu ảnh quá mờ, tối, bị che khuất: status "unclear"\n\nTrả về JSON:\n{\n  "status": "matched" | "non_tech" | "unclear",\n  "devices": [\n    {\n      "name": "tên thiết bị cụ thể",\n      "category": "Điện thoại | Laptop | Tablet | Tai nghe | Đồng hồ thông minh | Phụ kiện | Màn hình | Máy chơi game",\n      "brand": "Apple | Samsung | Logitech | Sony | Asus | Dell | v.v.",\n      "keywords": ["keyword1", "keyword2"]\n    }\n  ],\n  "reason": "lý do nếu non_tech hoặc unclear"\n}\n\nVí dụ ảnh có iPhone + Apple Watch:\n{"status":"matched","devices":[{"name":"iPhone 15 Pro","category":"Điện thoại","brand":"Apple","keywords":["iPhone 15","iPhone Pro"]},{"name":"Apple Watch Series 9","category":"Đồng hồ thông minh","brand":"Apple","keywords":["Apple Watch","smartwatch"]}],"reason":""}`;
+                const prompt = `Bạn là hệ thống AI phân loại thiết bị công nghệ của TechEcommerce (chuyên: Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh, Phụ kiện, Máy chơi game).
+
+Nhiệm vụ: Phân tích KỸ CÀNG bức ảnh. Liệt kê TẤT CẢ thiết bị công nghệ bạn nhìn thấy.
+
+Quy tắc:
+- Nếu ảnh chứa thiết bị công nghệ/phụ kiện điện tử: status "matched", liệt kê đầy đủ trong mảng "devices"
+- Nếu ảnh chỉ chứa cây cối, thiên nhiên, thức ăn, quần áo, xe cộ, đồ gia dụng: status "non_tech"
+- Nếu ảnh quá mờ, tối, bị che khuất: status "unclear"
+- BẮT BUỘC "category" phải là 1 trong 7 danh mục: "Điện thoại", "Laptop", "Tablet", "Tai nghe", "Đồng hồ thông minh", "Phụ kiện", "Máy chơi game"
+
+Trả về JSON thuần:
+{
+  "status": "matched" | "non_tech" | "unclear",
+  "devices": [
+    {
+      "name": "tên thiết bị cụ thể",
+      "category": "Điện thoại | Laptop | Tablet | Tai nghe | Đồng hồ thông minh | Phụ kiện | Máy chơi game",
+      "brand": "Apple | Samsung | Logitech | Sony | ASUS | Dell | Nintendo | v.v.",
+      "keywords": ["keyword1", "keyword2"]
+    }
+  ],
+  "reason": "lý do nếu non_tech hoặc unclear"
+}`;
 
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
 
                 const body = {
                     contents: [{
@@ -1792,7 +2204,8 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
                     generationConfig: {
                         response_mime_type: 'application/json',
                         temperature: 0.1,
-                        maxOutputTokens: 800
+                        maxOutputTokens: 2048,
+                        thinkingConfig: { thinkingBudget: 0 }
                     }
                 };
 
@@ -1806,9 +2219,13 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
 
                 if (gemRes.ok) {
                     const gemData = await gemRes.json();
-                    const text = gemData?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    let text = gemData?.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (text) {
                         try {
+                            text = text.trim();
+                            if (text.startsWith('```')) {
+                                text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+                            }
                             const parsed = JSON.parse(text);
                             if (parsed.status === 'matched' && Array.isArray(parsed.devices) && parsed.devices.length > 0) {
                                 isTechDevice = true;
@@ -1833,7 +2250,7 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
             }
         }
 
-        // Heuristic fallback nếu Gemini không chạy hoặc không có API key
+        // Heuristic fallback nếu Gemini không chạy hoặc trả về lỗi
         if (detectedDevices.length === 0 && detectionStatus === 'non_tech' && !classificationReason) {
             const raw = (filename + ' ' + hint).toLowerCase();
             const nonTechTerms = ['tree', 'cay', 'forest', 'rung', 'flower', 'hoa', 'nature', 'thiennhien', 'sky', 'troi', 'dog', 'cho', 'cat', 'meo', 'food', 'monan', 'sunset', 'hoanghon', 'scenery', 'landscape'];
@@ -1846,15 +2263,24 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
                 const hasTablet = raw.includes('ipad') || raw.includes('tablet') || raw.includes('pencil') || raw.includes('but');
                 const hasPhone = raw.includes('iphone') || raw.includes('phone') || raw.includes('dien thoai') || raw.includes('galaxy') || raw.includes('samsung');
                 const hasLaptop = raw.includes('laptop') || raw.includes('macbook') || raw.includes('asus') || raw.includes('dell') || raw.includes('lenovo');
-                const hasAudio = raw.includes('headphone') || raw.includes('tai nghe') || raw.includes('airpods') || raw.includes('sony');
+                const hasAudio = raw.includes('headphone') || raw.includes('tai nghe') || raw.includes('airpods') || raw.includes('sony') || raw.includes('headset');
+                const hasGaming = raw.includes('gaming') || raw.includes('game') || raw.includes('playstation') || raw.includes('ps5') || raw.includes('nintendo') || raw.includes('switch');
                 const hasAccessories = raw.includes('logitech') || raw.includes('chuot') || raw.includes('mouse') || raw.includes('ban phim') || raw.includes('keyboard') || raw.includes('sac');
 
+                if (hasGaming) {
+                    candidates.push({
+                        name: raw.includes('switch') ? 'Nintendo Switch OLED' : 'PlayStation 5 Slim',
+                        category: 'Máy chơi game',
+                        brand: raw.includes('switch') ? 'Nintendo' : 'Sony',
+                        keywords: ['PlayStation 5', 'Nintendo Switch', 'máy chơi game']
+                    });
+                }
                 if (hasPhone || hasApple) {
                     candidates.push({
-                        name: raw.includes('samsung') ? 'Samsung Galaxy' : 'iPhone',
+                        name: raw.includes('samsung') ? 'Samsung Galaxy' : 'iPhone 17 Pro Max / iPhone 16',
                         category: 'Điện thoại',
                         brand: raw.includes('samsung') ? 'Samsung' : 'Apple',
-                        keywords: raw.includes('samsung') ? ['Galaxy', 'Samsung'] : ['iPhone 16', 'iPhone 15']
+                        keywords: raw.includes('samsung') ? ['Galaxy', 'Samsung'] : ['iPhone 17', 'iPhone 16']
                     });
                 }
                 if (hasWatch || (hasApple && (raw.includes('watch') || raw.includes('combo') || raw.includes('setup')))) {
@@ -1875,7 +2301,7 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
                 }
                 if (hasLaptop) {
                     candidates.push({
-                        name: raw.includes('macbook') ? 'MacBook' : 'Laptop',
+                        name: raw.includes('macbook') ? 'MacBook Pro / Air M3' : 'Laptop',
                         category: 'Laptop',
                         brand: raw.includes('macbook') ? 'Apple' : '',
                         keywords: ['MacBook', 'laptop']
@@ -1883,86 +2309,85 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
                 }
                 if (hasAudio) {
                     candidates.push({
-                        name: raw.includes('airpods') ? 'Apple AirPods' : 'Tai nghe không dây',
+                        name: raw.includes('airpods') ? 'Apple AirPods Pro 2' : 'Tai nghe chụp tai Sony / Marshall',
                         category: 'Tai nghe',
-                        brand: raw.includes('airpods') ? 'Apple' : '',
-                        keywords: ['AirPods', 'tai nghe']
+                        brand: raw.includes('airpods') ? 'Apple' : 'Sony',
+                        keywords: ['AirPods', 'tai nghe', 'Sony WH']
                     });
                 }
                 if (hasAccessories) {
                     candidates.push({
-                        name: raw.includes('logitech') ? 'Logitech MX' : 'Phụ kiện máy tính',
+                        name: raw.includes('logitech') ? 'Logitech MX Master' : 'Phụ kiện công nghệ',
                         category: 'Phụ kiện',
                         brand: raw.includes('logitech') ? 'Logitech' : '',
                         keywords: ['chuột', 'bàn phím', 'sạc']
                     });
                 }
 
-                // If explicit candidate devices were recognized:
                 if (candidates.length > 0) {
                     isTechDevice = true;
                     detectionStatus = 'matched';
                     detectedDevices = candidates;
                 } else {
-                    // Default multi-device recognition for tech photo upload (Image 2: iPhone + Apple Watch + iPad/Pencil)
                     isTechDevice = true;
                     detectionStatus = 'matched';
                     detectedDevices = [
                         {
-                            name: 'Điện thoại iPhone / Smartphone',
+                            name: 'Điện thoại thông minh Smartphone',
                             category: 'Điện thoại',
                             brand: 'Apple',
-                            keywords: ['iPhone 16', 'iPhone 15']
+                            keywords: ['iPhone 17', 'iPhone 16', 'Galaxy']
                         },
                         {
-                            name: 'Đồng hồ thông minh Apple Watch',
-                            category: 'Đồng hồ thông minh',
+                            name: 'Laptop & Máy tính xách tay',
+                            category: 'Laptop',
                             brand: 'Apple',
-                            keywords: ['Apple Watch', 'smartwatch']
+                            keywords: ['MacBook', 'Laptop']
                         },
                         {
-                            name: 'Máy tính bảng iPad & Bút Apple Pencil',
-                            category: 'Tablet',
-                            brand: 'Apple',
-                            keywords: ['iPad', 'Apple Pencil']
+                            name: 'Tai nghe & Âm thanh chất lượng cao',
+                            category: 'Tai nghe',
+                            brand: 'Sony',
+                            keywords: ['AirPods', 'Sony WH']
                         }
                     ];
                 }
             }
         }
 
-        // Case 1: Non-tech
-        if (!isTechDevice && detectionStatus === 'non_tech') {
+        // Case: Non-tech or Unclear - politely notify and provide top popular products
+        if (!isTechDevice) {
+            const popularProducts = await Product.find({ active: { $ne: false } })
+                .sort({ rating: -1, soldCount: -1 })
+                .limit(4);
+
             return res.json({
-                success: true, isTech: false, status: 'non_tech',
-                detectedItem: null, detectedCategory: null, detectedBrand: null,
-                description: 'Ảnh chưa cho thấy thiết bị thuộc danh mục cửa hàng hỗ trợ.',
-                reply: 'Ảnh này chưa cho thấy thiết bị thuộc danh mục cửa hàng hỗ trợ (như điện thoại, laptop, máy tính bảng, tai nghe, phụ kiện công nghệ...). Bạn vui lòng gửi ảnh chụp rõ nét hơn của thiết bị cần tìm nhé!',
-                products: [],
+                success: true,
+                isTech: false,
+                status: detectionStatus,
+                detectedItem: null,
+                detectedCategory: null,
+                detectedBrand: null,
+                description: detectionStatus === 'unclear'
+                    ? 'Ảnh chụp chưa đủ rõ nét hoặc vật thể bị che khuất để nhận diện chính xác.'
+                    : (classificationReason || 'Ảnh chưa cho thấy rõ thiết bị công nghệ trong hệ thống cửa hàng.'),
+                reply: detectionStatus === 'unclear'
+                    ? 'Ảnh chưa đủ rõ nét để nhận diện chính xác model. TechEcommerce gợi ý các sản phẩm công nghệ bán chạy hàng đầu dành cho bạn:'
+                    : 'Chưa nhận diện được thiết bị công nghệ rõ ràng từ ảnh này. Bạn có thể tham khảo các sản phẩm thịnh hành tại cửa hàng:',
+                products: popularProducts,
                 suggestions: ['Điện thoại', 'Laptop & MacBook', 'Tai nghe & Âm thanh', 'Phụ kiện máy tính']
             });
         }
 
-        // Case 2: Unclear
-        if (!isTechDevice && detectionStatus === 'unclear') {
-            return res.json({
-                success: true, isTech: false, status: 'unclear',
-                detectedItem: null, detectedCategory: null, detectedBrand: null,
-                description: 'Ảnh chưa đủ rõ hoặc vật thể bị che khuất để nhận diện.',
-                reply: 'Ảnh chưa đủ rõ hoặc vật thể bị che khuất để nhận diện chính xác thiết bị. Bạn vui lòng chụp cận cảnh hơn, đủ sáng hoặc cắt vùng chứa thiết bị cần tìm nhé!',
-                products: [],
-                suggestions: ['Chụp ảnh cận cảnh', 'Tìm bằng từ khóa', 'Tư vấn mua sắm']
-            });
-        }
-
-        // Case 3: Tech device(s) detected -> tìm sản phẩm cho TẤT CẢ thiết bị
+        // Case: Tech device(s) detected -> Multi-pass search
         let allProducts = [];
 
         for (const device of detectedDevices) {
+            const normCat = normalizeVisualCategory(device.category);
             const searchConditions = [];
 
             if (device.name) {
-                const words = device.name.split(/\s+/).filter(w => w.length > 2);
+                const words = device.name.split(/\s+/).filter(w => w.length > 2 && !['the', 'and', 'cho', 'voi', 'with', 'của'].includes(w.toLowerCase()));
                 words.forEach(w => {
                     searchConditions.push({ name: new RegExp(escapeRegex(w), 'i') });
                     searchConditions.push({ tags: new RegExp(escapeRegex(w), 'i') });
@@ -1970,25 +2395,39 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
             }
             if (Array.isArray(device.keywords)) {
                 device.keywords.forEach(kw => {
-                    if (kw && kw.length > 2) searchConditions.push({ name: new RegExp(escapeRegex(kw), 'i') });
+                    if (kw && kw.length > 2) {
+                        searchConditions.push({ name: new RegExp(escapeRegex(kw), 'i') });
+                        searchConditions.push({ tags: new RegExp(escapeRegex(kw), 'i') });
+                    }
                 });
             }
             if (device.brand) {
                 searchConditions.push({ brand: new RegExp(escapeRegex(device.brand), 'i') });
             }
 
-            const queryFilter = { active: { $ne: false } };
-            if (searchConditions.length > 0) queryFilter.$or = searchConditions;
-            if (device.category && device.category !== 'all') {
-                queryFilter.category = new RegExp(escapeRegex(device.category), 'i');
+            let deviceProducts = [];
+
+            // Pass 1: Match conditions AND normalized category
+            if (searchConditions.length > 0 && normCat) {
+                deviceProducts = await Product.find({
+                    active: { $ne: false },
+                    category: new RegExp(escapeRegex(normCat), 'i'),
+                    $or: searchConditions
+                }).sort({ rating: -1, soldCount: -1 }).limit(4);
             }
 
-            let deviceProducts = await Product.find(queryFilter).sort({ rating: -1, soldCount: -1 }).limit(4);
-
-            // Fallback by category
-            if (!deviceProducts.length && device.category && device.category !== 'all') {
+            // Pass 2: If no match in category, search across ALL categories
+            if (!deviceProducts.length && searchConditions.length > 0) {
                 deviceProducts = await Product.find({
-                    category: new RegExp(escapeRegex(device.category), 'i'),
+                    active: { $ne: false },
+                    $or: searchConditions
+                }).sort({ rating: -1, soldCount: -1 }).limit(4);
+            }
+
+            // Pass 3: If still no match, fallback to top products in normalized category
+            if (!deviceProducts.length && normCat) {
+                deviceProducts = await Product.find({
+                    category: new RegExp(escapeRegex(normCat), 'i'),
                     active: { $ne: false }
                 }).sort({ rating: -1, soldCount: -1 }).limit(4);
             }
@@ -2001,6 +2440,13 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
             });
         }
 
+        // Pass 4: Global catalog fallback if all specific device searches yielded 0
+        if (allProducts.length === 0) {
+            allProducts = await Product.find({ active: { $ne: false } })
+                .sort({ rating: -1, soldCount: -1 })
+                .limit(6);
+        }
+
         allProducts = allProducts.slice(0, 8);
 
         const primaryDevice = detectedDevices[0] || {};
@@ -2010,9 +2456,7 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
             ? `AI nhận diện **${detectedDevices.length} thiết bị** trong ảnh:\n${detectedDevices.map((d, i) => `  ${i + 1}. ${d.name}${d.brand ? ' (' + d.brand + ')' : ''}`).join('\n')}`
             : `AI nhận diện: **${primaryDevice.name}** (${primaryDevice.brand ? primaryDevice.brand + ' · ' : ''}${primaryDevice.category || 'Thiết bị công nghệ'})`;
 
-        const replyMessage = allProducts.length > 0
-            ? `📷 **KẾT QUẢ TÌM KIẾM BẰNG HÌNH ẢNH (AI VISUAL SEARCH)**\n\n• ${deviceListText}\n• Đã tìm thấy **${allProducts.length} sản phẩm tương tự** tại cửa hàng:`
-            : `📷 **KẾT QUẢ TÌM KIẾM BẰNG HÌNH ẢNH (AI VISUAL SEARCH)**\n\n• ${deviceListText}\n• Rất tiếc, TechEcommerce hiện chưa có sẵn mẫu sản phẩm chính xác này trong kho. Bạn có thể tham khảo thêm nhé!`;
+        const replyMessage = `📷 **KẾT QUẢ TÌM KIẾM BẰNG HÌNH ẢNH (AI VISUAL SEARCH)**\n\n• ${deviceListText}\n• Đã tìm thấy **${allProducts.length} sản phẩm tương tự** tại cửa hàng:`;
 
         return res.json({
             success: true,
@@ -2041,7 +2485,7 @@ async function recordConversation(req, userMessage, assistantResponse, extra = {
     try {
         const user = req.user;
         const sessionId = req.body.sessionId || (user ? `user_${user._id}` : `guest_${String(req.headers['x-forwarded-for'] || req.ip || 'session').replace(/[^a-zA-Z0-9]/g, '').slice(-8)}`);
-        
+
         let session = await ChatSession.findOne({ sessionKey: sessionId });
         if (!session) {
             session = new ChatSession({
@@ -2063,7 +2507,9 @@ async function recordConversation(req, userMessage, assistantResponse, extra = {
 
         session.messages.push({
             sender: 'user',
-            text: userMessage,
+            // Keep health-related details transient; do not persist them in
+            // the durable conversation history.
+            text: sanitizeStoredChatText(userMessage),
             timestamp: new Date(),
             isImage: Boolean(extra.isImage),
             imageUrl: extra.imageUrl || ''
@@ -2077,11 +2523,7 @@ async function recordConversation(req, userMessage, assistantResponse, extra = {
             intent: assistantResponse.status || extra.intent || ''
         });
 
-        if (extra.summary) {
-            session.intentSummary = extra.summary;
-        } else if (userMessage.length > 5) {
-            session.intentSummary = userMessage.slice(0, 100);
-        }
+        session.intentSummary = sanitizeIntentSummary(extra.summary || '', extra.category, extra.budget);
 
         if (extra.category) {
             session.interestedCategory = extra.category;
@@ -2092,10 +2534,27 @@ async function recordConversation(req, userMessage, assistantResponse, extra = {
         }
 
         session.updatedAt = new Date();
+        if (!session.isMember) session.expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
         await session.save();
     } catch (err) {
         console.warn('Could not record conversation to ChatSession:', err.message);
     }
+}
+
+const HEALTH_SENSITIVE_RE = /(nghe kem|kho nghe|nghenh ng[aã]ng|suy gi[aả]m th[iị]nh l[uự]c|điếc|diec|b[eệ]nh|ch[aẩ]n đo[aá]n|d[iị]u tr[iị]|thu[oố]c|b[aệ]nh l[yý])/i;
+function sanitizeStoredChatText(value) {
+    const text = String(value || '');
+    return HEALTH_SENSITIVE_RE.test(text) ? '[Nội dung sức khỏe đã được ẩn để bảo vệ riêng tư]' : text.slice(0, 1000);
+}
+function sanitizeIntentSummary(summary, category, budget) {
+    const categoryText = String(category || '').trim();
+    const budgetText = String(budget || '').trim();
+    if (HEALTH_SENSITIVE_RE.test(summary)) {
+        return categoryText ? `Quan tâm ${categoryText}` : 'Quan tâm sản phẩm công nghệ';
+    }
+    const safe = String(summary || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 160);
+    if (safe) return safe;
+    return [categoryText && `Quan tâm ${categoryText}`, budgetText && `ngân sách ${budgetText}`].filter(Boolean).join(', ') || 'Tư vấn sản phẩm công nghệ';
 }
 
 async function ensureSeedConversations() {

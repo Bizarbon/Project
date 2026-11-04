@@ -1357,20 +1357,37 @@ html[data-theme='dark'] .storefront-header {
 }
 
 .storefront-logo-text {
-    font-size: clamp(1.15rem, 1.7vw, 1.6rem);
-    font-weight: 800;
+    font-size: clamp(1.2rem, 1.8vw, 1.65rem);
+    font-weight: 850;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, #0066FF 0%, #00D2FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    transition: filter 0.25s ease;
+}
+
+html[data-theme='dark'] .storefront-logo-text {
+    background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.45));
+}
+
+.storefront-logo:hover .storefront-logo-text {
+    filter: drop-shadow(0 0 14px rgba(0, 102, 255, 0.6));
 }
 
 .header-search {
     position: relative;
-    display: grid;
+    display: flex;
+    align-items: center;
     min-width: 0;
     height: 46px;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
-    align-items: center;
     border: 1px solid var(--neo-border-strong);
     border-radius: 8px;
     background: var(--neo-panel);
+    overflow: hidden;
 }
 
 .header-search:focus-within {
@@ -1379,32 +1396,43 @@ html[data-theme='dark'] .storefront-header {
 }
 
 .header-search-icon {
+    flex: 0 0 auto;
     padding-left: 0.9rem;
+    padding-right: 0.35rem;
     color: var(--neo-muted);
-    font-size: 1.35rem;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    line-height: 1;
 }
 
 .header-search input {
-    width: 100% !important;
-    height: 44px;
-    padding: 0 0.7rem !important;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0.6rem !important;
     border: 0 !important;
     outline: 0;
     background: transparent !important;
     box-shadow: none !important;
+    font-size: 0.9rem;
+    color: var(--neo-text, inherit);
 }
 
 .header-search-camera-btn {
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: transparent !important;
     border: none !important;
     color: var(--neo-muted) !important;
-    min-width: 38px !important;
+    width: 36px !important;
+    min-width: 36px !important;
     height: 100% !important;
     cursor: pointer;
-    padding: 0 6px !important;
+    padding: 0 !important;
+    margin-right: 6px;
     transition: color 0.15s ease, transform 0.15s ease;
 }
 
@@ -1414,14 +1442,22 @@ html[data-theme='dark'] .storefront-header {
 }
 
 .header-search button[type="submit"] {
+    flex: 0 0 auto;
     align-self: stretch;
-    min-width: 92px;
+    height: 100%;
+    min-width: 96px;
+    padding: 0 16px;
     border: 0 !important;
-    border-radius: 0 7px 7px 0 !important;
+    border-radius: 0 !important;
     color: #ffffff !important;
     background: linear-gradient(135deg, #38a3ff, #2f80ed) !important;
     font-weight: 600;
+    font-size: 0.9rem;
     cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Live Search Dropdown - Premium Redesign */
@@ -2060,6 +2096,43 @@ html[data-theme='dark'] .live-search-empty {
 .visual-detected-title {
     font-size: 0.95rem;
     color: #ffffff;
+}
+
+.visual-search-badge-flex {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.visual-search-user-thumb {
+    width: 46px;
+    height: 46px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    flex-shrink: 0;
+    background: #0f172a;
+}
+
+.visual-search-meta-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.visual-detected-desc {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--neo-muted, #94a3b8);
+    margin-top: 2px;
+    line-height: 1.3;
+}
+
+.badge-ai-chip.is-warning {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .faceted-spec-bar[hidden],
@@ -4985,12 +5058,21 @@ html[data-theme='dark'] .hero-control {
 }
 
 @media (max-width: 768px) {
+    .container,
+    main.container {
+        padding-inline: 12px !important;
+    }
+
+    body {
+        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
     .hero-carousel,
     #promoCarousel {
         display: block !important;
         position: relative !important;
-        min-height: 200px !important;
-        height: 200px !important;
+        min-height: 285px !important;
+        height: 285px !important;
         margin: 0.5rem 0 0.85rem !important;
         border-radius: 14px !important;
         overflow: hidden !important;
@@ -5012,7 +5094,7 @@ html[data-theme='dark'] .hero-control {
         inset: 0 !important;
         display: flex !important;
         align-items: center !important;
-        padding: 0.75rem 1rem !important;
+        padding: 0.55rem 0.8rem 1.2rem !important;
         width: 100% !important;
         height: 100% !important;
         opacity: 0;
@@ -5030,7 +5112,7 @@ html[data-theme='dark'] .hero-control {
         display: grid !important;
         grid-template-columns: 1.35fr 0.85fr !important;
         align-items: center !important;
-        gap: 0.45rem !important;
+        gap: 0.35rem !important;
         width: 100% !important;
         height: 100% !important;
     }
@@ -5044,17 +5126,21 @@ html[data-theme='dark'] .hero-control {
     }
 
     .hero-badge-wrap {
-        margin-bottom: 0.2rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 2px 7px !important;
+        margin-bottom: 0.15rem !important;
+        border-radius: 999px !important;
     }
 
     .hero-eyebrow {
-        font-size: 0.68rem !important;
+        font-size: 0.65rem !important;
     }
 
     .hero-slide h2 {
-        font-size: 1.15rem !important;
-        line-height: 1.25 !important;
-        margin-bottom: 0.3rem !important;
+        font-size: 1.02rem !important;
+        line-height: 1.22 !important;
+        margin-bottom: 0.2rem !important;
     }
 
     .hero-desc {
@@ -5063,27 +5149,35 @@ html[data-theme='dark'] .hero-control {
         -webkit-box-orient: vertical !important;
         -webkit-line-clamp: 2 !important;
         line-clamp: 2 !important;
-        font-size: 0.76rem !important;
-        line-height: 1.3 !important;
-        margin-bottom: 0.4rem !important;
+        font-size: 0.72rem !important;
+        line-height: 1.25 !important;
+        margin-bottom: 0.3rem !important;
     }
 
     .hero-features {
         display: flex !important;
         flex-wrap: wrap !important;
-        gap: 0.25rem !important;
-        margin-bottom: 0.45rem !important;
+        gap: 0.2rem !important;
+        margin-bottom: 0.35rem !important;
     }
 
     .hero-feature-pill {
-        font-size: 0.65rem !important;
-        padding: 2px 6px !important;
+        font-size: 0.62rem !important;
+        padding: 2px 5px !important;
+        white-space: nowrap !important;
     }
 
     .hero-cta {
-        padding: 0.32rem 0.75rem !important;
-        font-size: 0.76rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        min-height: 32px !important;
+        height: 32px !important;
+        padding: 0 0.85rem !important;
+        font-size: 0.74rem !important;
+        font-weight: 700 !important;
         border-radius: 9999px !important;
+        margin-bottom: 0.2rem !important;
     }
 
     .hero-slide-visual {
@@ -5098,7 +5192,7 @@ html[data-theme='dark'] .hero-control {
 
     .hero-slide-visual img,
     .hero-visual-img {
-        max-height: 140px !important;
+        max-height: 155px !important;
         max-width: 100% !important;
         object-fit: contain !important;
         display: block !important;
@@ -5109,23 +5203,53 @@ html[data-theme='dark'] .hero-control {
     }
 
     .hero-control {
-        top: auto !important;
-        bottom: 8px !important;
-        width: 26px !important;
-        height: 26px !important;
+        top: 50% !important;
+        bottom: auto !important;
+        transform: translateY(-50%) !important;
+        width: 28px !important;
+        height: 28px !important;
         font-size: 1.1rem !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 10 !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
     }
 
     .hero-control-prev {
-        left: 8px !important;
+        left: 6px !important;
     }
 
     .hero-control-next {
-        right: 8px !important;
+        right: 6px !important;
     }
 
     .hero-dots {
-        bottom: 12px !important;
+        position: absolute !important;
+        bottom: 8px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        z-index: 10 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    .hero-dot {
+        width: 6px !important;
+        height: 6px !important;
+        border-radius: 50% !important;
+    }
+
+    .hero-dot.is-active {
+        width: 16px !important;
+        border-radius: 999px !important;
     }
 
     /* Category Navigation Bar below Banner (CellphoneS Style) */
@@ -6445,21 +6569,90 @@ html[data-theme='dark'] .site-footer {
 }
 
 .product-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.55rem;
-    margin-top: auto;
-    padding-top: 0.8rem;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    margin-top: auto !important;
+    padding-top: 0.65rem !important;
+    width: 100% !important;
 }
 
-.product-actions .btn-add-cart,
+.product-actions .btn-add-cart {
+    flex: 1.35 !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 0.5rem !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+    background: #0066FF !important;
+    color: #ffffff !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.3rem !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.product-actions .btn-add-cart:hover:not(:disabled) {
+    background: #0052cc !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3) !important;
+}
+
+.product-actions .btn-quick-view,
 .product-actions .btn-compare {
-    width: 100%;
-    min-width: 0;
-    min-height: 42px;
-    margin: 0;
-    padding: 0.65rem 0.75rem;
-    white-space: nowrap;
+    flex: 1 !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 0.45rem !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    background: var(--surface, #f8fafc) !important;
+    color: var(--text-primary, #1e293b) !important;
+    border: 1px solid var(--border, #cbd5e1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.25rem !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.product-actions .btn-quick-view:hover,
+.product-actions .btn-compare:hover {
+    border-color: #0066FF !important;
+    color: #0066FF !important;
+    background: rgba(0, 102, 255, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+.product-actions .btn-compare.active {
+    background: #0284c7 !important;
+    border-color: #0284c7 !important;
+    color: #ffffff !important;
+}
+
+html[data-theme='dark'] .product-actions .btn-quick-view,
+html[data-theme='dark'] .product-actions .btn-compare {
+    background: rgba(30, 41, 59, 0.7) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='dark'] .product-actions .btn-quick-view:hover,
+html[data-theme='dark'] .product-actions .btn-compare:hover {
+    border-color: #38bdf8 !important;
+    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.12) !important;
 }
 
 /* Keep native select affordances visible after theme background overrides. */
@@ -8870,14 +9063,17 @@ html[data-theme='dark'] .product-price-row .price {
 .product-card .product-actions {
     margin-top: auto !important;
     padding-top: 0.75rem !important;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 0.5rem !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
 }
 
 .product-card .product-actions button {
-    min-height: 40px !important;
-    font-size: 0.85rem !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    font-size: 0.78rem !important;
     font-weight: 600 !important;
     border-radius: 8px !important;
 }
@@ -9550,3 +9746,2151 @@ html[data-theme='dark'] .btn-picker-add:hover {
     color: #ffffff !important;
 }
 
+
+/* ==========================================================================
+   LUCIAN UX/UI PHASE 1 — CORE STOREFRONT & CONVERSION (P0)
+   Elements: #021, #070, #100, #216, #226, #039, #051, #022, #228, #221, #240
+   ========================================================================== */
+
+:root,
+html[data-theme="light"] {
+    --ux-bg: #f8fafc;
+    --ux-surface: #ffffff;
+    --ux-surface-2: #f1f5f9;
+    --ux-border: #e2e8f0;
+    --ux-border-strong: #cbd5e1;
+    --ux-text: #0f172a;
+    --ux-muted: #475569;
+    --ux-subtle: #64748b;
+    --ux-accent: #2563eb;
+    --ux-accent-fg: #ffffff;
+    --ux-accent-soft: rgba(37, 99, 235, 0.12);
+    --ux-success: #10b981;
+    --ux-warn: #f59e0b;
+    --ux-danger: #ef4444;
+    --ux-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.14);
+}
+
+html[data-theme="dark"] {
+    --ux-bg: #070b14;
+    --ux-surface: #0f172a;
+    --ux-surface-2: #1e293b;
+    --ux-border: rgba(148, 163, 184, 0.18);
+    --ux-border-strong: rgba(148, 163, 184, 0.32);
+    --ux-text: #f8fafc;
+    --ux-muted: #94a3b8;
+    --ux-subtle: #64748b;
+    --ux-accent: #3b82f6;
+    --ux-accent-fg: #ffffff;
+    --ux-accent-soft: rgba(59, 130, 246, 0.18);
+    --ux-success: #10b981;
+    --ux-warn: #fbbf24;
+    --ux-danger: #f87171;
+    --ux-shadow: 0 18px 42px -10px rgba(2, 6, 23, 0.65);
+}
+
+/* Lucian UX/UI Prompt #021 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#021 */
+.theme-toggle.u021-sw-host {
+    --sky: #4187bf;
+    width: 94px !important;
+    height: 40px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 999px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle.u021-sw-host.is-dark,
+html[data-theme="dark"] .theme-toggle.u021-sw-host {
+    --sky: #1b202c;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.theme-toggle.u021-sw-host .u021-stage {
+    position: relative;
+    width: 224px;
+    height: 94px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--sky);
+    transform: scale(0.42);
+    transform-origin: center center;
+    transition: background .58s cubic-bezier(.22, 1, .36, 1), box-shadow .4s ease, transform .2s ease;
+    box-shadow:
+        inset 0 6px 12px rgba(9, 32, 63, .38),
+        inset 0 -3px 7px rgba(255, 255, 255, .32),
+        0 0 0 3px rgba(255, 255, 255, .28),
+        0 16px 34px -8px rgba(15, 23, 42, .45);
+}
+
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stage {
+    box-shadow:
+        inset 0 7px 14px rgba(0, 0, 0, .62),
+        inset 0 -2px 5px rgba(255, 255, 255, .07),
+        0 0 0 3px rgba(148, 163, 184, .24),
+        0 18px 36px -8px rgba(0, 0, 0, .72);
+}
+
+.theme-toggle.u021-sw-host:hover .u021-stage {
+    transform: scale(0.438);
+}
+
+.theme-toggle.u021-sw-host:active .u021-stage {
+    transform: scale(0.405);
+}
+
+.theme-toggle.u021-sw-host:focus-visible {
+    outline: none !important;
+}
+
+.theme-toggle.u021-sw-host:focus-visible .u021-stage {
+    box-shadow:
+        0 0 0 6px var(--ux-accent),
+        inset 0 6px 12px rgba(9, 32, 63, .38);
+}
+
+.u021-halo {
+    position: absolute;
+    top: 47px;
+    left: 47px;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    transition: transform .62s cubic-bezier(.34, 1.25, .64, 1);
+}
+
+.theme-toggle.u021-sw-host.is-dark .u021-halo,
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-halo {
+    transform: translateX(130px);
+}
+
+.u021-r {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, .09);
+    transition: background .58s ease;
+}
+
+.u021-r1 { width: 128px; height: 128px; }
+.u021-r2 { width: 178px; height: 178px; }
+.u021-r3 { width: 228px; height: 228px; }
+
+.theme-toggle.u021-sw-host.is-dark .u021-r,
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-r {
+    background: rgba(255, 255, 255, .045);
+}
+
+.u021-knob {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    z-index: 4;
+    overflow: hidden;
+    background: radial-gradient(circle at 32% 28%, #fff5b8 0%, #ffd43b 42%, #f4b41a 100%);
+    box-shadow:
+        inset -4px -5px 9px rgba(180, 105, 0, .42),
+        inset 3px 4px 8px rgba(255, 255, 255, .8),
+        0 6px 14px rgba(12, 24, 48, .38);
+    transition: transform .62s cubic-bezier(.34, 1.25, .64, 1);
+}
+
+.theme-toggle.u021-sw-host.is-dark .u021-knob,
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-knob {
+    transform: translateX(130px);
+}
+
+.u021-moon {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #eef1f6 0%, #cfd5df 58%, #adb5c4 100%);
+    box-shadow:
+        inset -5px -5px 10px rgba(72, 80, 98, .5),
+        inset 3px 4px 8px rgba(255, 255, 255, .85);
+    transform: translateX(100%);
+    transition: transform .58s cubic-bezier(.22, 1, .36, 1);
+}
+
+.theme-toggle.u021-sw-host.is-dark .u021-moon,
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-moon {
+    transform: translateX(0);
+}
+
+.u021-cr {
+    position: absolute;
+    border-radius: 50%;
+    background: #96a0b2;
+    box-shadow:
+        inset 1.5px 2px 3px rgba(55, 63, 78, .55),
+        0 1px 0 rgba(255, 255, 255, .55);
+}
+
+.u021-cr1 { width: 24px; height: 24px; top: 32px; left: 14px; }
+.u021-cr2 { width: 13px; height: 13px; top: 14px; left: 34px; }
+.u021-cr3 { width: 15px; height: 15px; top: 46px; left: 46px; }
+
+.u021-clouds {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    transition: transform .6s cubic-bezier(.22, 1, .36, 1), opacity .48s ease;
+}
+
+.theme-toggle.u021-sw-host.is-dark .u021-clouds,
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-clouds {
+    transform: translateY(72px);
+    opacity: 0;
+}
+
+.u021-cl {
+    position: absolute;
+    border-radius: 50%;
+}
+
+.u021-cb { background: #a8cbe8; }
+.u021-cf { background: #f4f9fd; }
+.u021-cb1 { width: 58px; height: 58px; bottom: -14px; left: 62px; }
+.u021-cb2 { width: 64px; height: 64px; bottom: -8px; left: 102px; }
+.u021-cb3 { width: 72px; height: 72px; bottom: 2px; left: 142px; }
+.u021-cb4 { width: 78px; height: 78px; bottom: 24px; right: -26px; }
+.u021-cf1 { width: 52px; height: 52px; bottom: -26px; left: 48px; }
+.u021-cf2 { width: 58px; height: 58px; bottom: -20px; left: 84px; }
+.u021-cf3 { width: 64px; height: 64px; bottom: -18px; left: 122px; }
+.u021-cf4 { width: 68px; height: 68px; bottom: -8px; left: 158px; }
+.u021-cf5 { width: 70px; height: 70px; bottom: 12px; right: -28px; }
+
+.u021-stars {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    transform: translateY(-64px);
+    opacity: 0;
+    transition: transform .6s cubic-bezier(.22, 1, .36, 1), opacity .48s ease;
+}
+
+.theme-toggle.u021-sw-host.is-dark .u021-stars,
+html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.u021-sp {
+    position: absolute;
+    background: #fff;
+    clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
+    animation: u021tw 2.6s ease-in-out infinite;
+}
+
+.u021-p1 { width: 13px; height: 13px; top: 16px; left: 38px; }
+.u021-p2 { width: 9px; height: 9px; top: 44px; left: 88px; animation-delay: .8s; }
+.u021-p3 { width: 8px; height: 8px; top: 64px; left: 32px; animation-delay: 1.5s; }
+
+.u021-sd {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+}
+
+.u021-d1 { width: 4px; height: 4px; top: 24px; left: 22px; opacity: .75; }
+.u021-d2 { width: 3px; height: 3px; top: 48px; left: 24px; opacity: .55; }
+.u021-d3 { width: 5px; height: 5px; top: 38px; left: 56px; opacity: .85; }
+.u021-d4 { width: 3px; height: 3px; top: 66px; left: 66px; opacity: .6; }
+.u021-d5 { width: 4px; height: 4px; top: 18px; left: 82px; opacity: .8; }
+.u021-d6 { width: 3px; height: 3px; top: 24px; left: 108px; opacity: .65; }
+
+@keyframes u021tw {
+    0%, 100% { transform: scale(1); opacity: .95; }
+    50% { transform: scale(.7); opacity: .45; }
+}
+
+@media (max-width: 768px) {
+    #themeToggle.theme-toggle.u021-sw-host,
+    .theme-toggle.u021-sw-host {
+        display: inline-flex !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        width: 64px !important;
+        height: 27px !important;
+        left: 10px !important;
+        bottom: 84px !important;
+    }
+    .theme-toggle.u021-sw-host .u021-stage {
+        transform: scale(0.285);
+    }
+    .theme-toggle.u021-sw-host:hover .u021-stage {
+        transform: scale(0.295);
+    }
+}
+
+/* Lucian UX/UI Prompt #070 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#070 */
+.u070-zone {
+    position: fixed;
+    top: 84px;
+    right: 20px;
+    z-index: 10050;
+    width: min(360px, calc(100vw - 28px));
+    pointer-events: none;
+}
+
+.u070-list {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+    transition: height .32s cubic-bezier(.22, 1, .36, 1);
+}
+
+.u070-t {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    bottom: auto !important;
+    pointer-events: auto;
+    display: grid !important;
+    grid-template-columns: auto 1fr auto;
+    align-items: start;
+    gap: .7rem;
+    padding: .82rem .92rem .94rem !important;
+    border-radius: 14px !important;
+    background: var(--ux-surface) !important;
+    color: var(--ux-text) !important;
+    border: 1px solid var(--ux-border) !important;
+    box-shadow: var(--ux-shadow) !important;
+    overflow: hidden;
+    transform-origin: top center;
+    transform: translate3d(0, calc(var(--i, 0) * 11px), 0) scale(calc(1 - var(--i, 0) * .045)) !important;
+    opacity: calc(1 - var(--i, 0) * .18) !important;
+    z-index: calc(30 - var(--i, 0));
+    transition:
+        transform .36s cubic-bezier(.22, 1, .36, 1),
+        opacity .28s ease,
+        border-color .2s ease;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+.u070-zone.is-hover .u070-t {
+    transform: translate3d(0, var(--stack-y, 0px), 0) scale(1) !important;
+    opacity: 1 !important;
+}
+
+.u070-t.is-enter {
+    transform: translate3d(24px, -16px, 0) scale(.94) !important;
+    opacity: 0 !important;
+}
+
+.u070-t.is-out {
+    transform: translate3d(110%, 0, 0) scale(.92) !important;
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+.u070-ic {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    margin-top: .05rem;
+}
+
+.u070-ic svg {
+    width: 14px;
+    height: 14px;
+}
+
+.u070-t[data-type="success"] .u070-ic {
+    background: rgba(16, 185, 129, 0.14);
+    color: var(--ux-success);
+}
+
+.u070-t[data-type="error"] .u070-ic {
+    background: rgba(239, 68, 68, 0.14);
+    color: var(--ux-danger);
+}
+
+.u070-t[data-type="warning"] .u070-ic {
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--ux-warn);
+}
+
+.u070-t[data-type="info"] .u070-ic {
+    background: var(--ux-accent-soft);
+    color: var(--ux-accent);
+}
+
+.u070-tx {
+    min-width: 0;
+}
+
+.u070-ti {
+    margin: 0;
+    font-size: .82rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--ux-text);
+}
+
+.u070-de {
+    margin: .18rem 0 0;
+    font-size: .78rem;
+    color: var(--ux-muted);
+    line-height: 1.42;
+}
+
+.u070-x {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--ux-subtle);
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background .15s ease, color .15s ease;
+}
+
+.u070-x:hover {
+    background: var(--ux-surface-2);
+    color: var(--ux-text);
+}
+
+.u070-x svg {
+    width: 12px;
+    height: 12px;
+}
+
+.u070-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--ux-surface-2);
+    overflow: hidden;
+}
+
+.u070-bar > i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: var(--ux-accent);
+}
+
+.u070-t[data-type="success"] .u070-bar > i { background: var(--ux-success); }
+.u070-t[data-type="error"] .u070-bar > i { background: var(--ux-danger); }
+.u070-t[data-type="warning"] .u070-bar > i { background: var(--ux-warn); }
+
+/* Lucian UX/UI Prompt #100 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#100 */
+#flashSaleTimer {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    perspective: 420px;
+}
+
+#flashSaleTimer .timer-box.u100-fl,
+#flashSaleTimer .fs-time-box.u100-fl {
+    position: relative;
+    min-width: 38px;
+    height: 34px;
+    padding: 0 6px !important;
+    border-radius: 8px;
+    background: #0f172a;
+    border: 1px solid rgba(248, 250, 252, 0.16);
+    box-shadow: 0 6px 14px -4px rgba(15, 23, 42, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    font-size: 0.92rem;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform-style: preserve-3d;
+}
+
+#flashSaleTimer .timer-box.u100-fl::after,
+#flashSaleTimer .fs-time-box.u100-fl::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.42);
+    z-index: 5;
+    pointer-events: none;
+}
+
+#flashSaleTimer .timer-box.u100-fl.is-flipping,
+#flashSaleTimer .fs-time-box.u100-fl.is-flipping {
+    animation: u100CardFlip 0.46s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes u100CardFlip {
+    0% { transform: rotateX(0deg) scale(1); }
+    45% { transform: rotateX(-38deg) scale(1.06); background: #dc2626; }
+    100% { transform: rotateX(0deg) scale(1); }
+}
+
+/* Lucian UX/UI Prompt #216 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#216 */
+/* Lucian UX/UI Prompt #226 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#226 */
+#promoCarousel {
+    --mx: 50%;
+    --my: 50%;
+}
+
+#promoCarousel .hero-grid-pattern {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+#promoCarousel .hero-grid-pattern::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        420px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(56, 189, 248, 0.22),
+        rgba(37, 99, 235, 0.08) 45%,
+        transparent 75%
+    );
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#promoCarousel .hero-slide.is-active .hero-kicker {
+    animation: u216HeroRise 0.52s cubic-bezier(.16, 1, .3, 1) 0.03s both;
+}
+
+#promoCarousel .hero-slide.is-active h1,
+#promoCarousel .hero-slide.is-active h2,
+#promoCarousel .hero-slide.is-active .hero-slide-title {
+    animation: u216HeroRise 0.58s cubic-bezier(.16, 1, .3, 1) 0.09s both;
+}
+
+#promoCarousel .hero-slide.is-active .hero-lead {
+    animation: u216HeroRise 0.62s cubic-bezier(.16, 1, .3, 1) 0.15s both;
+}
+
+#promoCarousel .hero-slide.is-active .hero-perks {
+    animation: u216HeroRise 0.64s cubic-bezier(.16, 1, .3, 1) 0.21s both;
+}
+
+#promoCarousel .hero-slide.is-active .hero-actions {
+    animation: u216HeroRise 0.66s cubic-bezier(.16, 1, .3, 1) 0.27s both;
+}
+
+#promoCarousel .hero-slide.is-active .hero-visual {
+    animation: u216HeroVisual 0.72s cubic-bezier(.16, 1, .3, 1) 0.14s both;
+}
+
+@keyframes u216HeroRise {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0);
+        filter: blur(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        filter: blur(0);
+    }
+}
+
+@keyframes u216HeroVisual {
+    from {
+        opacity: 0;
+        transform: translate3d(18px, 12px, 0) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+/* Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 */
+.header-category-list,
+#brandChipList {
+    position: relative;
+}
+
+.header-category-list > li,
+#brandChipList > li {
+    position: relative;
+    z-index: 1;
+}
+
+.u039-pill-item {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: var(--w, 0px);
+    height: var(--h, 36px);
+    transform: translate3d(var(--x, 0px), var(--y, 0px), 0);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.16), rgba(56, 189, 248, 0.18));
+    border: 1px solid rgba(59, 130, 246, 0.38);
+    box-shadow: 0 6px 18px -6px rgba(37, 99, 235, 0.45);
+    pointer-events: none !important;
+    z-index: 0 !important;
+    opacity: var(--pill-o, 0);
+    transition:
+        transform .38s cubic-bezier(.22, 1, .36, 1),
+        width .32s cubic-bezier(.22, 1, .36, 1),
+        height .25s ease,
+        opacity .2s ease;
+    list-style: none !important;
+}
+
+html[data-theme="dark"] .u039-pill-item {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(14, 165, 233, 0.22));
+    border-color: rgba(96, 165, 250, 0.5);
+    box-shadow: 0 8px 22px -6px rgba(37, 99, 235, 0.6);
+}
+
+/* Lucian UX/UI Prompt #051 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#051 */
+.btn-add-cart.u051-ok,
+.btn-add-cart-secondary.u051-ok,
+.sticky-btn-cart.u051-ok {
+    background: linear-gradient(135deg, #059669, #10b981) !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.55) !important;
+    transform: translateY(-1px);
+}
+
+.u051-fly-thumb {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #ffffff;
+    border: 2px solid #3b82f6;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.32);
+    z-index: 10060;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.u051-cart-bump {
+    animation: u051CartWobble 0.48s cubic-bezier(.22, 1, .36, 1);
+}
+
+.u051-badge-pop {
+    animation: u051BadgePop 0.42s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+@keyframes u051CartWobble {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    30% { transform: scale(1.12) rotate(-8deg); }
+    65% { transform: scale(1.06) rotate(6deg); }
+}
+
+@keyframes u051BadgePop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.42); }
+    100% { transform: scale(1); }
+}
+
+/* Lucian UX/UI Prompt #022 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#022 */
+.wishlist-btn,
+.btn-wishlist-toggle {
+    overflow: visible !important;
+}
+
+.wishlist-btn .u022-ring,
+.btn-wishlist-toggle .u022-ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border-radius: 50%;
+    border: 2px solid #f43f5e;
+    transform: scale(0.2);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.wishlist-btn .u022-burst,
+.btn-wishlist-toggle .u022-burst {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.wishlist-btn .u022-dot,
+.btn-wishlist-toggle .u022-dot {
+    position: absolute;
+    left: -2.5px;
+    top: -2.5px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #f43f5e;
+    opacity: 0;
+    transform: rotate(var(--a, 0deg)) translateY(0) scale(0);
+}
+
+.wishlist-btn.is-pop,
+.btn-wishlist-toggle.is-pop {
+    animation: u022HeartBounce 0.52s cubic-bezier(.16, 1, .3, 1);
+}
+
+.wishlist-btn.is-pop .u022-ring,
+.btn-wishlist-toggle.is-pop .u022-ring {
+    animation: u022RingOut 0.52s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+.wishlist-btn.is-pop .u022-dot,
+.btn-wishlist-toggle.is-pop .u022-dot {
+    animation: u022DotOut 0.58s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+@keyframes u022HeartBounce {
+    0% { transform: scale(1); }
+    25% { transform: scale(0.78); }
+    58% { transform: scale(1.28); }
+    80% { transform: scale(0.94); }
+    100% { transform: scale(1); }
+}
+
+@keyframes u022RingOut {
+    0% { transform: scale(0.3); opacity: 0.9; }
+    100% { transform: scale(1.65); opacity: 0; }
+}
+
+@keyframes u022DotOut {
+    0% { transform: rotate(var(--a, 0deg)) translateY(-4px) scale(0.4); opacity: 1; }
+    65% { opacity: 1; }
+    100% { transform: rotate(var(--a, 0deg)) translateY(-22px) scale(0); opacity: 0; }
+}
+
+/* Lucian UX/UI Prompt #228 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#228 */
+.product-card {
+    --cx: 50%;
+    --cy: 50%;
+    --o: 0;
+}
+
+.product-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: radial-gradient(
+        260px circle at var(--cx, 50%) var(--cy, 50%),
+        rgba(56, 189, 248, 0.72),
+        rgba(37, 99, 235, 0.32) 42%,
+        transparent 72%
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: var(--o, 0);
+    transition: opacity 0.26s ease;
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* Lucian UX/UI Prompt #221 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#221 */
+@media (min-width: 769px) {
+    .mobile-sticky-action-bar.u221-br {
+        display: flex !important;
+        position: fixed;
+        left: 50%;
+        right: auto;
+        bottom: 18px;
+        width: min(860px, calc(100vw - 40px));
+        padding: 12px 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--ux-border-strong);
+        box-shadow: 0 20px 48px -12px rgba(15, 23, 42, 0.24);
+        z-index: 980;
+        transform: translate3d(-50%, 140%, 0);
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            transform 0.38s cubic-bezier(.16, 1, .3, 1),
+            opacity 0.28s ease;
+    }
+
+    html[data-theme="dark"] .mobile-sticky-action-bar.u221-br {
+        background: rgba(15, 23, 42, 0.92);
+        border-color: rgba(148, 163, 184, 0.26);
+        box-shadow: 0 22px 52px -12px rgba(2, 6, 23, 0.78);
+    }
+
+    .mobile-sticky-action-bar.u221-br.u221-visible {
+        transform: translate3d(-50%, 0, 0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .mobile-sticky-action-bar.u221-br {
+        transition: transform 0.34s cubic-bezier(.16, 1, .3, 1), opacity 0.25s ease;
+    }
+    .mobile-sticky-action-bar.u221-br.u221-hidden-top {
+        transform: translate3d(0, 110%, 0);
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+.u221-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: contain;
+    background: #ffffff;
+    border: 1px solid var(--ux-border);
+    padding: 3px;
+    flex-shrink: 0;
+}
+
+.u221-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    margin-right: auto;
+}
+
+.u221-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ux-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+}
+
+@media (max-width: 768px) {
+    .u221-thumb,
+    .u221-title {
+        display: none;
+    }
+}
+
+/* Lucian UX/UI Prompt #240 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#240 */
+#cartFreeshipBanner .cart-freeship-bar-fill {
+    transition: width 0.52s cubic-bezier(.22, 1, .36, 1), background 0.3s ease !important;
+    position: relative;
+    overflow: hidden;
+}
+
+#cartFreeshipBanner.achieved .cart-freeship-bar-fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    animation: u240Shimmer 1.8s ease-in-out infinite;
+}
+
+.cart-item-card.u240-fl {
+    animation: u240ItemFlash 0.65s cubic-bezier(.16, 1, .3, 1);
+}
+
+.cart-item-card.u240-removing {
+    transform: translate3d(40px, 0, 0) scale(0.95) !important;
+    opacity: 0 !important;
+    transition: transform 0.24s ease, opacity 0.22s ease !important;
+}
+
+@keyframes u240Shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes u240ItemFlash {
+    0% {
+        background: rgba(37, 99, 235, 0.18);
+        transform: scale(0.975);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ============================================================================
+   PHASE 2 (P1) — GROUP 1: DISCOVERY, SEARCH, FILTER & CATALOG
+   ============================================================================ */
+
+/* Lucian UX/UI Prompt #322 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#322 */
+.header-search {
+    position: relative;
+}
+
+.u322-search-ticker {
+    position: absolute;
+    left: 40px;
+    right: 185px;
+    top: 50%;
+    height: 28px;
+    transform: translateY(-50%);
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.u322-search-ticker.is-active {
+    opacity: 1;
+}
+
+.header-search:focus-within .u322-search-ticker,
+.u322-search-ticker[hidden] {
+    opacity: 0 !important;
+}
+
+.header-search.has-ticker input:not(:focus):placeholder-shown::placeholder {
+    color: transparent !important;
+}
+
+.u322-ln {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--neo-muted, #64748b);
+    transition: transform 0.48s cubic-bezier(.3, 1.2, .5, 1), opacity 0.32s ease;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.u322-ln.is-up {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+.u322-ln.is-dn {
+    transform: translateY(100%);
+    opacity: 0;
+    transition: none;
+}
+
+.u322-ln b {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 5px;
+    background: rgba(37, 99, 235, 0.14);
+    color: var(--ux-accent, #2563eb);
+    font-size: 0.68rem;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.u322-ln span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.u322-ln em {
+    flex: none;
+    font-style: normal;
+    font-size: 0.64rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 999px;
+    background: rgba(239, 68, 68, 0.14);
+    color: #ef4444;
+}
+
+.u322-ln em.ai {
+    background: rgba(56, 189, 248, 0.16);
+    color: #0284c7;
+}
+
+html[data-theme="dark"] .u322-ln em.ai {
+    color: #38bdf8;
+}
+
+/* Lucian UX/UI Prompt #046 (Disabled per user request) */
+.u046-kbd-badge {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .u046-kbd-badge {
+        display: none !important;
+    }
+    .u322-search-ticker {
+        right: 140px;
+    }
+}
+
+.live-search-dropdown {
+    transform-origin: top center;
+    animation: u046DropdownUnfold 0.26s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes u046DropdownUnfold {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.live-search-item,
+.trending-rank-btn {
+    animation: u046ItemIn 0.34s cubic-bezier(.22, 1, .36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 24ms);
+}
+
+@keyframes u046ItemIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.live-search-link.selected,
+.live-search-link:hover,
+.trending-rank-btn.selected {
+    background: rgba(37, 99, 235, 0.1) !important;
+    box-shadow: inset 3px 0 0 var(--ux-accent, #2563eb);
+}
+
+/* Lucian UX/UI Prompt #024 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#024 */
+.u024-toggle-btn {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--ux-accent, #2563eb);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+}
+
+html[data-theme="dark"] .u024-toggle-btn {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.14);
+    border-color: rgba(96, 165, 250, 0.32);
+}
+
+.u024-toggle-btn:hover {
+    background: rgba(37, 99, 235, 0.16);
+    transform: translateY(-1px);
+}
+
+.u024-toggle-btn[aria-expanded="true"] {
+    background: linear-gradient(135deg, #2563eb, #0284c7);
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.u024-panel {
+    position: relative;
+    margin: 0.55rem 0 0.85rem;
+    padding: 0.85rem 1.15rem 0.75rem;
+    border-radius: 16px;
+    background: var(--neo-panel-solid, #ffffff);
+    border: 1px solid var(--neo-border, rgba(148, 163, 184, 0.24));
+    box-shadow: 0 10px 26px -18px rgba(15, 23, 42, 0.18);
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(.22, 1, .36, 1);
+}
+
+html[data-theme="dark"] .u024-panel {
+    background: rgba(15, 23, 42, 0.78);
+    border-color: rgba(56, 189, 248, 0.18);
+    box-shadow: 0 14px 32px -18px rgba(0, 0, 0, 0.55);
+}
+
+.u024-panel[hidden] {
+    display: none !important;
+}
+
+.u024-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.u024-range-copy small {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--neo-muted, #64748b);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.u024-val {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.96rem;
+    font-weight: 800;
+    color: var(--neo-text, #0f172a);
+    font-variant-numeric: tabular-nums;
+}
+
+.u024-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #059669;
+}
+
+html[data-theme="dark"] .u024-count {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.14);
+}
+
+.u024-roll {
+    position: relative;
+    display: inline-block;
+    min-width: 2.4ch;
+    height: 18px;
+    overflow: hidden;
+    text-align: right;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
+.u024-roll span {
+    display: block;
+    line-height: 18px;
+    transition: transform 0.38s cubic-bezier(.22, 1.25, .36, 1), opacity 0.25s ease;
+}
+
+.u024-roll span + span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+.u024-hist {
+    position: relative;
+    height: 54px;
+    margin: 10px 6px 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.u024-bar {
+    flex: 1;
+    height: calc(var(--h, 15) * 1%);
+    border-radius: 5px 5px 2px 2px;
+    background: rgba(148, 163, 184, 0.25);
+    transform-origin: 50% 100%;
+    transform: scaleY(0.78);
+    transition: background 0.3s ease, transform 0.45s cubic-bezier(.22, 1.25, .36, 1), opacity 0.3s ease;
+}
+
+.u024-bar.in {
+    background: linear-gradient(180deg, #38bdf8, #2563eb 65%, #1d4ed8);
+    transform: scaleY(1);
+}
+
+html[data-theme="dark"] .u024-bar.in {
+    background: linear-gradient(180deg, #5eead4, #0ea5e9 60%, #2563eb);
+}
+
+.u024-track {
+    position: relative;
+    height: 28px;
+    margin: 0 6px;
+}
+
+.u024-rail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.25);
+}
+
+.u024-sel {
+    position: absolute;
+    top: 50%;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #2563eb, #06b6d4);
+    left: calc(var(--a, 0) * 1%);
+    right: calc(100% - var(--b, 100) * 1%);
+}
+
+.u024-h {
+    position: absolute;
+    top: 50%;
+    left: calc(var(--pos, 0) * 1%);
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 0;
+    padding: 0;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: grab;
+    touch-action: none;
+    z-index: 2;
+    box-shadow: 0 0 0 2.5px #2563eb, 0 4px 12px rgba(37, 99, 235, 0.35);
+    transition: transform 0.3s cubic-bezier(.22, 1.25, .36, 1), box-shadow 0.25s ease;
+}
+
+.u024-h::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border-radius: 50%;
+    background: #2563eb;
+    transform: scale(0.65);
+    transition: transform 0.3s cubic-bezier(.22, 1.25, .36, 1);
+}
+
+.u024-h:hover {
+    transform: scale(1.1);
+}
+
+.u024-h.drag {
+    cursor: grabbing;
+    transform: scale(1.18);
+    box-shadow: 0 0 0 2.5px #06b6d4, 0 0 0 8px rgba(6, 182, 212, 0.2), 0 6px 14px rgba(15, 23, 42, 0.35);
+}
+
+.u024-h.drag::after {
+    transform: scale(1);
+    background: #06b6d4;
+}
+
+.u024-scale {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px 6px 0;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--neo-muted, #64748b);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Lucian UX/UI Prompt #019 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#019 */
+.faceted-chip {
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.28s ease, color 0.25s ease, border-color 0.25s ease, padding 0.38s cubic-bezier(.22, 1.25, .36, 1), transform 0.28s cubic-bezier(.22, 1.25, .36, 1) !important;
+}
+
+.faceted-chip:active {
+    transform: scale(0.94) !important;
+}
+
+.faceted-chip .u019-check {
+    display: inline-grid;
+    place-items: center;
+    width: 0;
+    height: 15px;
+    margin-right: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: width 0.38s cubic-bezier(.22, 1.25, .36, 1), margin 0.38s cubic-bezier(.22, 1.25, .36, 1), opacity 0.22s ease;
+}
+
+.faceted-chip .u019-check svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.faceted-chip.active .u019-check,
+.faceted-chip[aria-pressed="true"] .u019-check {
+    width: 15px;
+    margin-right: 5px;
+    opacity: 1;
+}
+
+/* Lucian UX/UI Prompt #092 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#092 */
+.u092-empty-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    margin: 1rem 0;
+    border-radius: 20px;
+    background: var(--neo-panel-solid, #ffffff);
+    border: 1px dashed rgba(59, 130, 246, 0.35);
+    box-shadow: 0 18px 40px -24px rgba(15, 23, 42, 0.2);
+}
+
+html[data-theme="dark"] .u092-empty-box {
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(56, 189, 248, 0.28);
+}
+
+.u092-art {
+    width: 150px;
+    height: 92px;
+    margin-bottom: 0.5rem;
+}
+
+.u092-art svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.u092-shelf {
+    stroke: rgba(148, 163, 184, 0.45);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 2 9;
+}
+
+.u092-lens {
+    animation: u092Scan 3.6s ease-in-out infinite;
+}
+
+@keyframes u092Scan {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(46px, 10px) rotate(8deg); }
+    50% { transform: translate(78px, -4px) rotate(-4deg); }
+    75% { transform: translate(30px, -8px) rotate(-10deg); }
+}
+
+.u092-lens circle {
+    fill: rgba(37, 99, 235, 0.14);
+    stroke: var(--ux-accent, #2563eb);
+    stroke-width: 4.5;
+}
+
+.u092-lens path {
+    stroke: var(--ux-accent, #2563eb);
+    stroke-width: 6.5;
+    stroke-linecap: round;
+}
+
+.u092-lens .gl {
+    fill: none;
+    stroke: #ffffff;
+    stroke-opacity: 0.75;
+    stroke-width: 2.8;
+}
+
+.u092-title {
+    margin: 0.35rem 0 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--neo-text, #0f172a);
+}
+
+.u092-sub {
+    margin: 0.3rem 0 0;
+    font-size: 0.86rem;
+    color: var(--neo-muted, #64748b);
+}
+
+.u092-sgs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    width: 100%;
+    max-width: 460px;
+    margin-top: 1.1rem;
+}
+
+.u092-sg {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.5rem 1rem 0.5rem 0.75rem;
+    border: 1px solid rgba(59, 130, 246, 0.22);
+    border-radius: 13px;
+    background: rgba(37, 99, 235, 0.06);
+    color: var(--neo-text, #0f172a);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    animation: u092SgUp 0.42s cubic-bezier(.22, 1.25, .36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms + 60ms);
+    transition: background-color 0.2s ease, transform 0.25s cubic-bezier(.22, 1.25, .36, 1), border-color 0.2s ease;
+}
+
+html[data-theme="dark"] .u092-sg {
+    background: rgba(30, 41, 59, 0.78);
+    border-color: rgba(96, 165, 250, 0.24);
+}
+
+.u092-sg:hover {
+    background: rgba(37, 99, 235, 0.14);
+    border-color: var(--ux-accent, #2563eb);
+    transform: translateY(-2px);
+}
+
+.u092-sg s {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    text-decoration: line-through;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.u092-sg span {
+    flex: 1;
+}
+
+.u092-sg b {
+    color: var(--ux-accent, #2563eb);
+}
+
+html[data-theme="dark"] .u092-sg b {
+    color: #38bdf8;
+}
+
+@keyframes u092SgUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Lucian UX/UI Prompt #079 & #251 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#079 */
+.u079-skeleton-card {
+    border-radius: 16px;
+    padding: 1rem;
+    background: var(--neo-panel-solid, #ffffff);
+    border: 1px solid var(--neo-border, rgba(148, 163, 184, 0.2));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 360px;
+}
+
+html[data-theme="dark"] .u079-skeleton-card {
+    background: rgba(15, 23, 42, 0.75);
+}
+
+.u079-sk-block {
+    border-radius: 10px;
+    background: linear-gradient(100deg, rgba(148, 163, 184, 0.14) 28%, rgba(148, 163, 184, 0.28) 45%, rgba(148, 163, 184, 0.14) 62%) 0 0 / 600px 100% no-repeat, rgba(148, 163, 184, 0.12);
+    animation: u079Shine 1.5s linear infinite;
+}
+
+@keyframes u079Shine {
+    from { background-position: -600px 0, 0 0; }
+    to { background-position: 600px 0, 0 0; }
+}
+
+.product-card.u251-reveal {
+    animation: u251CardRise 0.52s cubic-bezier(.2, .8, .2, 1) backwards;
+    animation-delay: calc(var(--card-idx, 0) * 42ms);
+}
+
+@keyframes u251CardRise {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.975);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ==========================================================================
+   LUCIAN UX/UI PROMPT — PHASE 2 (P1) GROUP 2:
+   PRODUCT DETAIL, CART & CHECKOUT (#018, #061, #356, #230, #298, #081)
+   ========================================================================== */
+
+/* Lucian UX/UI Prompt #018 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#018 */
+.qty-stepper.u018-shake,
+.cart-stepper.u018-shake {
+    animation: u018Shake 0.35s ease;
+}
+
+@keyframes u018Shake {
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+}
+
+.qty-stepper input.u018-roll-up,
+.cart-stepper .stepper-val.u018-roll-up {
+    animation: u018RollUp 0.24s cubic-bezier(.2, 1.3, .3, 1);
+}
+
+.qty-stepper input.u018-roll-dn,
+.cart-stepper .stepper-val.u018-roll-dn {
+    animation: u018RollDn 0.24s cubic-bezier(.2, 1.3, .3, 1);
+}
+
+@keyframes u018RollUp {
+    from { transform: translateY(8px); opacity: 0.25; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes u018RollDn {
+    from { transform: translateY(-8px); opacity: 0.25; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Lucian UX/UI Prompt #356 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#356 */
+.u356-stage {
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+}
+
+.u356-loupe {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    width: 148px;
+    height: 148px;
+    border-radius: 50%;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.45), 0 0 0 1px rgba(47, 128, 237, 0.35);
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    pointer-events: none;
+    background-color: #ffffff;
+    background-repeat: no-repeat;
+    background-size: 220% 220%;
+    background-position: var(--bx, 50%) var(--by, 50%);
+    transition: opacity 0.2s ease, transform 0.24s cubic-bezier(.2, 1.3, .3, 1);
+    z-index: 15;
+}
+
+.u356-stage.is-loupe-on .u356-loupe {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.u356-loupe::after {
+    content: "2.2×";
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 2px 7px;
+    border-radius: 99px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #fff;
+    font: 800 9px/1 var(--font-sans, system-ui);
+}
+
+.u061-open-btn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 16;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(15, 23, 42, 0.76);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.u061-open-btn:hover {
+    transform: translateY(-2px);
+    background: var(--neo-primary, #2f80ed);
+}
+
+@media (hover: none), (max-width: 768px) {
+    .u356-loupe {
+        display: none !important;
+    }
+}
+
+/* Lucian UX/UI Prompt #061 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#061 */
+.u061-lightbox {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(8, 11, 18, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 9999;
+    color: #ffffff;
+}
+
+.u061-lightbox[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: u061FadeIn 0.22s ease;
+}
+
+@keyframes u061FadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.u061-lb-inner {
+    position: relative;
+    width: min(92vw, 940px);
+    height: min(88vh, 680px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.u061-lb-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 5;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.u061-lb-close:hover {
+    background: rgba(239, 68, 68, 0.85);
+    transform: rotate(90deg);
+}
+
+.u061-lb-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 5;
+    transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.u061-lb-prev { left: 10px; }
+.u061-lb-next { right: 10px; }
+
+.u061-lb-nav:hover {
+    background: var(--neo-primary, #2f80ed);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.u061-lb-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    max-height: calc(100% - 76px);
+    width: 100%;
+    overflow: hidden;
+}
+
+.u061-lb-stage img {
+    max-width: 82%;
+    max-height: 72vh;
+    object-fit: contain;
+    border-radius: 16px;
+    background: #ffffff;
+    padding: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+    cursor: zoom-in;
+    transition: transform 0.3s cubic-bezier(.2, .9, .2, 1);
+}
+
+.u061-lb-stage.is-zoomed img {
+    transform: scale(1.75);
+    cursor: zoom-out;
+}
+
+.u061-lb-caption {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+.u061-lb-count {
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(47, 128, 237, 0.35);
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+
+.u061-lb-thumbs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 6px;
+}
+
+.u061-lb-thumb {
+    width: 54px;
+    height: 54px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background: #fff;
+    padding: 3px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.u061-lb-thumb.is-on {
+    opacity: 1;
+    border-color: #60a5fa;
+    transform: translateY(-2px);
+}
+
+.u061-lb-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Lucian UX/UI Prompt #230 & #298 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#230 */
+.u230-input-wrap.u230-bad {
+    animation: u230Shake 0.35s ease;
+}
+
+.u230-input-wrap.u230-bad input {
+    border-color: #ef4444 !important;
+}
+
+@keyframes u230Shake {
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+}
+
+.u230-apply-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.u230-btn-spin {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.u230-apply-btn.is-busy .u230-btn-txt {
+    opacity: 0;
+}
+
+.u230-apply-btn.is-busy .u230-btn-spin {
+    opacity: 1;
+    animation: u230Spin 0.65s linear infinite;
+}
+
+@keyframes u230Spin {
+    to { transform: rotate(360deg); }
+}
+
+.u230-applied-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 7px 11px;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #059669;
+    font-size: 0.8rem;
+    font-weight: 700;
+    animation: u230PillPop 0.28s cubic-bezier(.2, 1.3, .3, 1);
+}
+
+html[data-theme="dark"] .u230-applied-pill {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.16);
+}
+
+@keyframes u230PillPop {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.u230-pill-tag {
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: #10b981;
+    color: #fff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem;
+}
+
+.u230-pill-disc {
+    margin-left: auto;
+}
+
+.u230-pill-rm {
+    border: 0;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    font-weight: 800;
+    padding: 2px 5px;
+}
+
+.u298-tickets-list {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-top: 10px;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+}
+
+.u298-ticket {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: stretch;
+    min-width: 215px;
+    border-radius: 11px;
+    border: 1px solid rgba(47, 128, 237, 0.28);
+    background: linear-gradient(135deg, rgba(47, 128, 237, 0.08), rgba(56, 189, 248, 0.04));
+    overflow: hidden;
+    transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.u298-ticket:hover {
+    transform: translateY(-2px);
+    border-color: var(--neo-primary, #2f80ed);
+    box-shadow: 0 6px 16px rgba(47, 128, 237, 0.14);
+}
+
+.u298-ticket.is-got {
+    border-color: rgba(16, 185, 129, 0.5);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+}
+
+.u298-ticket.is-tearing .u298-tear-btn {
+    transform: translateX(4px) rotate(4deg);
+}
+
+.u298-ticket-main {
+    flex: 1;
+    padding: 7px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.u298-off {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--neo-primary, #2f80ed);
+}
+
+.u298-ticket.is-got .u298-off {
+    color: #10b981;
+}
+
+.u298-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--neo-text, #0f172a);
+}
+
+.u298-cond {
+    font-size: 0.68rem;
+    color: var(--neo-text-muted, #64748b);
+}
+
+.u298-perf {
+    position: relative;
+    width: 10px;
+    border-left: 1.5px dashed rgba(148, 163, 184, 0.45);
+}
+
+.u298-tear-btn {
+    border: 0;
+    background: rgba(47, 128, 237, 0.12);
+    color: var(--neo-primary, #2f80ed);
+    padding: 0 10px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.18s ease, color 0.18s ease, transform 0.25s cubic-bezier(.2, .9, .2, 1);
+}
+
+.u298-tear-btn:hover {
+    background: var(--neo-primary, #2f80ed);
+    color: #fff;
+}
+
+.u298-ticket.is-got .u298-tear-btn {
+    background: #10b981;
+    color: #fff;
+}
+
+.u298-check-ico {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    display: none;
+}
+
+.u298-ticket.is-got .u298-check-ico {
+    display: inline-block;
+}
+
+/* Lucian UX/UI Prompt #081 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#081 */
+.u081-checkout-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.u081-steps-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    background: rgba(47, 128, 237, 0.08);
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--neo-text-muted, #64748b);
+}
+
+.u081-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s ease;
+}
+
+.u081-step::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+}
+
+.u081-step.is-on {
+    color: var(--neo-primary, #2f80ed);
+}
+
+.u081-step.is-on::before {
+    opacity: 1;
+    background: #10b981;
+}
+
+.u081-pay-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.u081-ring-svg {
+    width: 20px;
+    height: 20px;
+    display: none;
+}
+
+.u081-checkout-wrap.is-run .u081-ring-svg,
+.u081-checkout-wrap.is-ok .u081-ring-svg {
+    display: inline-block;
+}
+
+.u081-ring-svg .u081-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.28);
+    stroke-width: 2.5;
+}
+
+.u081-ring-svg .u081-fg {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 69.1;
+    stroke-dashoffset: 69.1;
+    transform: rotate(-90deg);
+    transform-origin: 14px 14px;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.u081-ring-svg .u081-ck {
+    fill: none;
+    stroke: #10b981;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    transition: stroke-dashoffset 0.28s ease;
+}
+
+.u081-checkout-wrap.is-ok .u081-ring-svg .u081-ck {
+    stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle.u021-sw-host *,
+    .u070-t,
+    #flashSaleTimer .fs-time-box.u100-fl,
+    #promoCarousel .hero-slide.is-active *,
+    .u039-pill-item,
+    .wishlist-btn *,
+    .btn-wishlist-toggle *,
+    .mobile-sticky-action-bar.u221-br,
+    #cartFreeshipBanner .cart-freeship-bar-fill,
+    .cart-item-card,
+    .u322-ticker-roll,
+    .product-card.u251-reveal,
+    .u079-sk-block,
+    .u092-mag-group {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+html.visual-reduce-motion .u021-sp,
+html.visual-reduce-motion #promoCarousel .hero-slide.is-active *,
+html.visual-reduce-motion #flashSaleTimer .fs-time-box.u100-fl.is-flipping,
+html.visual-reduce-motion .wishlist-btn.is-pop,
+html.visual-reduce-motion .u051-fly-thumb,
+html.visual-reduce-motion .u322-ticker-roll,
+html.visual-reduce-motion .product-card.u251-reveal,
+html.visual-reduce-motion .u079-sk-block,
+html.visual-reduce-motion .u092-mag-group {
+    animation: none !important;
+}

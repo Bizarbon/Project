@@ -4,11 +4,13 @@ const { OAuth2Client } = require('google-auth-library');
 
 let googleClientInstance = null;
 
+const DEFAULT_GOOGLE_CLIENT_ID = '209752916771-2971mlsgd9gbmgpg666ff21e6guf3nb6.apps.googleusercontent.com';
+
 function getClientId() {
     if (!process.env.GOOGLE_CLIENT_ID) {
         dotenv.config({ path: path.resolve(__dirname, '../../.env') });
     }
-    return String(process.env.GOOGLE_CLIENT_ID || '').trim();
+    return String(process.env.GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID).trim();
 }
 
 function getGoogleClient() {

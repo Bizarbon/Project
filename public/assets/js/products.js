@@ -341,6 +341,8 @@ function handleCategorySelectChange() {
         customInput.style.display = 'none';
         customInput.value = select.value;
     }
+    const hearingFields = document.getElementById('hearingAidAdminFields');
+    if (hearingFields) hearingFields.hidden = select.value !== 'Máy trợ thính';
 }
 
 function updateImagePreview() {
@@ -394,7 +396,17 @@ if (productForm) {
             reviewCount: ratingData.reviewCount,
             soldCount: Number(document.getElementById('soldCount').value || 0),
             featured: document.getElementById('featured').value === 'true',
-            specs: specPayload()
+            specs: specPayload(),
+            hearingAidProfile: categoryVal === 'Máy trợ thính' ? {
+                manufacturer: document.getElementById('hearingManufacturer')?.value.trim() || '',
+                responsibleEntity: document.getElementById('hearingResponsibleEntity')?.value.trim() || '',
+                verificationStatus: document.getElementById('hearingVerificationStatus')?.value || 'pending',
+                requiredDocuments: [{
+                    name: 'Hồ sơ pháp lý do quản trị viên cung cấp',
+                    reference: document.getElementById('hearingDocumentReference')?.value.trim() || '',
+                    verified: document.getElementById('hearingVerificationStatus')?.value === 'verified'
+                }]
+            } : undefined
         };
 
         try {
@@ -553,6 +565,25 @@ function resetForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const hearingAidOption = document.createElement('option');
+    hearingAidOption.value = 'Máy trợ thính';
+    hearingAidOption.textContent = 'Máy trợ thính';
+    document.getElementById('categorySelect')?.appendChild(hearingAidOption);
+    const form = document.getElementById('productForm');
+    if (form && !document.getElementById('hearingAidAdminFields')) {
+        const fieldset = document.createElement('fieldset');
+        fieldset.id = 'hearingAidAdminFields';
+        fieldset.className = 'form-group full-width';
+        fieldset.hidden = true;
+        fieldset.innerHTML = '<legend>Hồ sơ máy trợ thính</legend>' +
+            '<label for="hearingManufacturer">Nhà sản xuất</label><input id="hearingManufacturer" type="text">' +
+            '<label for="hearingResponsibleEntity">Đơn vị chịu trách nhiệm</label><input id="hearingResponsibleEntity" type="text">' +
+            '<label for="hearingVerificationStatus">Trạng thái xác minh</label><select id="hearingVerificationStatus"><option value="pending">Chờ xác minh</option><option value="verified">Đã xác minh</option><option value="rejected">Từ chối</option></select>' +
+            '<label for="hearingDocumentReference">Mã tài liệu đã xác minh</label><input id="hearingDocumentReference" type="text">' +
+            '<small>Không nhập hồ sơ giả; backend sẽ chặn kích hoạt nếu chưa đủ dữ liệu.</small>';
+        form.querySelector('.form-actions')?.before(fieldset);
+    }
+
     // Search input
     document.getElementById('adminProductSearch')?.addEventListener('input', renderProductTable);
 

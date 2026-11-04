@@ -110,7 +110,10 @@ function setupAvatarEditor() {
 function setupProfileHeader() {
     const header = document.querySelector('.storefront-header');
     const locationLabel = document.querySelector('[data-shopping-location-label]') || document.getElementById('profileLocationLabel');
-    if (locationLabel) locationLabel.textContent = localStorage.getItem('shoppingLocation') || 'Hồ Chí Minh';
+    if (locationLabel) {
+        const curL = localStorage.getItem('shoppingLocation');
+        locationLabel.textContent = (curL && curL !== 'Hồ Chí Minh') ? curL : 'Thành phố Hồ Chí Minh';
+    }
     if (!header) return;
     const updateHeight = () => document.documentElement.style.setProperty('--storefront-header-height', `${header.offsetHeight}px`);
     updateHeight();

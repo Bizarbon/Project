@@ -1,0 +1,8 @@
+# Robots.txt for TechEcommerce - https://techshopvn.vercel.app/
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap index
+Sitemap: https://techshopvn.vercel.app/sitemap.xml

@@ -12,7 +12,7 @@
     <meta property="og:title" content="Đăng ký TechMember - TechEcommerce">
     <meta property="og:description" content="Tạo tài khoản thành viên TechMember để nhận ngập tràn ưu đãi từ TechEcommerce.">
     <meta property="og:type" content="website">
-    <link rel="canonical" href="https://techecommerce-shop.vercel.app/pages/auth/register.html">
+    <link rel="canonical" href="https://techshopvn.vercel.app/pages/auth/register.html">
     <title>Đăng ký TechMember - TechEcommerce</title>
     <link rel="stylesheet" href="../../assets/css/cellphones-auth.css?v=20260925-v5">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -25,7 +25,7 @@
         "publisher": {
             "@type": "Organization",
             "name": "TechEcommerce",
-            "url": "https://techecommerce-shop.vercel.app"
+            "url": "https://techshopvn.vercel.app"
         }
     }
     </script>
@@ -108,60 +108,75 @@
                             <p class="auth-form-subtitle">Đăng ký thành viên để nhận ngay trọn vẹn đặc quyền ưu đãi</p>
                         </header>
 
-                        <form id="registerForm" class="auth-form-cellphones">
+                        <form id="registerForm" class="auth-form-cellphones" novalidate>
+                            <!-- Lucian UX/UI Prompt #025, #036, #062, #066 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#036 -->
                             <div class="auth-form-grid-two">
-                                <p class="auth-field-cellphones">
+                                <p class="auth-field-cellphones u025-field">
                                     <label for="name">Họ và tên</label>
                                     <span class="auth-input-wrap-cellphones">
                                         <input type="text" id="name" name="name" required autocomplete="name" minlength="2" maxlength="80" placeholder="Ví dụ: Nguyễn Văn A" aria-describedby="nameHelp">
+                                        <span class="u025-ok-badge" aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M3 7.3l2.7 2.7L11 4.5"/></svg></span>
                                     </span>
                                     <small class="auth-field-help" id="nameHelp">Tên dùng trên đơn hàng và hồ sơ.</small>
                                 </p>
 
-                                <p class="auth-field-cellphones">
+                                <p class="auth-field-cellphones u025-field">
                                     <label for="phone">Số điện thoại</label>
                                     <span class="auth-input-wrap-cellphones">
                                         <input type="tel" id="phone" name="phone" required autocomplete="tel" inputmode="tel" pattern="(?:\+84|0)\d{9,10}" placeholder="Ví dụ: 0912345678" aria-describedby="phoneHelp">
+                                        <span class="u025-ok-badge" aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M3 7.3l2.7 2.7L11 4.5"/></svg></span>
                                     </span>
                                     <small class="auth-field-help" id="phoneHelp">Dùng để xác nhận và giao hàng.</small>
                                 </p>
                             </div>
 
                             <div class="auth-form-grid-two">
-                                <p class="auth-field-cellphones">
+                                <p class="auth-field-cellphones u025-field">
                                     <label for="email">Địa chỉ email</label>
                                     <span class="auth-input-wrap-cellphones">
                                         <input type="email" id="email" name="email" required autocomplete="email" placeholder="Ví dụ: name@gmail.com" aria-describedby="emailHelp">
+                                        <span class="u025-ok-badge" aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M3 7.3l2.7 2.7L11 4.5"/></svg></span>
                                     </span>
                                     <small class="auth-field-help" id="emailHelp">Nhận thông báo đơn và mật khẩu.</small>
                                 </p>
 
-                                <p class="auth-field-cellphones">
+                                <p class="auth-field-cellphones u025-field">
                                     <label for="username">Tên đăng nhập</label>
                                     <span class="auth-input-wrap-cellphones">
                                         <input type="text" id="username" name="username" required autocomplete="username" minlength="3" maxlength="30" pattern="[a-zA-Z0-9_]{3,30}" placeholder="Ví dụ: vana_tech" aria-describedby="usernameHelp">
+                                        <span class="u025-ok-badge" aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M3 7.3l2.7 2.7L11 4.5"/></svg></span>
                                     </span>
                                     <small class="auth-field-help" id="usernameHelp">Chữ cái, số hoặc dấu gạch dưới.</small>
                                 </p>
                             </div>
 
-                            <p class="auth-field-cellphones">
-                                <label for="registerPassword">Mật khẩu</label>
+                            <div class="auth-field-cellphones u025-field u036-pw-group" data-lvl="0">
+                                <span class="u062-label-row">
+                                    <label for="registerPassword">Mật khẩu</label>
+                                    <span class="u036-lvl-lbl" id="u036StrengthText" aria-live="polite">Chưa nhập</span>
+                                </span>
                                 <span class="auth-input-wrap-cellphones">
                                     <input type="password" id="registerPassword" name="password" required minlength="8" maxlength="72" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,72}" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự, chữ hoa & số" aria-describedby="registerPasswordHelp">
-                                    <button class="auth-password-toggle" type="button" data-password-toggle="registerPassword" aria-label="Hiện mật khẩu">
+                                    <button class="auth-password-toggle u062-eye-btn" type="button" data-password-toggle="registerPassword" aria-pressed="false" aria-label="Hiện mật khẩu">
                                         <svg class="eye-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                         <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                                     </button>
                                 </span>
+                                <div class="u036-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                                <ul class="u036-rules" id="u036RulesList">
+                                    <li data-r="len"><span class="u036-dot" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3L9.5 3.8"/></svg></span>8+ ký tự</li>
+                                    <li data-r="up"><span class="u036-dot" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3L9.5 3.8"/></svg></span>Chữ hoa (A–Z)</li>
+                                    <li data-r="low"><span class="u036-dot" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3L9.5 3.8"/></svg></span>Chữ thường (a–z)</li>
+                                    <li data-r="num"><span class="u036-dot" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.3l2.3 2.3L9.5 3.8"/></svg></span>Chữ số (0–9)</li>
+                                </ul>
                                 <small class="auth-field-help" id="registerPasswordHelp">Cần có chữ hoa, chữ thường và chữ số.</small>
-                            </p>
+                            </div>
 
-                            <p class="auth-field-cellphones">
+                            <p class="auth-field-cellphones u025-field">
                                 <label for="confirmPassword">Nhập lại mật khẩu</label>
                                 <span class="auth-input-wrap-cellphones">
                                     <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8" maxlength="72" autocomplete="new-password" placeholder="Nhập lại mật khẩu để xác nhận" aria-describedby="confirmPasswordHelp">
-                                    <button class="auth-password-toggle" type="button" data-password-toggle="confirmPassword" aria-label="Hiện mật khẩu">
+                                    <button class="auth-password-toggle u062-eye-btn" type="button" data-password-toggle="confirmPassword" aria-pressed="false" aria-label="Hiện mật khẩu">
                                         <svg class="eye-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                         <svg class="eye-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                                     </button>
@@ -169,16 +184,22 @@
                                 <small class="auth-field-help" id="confirmPasswordHelp">Hai mật khẩu cần trùng khớp.</small>
                             </p>
 
-                            <button type="submit" class="btn-cellphones-red" id="submitBtn">Đăng ký</button>
+                            <button type="submit" class="btn-cellphones-red u062-submit-btn" id="submitBtn">
+                                <span class="u062-btn-txt">Đăng ký</span>
+                                <i class="u062-spin" aria-hidden="true"></i>
+                                <svg class="u062-ok-svg" viewBox="0 0 26 26" aria-hidden="true"><path d="M6 13.5l4.5 4.5L20 8.5"/></svg>
+                            </button>
                             <output class="auth-form-status" id="authFormStatus" role="status" aria-live="polite"></output>
 
                             <p class="auth-divider-cellphones"><span>Hoặc đăng ký bằng</span></p>
 
-                            <nav class="auth-social-row" aria-label="Đăng ký bằng mạng xã hội">
+                            <nav class="auth-social-row u066-social-nav" aria-label="Đăng ký bằng mạng xã hội">
                                 <div class="btn-social-wrapper" id="googleRegisterContainer">
-                                    <button type="button" class="btn-social-card" data-social-provider="google" id="btnGoogleRegister" aria-label="Đăng ký nhanh với Google">
+                                    <button type="button" class="btn-social-card u066-social-btn" data-social-provider="google" id="btnGoogleRegister" aria-label="Đăng ký nhanh với Google">
                                         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-                                        <span>Google</span>
+                                        <span>Tiếp tục với Google</span>
+                                        <span class="u066-recent">Nhanh nhất</span>
+                                        <span class="u066-st" aria-hidden="true"><i></i><svg viewBox="0 0 22 22"><path d="M5 11.5l4 4L17 7"/></svg></span>
                                     </button>
                                     <div id="gsiRegisterMountPoint" class="gsi-mount-point" aria-label="Đăng ký bằng Google"></div>
                                 </div>

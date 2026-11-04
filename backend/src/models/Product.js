@@ -37,6 +37,36 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    hearingAidProfile: {
+        designType: { type: String, default: '' },
+        audioFeatures: [{ type: String, trim: true }],
+        bluetoothCompatibility: { type: String, default: '' },
+        batteryCharging: { type: String, default: '' },
+        technicalSpecs: {
+            db: { type: String, default: '' },
+            khz: { type: String, default: '' },
+            channels: { type: String, default: '' }
+        },
+        manufacturer: { type: String, default: '' },
+        responsibleEntity: { type: String, default: '' },
+        medicalDeviceClassification: { type: String, default: '' },
+        circulationNumber: { type: String, default: '' },
+        declarationNumber: { type: String, default: '' },
+        requiredDocuments: [{
+            name: { type: String, trim: true },
+            reference: { type: String, trim: true },
+            verified: { type: Boolean, default: false }
+        }],
+        instructionManualUrl: { type: String, default: '' },
+        technicalDocumentUrl: { type: String, default: '' },
+        verificationStatus: {
+            type: String,
+            enum: ['not_applicable', 'pending', 'verified', 'rejected'],
+            default: 'not_applicable'
+        },
+        verifiedAt: { type: Date, default: null },
+        verifiedBy: { type: String, default: '' }
+    },
     stock: {
         type: Number,
         default: 0,
@@ -84,6 +114,9 @@ const productSchema = new mongoose.Schema({
     variants: [{
         sku: { type: String, default: '' },
         color: { type: String, default: '' },
+        colorHex: { type: String, default: '' },
+        image: { type: String, default: '' },
+        compareAtPrice: { type: Number, default: 0 },
         ram: { type: String, default: '' },
         storage: { type: String, default: '' },
         price: { type: Number, default: 0, min: 0 },

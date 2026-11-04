@@ -502,7 +502,7 @@ function printCustomerInvoice() {
     const orderDateFormatted = orderDate(order.orderDate || order.createdAt);
     const trackingCode = order.trackingNumber || 'CHƯA_TẠO_VẬN_ĐƠN';
     const shippingUnit = order.shippingUnit || 'Giao Hàng Tiêu Chuẩn';
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent('https://techecommerce-shop.vercel.app/pages/account/order-detail.html?id=' + order._id)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent('https://techshopvn.vercel.app/pages/account/order-detail.html?id=' + order._id)}`;
 
     const itemsRows = (order.products || []).map((item, idx) => {
         const prodName = item.product?.name || item.productName || 'Sản phẩm công nghệ';

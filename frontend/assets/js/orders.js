@@ -1465,7 +1465,7 @@ async function printOrderInvoice(id) {
     const orderDateFormatted = formatDate(order.orderDate || order.createdAt);
     const trackingCode = order.trackingNumber || 'CHƯA_TẠO_VẬN_ĐƠN';
     const shippingUnit = order.shippingUnit || 'Giao Hàng Nhanh / Tiêu Chuẩn';
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent('https://techecommerce-shop.vercel.app/pages/account/orders.html?id=' + order._id)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent('https://techshopvn.vercel.app/pages/account/orders.html?id=' + order._id)}`;
 
     const itemsRows = (order.products || []).map((item, idx) => {
         const prodName = item.product?.name || item.productName || 'Sản phẩm công nghệ';
@@ -1531,7 +1531,7 @@ async function printOrderInvoice(id) {
                         <h2>CÔNG TY CỔ PHẦN CÔNG NGHỆ TECHECOMMERCE VIỆT NAM</h2>
                         <p><strong>Mã số thuế:</strong> 0318992388</p>
                         <p><strong>Địa chỉ:</strong> Tầng 5, Tòa nhà Innovation, TP. Hồ Chí Minh</p>
-                        <p><strong>Hotline:</strong> 0842.331.606 | <strong>Website:</strong> techecommerce-shop.vercel.app</p>
+                        <p><strong>Hotline:</strong> 0842.331.606 | <strong>Website:</strong> techshopvn.vercel.app</p>
                     </div>
                     <div class="inv-meta">
                         <h1>PHIẾU ĐÓNG GÓI &amp; HÓA ĐƠN VAT</h1>

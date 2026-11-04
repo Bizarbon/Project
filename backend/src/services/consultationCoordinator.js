@@ -11,8 +11,22 @@ const aiModelService = require('./aiModelService');
 // -------------------------------------------------------------
 // TIỆN ÍCH CHUẨN HÓA VĂN BẢN VÀ ĐỊNH DẠNG TIỀN TỆ
 // -------------------------------------------------------------
+function repairMojibake(value) {
+    const source = String(value || '');
+    // Some legacy fixtures and persisted messages were decoded as Latin-1
+    // instead of UTF-8 (for example "MĂ¬nh", "Ä‘"). Repair those strings
+    // before accent folding so intent/entity matching remains deterministic.
+    if (!/[ÃÂÄÐá»ÆĂ]/.test(source) || typeof Buffer === 'undefined') return source;
+    try {
+        const repaired = Buffer.from(source, 'latin1').toString('utf8');
+        return repaired.includes('\uFFFD') ? source : repaired;
+    } catch (_) {
+        return source;
+    }
+}
+
 function normalizeText(value) {
-    return String(value || '')
+    return repairMojibake(value)
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -87,6 +101,7 @@ const PRODUCT_TYPE_INTENTS = [
     { key: 'camera', label: 'camera bỏ túi', aliases: ['camera bo tui', 'osmo pocket', 'camera vlog'], category: 'Phụ kiện', name: /camera|osmo pocket/i },
     { key: 'speaker', label: 'loa Bluetooth', aliases: ['loa bluetooth', 'loa khong day', 'loa'], category: 'Tai nghe', name: /^loa\b/i },
     { key: 'headphones', label: 'tai nghe', aliases: ['tai nghe', 'airpods', 'headphone', 'earbuds', 'headset', 'galaxy buds'], category: 'Tai nghe', name: /^tai nghe\b/i },
+    { key: 'hearing_aid', label: 'máy trợ thính', aliases: ['may tro thinh', 'may nghe tro thinh', 'thiet bi tro thinh', 'tro thinh', 'hearing aid', 'hearing aids', 'nghe kem', 'kho nghe', 'nghenh ngang'], category: 'Máy trợ thính' },
     { key: 'smartwatch', label: 'đồng hồ thông minh', aliases: ['dong ho thong minh', 'smartwatch', 'apple watch', 'galaxy watch', 'garmin watch', 'vong deo tay thong minh', 'dong ho'], category: 'Đồng hồ thông minh' },
     { key: 'console', label: 'máy chơi game', aliases: ['may choi game', 'playstation', 'ps5', 'nintendo switch', 'steam deck', 'rog ally'], category: 'Máy chơi game' },
     { key: 'tablet', label: 'máy tính bảng', aliases: ['may tinh bang', 'tablet', 'ipad', 'galaxy tab', 'matepad'], category: 'Tablet' },
@@ -602,6 +617,7 @@ function inferCategory(text) {
             'vivobook', 'thinkpad', 'rog strix', 'acer nitro', 'katana', 'ideapad', 'inspiron',
             'may hoc lap trinh', 'may lap trinh', 'lap trinh', 'hoc code', 'hoc it', 'cntt',
             'laptop di hoc', 'laptop sinh vien', 'laptop hoc tap', 'laptop van phong', 'laptop choi game',
+            'may tinh van phong', 'may tinh xach tay', 'may tinh ca nhan', 'may van phong', 'may hoc tap',
             'mua laptop', 'can laptop', 'laptop mong nhe', 'laptop gaming'
         ]],
         ['Điện thoại', [
@@ -610,6 +626,10 @@ function inferCategory(text) {
         ]],
         ['Tai nghe', [
             'tai nghe', 'airpods', 'headphone', 'earbuds', 'headset', 'galaxy buds'
+        ]],
+        ['Máy trợ thính', [
+            'may tro thinh', 'may nghe tro thinh', 'thiet bi tro thinh', 'tro thinh', 'hearing aid', 'hearing aids',
+            'nghe kem', 'kho nghe', 'nghenh ngang'
         ]],
         ['Tablet', [
             'tablet', 'may tinh bang', 'ipad', 'galaxy tab', 'matepad', 'honor pad', 'xiaomi pad'
@@ -741,6 +761,7 @@ function isBrandOnlyQuery(text) {
 
 const PRODUCT_EXACT_ALIASES = [
     // --- Samsung Phones ---
+    { terms: ['z fold7', 'z fold 7', 'galaxy z fold7', 'galaxy z fold 7', 'samsung z fold7', 'samsung z fold 7', 'fold7', 'fold 7'], match: /z fold7/i },
     { terms: ['s26 ultra', 's26ultra', 'galaxy s26 ultra', 'samsung s26 ultra', 'samsung galaxy s26 ultra'], match: /s26 ultra/i },
     { terms: ['s25 ultra', 's25ultra', 'galaxy s25 ultra', 'samsung s25 ultra', 'samsung galaxy s25 ultra'], match: /s25 ultra/i },
     { terms: ['s25 plus', 's25plus', 's25+', 'galaxy s25 plus', 'samsung s25 plus', 'samsung galaxy s25 plus'], match: /s25 plus|s25\+/i },
@@ -749,6 +770,8 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['galaxy a05s', 'samsung a05s', 'a05s', 'a05'], match: /a05s|a05/i },
 
     // --- Apple Phones ---
+    { terms: ['iphone 17 pro max', '17 pro max', '17promax', 'ip 17 pro max', 'ip 17promax', 'ip17 pro max'], match: /iphone 17 pro max/i },
+    { terms: ['iphone 17 pro', '17 pro', '17pro', 'ip 17 pro', 'ip17 pro', 'iphone 17'], match: /^((?!max).)*iphone 17 pro/i },
     { terms: ['iphone 16 pro max', '16 pro max', '16promax', 'ip 16 pro max', 'ip 16promax', 'ip16 pro max'], match: /iphone 16 pro max/i },
     { terms: ['iphone 16 pro', '16 pro', '16pro', 'ip 16 pro', 'ip16 pro'], match: /^((?!max).)*iphone 16 pro/i },
     { terms: ['iphone 15 pro max', '15 pro max', '15promax', 'ip 15 pro max', 'ip 15promax', 'ip15 pro max'], match: /iphone 15 pro max/i },
@@ -761,10 +784,12 @@ const PRODUCT_EXACT_ALIASES = [
     // --- OPPO Phones ---
     { terms: ['reno12 f', 'reno 12 f', 'reno12f', 'oppo reno 12 f'], match: /reno12 f/i },
     { terms: ['reno12', 'reno 12', 'oppo reno12', 'oppo reno 12'], match: /^((?!reno12 f).)*reno12/i },
-    { terms: ['find x8', 'oppo find x8', 'findx8'], match: /find x8/i },
+    { terms: ['find x8 pro', 'oppo find x8 pro', 'findx8 pro'], match: /find x8 pro/i },
+    { terms: ['find x8', 'oppo find x8', 'findx8'], match: /^((?!pro).)*find x8/i },
     { terms: ['oppo a79', 'a79 5g', 'a79'], match: /a79/i },
 
     // --- HONOR Phones ---
+    { terms: ['magic7 pro', 'magic 7 pro', 'honor magic7 pro', 'honor magic 7 pro', 'magic7'], match: /magic7 pro/i },
     { terms: ['honor 200', 'honor 200 5g'], match: /honor 200/i },
     { terms: ['honor x8b', 'x8b'], match: /honor x8b/i },
 
@@ -1058,7 +1083,7 @@ async function handleBrandWithCategory(brandName, category, context = {}) {
 /**
  * 2. Khách tra cứu chính xác model / biến thể (Exact Lookup)
  */
-async function handleExactProductLookup(product, context = {}) {
+async function handleExactProductLookup(product, context = {}, userMessage = '') {
     const s = product.specs || {};
     const stockStatus = product.stock > 0
         ? `✅ **Tình trạng:** Sẵn hàng tại kho (**còn ${product.stock} máy** nguyên seal)`
@@ -1081,7 +1106,7 @@ async function handleExactProductLookup(product, context = {}) {
 
     const installmentEstimate = Math.round((product.price * 0.7) / 12);
 
-    const reply = `Dạ có sẵn thông tin chính xác về **${product.name}** tại TechEcommerce đây ạ! 🎯\n\n` +
+    const defaultReply = `Dạ có sẵn thông tin chính xác về **${product.name}** tại TechEcommerce đây ạ! 🎯\n\n` +
         `• 💰 **Giá bán chính hãng:** **${money(product.price)}** ${product.compareAtPrice > product.price ? `(Giá gốc: ~~${money(product.compareAtPrice)}~~, tiết kiệm ${money(product.compareAtPrice - product.price)})` : ''}\n` +
         `${stockStatus}\n` +
         `• 🛡️ **Bảo hành:** ${warrantyInfo}\n` +
@@ -1089,8 +1114,21 @@ async function handleExactProductLookup(product, context = {}) {
         `📋 **Cấu hình nổi bật:**\n${keySpecs}\n\n` +
         `👉 Bạn có muốn mình hỗ trợ **thêm sản phẩm này vào giỏ hàng**, tính chi tiết bảng trả góp 0%, hay so sánh với mẫu máy tương đương không ạ?`;
 
+    const queryText = userMessage || context.currentMessage || `Tư vấn chi tiết về sản phẩm ${product.name}`;
+    const grounded = await aiModelService.generateGroundedConsultation({
+        userMessage: queryText,
+        dialogueAct: 'exact_lookup',
+        verifiedProducts: [product],
+        context: {
+            ...context,
+            category: product.category,
+            brand: product.brand
+        },
+        fallbackText: defaultReply
+    });
+
     return {
-        reply,
+        reply: grounded.reply,
         products: [product],
         suggestions: [
             `Thêm ${product.name} vào giỏ`,
@@ -1106,6 +1144,11 @@ async function handleExactProductLookup(product, context = {}) {
             missingSlots: [],
             lastProducts: [product],
             currentIntent: 'exact_lookup'
+        },
+        meta: {
+            provider: grounded.provider,
+            model: grounded.model,
+            isFallback: grounded.isFallback
         }
     };
 }
@@ -1267,13 +1310,24 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     if (!productType) return null;
 
     const normalizedMessage = normalizeText(message);
+    // Preserve the customer's self-described technical proficiency through
+    // the catalog qualification path (beginner/basic users should not lose
+    // that signal when the first message contains a product type).
+    context = {
+        ...context,
+        techProficiency: extractTechProficiency(message) || context.techProficiency || 'intermediate'
+    };
     const isAvailabilityQuestion = (
         /\b(co|con)\b.*\b(khong|ko|khong a|khong vay)\b/i.test(normalizedMessage)
         || /\b(?:ben ban|cua hang|shop)\b.*\b(?:co|con)\b/i.test(normalizedMessage)
     );
 
     const isRestartingConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua)\b/i.test(normalizedMessage);
-    const isExplicitReset = isRestartingConsultation && !extractBudget(message) && !extractQualificationUseCase(message) && !extractBrandPreference(message);
+    const isExplicitReset = isRestartingConsultation &&
+        !extractBudget(message) &&
+        !extractQualificationUseCase(message) &&
+        !extractUseCase(message) &&
+        !extractBrandPreference(message);
 
     const previousQualification = isExplicitReset ? {} : (context.qualification || {});
 
@@ -1281,7 +1335,14 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     const budget = extractedBudget || (isExplicitReset ? 0 : (previousQualification.budget || context.budget || 0));
 
     const brand = extractBrandPreference(message) || (isExplicitReset ? '' : (previousQualification.brand || context.brand || ''));
-    const useCase = extractQualificationUseCase(message) || (isExplicitReset ? '' : (previousQualification.useCase || context.useCase || ''));
+    const directUseCase = /van phong|luot web|word|excel|hoc tap|sinh vien|văn phòng|lướt web|học tập|sinh viên/i.test(normalizedMessage + ' ' + message)
+        ? 'làm việc văn phòng / học tập'
+        : /lap trinh|code|docker|cntt|cong nghe thong tin|ide/.test(normalizedMessage)
+            ? 'lập trình & công nghệ'
+            : /gaming|choi game|fps|genshin|valorant/.test(normalizedMessage)
+                ? 'chơi game giải trí'
+                : '';
+    const useCase = extractQualificationUseCase(message) || directUseCase || (isExplicitReset ? '' : (previousQualification.useCase || context.useCase || ''));
     const preference = extractQualificationPreference(message) || (isExplicitReset ? '' : (previousQualification.preference || ''));
 
     const qualification = { budget, brand, useCase, preference };
@@ -1318,23 +1379,18 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             }
         }
 
-        const questions = [
-            QUESTION_MAP.budget,
-            QUESTION_MAP.useCase,
-            QUESTION_MAP.preference,
-            QUESTION_MAP.brand
-        ];
-
-        const qualificationIntro = availabilityIntro
-            ? `Để chọn đúng **${productType.label}** hợp nhất, mình xin hỏi thêm:`
-            : `Dạ được ạ! Để chọn đúng **${productType.label}** hợp nhất, mình xin hỏi thêm:`;
+        const reply = `${availabilityIntro}Cửa hàng tụi mình hiện có đầy đủ các mẫu **${productType.label}** chính hãng mới nguyên seal 100% với nhiều phân khúc giá.\n\n` +
+            `👉 Để mình chọn máy vừa vặn nhất, bạn dự kiến **ngân sách khoảng bao nhiêu triệu** và dùng cho **nhu cầu chính nào** (như học tập văn phòng, đồ họa, chơi game hay di chuyển nhiều) ạ? 😊`;
 
         return {
-            reply: `${availabilityIntro}${qualificationIntro}\n\n` +
-                questions.map((question, index) => `${index + 1}. ${question}`).join('\n') +
-                `\n\nBạn trả lời từng ý hoặc gộp trong một tin nhắn đều được nhé. Mình sẽ giữ nguyên các thông tin đã ghi nhận và không hỏi lại. 😊`,
+            reply,
             products: [],
-            suggestions: qualificationSuggestions(productType, ['budget']),
+            suggestions: [
+                `${productType.label} dưới 10 triệu`,
+                `${productType.label} 10 - 20 triệu`,
+                `${productType.label} trên 20 triệu`,
+                'Săn mã giảm giá hôm nay'
+            ],
             context: {
                 ...context,
                 stage: 'qualifying_needs',
@@ -1347,7 +1403,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                 preference: '',
                 qualification,
                 availabilityConfirmed: context.availabilityConfirmed || Boolean(availabilityIntro),
-                missingSlots,
+                missingSlots: ['budget', 'useCase', 'preference', 'brand'],
                 lastProducts: [],
                 topProduct: null,
                 currentIntent: 'qualifying_needs'
@@ -1356,11 +1412,10 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     }
 
     // -------------------------------------------------------------
-    // TRƯỜNG HỢP 2: Khách ĐÃ TRẢ LỜI MỘT SỐ CÂU nhưng CHƯA ĐỦ HẾT 4 CÂU
-    // (missingSlots.length > 0 && missingSlots.length < 4)
-    // Yêu cầu:
-    // 1. Phải cho khách trả lời hết 4 câu rồi mới sổ sang trang sản phẩm đó!
-    // 2. Nếu khách hỏi/nêu ngân sách (ví dụ: dưới 10tr), sổ ra CÁC sản phẩm mà khách hỏi dưới 10tr đó!
+    // TRƯỜNG HỢP 2: Khách ĐÃ TRẢ LỜI MỘT SỐ CÂU
+    // FAST-TRACK: Nếu khách đã có Ngân sách HOẶC Nhu cầu sử dụng,
+    // LẬP TỨC đề xuất 2-3 sản phẩm MongoDB phù hợp nhất kèm phân tích,
+    // tuyệt đối KHÔNG ép trả lời nốt các câu hỏi khảo sát!
     // -------------------------------------------------------------
     if (missingSlots.length > 0) {
         const candidateQuery = {
@@ -1379,31 +1434,130 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             delete candidateQuery.brand;
             matchingProducts = await Product.find(candidateQuery).sort({ rating: -1, price: -1 });
         }
-
-        const ackList = [];
-        if (budget > 0) ackList.push(`mức giá **dưới ${money(budget)}**`);
-        if (useCase) ackList.push(`nhu cầu **${useCase}**`);
-        if (preference) ackList.push(`tiêu chí **${preference}**`);
-        if (brand && brand !== 'Tất cả thương hiệu') ackList.push(`thương hiệu **${brand}**`);
-        else if (brand === 'Tất cả thương hiệu') ackList.push(`không phân biệt thương hiệu`);
-
-        let ackMessage = '';
-        if (budget > 0) {
-            ackMessage = `Dạ mình đã ghi nhận ${ackList.join(', ')} và **hiển thị toàn bộ danh sách các mẫu ${productType.label} phù hợp ngân sách này trên màn hình** để bạn tiện theo dõi (gồm ${matchingProducts.length} sản phẩm).\n\n`;
-        } else {
-            ackMessage = `Dạ mình đã ghi nhận ${ackList.join(', ')}.\n\n`;
+        // A hard budget can legitimately be below the catalog floor. Keep the
+        // conversation useful by showing the closest real in-stock item from
+        // MongoDB instead of returning an empty list (never invent a product).
+        let nearestBudgetProduct = null;
+        if (!matchingProducts.length && budget > 0) {
+            const nearestQuery = {
+                category: productType.category,
+                active: { $ne: false },
+                stock: { $gt: 0 },
+                ...(productType.name ? { name: productType.name } : {})
+            };
+            const nearestCandidates = await Product.find(nearestQuery);
+            nearestCandidates.sort((a, b) => Math.abs(a.price - budget) - Math.abs(b.price - budget));
+            nearestBudgetProduct = nearestCandidates[0] || null;
+            if (nearestBudgetProduct) matchingProducts = [nearestBudgetProduct];
         }
 
-        const remainingMessage = `Để tìm ra đúng chiếc máy hoàn hảo nhất cho bạn, bạn giúp mình trả lời nốt ${missingSlots.length} câu hỏi còn lại nhé:\n\n` +
-            missingSlots.map((slotKey, index) => `${index + 1}. ${QUESTION_MAP[slotKey]}`).join('\n') +
-            `\n\nBạn có thể chọn nhanh gợi ý bên dưới hoặc gộp trong tin nhắn nhé! 😊`;
+        // FAST-TRACK: Nếu khách đã nêu ít nhất 2 tiêu chí (Category + Ngân sách HOẶC Category + Nhu cầu sử dụng),
+        // Lập tức đề xuất ngay 2-3 sản phẩm MongoDB phù hợp nhất kèm phân tích & lý do, không bắt trả lời nốt khảo sát!
+        const hasEnoughSignals = Boolean(budget > 0 || useCase || (brand && brand !== 'Tất cả thương hiệu' && budget > 0));
 
-        const nextSuggestions = qualificationSuggestions(productType, missingSlots);
+        if (hasEnoughSignals && matchingProducts.length > 0) {
+            matchingProducts.sort((a, b) => {
+                const scoreA = calculateMatchScore(a, { useCase, preference, brand });
+                const scoreB = calculateMatchScore(b, { useCase, preference, brand });
+                if (scoreB !== scoreA) return scoreB - scoreA;
+                if (budget > 0) {
+                    const diffA = Math.abs(a.price - budget);
+                    const diffB = Math.abs(b.price - budget);
+                    if (diffA !== diffB) return diffA - diffB;
+                }
+                return (b.rating || 0) - (a.rating || 0);
+            });
+
+            const selected = matchingProducts.slice(0, 3);
+            const top = selected[0];
+
+            let intro = '';
+            const isForMomOrElderly = /tang me|cho me|phu huynh|nguoi lon tuoi|ong ba|bo me/i.test(normalizedMessage + ' ' + (useCase || '') + ' ' + (preference || ''));
+            const isForStudent = /sinh vien|hoc sinh|di hoc|hoc tap/i.test(normalizedMessage + ' ' + (useCase || ''));
+            const isForDev = /lap trinh|code|cntt|it|developer|docker/i.test(normalizedMessage + ' ' + (useCase || ''));
+
+            if (isForMomOrElderly) {
+                intro = `Dạ chọn ${productType.label} tặng mẹ là một món quà rất ý nghĩa và chu đáo ạ! ❤️ Với phụ huynh, tiêu chí quan trọng nhất là màn hình to rõ dễ nhìn, pin bền dùng cả ngày, camera chụp gia đình sắc nét và máy hoạt động ổn định, dễ dùng.\n\n` +
+                    `Trong tầm giá ${budget > 0 ? `khoảng **${money(budget)}**` : ''}, mình xin gợi ý ngay **${selected.length} mẫu tối ưu nhất** tại kho TechEcommerce:\n\n`;
+            } else if (isForStudent) {
+                intro = `Dạ với ngân sách ${budget > 0 ? `khoảng **${money(budget)}**` : ''} phục vụ việc học tập sinh viên, mình đề xuất ngay **${selected.length} mẫu ${productType.label}** có cấu hình bền bỉ, tối ưu chi phí suốt 4 năm đại học:\n\n`;
+            } else if (isForDev) {
+                intro = `Dạ với nhu cầu lập trình & công nghệ trong ngân sách ${budget > 0 ? `khoảng **${money(budget)}**` : ''}, mình ưu tiên chọn các mẫu có CPU đa nhân mạnh mẽ và khả năng nâng cấp RAM tốt:\n\n`;
+            } else if (budget > 0 && useCase) {
+                intro = `Dạ với mức ngân sách **dưới ${money(budget)}** phục vụ nhu cầu **${useCase}**, mình xin đề xuất ngay **${selected.length} phương án tối ưu nhất** tại kho TechEcommerce:\n\n`;
+            } else if (budget > 0) {
+                intro = `Dạ với mức ngân sách **dưới ${money(budget)}**, mình đã chọn lọc ngay **${selected.length} mẫu ${productType.label}** chính hãng có cấu hình và độ bền xuất sắc nhất:\n\n`;
+            } else {
+                intro = `Dạ với nhu cầu **${useCase}**, mình xin đề xuất **${selected.length} mẫu ${productType.label}** phù hợp nhất để bạn cân nhắc:\n\n`;
+            }
+
+            const productDetails = selected.map((p, idx) => {
+                const s = p.specs || {};
+                const highlights = [];
+                if (s.camera) highlights.push(`Camera ${s.camera}`);
+                if (s.cpu) highlights.push(`Chip ${s.cpu}`);
+                if (s.ram) highlights.push(`RAM ${s.ram}`);
+                if (s.battery) highlights.push(`Pin ${s.battery}`);
+                if (s.screen) highlights.push(`Màn hình ${s.screen}`);
+                const highlightText = highlights.slice(0, 3).join(' • ') || 'Cấu hình ổn định, độ hoàn thiện cao';
+                const monthlyInst = Math.round((p.price * 0.7) / 12);
+
+                return `${idx + 1}. 🌟 **${p.name}** — Giá: **${money(p.price)}** (Kho còn ${p.stock} máy)\n` +
+                    `   • **Điểm nổi bật:** ${highlightText}.\n` +
+                    `   • **Chính sách:** Bảo hành chính hãng ${p.warranty || '12 - 24 tháng'}, lỗi 1 đổi 1 trong 30 ngày, trả góp 0% chỉ từ ~${money(monthlyInst)}/tháng.`;
+            }).join('\n\n');
+
+            const outro = `\n\n👉 Bạn đang ưng ý mẫu nào trong các lựa chọn trên, hoặc bạn muốn mình so sánh sâu hơn giữa 2 máy để dễ chốt hơn không ạ? 😊`;
+
+            const defaultReply = `${intro}${productDetails}${outro}`;
+            const grounded = await aiModelService.generateGroundedConsultation({
+                userMessage: message,
+                dialogueAct: 'recommend',
+                verifiedProducts: selected,
+                context: { ...context, category: productType.category, budget, useCase, preference },
+                fallbackText: defaultReply
+            });
+
+            return {
+                reply: grounded.reply,
+                products: selected,
+                suggestions: [
+                    selected.length >= 2 ? 'So sánh 2 máy trên' : null,
+                    `Xem chi tiết ${selected[0].name.replace(/(Điện thoại|Laptop)\s*/gi, '').slice(0, 18)}`,
+                    selected[1] ? `Xem chi tiết ${selected[1].name.replace(/(Điện thoại|Laptop)\s*/gi, '').slice(0, 18)}` : null,
+                    'Tính trả góp 0%',
+                    'Săn mã giảm giá'
+                ].filter(Boolean),
+                context: {
+                    ...context,
+                    stage: 'recommended',
+                    category: productType.category,
+                    productType: productType.key,
+                    brand,
+                    budget,
+                    budgetType: budget ? (isHardBudgetLimit(message) ? 'hard' : 'soft') : 'unspecified',
+                    useCase,
+                    preference,
+                    qualification,
+                    lastProducts: selected,
+                    topProduct: top,
+                    currentIntent: 'recommended'
+                },
+                meta: {
+                    provider: grounded.provider,
+                    model: grounded.model,
+                    isFallback: grounded.isFallback
+                }
+            };
+        }
+
+        // Nếu khách chưa nêu ngân sách / nhu cầu:
+        const naturalQuestion = `Dạ để mình lọc mẫu **${productType.label}** vừa vặn nhất, bạn dự kiến mức ngân sách khoảng bao nhiêu triệu và ưu tiên nhu cầu nào nhất (như học tập văn phòng, đồ họa, chơi game hay di chuyển nhiều) ạ? 😊`;
 
         return {
-            reply: `${ackMessage}${remainingMessage}`,
+            reply: naturalQuestion,
             products: matchingProducts.slice(0, 3),
-            suggestions: nextSuggestions,
+            suggestions: qualificationSuggestions(productType, missingSlots),
             context: {
                 ...context,
                 stage: 'qualifying_needs',
@@ -1474,10 +1628,10 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
         const otherCandidates = candidates.slice(1);
         const brandSummary = brand && brand !== 'Tất cả thương hiệu' ? `Thương hiệu ${brand}` : 'Thương hiệu bất kỳ';
 
-        let reply = `Dạ cảm ơn bạn đã trả lời đầy đủ 4 câu hỏi tư vấn! Cửa hàng tụi mình xin tổng hợp trọn vẹn nhu cầu của bạn:\n` +
+        let reply = `Dạ dựa trên các tiêu chí bạn đã chia sẻ, mình xin tổng hợp nhanh nhu cầu của bạn:\n` +
             `• **Ngân sách:** ${budget > 0 ? `Dưới ${money(budget)}` : 'Linh hoạt'}\n` +
-            `• **Mục đích:** ${useCase}\n` +
-            `• **Tiêu chí ưu tiên:** ${preference}\n` +
+            `• **Mục đích:** ${useCase || 'Làm việc & Giải trí'}\n` +
+            `• **Tiêu chí ưu tiên:** ${preference || 'Bền bỉ, mượt mà'}\n` +
             `• **Thương hiệu:** ${brandSummary}\n\n` +
             `🏆 Mẫu máy **tối ưu số 1 và chuẩn xác nhất** dành cho bạn chính là:\n` +
             `🌟 **${topProduct.name}** — **${money(topProduct.price)}** (chính hãng 100%, còn ${topProduct.stock} sản phẩm)\n\n` +
@@ -1491,8 +1645,23 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
 
         reply += `\n👉 Cửa hàng đã hiển thị ngay mẫu **${topProduct.name}** trên màn hình để bạn xem chi tiết và dễ dàng đặt mua. Bạn có muốn thêm vào giỏ hàng ngay hay cần mình hỗ trợ thêm thông tin gì không ạ? 😊`;
 
+        const grounded = await aiModelService.generateGroundedConsultation({
+            userMessage: message,
+            dialogueAct: 'recommend',
+            verifiedProducts: candidates.slice(0, 3),
+            context: {
+                ...context,
+                category: productType.category,
+                brand: fallbackBrand ? '' : brand,
+                budget,
+                useCase,
+                preference
+            },
+            fallbackText: reply
+        });
+
         return {
-            reply,
+            reply: grounded.reply,
             products: candidates,
             suggestions: [
                 `Xem chi tiết ${topProduct.name.slice(0, 24)}`,
@@ -1515,6 +1684,11 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                 currentIntent: 'consultation_completed',
                 lastProducts: candidates,
                 topProduct
+            },
+            meta: {
+                provider: grounded.provider,
+                model: grounded.model,
+                isFallback: grounded.isFallback
             }
         };
     }
@@ -1571,8 +1745,8 @@ async function handleClarifyNeeds(category, existingSlots = {}, userProficiency 
             if (!existingSlots.budget && !existingSlots.useCase) {
                 question = userProficiency === 'beginner'
                     ? `Dạ chào bạn! Để mình giúp bạn chọn được chiếc laptop vừa vặn nhất, chạy mượt mà không lo bị đơ giật mà cũng không lãng phí tiền, bạn có thể chia sẻ thêm giúp mình:\n` +
-                      `1. Mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu?\n` +
-                      `2. Bạn dùng máy cho ngành học hay công việc chính nào (văn phòng, lập trình hay đồ họa gaming) ạ? 😊`
+                    `1. Mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu?\n` +
+                    `2. Bạn dùng máy cho ngành học hay công việc chính nào (văn phòng, lập trình hay đồ họa gaming) ạ? 😊`
                     : `Dạ chào bạn! Để mình lọc cấu hình laptop chuẩn nhất cho nhu cầu của bạn, bạn dự kiến khoảng **ngân sách bao nhiêu** (ví dụ: dưới 15 triệu, 15 - 20 triệu hay trên 20 triệu) và phục vụ **công việc / ngành học nào** (học tập văn phòng, lập trình CNTT hay đồ họa 3D gaming) ạ? 😊`;
                 suggestions = [
                     'Laptop sinh viên dưới 15 triệu',
@@ -1913,14 +2087,22 @@ async function handleRecommendWithTradeOffs({
     if (selected.length === 1) {
         const single = selected[0];
         const s = single.specs || {};
-        const reply = `Dạ trong tầm ngân sách và tiêu chí của bạn, hiện tại TechEcommerce có **duy nhất 1 lựa chọn chính hãng xuất sắc nhất** đáp ứng trọn vẹn là:\n\n` +
+        const defaultSingleReply = `Dạ trong tầm ngân sách và tiêu chí của bạn, hiện tại TechEcommerce có **duy nhất 1 lựa chọn chính hãng xuất sắc nhất** đáp ứng trọn vẹn là:\n\n` +
             `⭐ **${single.name}** - Giá: **${money(single.price)}** (Kho còn ${single.stock} máy)\n` +
             `• Cấu hình: CPU ${s.cpu || ''} | RAM ${s.ram || ''} | Ổ cứng ${s.storage || ''} | Màn hình ${s.screen || ''}\n` +
             `• Điểm mạnh: Cấu hình ổn định, thời lượng pin tốt, bảo hành chính hãng ${single.warranty || '12 tháng'}.\n\n` +
             `Do kho chỉ còn mẫu này phù hợp nhất với tầm giá, bạn có muốn mình gửi bảng tính trả góp hoặc thêm vào giỏ hàng ngay không ạ?`;
 
+        const groundedSingle = await aiModelService.generateGroundedConsultation({
+            userMessage: context.currentMessage || `Tư vấn sản phẩm ${single.name}`,
+            dialogueAct: 'recommend',
+            verifiedProducts: selected,
+            context,
+            fallbackText: defaultSingleReply
+        });
+
         return {
-            reply,
+            reply: groundedSingle.reply,
             products: selected,
             suggestions: [`Thêm ${single.name} vào giỏ`, 'Tính trả góp 0%', 'Xem chính sách bảo hành'],
             context: {
@@ -1929,6 +2111,11 @@ async function handleRecommendWithTradeOffs({
                 budget,
                 lastProducts: selected,
                 currentIntent: 'recommend_single'
+            },
+            meta: {
+                provider: groundedSingle.provider,
+                model: groundedSingle.model,
+                isFallback: groundedSingle.isFallback
             }
         };
     }
@@ -1973,26 +2160,41 @@ async function handleRecommendWithTradeOffs({
                 `• Nếu bạn muốn **tối đa hóa cấu hình để dùng bền bỉ 4-5 năm tới** -> Chọn **${p1.price >= p2.price ? p1.name : p2.name}**.\n` +
                 `• Nếu bạn muốn **tiết kiệm chi phí mà vẫn mượt mà các tác vụ hàng ngày** -> Chọn **${p1.price < p2.price ? p1.name : p2.name}**.`;
         }
+    } else if (category === 'Điện thoại' && selected.length >= 2) {
+        const s1 = p1?.specs || {};
+        const s2 = p2?.specs || {};
+        tradeOffAnalysis =
+            `1. 🌟 **Phương án 1:** **${p1.name}** (${money(p1.price)})\n` +
+            `   • **Ưu điểm nổi bật:** ${s1.camera ? `Camera ${s1.camera}, ` : ''}${s1.cpu ? `Chip ${s1.cpu}, ` : ''}${s1.screen ? `Màn hình ${s1.screen}, ` : ''}pin ${s1.battery || 'bền bỉ'}.\n` +
+            `   • **Điểm đánh đổi:** ${p1.price > p2.price ? `Mức giá cao hơn ${money(p1.price - p2.price)} nhưng đổi lại cấu hình và camera vượt trội.` : 'Bộ nhớ hoặc tốc độ sạc ở mức tiêu chuẩn.'}\n\n` +
+            `2. 🌟 **Phương án 2:** **${p2.name}** (${money(p2.price)})\n` +
+            `   • **Ưu điểm nổi bật:** ${p2.price < p1.price ? `Giá tiết kiệm hơn (${money(p1.price - p2.price)}), ` : ''}${s2.battery ? `Pin ${s2.battery}, ` : ''}${s2.camera ? `Camera ${s2.camera}, ` : ''}giao diện mượt mà dễ sử dụng.\n` +
+            `   • **Điểm đánh đổi:** ${p2.price < p1.price ? 'Thông số camera và hiệu năng chip thấp hơn phương án 1 một chút.' : 'Kích thước hoặc trọng lượng có thể lớn hơn.'}`;
+
+        conditionalConclusion =
+            `📌 **GỢI Ý QUYẾT ĐỊNH CHO BẠN:**\n` +
+            `• Nếu bạn ưu tiên **chụp ảnh sắc nét, màn hình đẹp và cấu hình mạnh mẽ lâu dài** -> Nên chọn **${p1.price >= p2.price ? p1.name : p2.name}**.\n` +
+            `• Nếu bạn ưu tiên **tối ưu chi phí, pin bền bỉ cả ngày và giao diện thân thiện** -> Nên chọn **${p1.price < p2.price ? p1.name : p2.name}**.`;
     } else {
         tradeOffAnalysis = selected.map((p, idx) => {
             const ps = p.specs || {};
             const keyHighlight = ps.cpu ? `Chip ${ps.cpu}` : (ps.connectivity || ps.screen || '');
             const displayPrice = money(p.price);
             return `${idx + 1}. 🌟 **Phương án ${idx + 1}:** **${p.name}** (${displayPrice})\n` +
-                `   • **Ưu điểm:** ${keyHighlight ? `${keyHighlight}, ` : ''}${ps.camera ? `Camera ${ps.camera}, ` : ''}${ps.battery ? `Pin ${ps.battery}, ` : ''}bảo hành chính hãng ${p.warranty || '12 tháng'}.\n` +
-                `   • **Tình trạng:** Sẵn hàng kho (${p.stock} máy), hỗ trợ trả góp 0% chỉ từ ${money(Math.round(p.price * 0.7 / 12))}/tháng.`;
+                `   • **Ưu điểm nổi bật:** ${keyHighlight ? `${keyHighlight}, ` : ''}${ps.camera ? `Camera ${ps.camera}, ` : ''}${ps.battery ? `Pin ${ps.battery}, ` : ''}bảo hành chính hãng ${p.warranty || '12 tháng'}.\n` +
+                `   • **Tình trạng:** Sẵn hàng kho (${p.stock} máy), hỗ trợ trả góp 0% chỉ từ ~${money(Math.round(p.price * 0.7 / 12))}/tháng.`;
         }).join('\n\n');
-        conditionalConclusion = `💡 **Gợi ý lựa chọn:** Bạn có thể bấm vào thẻ sản phẩm bên dưới để xem hình ảnh thực tế và cấu hình chi tiết của từng máy nhé!`;
+        conditionalConclusion = `💡 **Gợi ý lựa chọn:** Cả hai sản phẩm đều là hàng mới chính hãng 100% nguyên seal. Bạn có thể bấm vào thẻ sản phẩm bên dưới để xem hình ảnh thực tế và cấu hình chi tiết nhé!`;
     }
 
     let budgetText = budget > 0 ? `ngân sách tối đa **${money(budget)}**` : '';
     let brandText = brand ? `thương hiệu **${brand}**` : '';
     let criteriaText = [brandText, budgetText].filter(Boolean).join(' ');
 
-    const defaultReply = `Dạ dựa trên nhu cầu **${useCase || 'sử dụng'}** ${criteriaText ? `với ${criteriaText}, ` : ''}mình xin đề xuất **${selected.length} phương án tối ưu nhất** tại kho TechEcommerce kèm phân tích điểm được và điểm đánh đổi để bạn dễ dàng quyết định:\n\n` +
+    const defaultReply = `Dạ dựa trên nhu cầu **${useCase || 'sử dụng'}** ${criteriaText ? `với ${criteriaText}, ` : ''}mình xin đề xuất **${selected.length} phương án tối ưu nhất** tại kho TechEcommerce kèm phân tích điểm được và điểm đánh đổi để bạn dễ dàng lựa chọn:\n\n` +
         `${tradeOffAnalysis}\n\n` +
         `${conditionalConclusion}\n\n` +
-        `👉 Bạn đang nghiêng về phương án nào hơn, hoặc bạn còn băn khoăn điều gì giữa các mẫu máy này không ạ?`;
+        `👉 Bạn đang nghiêng về phương án nào hơn, hoặc bạn muốn mình so sánh chi tiết hơn về điểm nào giữa các mẫu máy này không ạ? 😊`;
 
     const grounded = await aiModelService.generateGroundedConsultation({
         userMessage: context.currentMessage || '',
@@ -2039,7 +2241,7 @@ async function handleContextualFollowUp(message, context = {}) {
     if (ordinal && lastProducts.length >= ordinal) {
         const targetProduct = await Product.findById(lastProducts[ordinal - 1]._id || lastProducts[ordinal - 1]);
         if (targetProduct) {
-            return await handleExactProductLookup(targetProduct, context);
+            return await handleExactProductLookup(targetProduct, context, message);
         }
     }
 
@@ -2187,6 +2389,53 @@ async function handleContextualFollowUp(message, context = {}) {
         }
     }
 
+    // F. Người dùng hỏi sâu về sản phẩm đang xem / vừa được gợi ý ("máy này pin bao lâu", "chơi game nóng không", "camera chụp đêm tốt không", "ưu nhược điểm")
+    const isDeepProductQuestion = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|pin|sac|man hinh|camera|chup anh|quay phim|choi game|gaming|nong|tan nhiet|nang|mong|nhe|ben|code|lap trinh|do hoa|render|uu diem|nhuoc diem|danh gia|tot khong|on khong|muot khong|bao lau|may tieng|phu hop|co nen mua)\b/i.test(norm);
+    if (lastProducts.length > 0 && isDeepProductQuestion && !catInMsg && !brandInMsg && context.stage !== 'qualifying_needs') {
+        const productIds = lastProducts.slice(0, 3).map(item => item?._id || item).filter(Boolean);
+        const verifiedDocs = await Product.find({ _id: { $in: productIds }, active: { $ne: false } });
+        if (verifiedDocs.length > 0) {
+            const primary = verifiedDocs[0];
+            const s = primary.specs || {};
+            const fallbackQa = `Dạ về thắc mắc của bạn đối với **${primary.name}** (Giá: **${money(primary.price)}**):\n\n` +
+                `• **Cấu hình thực tế:** ${[s.cpu && `Vi xử lý ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.storage && `Bộ nhớ ${s.storage}`, s.screen && `Màn hình ${s.screen}`, s.battery && `Pin ${s.battery}`].filter(Boolean).join(' • ') || 'Cấu hình chính hãng tiêu chuẩn'}.\n` +
+                `• **Đánh giá sử dụng:** Máy đáp ứng mượt mà các tác vụ học tập, làm việc và giải trí hàng ngày với độ bền cao, bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày).\n\n` +
+                `👉 Bạn có muốn mình tính chi tiết bảng trả góp 0% hoặc hỗ trợ đặt mua mẫu **${primary.name}** này ngay không ạ?`;
+
+            const groundedQa = await aiModelService.generateGroundedConsultation({
+                userMessage: message,
+                dialogueAct: 'product_qa',
+                verifiedProducts: verifiedDocs,
+                context: {
+                    ...context,
+                    currentMessage: message
+                },
+                fallbackText: fallbackQa
+            });
+
+            return {
+                reply: groundedQa.reply,
+                products: verifiedDocs,
+                suggestions: [
+                    `Thêm ${primary.name.slice(0, 20)} vào giỏ`,
+                    'Tính trả góp 0%',
+                    verifiedDocs.length >= 2 ? 'So sánh 2 máy trên' : 'So sánh với máy khác',
+                    'Săn mã giảm giá'
+                ],
+                context: {
+                    ...context,
+                    lastProducts: verifiedDocs,
+                    currentIntent: 'product_qa'
+                },
+                meta: {
+                    provider: groundedQa.provider,
+                    model: groundedQa.model,
+                    isFallback: groundedQa.isFallback
+                }
+            };
+        }
+    }
+
     return null;
 }
 
@@ -2197,11 +2446,19 @@ async function buildComparisonResponse(p1, p2, context = {}) {
     const s1 = p1.specs || {};
     const s2 = p2.specs || {};
 
-    const tableMarkdown = `⚖️ **BẢNG SO SÁNH THÔNG SỐ KỸ THUẬT THỰC TẾ HỆ THỐNG**
+    const diffPrice = Math.abs(p1.price - p2.price);
+    const cheaper = p1.price < p2.price ? p1 : p2;
+    const higher = p1.price >= p2.price ? p1 : p2;
+
+    const p1Saving = p1.price < p2.price ? ` *(Tiết kiệm ${money(diffPrice)})*` : '';
+    const p2Saving = p2.price < p1.price ? ` *(Tiết kiệm ${money(diffPrice)})*` : '';
+
+    const introLine = `Dạ mình đã lập bảng so sánh chi tiết giữa **${p1.name}** và **${p2.name}** dựa trên thông số thực tế tại kho để bạn dễ dàng cân nhắc nhé:\n\n`;
+    const tableMarkdown = `${introLine}⚖️ **BẢNG SO SÁNH THÔNG SỐ KỸ THUẬT & GIÁ BÁN THỰC TẾ**
 
 | Tiêu chí so sánh | **${p1.name}** | **${p2.name}** |
 | :--- | :--- | :--- |
-| **Giá niêm yết** | **${money(p1.price)}** | **${money(p2.price)}** |
+| **Giá niêm yết** | **${money(p1.price)}**${p1Saving} | **${money(p2.price)}**${p2Saving} |
 | **Tình trạng kho** | ${p1.stock > 0 ? `Còn ${p1.stock} máy` : 'Tạm hết'} | ${p2.stock > 0 ? `Còn ${p2.stock} máy` : 'Tạm hết'} |
 | **Vi xử lý (CPU)** | ${s1.cpu || 'Tiêu chuẩn'} | ${s2.cpu || 'Tiêu chuẩn'} |
 | **Bộ nhớ RAM** | ${s1.ram || 'Tiêu chuẩn'} | ${s2.ram || 'Tiêu chuẩn'} |
@@ -2209,20 +2466,21 @@ async function buildComparisonResponse(p1, p2, context = {}) {
 | **Màn hình** | ${s1.screen || 'Tiêu chuẩn'} | ${s2.screen || 'Tiêu chuẩn'} |
 | **Thời lượng pin** | ${s1.battery || 'Tiêu chuẩn nhà sản xuất'} | ${s2.battery || 'Tiêu chuẩn nhà sản xuất'} |
 | **Trọng lượng** | ${s1.weight || 'Tiêu chuẩn'} | ${s2.weight || 'Tiêu chuẩn'} |
-| **Chính sách bảo hành** | ${p1.warranty || 'Chính hãng 12 - 24 tháng'} | ${p2.warranty || 'Chính hãng 12 - 24 tháng'} |`;
-
-    const diffPrice = Math.abs(p1.price - p2.price);
-    const cheaper = p1.price < p2.price ? p1 : p2;
-    const higher = p1.price >= p2.price ? p1 : p2;
+| **Chính sách bảo hành** | ${p1.warranty || 'Chính hãng 12-24 tháng (Lỗi 1 đổi 1 trong 30 ngày)'} | ${p2.warranty || 'Chính hãng 12-24 tháng (Lỗi 1 đổi 1 trong 30 ngày)'} |`;
 
     const analysis =
-        `🔍 **PHÂN TÍCH ĐÁNH ĐỔI:**\n` +
-        `• **${cheaper.name}** có ưu thế lớn về tài chính, giúp bạn tiết kiệm ngay **${money(diffPrice)}**, đáp ứng tốt nhu cầu cơ bản hàng ngày.\n` +
-        `• **${higher.name}** vượt trội hơn về cấu hình phần cứng (${(higher.specs || {}).cpu || ''}), tản nhiệt và độ bền bỉ khi xử lý đa nhiệm lâu dài.\n\n` +
-        `🎯 **KẾT LUẬN CÓ ĐIỀU KIỆN:**\n` +
-        `• Chọn **${cheaper.name}** nếu bạn ưu tiên chi phí tiết kiệm và tác vụ vừa phải.\n` +
-        `• Chọn **${higher.name}** nếu bạn cần hiệu năng cao hơn và dùng máy bền vững 4-5 năm không lo lỗi thời.\n\n` +
-        `👉 Bạn thấy mẫu máy nào phù hợp với thói quen sử dụng của mình hơn?`;
+        `🔍 **PHÂN TÍCH ĐÁNH ĐỔI & ĐIỂM KHÁC BIỆT:**\n` +
+        `• **${cheaper.name}** có ưu thế vượt trội về tài chính: Giúp bạn **tiết kiệm ngay ${money(diffPrice)}** mà vẫn đáp ứng xuất sắc mọi nhu cầu lướt web, xem phim sắc nét, học tập và tác vụ hàng ngày.\n` +
+        `• **${higher.name}** vượt trội về hiệu năng và trải nghiệm cao cấp: Cấu hình mạnh mẽ hơn (${(higher.specs || {}).cpu || 'chip cao cấp'}), tản nhiệt tối ưu, màn hình rực rỡ và dùng bền bỉ 4-5 năm không lo giật lag.\n\n` +
+        `🎯 **LỜI KHUYÊN CHỌN MUA ĐÚNG NHU CẦU:**\n` +
+        `👉 **Chốt mua ${cheaper.name} ngay nếu:** Bạn cần chiếc máy thực dụng, pin bền, tiết kiệm tối đa ngân sách để làm việc, học tập hoặc làm máy phụ.\n` +
+        `👉 **Chốt mua ${higher.name} ngay nếu:** Bạn muốn thiết bị sang trọng, chơi game đồ họa mượt mà, camera sắc nét và đầu tư lâu dài không phải đổi máy.\n\n` +
+        `🛡️ **ĐẶC QUYỀN MUA HÀNG HÔM NAY TẠI CỬA HÀNG:**\n` +
+        `• 100% hàng mới chính hãng nguyên seal, cam kết chất lượng tuyệt đối.\n` +
+        `• Lỗi 1 đổi 1 trong 30 ngày đầu tiên nếu phát sinh lỗi phần cứng.\n` +
+        `• Hỗ trợ trả góp 0% lãi suất (chỉ cần CCCD, xét duyệt online trong 3 phút).\n` +
+        `• Miễn phí giao hàng hỏa tốc trong 2h, kiểm tra máy ưng ý mới thanh toán.\n\n` +
+        `👉 Bạn thấy mẫu máy nào phù hợp với thói quen sử dụng của mình hơn để mình hỗ trợ bạn đặt hàng ngay nhé?`;
 
     const defaultReply = `${tableMarkdown}\n\n${analysis}`;
     const grounded = await aiModelService.generateGroundedConsultation({
@@ -2237,10 +2495,10 @@ async function buildComparisonResponse(p1, p2, context = {}) {
         reply: grounded.reply,
         products: [p1, p2],
         suggestions: [
-            `Chọn ${p1.name}`,
-            `Chọn ${p2.name}`,
+            `Chọn mua ${p1.name.slice(0, 22)}`,
+            `Chọn mua ${p2.name.slice(0, 22)}`,
             'Tính trả góp 0%',
-            'Săn mã giảm giá'
+            'Mã giảm giá hôm nay'
         ],
         context: {
             ...context,
@@ -2291,7 +2549,7 @@ async function resolveBrandComparison(message, context = {}) {
     // A follow-up such as “hai máy này” must use the products already shown.
     if (brands.length < 2 && context.lastProducts && context.lastProducts.length >= 2 &&
         (context.currentIntent === 'compare_products' || context.stage === 'comparison' ||
-         /hai may|2 may|dang hien thi|vua roi|tren|chenh gia|man hinh|pin|camera/i.test(norm))) {
+            /hai may|2 may|dang hien thi|vua roi|tren|chenh gia|man hinh|pin|camera/i.test(norm))) {
         products = await Product.find({
             _id: { $in: context.lastProducts.slice(0, 2).map(item => item._id || item) },
             active: { $ne: false }
@@ -2709,9 +2967,35 @@ async function checkUncarriedItemForCategory(message, category) {
 // HÀM ĐIỀU PHỐI CHÍNH (MAIN DISPATCHER)
 // -------------------------------------------------------------
 
+function isHearingAidMedicalQuestion(message) {
+    const text = normalizeText(message);
+    return /(nghe kem|kho nghe|nghenh ngang|suy giam thinh luc|chan doan|dieu tri|chua khoi|phuc hoi thinh luc)/i.test(text);
+}
+
+function buildHearingAidSafetyResponse() {
+    return {
+        reply: 'Mình có thể tư vấn thông tin sản phẩm máy trợ thính như thiết kế, tính năng, Bluetooth, pin, thông số được công bố, giá và bảo hành. Mình không thể chẩn đoán, điều trị hoặc khẳng định máy có thể chữa khỏi hay khôi phục thính lực. Nếu bạn đang gặp khó khăn khi nghe, hãy trao đổi với chuyên gia thính học hoặc cơ sở y tế phù hợp. Bạn không cần chia sẻ thông tin sức khỏe cá nhân để được tư vấn sản phẩm.',
+        products: [],
+        suggestions: ['Xem máy trợ thính', 'Tư vấn Bluetooth', 'Tư vấn pin và sạc'],
+        context: { category: 'Máy trợ thính', currentIntent: 'hearing_aid_information', stage: 'hearing_aid_safety' },
+        meta: { provider: 'deterministic_engine', isFallback: true, model: 'none' }
+    };
+}
+
 async function coordinateConsultation({ message, user = null, context = {} }) {
     const text = normalizeText(message);
-    const prev = { ...(context || {}) };
+    const prev = { ...(context || {}), currentMessage: message };
+
+    // Nếu khách đang đứng ở trang chi tiết 1 sản phẩm (pageProductId) và hỏi về "máy này / sản phẩm này"
+    if (prev.pageProductId && (!Array.isArray(prev.lastProducts) || prev.lastProducts.length === 0)) {
+        try {
+            const pageProd = await Product.findOne({ _id: prev.pageProductId, active: { $ne: false } });
+            if (pageProd) {
+                prev.lastProducts = [pageProd];
+                if (!prev.category) prev.category = pageProd.category;
+            }
+        } catch (_) { }
+    }
 
     // Establish one authoritative category for the entire turn. Explicit
     // words in the current message win; otherwise use the active catalog page.
@@ -2726,6 +3010,20 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
             prev.categorySource = 'message';
         } else if (pageCategory) {
             prev.categorySource = 'page';
+        }
+    }
+    // Capture obvious needs before the slot-filling branches run. This keeps
+    // a complete request such as "laptop văn phòng lướt web" from being
+    // treated as an empty generic consultation.
+    if (!prev.useCase) {
+        if (/van phong|luot web|word|excel|hoc tap|sinh vien/.test(text)) {
+            prev.useCase = 'làm việc văn phòng / học tập';
+        } else if (/lap trinh|code|docker|cntt|cong nghe thong tin|ide/.test(text)) {
+            prev.useCase = 'lập trình & công nghệ';
+        } else if (/gaming|choi game|fps|genshin|valorant/.test(text)) {
+            prev.useCase = 'chơi game giải trí';
+        } else if (/do hoa|dung video|render|photoshop|premiere/.test(text)) {
+            prev.useCase = 'thiết kế đồ họa & video';
         }
     }
     if (messageCategory && Array.isArray(prev.lastProducts) && prev.lastProducts.length) {
@@ -2746,6 +3044,10 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
     const unsupportedItem = checkUnsupportedProduct(message);
     if (unsupportedItem) {
         return buildOutOfCatalogResponse(unsupportedItem, message);
+    }
+
+    if (authoritativeCategory === 'Máy trợ thính' && isHearingAidMedicalQuestion(message)) {
+        return buildHearingAidSafetyResponse();
     }
 
     // 1. Kiểm tra câu hỏi chẩn đoán máy cũ (Core i5 Gen 8, nâng cấp SSD/RAM vs Mua mới)
@@ -2790,7 +3092,7 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
     // 2b. Kiểm tra câu tra cứu chính xác 1 model / biến thể (Exact Lookup)
     // Nếu khách đã chỉ rõ model máy -> trả lời đúng sản phẩm, giá, tồn kho ngay lập tức!
     if (matchedProducts.length >= 1 && !isComparingIntent) {
-        return await handleExactProductLookup(matchedProducts[0], prev);
+        return await handleExactProductLookup(matchedProducts[0], prev, message);
     }
 
     // Khách đang được hỏi về một loại sản phẩm nhưng chuyển hẳn sang loại khác
@@ -2868,10 +3170,16 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
 
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở
     // trên, nhánh exact lookup đã ưu tiên trả sản phẩm ngay lập tức.
+    if (Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
+        /may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text)) {
+        const earlyContextualResponse = await handleContextualFollowUp(message, prev);
+        if (earlyContextualResponse) return earlyContextualResponse;
+    }
+
     if ((prev.stage === 'qualifying_needs' || prev.stage === 'recommended') && (prev.productType || prev.category)) {
-            const qualifyingProductType = prev.productType
-                ? PRODUCT_TYPE_INTENTS.find(type => type.key === prev.productType)
-                : null;
+        const qualifyingProductType = prev.productType
+            ? PRODUCT_TYPE_INTENTS.find(type => type.key === prev.productType)
+            : null;
         if (qualifyingProductType) {
             return await handleCatalogProductTypeQuery(message, prev, qualifyingProductType);
         }
@@ -3033,4 +3341,6 @@ module.exports = {
     isOldDeviceDiagnosis,
     money,
     normalizeText
+    , isHearingAidMedicalQuestion
+    , buildHearingAidSafetyResponse
 };

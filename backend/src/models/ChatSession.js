@@ -82,6 +82,16 @@ const chatSessionSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Guest conversations are transient and must not be retained indefinitely.
+// Member history remains available for account workflows; guest sessions expire
+// after 90 days through MongoDB's TTL monitor.
+chatSessionSchema.add({
+    expiresAt: {
+        type: Date,
+        default: function () { return this.isMember ? null : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); }
+    }
+});
+chatSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0, partialFilterExpression: { isMember: false } });
 chatSessionSchema.index({ updatedAt: -1 });
 
 module.exports = mongoose.model('ChatSession', chatSessionSchema);

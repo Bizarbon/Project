@@ -170,7 +170,11 @@ const uniformCatalog = [
         "compareAtPrice": 36990000,
         "image": "/assets/images/products/cps-iphone-16-pro-max.png",
         "images": [
-            "/assets/images/products/cps-iphone-16-pro-max.png"
+            "/assets/images/products/cps-iphone-16-pro-max.png",
+            "/assets/uploads/products/iphone-16-pro-max-desert.png",
+            "/assets/uploads/products/iphone-16-pro-max-natural.png",
+            "/assets/uploads/products/iphone-16-pro-max-white.png",
+            "/assets/uploads/products/iphone-16-pro-max-black.png"
         ],
         "description": "Màn hình Super Retina XDR 6.9 inch, chip A18 Pro, khung viền Titan sa mạc đẳng cấp, nút điều khiển Camera Control chuyên nghiệp.",
         "specs": {
@@ -196,7 +200,53 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/RfakDAwVdRw",
         "sourceUrl": "https://cellphones.com.vn/iphone-16-pro-max.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/i/p/iphone-16-pro-max.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00006-DESERT",
+                "color": "Titan Sa Mạc (Desert Titanium)",
+                "colorHex": "#c5a582",
+                "image": "/assets/uploads/products/iphone-16-pro-max-desert.png",
+                "compareAtPrice": 36990000,
+                "ram": "",
+                "storage": "",
+                "price": 34990000,
+                "stock": 35
+            },
+            {
+                "sku": "TECH-00006-NATURAL",
+                "color": "Titan Tự Nhiên (Natural Titanium)",
+                "colorHex": "#97928b",
+                "image": "/assets/uploads/products/iphone-16-pro-max-natural.png",
+                "compareAtPrice": 36990000,
+                "ram": "",
+                "storage": "",
+                "price": 34990000,
+                "stock": 28
+            },
+            {
+                "sku": "TECH-00006-WHITE",
+                "color": "Titan Trắng (White Titanium)",
+                "colorHex": "#e3e4e5",
+                "image": "/assets/uploads/products/iphone-16-pro-max-white.png",
+                "compareAtPrice": 36990000,
+                "ram": "",
+                "storage": "",
+                "price": 34990000,
+                "stock": 22
+            },
+            {
+                "sku": "TECH-00006-BLACK",
+                "color": "Titan Đen (Black Titanium)",
+                "colorHex": "#3b3a39",
+                "image": "/assets/uploads/products/iphone-16-pro-max-black.png",
+                "compareAtPrice": 36990000,
+                "ram": "",
+                "storage": "",
+                "price": 34990000,
+                "stock": 19
+            }
+        ]
     },
     {
         "name": "iPhone 16 Pro 128GB",
@@ -206,7 +256,11 @@ const uniformCatalog = [
         "compareAtPrice": 28990000,
         "image": "/assets/uploads/products/iphone-16-pro.png",
         "images": [
-            "/assets/uploads/products/iphone-16-pro.png"
+            "/assets/uploads/products/iphone-16-pro.png",
+            "/assets/uploads/products/iphone-16-pro-natural.png",
+            "/assets/uploads/products/iphone-16-pro-desert.png",
+            "/assets/uploads/products/iphone-16-pro-white.png",
+            "/assets/uploads/products/iphone-16-pro-black.png"
         ],
         "description": "Kích thước nhỏ gọn 6.3 inch viền siêu mỏng, chip A18 Pro, camera tiềm vọng zoom quang 5x vượt trội.",
         "specs": {
@@ -231,7 +285,53 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/wVWVKMZomDw",
         "sourceUrl": "https://cellphones.com.vn/iphone-16-pro.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/i/p/iphone-16-pro.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00007-NATURAL",
+                "color": "Titan Tự Nhiên (Natural Titanium)",
+                "colorHex": "#97928b",
+                "image": "/assets/uploads/products/iphone-16-pro-natural.png",
+                "compareAtPrice": 28990000,
+                "ram": "",
+                "storage": "",
+                "price": 28490000,
+                "stock": 25
+            },
+            {
+                "sku": "TECH-00007-DESERT",
+                "color": "Titan Sa Mạc (Desert Titanium)",
+                "colorHex": "#c5a582",
+                "image": "/assets/uploads/products/iphone-16-pro-desert.png",
+                "compareAtPrice": 28990000,
+                "ram": "",
+                "storage": "",
+                "price": 28490000,
+                "stock": 30
+            },
+            {
+                "sku": "TECH-00007-WHITE",
+                "color": "Titan Trắng (White Titanium)",
+                "colorHex": "#e3e4e5",
+                "image": "/assets/uploads/products/iphone-16-pro-white.png",
+                "compareAtPrice": 28990000,
+                "ram": "",
+                "storage": "",
+                "price": 28490000,
+                "stock": 18
+            },
+            {
+                "sku": "TECH-00007-BLACK",
+                "color": "Titan Đen (Black Titanium)",
+                "colorHex": "#3b3a39",
+                "image": "/assets/uploads/products/iphone-16-pro-black.png",
+                "compareAtPrice": 28990000,
+                "ram": "",
+                "storage": "",
+                "price": 28490000,
+                "stock": 15
+            }
+        ]
     },
     {
         "name": "iPhone 15 Pro Max 256GB",
@@ -241,7 +341,11 @@ const uniformCatalog = [
         "compareAtPrice": 34990000,
         "image": "/assets/uploads/products/iphone-15-pro-max.png",
         "images": [
-            "/assets/uploads/products/iphone-15-pro-max.png"
+            "/assets/uploads/products/iphone-15-pro-max.png",
+            "/assets/uploads/products/iphone-15-pro-max-natural.jpg",
+            "/assets/uploads/products/iphone-15-pro-max-blue.jpg",
+            "/assets/uploads/products/iphone-15-pro-max-white.jpg",
+            "/assets/uploads/products/iphone-15-pro-max-black.jpg"
         ],
         "description": "Khung viền Titan tự nhiên, chip A17 Pro mạnh mẽ, camera 48MP zoom quang 5x cùng cổng kết nối USB-C tốc độ cao.",
         "specs": {
@@ -265,7 +369,53 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/UYXz1j0RUWQ",
         "sourceUrl": "https://cellphones.com.vn/iphone-15-pro-max.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/p/8/p8-iphone-15-pro-max-256gb-chinh-hang-vn-a.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00008-NATURAL",
+                "color": "Titan Tự Nhiên (Natural Titanium)",
+                "colorHex": "#97928b",
+                "image": "/assets/uploads/products/iphone-15-pro-max-natural.jpg",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 29490000,
+                "stock": 40
+            },
+            {
+                "sku": "TECH-00008-BLUE",
+                "color": "Titan Xanh (Blue Titanium)",
+                "colorHex": "#2f3844",
+                "image": "/assets/uploads/products/iphone-15-pro-max-blue.jpg",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 29490000,
+                "stock": 26
+            },
+            {
+                "sku": "TECH-00008-WHITE",
+                "color": "Titan Trắng (White Titanium)",
+                "colorHex": "#e3e4e5",
+                "image": "/assets/uploads/products/iphone-15-pro-max-white.jpg",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 29490000,
+                "stock": 20
+            },
+            {
+                "sku": "TECH-00008-BLACK",
+                "color": "Titan Đen (Black Titanium)",
+                "colorHex": "#3b3a39",
+                "image": "/assets/uploads/products/iphone-15-pro-max-black.jpg",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 29490000,
+                "stock": 14
+            }
+        ]
     },
     {
         "name": "Samsung Galaxy S25 Ultra 256GB",
@@ -275,7 +425,11 @@ const uniformCatalog = [
         "compareAtPrice": 34990000,
         "image": "/assets/uploads/products/samsung-galaxy-s25-ultra.png",
         "images": [
-            "/assets/uploads/products/samsung-galaxy-s25-ultra.png"
+            "/assets/uploads/products/samsung-galaxy-s25-ultra.png",
+            "/assets/uploads/products/samsung-s25-ultra-gray.png",
+            "/assets/uploads/products/samsung-s25-ultra-black.png",
+            "/assets/uploads/products/samsung-s25-ultra-yellow.png",
+            "/assets/uploads/products/samsung-s25-ultra-violet.png"
         ],
         "description": "Quyền năng Galaxy AI thế hệ mới, khung viền Titan bo cong công thái học, camera 200MP zoom mắt thần bóng đêm kèm bút S Pen.",
         "specs": {
@@ -300,7 +454,53 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/WXZRJO9w8nU",
         "sourceUrl": "https://cellphones.com.vn/samsung-galaxy-s25-ultra.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/p/9/p9-samsung-galaxy-s25-ultra-12gb-256gb.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00009-GRAY",
+                "color": "Titan Xám (Titanium Gray)",
+                "colorHex": "#6b6e70",
+                "image": "/assets/uploads/products/samsung-s25-ultra-gray.png",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 32
+            },
+            {
+                "sku": "TECH-00009-BLACK",
+                "color": "Titan Đen (Titanium Black)",
+                "colorHex": "#2b2b2b",
+                "image": "/assets/uploads/products/samsung-s25-ultra-black.png",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 28
+            },
+            {
+                "sku": "TECH-00009-YELLOW",
+                "color": "Titan Vàng (Titanium Yellow)",
+                "colorHex": "#e6dbb8",
+                "image": "/assets/uploads/products/samsung-s25-ultra-yellow.png",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 16
+            },
+            {
+                "sku": "TECH-00009-VIOLET",
+                "color": "Titan Tím (Titanium Violet)",
+                "colorHex": "#584f6b",
+                "image": "/assets/uploads/products/samsung-s25-ultra-violet.png",
+                "compareAtPrice": 34990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 18
+            }
+        ]
     },
     {
         "name": "Samsung Galaxy S25 Plus 256GB",
@@ -310,7 +510,11 @@ const uniformCatalog = [
         "compareAtPrice": 26990000,
         "image": "/assets/uploads/products/samsung-galaxy-s25-plus.png",
         "images": [
-            "/assets/uploads/products/samsung-galaxy-s25-plus.png"
+            "/assets/uploads/products/samsung-galaxy-s25-plus.png",
+            "/assets/uploads/products/samsung-s25-plus-gray.png",
+            "/assets/uploads/products/samsung-s25-plus-black.png",
+            "/assets/uploads/products/samsung-s25-plus-violet.png",
+            "/assets/uploads/products/samsung-s25-plus-yellow.png"
         ],
         "description": "Màn hình 2K+ siêu nét viền mỏng đối xứng, chip Snapdragon 8 Elite đỉnh cao, hỗ trợ đầy đủ bộ công cụ Galaxy AI thông minh.",
         "specs": {
@@ -334,7 +538,53 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/-iodtx2q9uA",
         "sourceUrl": "https://cellphones.com.vn/samsung-galaxy-s25-plus.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/p/1/p10-samsung-galaxy-s25-plus-256gb.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00010-GRAY",
+                "color": "Xám Marble (Marble Gray)",
+                "colorHex": "#7a7d80",
+                "image": "/assets/uploads/products/samsung-s25-plus-gray.png",
+                "compareAtPrice": 26990000,
+                "ram": "",
+                "storage": "",
+                "price": 24990000,
+                "stock": 22
+            },
+            {
+                "sku": "TECH-00010-BLACK",
+                "color": "Đen Onyx (Onyx Black)",
+                "colorHex": "#222222",
+                "image": "/assets/uploads/products/samsung-s25-plus-black.png",
+                "compareAtPrice": 26990000,
+                "ram": "",
+                "storage": "",
+                "price": 24990000,
+                "stock": 25
+            },
+            {
+                "sku": "TECH-00010-VIOLET",
+                "color": "Tím Cobalt (Cobalt Violet)",
+                "colorHex": "#4d4661",
+                "image": "/assets/uploads/products/samsung-s25-plus-violet.png",
+                "compareAtPrice": 26990000,
+                "ram": "",
+                "storage": "",
+                "price": 24990000,
+                "stock": 14
+            },
+            {
+                "sku": "TECH-00010-YELLOW",
+                "color": "Vàng Amber (Amber Yellow)",
+                "colorHex": "#eddca4",
+                "image": "/assets/uploads/products/samsung-s25-plus-yellow.png",
+                "compareAtPrice": 26990000,
+                "ram": "",
+                "storage": "",
+                "price": 24990000,
+                "stock": 12
+            }
+        ]
     },
     {
         "name": "Xiaomi 14 Ultra 512GB",
@@ -344,7 +594,9 @@ const uniformCatalog = [
         "compareAtPrice": 32990000,
         "image": "/assets/uploads/products/xiaomi-14-ultra.png",
         "images": [
-            "/assets/uploads/products/xiaomi-14-ultra.png"
+            "/assets/uploads/products/xiaomi-14-ultra.png",
+            "/assets/uploads/products/xiaomi-14-ultra-black.jpg",
+            "/assets/uploads/products/xiaomi-14-ultra-white.jpg"
         ],
         "description": "Kiệt tác nhiếp ảnh hợp tác cùng Leica, cảm biến 1 inch thế hệ mới, ống kính quang học Summilux đỉnh cao.",
         "specs": {
@@ -368,7 +620,31 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/5E5SNAqEATw",
         "sourceUrl": "https://cellphones.com.vn/xiaomi-14-ultra.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/x/i/xiaomi-14-ultra_3.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00011-BLACK",
+                "color": "Đen Da Thuần Chay (Black Leather)",
+                "colorHex": "#1c1917",
+                "image": "/assets/uploads/products/xiaomi-14-ultra-black.jpg",
+                "compareAtPrice": 32990000,
+                "ram": "",
+                "storage": "",
+                "price": 29990000,
+                "stock": 20
+            },
+            {
+                "sku": "TECH-00011-WHITE",
+                "color": "Trắng Da Thuần Chay (White Leather)",
+                "colorHex": "#f8fafc",
+                "image": "/assets/uploads/products/xiaomi-14-ultra-white.jpg",
+                "compareAtPrice": 32990000,
+                "ram": "",
+                "storage": "",
+                "price": 29990000,
+                "stock": 18
+            }
+        ]
     },
     {
         "name": "POCO X8 Pro Max 5G 256GB",
@@ -378,7 +654,10 @@ const uniformCatalog = [
         "compareAtPrice": 10990000,
         "image": "/assets/uploads/products/poco-x8-pro-max.png",
         "images": [
-            "/assets/uploads/products/poco-x8-pro-max.png"
+            "/assets/uploads/products/poco-x8-pro-max.png",
+            "/assets/uploads/products/poco-x8-yellow.png",
+            "/assets/uploads/products/poco-x8-black.png",
+            "/assets/uploads/products/poco-x8-gray.png"
         ],
         "description": "Hiệu năng bứt phá phân khúc tầm trung với cấu hình cực mạnh, sạc siêu tốc 90W và màn hình 144Hz siêu mượt mà.",
         "specs": {
@@ -401,41 +680,132 @@ const uniformCatalog = [
         "videoUrl": "https://www.youtube.com/embed/PdDL-h3l5RY",
         "sourceUrl": "https://cellphones.com.vn/dien-thoai-xiaomi-poco-x6-pro.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/t/_/t_i_xu_ng_22__6.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00012-YELLOW",
+                "color": "Vàng POCO Đặc Trưng (POCO Yellow)",
+                "colorHex": "#eab308",
+                "image": "/assets/uploads/products/poco-x8-yellow.png",
+                "compareAtPrice": 10990000,
+                "ram": "",
+                "storage": "",
+                "price": 9490000,
+                "stock": 38
+            },
+            {
+                "sku": "TECH-00012-BLACK",
+                "color": "Đen Cổ Điển (Classic Black)",
+                "colorHex": "#171717",
+                "image": "/assets/uploads/products/poco-x8-black.png",
+                "compareAtPrice": 10990000,
+                "ram": "",
+                "storage": "",
+                "price": 9490000,
+                "stock": 30
+            },
+            {
+                "sku": "TECH-00012-GRAY",
+                "color": "Xám Titan (Titanium Gray)",
+                "colorHex": "#64748b",
+                "image": "/assets/uploads/products/poco-x8-gray.png",
+                "compareAtPrice": 10990000,
+                "ram": "",
+                "storage": "",
+                "price": 9490000,
+                "stock": 24
+            }
+        ]
     },
     {
-        "name": "Samsung Galaxy S26 Ultra 5G 256GB",
+        "name": "Samsung Galaxy S24 Ultra 5G 256GB",
         "brand": "Samsung",
         "category": "Điện thoại",
-        "price": 36990000,
-        "compareAtPrice": 39990000,
-        "image": "/assets/uploads/products/samsung-galaxy-s26-ultra.png",
+        "price": 26990000,
+        "compareAtPrice": 31990000,
+        "image": "/assets/uploads/products/samsung-s24-ultra-gray.png",
         "images": [
-            "/assets/uploads/products/samsung-galaxy-s26-ultra.png"
+            "/assets/uploads/products/samsung-s24-ultra-gray.png",
+            "/assets/uploads/products/samsung-s24-ultra-black.png",
+            "/assets/uploads/products/samsung-s24-ultra-yellow.png",
+            "/assets/uploads/products/samsung-s24-ultra-violet.png"
         ],
-        "description": "Siêu phẩm công nghệ đột phá dẫn đầu xu hướng tương lai với trí tuệ nhân tạo Galaxy AI mở rộng và cụm camera zoom vô cực.",
+        "description": "Flagship đỉnh cao công nghệ từ Samsung với khung viền Titan sang trọng và bền bỉ, màn hình Dynamic AMOLED 2X phẳng 6.8 inch chống chói vượt trội, bút S Pen tích hợp quyền năng cùng sức mạnh trí tuệ nhân tạo Galaxy AI đột phá.",
         "specs": {
-            "cpu": "Snapdragon thế hệ mới",
+            "cpu": "Snapdragon 8 Gen 3 for Galaxy (4nm)",
             "ram": "12GB",
             "storage": "256GB",
-            "screen": "Dynamic AMOLED 2X 120Hz",
-            "battery": "5.200 mAh",
-            "os": "One UI"
+            "screen": "Dynamic AMOLED 2X 6.8 inch QHD+ 120Hz 2600 nits",
+            "camera": "200MP OIS + 50MP Periscope 5x + 12MP Ultra-wide + 10MP Tele 3x",
+            "battery": "5.000 mAh (Sạc nhanh 45W)",
+            "os": "One UI 6.1 (Android 14) hỗ trợ Galaxy AI",
+            "weight": "232g"
         },
         "tags": [
             "Samsung",
+            "Galaxy S24 Ultra",
+            "S24 Ultra",
             "Ultra",
-            "5G"
+            "5G",
+            "Flagship",
+            "Galaxy AI"
         ],
         "featured": true,
         "rating": 5,
-        "reviewCount": 24,
-        "soldCount": 95,
-        "stock": 15,
-        "videoUrl": "https://www.youtube.com/embed/xsHhWU3Uvjw",
+        "reviewCount": 42,
+        "soldCount": 128,
+        "stock": 20,
+        "warranty": "Chính hãng 12 tháng",
+        "videoUrl": "https://www.youtube.com/embed/S0vldC2uLfw",
         "sourceUrl": "https://cellphones.com.vn/samsung-galaxy-s24-ultra.html",
-        "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/s/s/ss-s24-ultra-xam-222.png",
-        "sourceFetchedAt": "2026-10-03T11:18:39.281Z"
+        "originalImageUrl": "/assets/uploads/products/samsung-s24-ultra-gray.png",
+        "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
+        "variants": [
+            {
+                "sku": "TECH-00013-GRAY",
+                "color": "Titan Xám (Titanium Gray)",
+                "colorHex": "#878681",
+                "image": "/assets/uploads/products/samsung-s24-ultra-gray.png",
+                "compareAtPrice": 31990000,
+                "price": 26990000,
+                "stock": 25,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00013-BLACK",
+                "color": "Titan Đen (Titanium Black)",
+                "colorHex": "#262626",
+                "image": "/assets/uploads/products/samsung-s24-ultra-black.png",
+                "compareAtPrice": 31990000,
+                "price": 26990000,
+                "stock": 20,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00013-YELLOW",
+                "color": "Titan Vàng (Titanium Yellow)",
+                "colorHex": "#d1be9b",
+                "image": "/assets/uploads/products/samsung-s24-ultra-yellow.png",
+                "compareAtPrice": 31990000,
+                "price": 26990000,
+                "stock": 18,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00013-VIOLET",
+                "color": "Titan Tím (Titanium Violet)",
+                "colorHex": "#433d56",
+                "image": "/assets/uploads/products/samsung-s24-ultra-violet.png",
+                "compareAtPrice": 31990000,
+                "price": 26990000,
+                "stock": 15,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     },
     {
         "name": "MacBook Air 13 inch M3 512GB",
@@ -449,7 +819,7 @@ const uniformCatalog = [
         ],
         "description": "Đỉnh cao laptop mỏng nhẹ với sức mạnh của chip Apple Silicon M3, thời lượng pin 18 giờ cùng màn hình Liquid Retina sắc nét.",
         "specs": {
-            "cpu": "Apple M5 10-core CPU 8-core GPU",
+            "cpu": "Apple M3 8-core CPU 10-core GPU",
             "ram": "16GB Unified",
             "storage": "512GB SSD",
             "screen": "13.6 inch Liquid Retina",
@@ -720,7 +1090,7 @@ const uniformCatalog = [
         ],
         "description": "Màn hình Ultra Retina XDR Tandem OLED đỉnh cao nhất, chip Apple M4 thế hệ mới siêu mạnh mẽ và độ mỏng chỉ 5.3mm.",
         "specs": {
-            "cpu": "Apple M5",
+            "cpu": "Apple M4 9-core",
             "ram": "8GB",
             "storage": "256GB",
             "screen": "Tandem OLED 11 inch 120Hz",
@@ -755,7 +1125,7 @@ const uniformCatalog = [
         ],
         "description": "Chip Apple M2 mạnh mẽ đáp ứng đồ họa chuyên sâu, hỗ trợ Apple Pencil Pro và Magic Keyboard tiện lợi.",
         "specs": {
-            "cpu": "Apple M4 8-core",
+            "cpu": "Apple M2 8-core",
             "ram": "8GB",
             "storage": "128GB",
             "screen": "Liquid Retina 11 inch",
@@ -1638,7 +2008,7 @@ const uniformCatalog = [
         "reviewCount": 140,
         "soldCount": 490,
         "stock": 15,
-        "videoUrl": "https://www.youtube.com/embed/PR7Q8L2kb-s",
+        "videoUrl": "https://www.youtube.com/embed/SyfuWvnr5XM",
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-sony-playstation-5-slim.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-choi-game-sony-playstation-5-slim.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
@@ -1653,11 +2023,12 @@ const uniformCatalog = [
         "images": [
             "/assets/uploads/products/ps-portal.png"
         ],
-        "description": "Hỗ trợ xuất hình ảnh 4K HDR sắc nét, kho game độc quyền khổng lồ, đi kèm tay cầm DualShock 4 không dây phản hồi nhanh nhạy.",
+        "description": "Thiết bị chơi game từ xa chuyên dụng cho PS5 qua kết nối Wi-Fi với màn hình LCD 8 inch 1080p 60fps, tích hợp trọn vẹn tính năng Haptic Feedback và Adaptive Triggers.",
         "specs": {
-            "cpu": "AMD Jaguar 8 nhân",
-            "storage": "1TB HDD",
-            "video": "4K HDR"
+            "screen": "Màn hình 8 inch 1080p 60Hz",
+            "connectivity": "Kết nối Wi-Fi Remote Play PS5",
+            "features": "Haptic Feedback & Adaptive Triggers",
+            "audio": "Jack tai nghe 3.5mm & Loa tích hợp"
         },
         "tags": [
             "Sony",
@@ -1669,7 +2040,7 @@ const uniformCatalog = [
         "reviewCount": 45,
         "soldCount": 190,
         "stock": 18,
-        "videoUrl": "https://www.youtube.com/embed/347DdlVr9qg",
+        "videoUrl": "https://www.youtube.com/embed/Z8uJHFJxD4E",
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-sony-playstation-portal.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-choi-game-sony-playstation-portal-1.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
@@ -1684,12 +2055,14 @@ const uniformCatalog = [
         "images": [
             "/assets/uploads/products/asus-rog-ally.png"
         ],
-        "description": "Màn hình HDR OLED 7.4 inch 90Hz độ tương phản vô cực, thời lượng pin nâng cấp vượt trội, trải nghiệm trọn vẹn toàn bộ kho game Steam PC.",
+        "description": "Chiến mượt mọi tựa game AAA trên nền tảng Windows 11 với màn hình 7 inch FHD 120Hz FreeSync Premium và tản nhiệt Zero Gravity.",
         "specs": {
-            "screen": "HDR OLED 7.4 inch 90Hz",
-            "cpu": "AMD Sephiroth 6nm APU",
+            "cpu": "AMD Ryzen Z1 Extreme",
+            "ram": "16GB LPDDR5",
             "storage": "512GB NVMe SSD",
-            "os": "SteamOS"
+            "screen": "7 inch FHD 120Hz FreeSync Premium",
+            "os": "Windows 11 Home",
+            "cooling": "Tản nhiệt Zero Gravity"
         },
         "tags": [
             "Valve",
@@ -1702,7 +2075,7 @@ const uniformCatalog = [
         "reviewCount": 52,
         "soldCount": 180,
         "stock": 12,
-        "videoUrl": "https://www.youtube.com/embed/M_aEGf6kDCk",
+        "videoUrl": "https://www.youtube.com/embed/rZIkMiv613U",
         "sourceUrl": "https://cellphones.com.vn/rog-xbox-ally.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/r/o/rog-xbox-ally_2_.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
@@ -1711,18 +2084,21 @@ const uniformCatalog = [
         "name": "Máy chơi game cầm tay ASUS ROG Ally X 24GB/1TB",
         "brand": "ASUS",
         "category": "Máy chơi game",
-        "price": 12990000,
-        "compareAtPrice": 14490000,
+        "price": 22990000,
+        "compareAtPrice": 24990000,
         "image": "/assets/uploads/products/asus-rog-ally-x.jpg",
         "images": [
             "/assets/uploads/products/asus-rog-ally-x.jpg"
         ],
-        "description": "Trải nghiệm thực tế hỗn hợp (Mixed Reality) đột phá với camera Passthrough màu sắc nét, đồ họa mạnh gấp đôi Quest 2 cùng thấu kính Pancake mỏng nhẹ.",
+        "description": "Phiên bản nâng cấp toàn diện với viên pin khủng 80Wh gấp đôi thế hệ trước, RAM 24GB LPDDR5X tốc độ cao và thiết kế công thái học cầm nắm thoải mái.",
         "specs": {
-            "cpu": "Snapdragon XR2 Gen 2",
-            "ram": "8GB",
-            "storage": "128GB",
-            "screen": "4K+ Infinite Display (2064x2208 mỗi mắt)"
+            "cpu": "AMD Ryzen Z1 Extreme",
+            "ram": "24GB LPDDR5X",
+            "storage": "1TB PCIe 4.0 SSD",
+            "screen": "7 inch FHD 120Hz FreeSync Premium",
+            "battery": "80Wh (Gấp đôi thế hệ trước)",
+            "os": "Windows 11 Home",
+            "weight": "678g"
         },
         "tags": [
             "Meta",
@@ -1735,7 +2111,7 @@ const uniformCatalog = [
         "reviewCount": 40,
         "soldCount": 130,
         "stock": 14,
-        "videoUrl": "https://www.youtube.com/embed/7cnDo8DKIgc",
+        "videoUrl": "https://www.youtube.com/embed/T9byxIJ5To8",
         "sourceUrl": "https://cellphones.com.vn/rog-xbox-ally-x.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/r/o/rog-xbox-ally-x-1_1.jpg",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
@@ -1937,7 +2313,7 @@ const uniformCatalog = [
         "reviewCount": 35,
         "soldCount": 80,
         "stock": 25,
-         "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/kPk634HF7Mk",
         "warranty": "Chính hãng 12 tháng (Bảo hành 3S1)",
         "sourceUrl": "https://cellphones.com.vn/laptop-acer-aspire-3-a315-59-381e.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/l/a/laptop-acer-aspire-3-a315-59-381e-thumbnails.png",
@@ -1975,7 +2351,7 @@ const uniformCatalog = [
         "reviewCount": 42,
         "soldCount": 97,
         "stock": 14,
-         "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/FFKLSKpoBkk",
         "warranty": "Chính hãng 12 tháng (Bảo hành 3S1)",
         "sourceUrl": "https://cellphones.com.vn/laptop-acer-swift-go-14-sfg14-41-r251.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_744_1__1_4.png",
@@ -2013,7 +2389,7 @@ const uniformCatalog = [
         "reviewCount": 49,
         "soldCount": 114,
         "stock": 8,
-         "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/BUVHEQUJFkM",
         "warranty": "Chính hãng 12 tháng (Bảo hành 3S1)",
         "sourceUrl": "https://cellphones.com.vn/laptop-acer-gaming-nitro-v-15-propanel-anv15-52-50va.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_975_17.png",
@@ -2051,7 +2427,7 @@ const uniformCatalog = [
         "reviewCount": 56,
         "soldCount": 131,
         "stock": 30,
-         "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/3Ng9O5D7wPY",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-asus-vivobook-go-14-e1404fa-nk177w.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_-_2023-06-08t005130.908.png",
@@ -2089,7 +2465,7 @@ const uniformCatalog = [
         "reviewCount": 63,
         "soldCount": 148,
         "stock": 22,
-         "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/FpIsVvewXzA",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-asus-vivobook-14-x1404va-eb355w.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_744_1_107.png",
@@ -2127,7 +2503,7 @@ const uniformCatalog = [
         "reviewCount": 70,
         "soldCount": 165,
         "stock": 12,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/QXm4JOD1CZ4",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-asus-zenbook-14-oled-ux3405ma-pp151w.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_565_36_.png",
@@ -2165,7 +2541,7 @@ const uniformCatalog = [
         "reviewCount": 77,
         "soldCount": 182,
         "stock": 20,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/9bRHuVjGbOY",
         "warranty": "Chính hãng 12 tháng (Bảo hành tận nơi ProSupport)",
         "sourceUrl": "https://cellphones.com.vn/laptop-dell-vostro-3530-2h1tpi7.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_d_i_10__1_3.png",
@@ -2203,7 +2579,7 @@ const uniformCatalog = [
         "reviewCount": 84,
         "soldCount": 199,
         "stock": 15,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/S6gJqE7P7vA",
         "warranty": "Chính hãng 12 tháng (Bảo hành tận nơi)",
         "sourceUrl": "https://cellphones.com.vn/laptop-dell-inspiron-14-5440-d0f3w.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_744_1_29.png",
@@ -2241,7 +2617,7 @@ const uniformCatalog = [
         "reviewCount": 91,
         "soldCount": 216,
         "stock": 7,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/b5Qc84AGNkA",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-dell-xps-9315.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_12__5.png",
@@ -2278,7 +2654,7 @@ const uniformCatalog = [
         "reviewCount": 98,
         "soldCount": 233,
         "stock": 28,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/5IsPKJ4eEM8",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-hp-15-fd1289tu-c2cv8pa.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_744_1_96.png",
@@ -2316,7 +2692,7 @@ const uniformCatalog = [
         "reviewCount": 105,
         "soldCount": 250,
         "stock": 18,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/8n9ruRT5Dqs",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-hp-omnibook-7-14-fr0033tu-c1mn2pa.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_744_1_105.png",
@@ -2354,7 +2730,7 @@ const uniformCatalog = [
         "reviewCount": 112,
         "soldCount": 267,
         "stock": 15,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/e9an6tSxrvI",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-hp-victus-15-fa1139tx-8y6w3pa.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_d_i_6_35.png",
@@ -2392,7 +2768,7 @@ const uniformCatalog = [
         "reviewCount": 119,
         "soldCount": 284,
         "stock": 6,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/S5D32BVF-xQ",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-hp-gaming-omen-16-am0176tx-bx9d3pa.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_d_i_3__3_23.png",
@@ -2429,7 +2805,7 @@ const uniformCatalog = [
         "reviewCount": 126,
         "soldCount": 301,
         "stock": 35,
-        "videoUrl": "https://www.youtube.com/embed/2_mF7z5Z03Y",
+        "videoUrl": "https://www.youtube.com/embed/H3R9lpQGoWg",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/may-tinh-bang-lenovo-tab-m11.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-tinh-bang-lenovo-tab-m11-thumb.png",
@@ -2467,7 +2843,7 @@ const uniformCatalog = [
         "reviewCount": 133,
         "soldCount": 318,
         "stock": 20,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/3lzdQkxkcLA",
         "warranty": "Chính hãng 24 tháng (Lenovo Premium Care)",
         "sourceUrl": "https://cellphones.com.vn/laptop-lenovo-loq-15iax9-83gs001rvn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_509_9__1.png",
@@ -2505,7 +2881,7 @@ const uniformCatalog = [
         "reviewCount": 140,
         "soldCount": 335,
         "stock": 14,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/1Li8NKsl3X4",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-lenovo-thinkpad-e14-gen-7-21t90025vn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_744_1_59.png",
@@ -2517,9 +2893,9 @@ const uniformCatalog = [
         "category": "Laptop",
         "price": 29990000,
         "compareAtPrice": 33490000,
-        "image": "/assets/uploads/products/lenovo-legion-5.png",
+        "image": "/assets/uploads/products/p75-laptop-lenovo-gaming-legion-5-16irx9-83dg004yvn.png",
         "images": [
-            "/assets/uploads/products/lenovo-legion-5.png"
+            "/assets/uploads/products/p75-laptop-lenovo-gaming-legion-5-16irx9-83dg004yvn.png"
         ],
         "description": "Vua laptop gaming phân khúc cận cao cấp với chip Core i7 dòng HX và màn hình chuẩn màu 100% sRGB 165Hz.",
         "specs": {
@@ -2543,10 +2919,10 @@ const uniformCatalog = [
         "reviewCount": 147,
         "soldCount": 352,
         "stock": 9,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/THOgoCNYVBQ",
         "warranty": "Chính hãng 36 tháng (Lenovo Legion Ultimate Support)",
         "sourceUrl": "https://cellphones.com.vn/laptop-lenovo-legion-5-15irx10-83ly00hrvn.html",
-        "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_902_1.png",
+        "originalImageUrl": "/assets/uploads/products/p75-laptop-lenovo-gaming-legion-5-16irx9-83dg004yvn.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
     },
     {
@@ -2581,7 +2957,7 @@ const uniformCatalog = [
         "reviewCount": 154,
         "soldCount": 369,
         "stock": 25,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/-K2OyhCZRlI",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-msi-modern-14-c12mo-660vn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_1__2_26.png",
@@ -2619,7 +2995,7 @@ const uniformCatalog = [
         "reviewCount": 41,
         "soldCount": 386,
         "stock": 18,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/nVEFWh-uATg",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-msi-modern-15-b13m-297vn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_1__1_110.png",
@@ -2657,7 +3033,7 @@ const uniformCatalog = [
         "reviewCount": 48,
         "soldCount": 403,
         "stock": 16,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/c47hfVRjzXQ",
         "warranty": "Chính hãng 24 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-msi-cyborg-15-a12ve-412vn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_509_10__1.png",
@@ -2669,9 +3045,10 @@ const uniformCatalog = [
         "category": "Điện thoại",
         "price": 5490000,
         "compareAtPrice": 6290000,
-        "image": "/assets/uploads/products/oppo-a79-5g.png",
+        "image": "/assets/uploads/products/oppo-a79-purple.png",
         "images": [
-            "/assets/uploads/products/oppo-a79-5g.png"
+            "/assets/uploads/products/oppo-a79-purple.png",
+            "/assets/uploads/products/oppo-a79-black.png"
         ],
         "description": "Thiết kế mặt lưng lông vũ phát sáng, loa kép âm lượng siêu lớn 300% và sạc nhanh SuperVOOC 33W.",
         "specs": {
@@ -2695,11 +3072,35 @@ const uniformCatalog = [
         "reviewCount": 55,
         "soldCount": 420,
         "stock": 30,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/oa7Bvv0aAkQ",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/oppo-a79.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/o/p/oppo-a79-tim.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00079-PURPLE",
+                "color": "Tím Tinh Thể (Mystery Purple)",
+                "colorHex": "#a855f7",
+                "image": "/assets/uploads/products/oppo-a79-purple.png",
+                "price": 6990000,
+                "compareAtPrice": 7990000,
+                "stock": 25,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00079-BLACK",
+                "color": "Đen Huyền Bí (Glowing Black)",
+                "colorHex": "#18181b",
+                "image": "/assets/uploads/products/oppo-a79-black.png",
+                "price": 6990000,
+                "compareAtPrice": 7990000,
+                "stock": 20,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     },
     {
         "name": "Điện thoại OPPO Reno12 F 5G 8GB/256GB",
@@ -2707,9 +3108,10 @@ const uniformCatalog = [
         "category": "Điện thoại",
         "price": 8490000,
         "compareAtPrice": 9490000,
-        "image": "/assets/uploads/products/oppo-reno12-f-5g.png",
+        "image": "/assets/uploads/products/oppo-reno12-f-orange.png",
         "images": [
-            "/assets/uploads/products/oppo-reno12-f-5g.png"
+            "/assets/uploads/products/oppo-reno12-f-orange.png",
+            "/assets/uploads/products/oppo-reno12-f-green.png"
         ],
         "description": "Chuyên gia chân dung AI thế hệ mới với đèn viền Halo độc đáo, tính năng xóa vật thể AI và tăng cường tín hiệu AI.",
         "specs": {
@@ -2733,11 +3135,35 @@ const uniformCatalog = [
         "reviewCount": 62,
         "soldCount": 87,
         "stock": 22,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/fqCbesXcy8Q",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/dien-thoai-oppo-reno12-f.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_4__6_73.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00080-ORANGE",
+                "color": "Cam Hổ Phách (Amber Orange)",
+                "colorHex": "#ea580c",
+                "image": "/assets/uploads/products/oppo-reno12-f-orange.png",
+                "price": 8490000,
+                "compareAtPrice": 9490000,
+                "stock": 22,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00080-GREEN",
+                "color": "Xanh Lá Olive (Olive Green)",
+                "colorHex": "#15803d",
+                "image": "/assets/uploads/products/oppo-reno12-f-green.png",
+                "price": 8490000,
+                "compareAtPrice": 9490000,
+                "stock": 28,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     },
     {
         "name": "Điện thoại OPPO Reno12 5G 12GB/512GB Thiết Kế Tương Lai",
@@ -2745,9 +3171,10 @@ const uniformCatalog = [
         "category": "Điện thoại",
         "price": 12490000,
         "compareAtPrice": 13990000,
-        "image": "/assets/uploads/products/oppo-reno12-5g.png",
+        "image": "/assets/uploads/products/oppo-reno12-silver.png",
         "images": [
-            "/assets/uploads/products/oppo-reno12-5g.png"
+            "/assets/uploads/products/oppo-reno12-silver.png",
+            "/assets/uploads/products/oppo-reno12-brown.png"
         ],
         "description": "Màn hình cong vô cực 3D, khung viền hợp kim siêu bền chịu lực va đập và bộ tính năng chỉnh ảnh AI Studio.",
         "specs": {
@@ -2771,11 +3198,35 @@ const uniformCatalog = [
         "reviewCount": 69,
         "soldCount": 104,
         "stock": 18,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/fNujY67zcrk",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/dien-thoai-oppo-reno12-5g.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_5__7_70.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00081-SILVER",
+                "color": "Bạc Vũ Trụ (Astro Silver)",
+                "colorHex": "#94a3b8",
+                "image": "/assets/uploads/products/oppo-reno12-silver.png",
+                "price": 11990000,
+                "compareAtPrice": 12990000,
+                "stock": 26,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00081-BROWN",
+                "color": "Nâu Hoàng Hôn (Sunset Brown)",
+                "colorHex": "#78350f",
+                "image": "/assets/uploads/products/oppo-reno12-brown.png",
+                "price": 11990000,
+                "compareAtPrice": 12990000,
+                "stock": 18,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     },
     {
         "name": "Điện thoại OPPO Find X8 16GB/512GB Camera Hasselblad",
@@ -2785,7 +3236,9 @@ const uniformCatalog = [
         "compareAtPrice": 24990000,
         "image": "/assets/uploads/products/oppo-find-x8.png",
         "images": [
-            "/assets/uploads/products/oppo-find-x8.png"
+            "/assets/uploads/products/oppo-find-x8.png",
+            "/assets/uploads/products/oppo-find-x8-gray.png",
+            "/assets/uploads/products/oppo-find-x8-black.png"
         ],
         "description": "Siêu phẩm nhiếp ảnh di động hợp tác cùng Hasselblad huyền thoại, chip Dimensity 9400 tiến trình 3nm mạnh mẽ nhất.",
         "specs": {
@@ -2809,11 +3262,35 @@ const uniformCatalog = [
         "reviewCount": 76,
         "soldCount": 121,
         "stock": 10,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/cCpg8-kplK0",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/dien-thoai-oppo-find-x8.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/d/i/dien-thoai-oppo-find-x8-xam-1.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00082-GRAY",
+                "color": "Xám Tinh Tú (Starry Grey)",
+                "colorHex": "#64748b",
+                "image": "/assets/uploads/products/oppo-find-x8-gray.png",
+                "compareAtPrice": 24990000,
+                "ram": "",
+                "storage": "",
+                "price": 22990000,
+                "stock": 26
+            },
+            {
+                "sku": "TECH-00082-BLACK",
+                "color": "Đen Không Gian (Space Black)",
+                "colorHex": "#18181b",
+                "image": "/assets/uploads/products/oppo-find-x8-black.png",
+                "compareAtPrice": 24990000,
+                "ram": "",
+                "storage": "",
+                "price": 22990000,
+                "stock": 22
+            }
+        ]
     },
     {
         "name": "Pin sạc dự phòng Baseus Blade HD 100W 20.000mAh Siêu Mỏng",
@@ -2843,7 +3320,7 @@ const uniformCatalog = [
         "reviewCount": 83,
         "soldCount": 138,
         "stock": 40,
-        "videoUrl": "https://www.youtube.com/embed/7rPjJt3tKjU",
+        "videoUrl": "https://www.youtube.com/embed/Xi90QGF0uLo",
         "warranty": "Chính hãng 12 tháng (1 đổi 1)",
         "sourceUrl": "https://cellphones.com.vn/pin-du-phong-baseus-enerfill-20000mah-100w-tich-hop-cap-doi-usb-c-man-hinh-fc41.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/p/i/pin-du-phong-baseus-enerfill-20000mah-100w-tich-hop-cap-doi-usb-c-man-hinh-fc41_1_.png",
@@ -2876,7 +3353,7 @@ const uniformCatalog = [
         "reviewCount": 90,
         "soldCount": 155,
         "stock": 25,
-        "videoUrl": "https://www.youtube.com/embed/7rPjJt3tKjU",
+        "videoUrl": "https://www.youtube.com/embed/p52L0vGVGLw",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/pin-du-phong-baseus-enercore-cr11-kem-cap-rut-gon-20000mah-67w.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/p/i/pin-du-phong-baseus-enercore-cr11-kem-cap-rut-gon-20000mah-67w.png",
@@ -2910,7 +3387,7 @@ const uniformCatalog = [
         "reviewCount": 97,
         "soldCount": 172,
         "stock": 30,
-        "videoUrl": "https://www.youtube.com/embed/7rPjJt3tKjU",
+        "videoUrl": "https://www.youtube.com/embed/7RhCCWwh7eM",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/tay-cam-chong-rung-dji-om-6.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/a/tay-cam-chong-rung-dji-om-6_1.png",
@@ -2944,7 +3421,7 @@ const uniformCatalog = [
         "reviewCount": 104,
         "soldCount": 189,
         "stock": 15,
-        "videoUrl": "https://www.youtube.com/embed/7rPjJt3tKjU",
+        "videoUrl": "https://www.youtube.com/embed/lHEj37RlUkI",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/microphone-dji-mini-2-tx-tx-rx-2-mic.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/i/microphone-dji-mini-2-tx-tx-rx-2-mic-new-black-01.jpg",
@@ -2956,9 +3433,11 @@ const uniformCatalog = [
         "category": "Điện thoại",
         "price": 4990000,
         "compareAtPrice": 5690000,
-        "image": "/assets/uploads/products/honor-x9d-5g.jpg",
+        "image": "/assets/uploads/products/honor-x8b-green.png",
         "images": [
-            "/assets/uploads/products/honor-x9d-5g.jpg"
+            "/assets/uploads/products/honor-x8b-green.png",
+            "/assets/uploads/products/honor-x8b-silver.png",
+            "/assets/uploads/products/honor-x8b-black.png"
         ],
         "description": "Điện thoại bộ nhớ khủng 512GB trong tầm giá 5 triệu, camera 108MP và đèn flash selfie chuyên dụng.",
         "specs": {
@@ -2982,11 +3461,46 @@ const uniformCatalog = [
         "reviewCount": 111,
         "soldCount": 206,
         "stock": 25,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/80iQ9VnrRKI",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/dien-thoai-honor-x9d.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/d/i/dien-thoai-honor-x9d-3_1.jpg",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00087-GREEN",
+                "color": "Xanh Da Retro (Glamorous Green)",
+                "colorHex": "#047857",
+                "image": "/assets/uploads/products/honor-x8b-green.png",
+                "price": 6490000,
+                "compareAtPrice": 7490000,
+                "stock": 25,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00087-SILVER",
+                "color": "Bạc Ánh Sao (Titanium Silver)",
+                "colorHex": "#cbd5e1",
+                "image": "/assets/uploads/products/honor-x8b-silver.png",
+                "price": 6490000,
+                "compareAtPrice": 7490000,
+                "stock": 20,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00087-BLACK",
+                "color": "Đen Bóng Đêm (Midnight Black)",
+                "colorHex": "#111827",
+                "image": "/assets/uploads/products/honor-x8b-black.png",
+                "price": 6490000,
+                "compareAtPrice": 7490000,
+                "stock": 18,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     },
     {
         "name": "Điện thoại HONOR 200 5G 12GB/256GB Chân Dung Studio",
@@ -2994,9 +3508,11 @@ const uniformCatalog = [
         "category": "Điện thoại",
         "price": 11490000,
         "compareAtPrice": 12990000,
-        "image": "/assets/uploads/products/honor-200-5g.png",
+        "image": "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc.png",
         "images": [
-            "/assets/uploads/products/honor-200-5g.png"
+            "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc.png",
+            "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc-g1.png",
+            "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc-g2.png"
         ],
         "description": "Hợp tác cùng Studio Harcourt Paris danh tiếng kiến tạo ảnh chân dung nghệ thuật đỉnh cao, sạc siêu tốc 100W.",
         "specs": {
@@ -3020,11 +3536,46 @@ const uniformCatalog = [
         "reviewCount": 118,
         "soldCount": 223,
         "stock": 18,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/nlepQwzwdzY",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/dien-thoai-honor-200.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/d/i/dien-thoai-honor-200_2_.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00088-GREEN",
+                "color": "Xanh Lục Bảo (Emerald Green)",
+                "colorHex": "#059669",
+                "image": "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc.png",
+                "price": 11490000,
+                "compareAtPrice": 13490000,
+                "stock": 24,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00088-BLACK",
+                "color": "Đen Tiêu Chuẩn (Black)",
+                "colorHex": "#1f2937",
+                "image": "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc-g1.png",
+                "price": 11490000,
+                "compareAtPrice": 13490000,
+                "stock": 20,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00088-WHITE",
+                "color": "Trắng Ánh Trăng (Moonlight White)",
+                "colorHex": "#f1f5f9",
+                "image": "/assets/uploads/products/p88-honor-200-5g-12gb-512gb-cu-tray-xuoc-g2.png",
+                "price": 11490000,
+                "compareAtPrice": 13490000,
+                "stock": 18,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     },
     {
         "name": "Tai nghe không dây JBL Wave Beam TWS Chống Nước",
@@ -3054,7 +3605,7 @@ const uniformCatalog = [
         "reviewCount": 125,
         "soldCount": 240,
         "stock": 45,
-        "videoUrl": "https://www.youtube.com/embed/a-Oia5CafkQ",
+        "videoUrl": "https://www.youtube.com/embed/e57EQxYKeJY",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/tai-nghe-khong-day-jbl-wave-beam.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/a/tai-nghe-khong-day-jbl-wave-beam-0000.png",
@@ -3088,7 +3639,7 @@ const uniformCatalog = [
         "reviewCount": 132,
         "soldCount": 257,
         "stock": 30,
-        "videoUrl": "https://www.youtube.com/embed/a-Oia5CafkQ",
+        "videoUrl": "https://www.youtube.com/embed/S4k1tfLJUX8",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/loa-bluetooth-jbl-flip-6.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_211_1__1.png",
@@ -3122,7 +3673,7 @@ const uniformCatalog = [
         "reviewCount": 139,
         "soldCount": 274,
         "stock": 25,
-        "videoUrl": "https://www.youtube.com/embed/a-Oia5CafkQ",
+        "videoUrl": "https://www.youtube.com/embed/rcsUJY_Ym4o",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/loa-bluetooth-jbl-charge-5.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/g/r/group_211.png",
@@ -3156,7 +3707,7 @@ const uniformCatalog = [
         "reviewCount": 146,
         "soldCount": 291,
         "stock": 16,
-        "videoUrl": "https://www.youtube.com/embed/a-Oia5CafkQ",
+        "videoUrl": "https://www.youtube.com/embed/KpX_rk5J1B8",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/tai-nghe-bluetooth-jbl-tour-pro-2.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/a/tai-nghe-bluetooth-jbl-tour-pro-2.png",
@@ -3166,17 +3717,18 @@ const uniformCatalog = [
         "name": "Chuột Gaming không dây Logitech G304 Lightspeed",
         "brand": "Logitech",
         "category": "Phụ kiện",
-        "price": 2890000,
-        "compareAtPrice": 3290000,
+        "price": 790000,
+        "compareAtPrice": 990000,
         "image": "/assets/uploads/products/logitech-g304.png",
         "images": [
             "/assets/uploads/products/logitech-g304.png"
         ],
-        "description": "Dây đeo cân bằng trọng lực giúp đeo kính thực tế ảo êm ái hàng giờ liền, nhân đôi thời lượng chơi game.",
+        "description": "Chuột gaming không dây quốc dân với công nghệ Lightspeed phản hồi 1ms siêu nhạy, cảm biến HERO 12.000 DPI tiết kiệm pin lên đến 250 giờ chỉ với 1 viên pin AA.",
         "specs": {
-            "connectivity": "Cổng Type-C sạc nối tiếp",
-            "battery": "Tích hợp pin lithium tăng thêm 2 giờ chơi",
-            "weight": "330g"
+            "sensor": "Cảm biến HERO 12.000 DPI",
+            "connectivity": "Không dây Lightspeed USB",
+            "weight": "99g",
+            "battery": "Pin AA lên đến 250 giờ"
         },
         "tags": [
             "Meta",
@@ -3190,7 +3742,7 @@ const uniformCatalog = [
         "reviewCount": 153,
         "soldCount": 308,
         "stock": 20,
-        "videoUrl": "https://www.youtube.com/embed/K8q3vj2v8q4",
+        "videoUrl": "https://www.youtube.com/embed/UptzksQtRQI",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/chuot-gaming-khong-day-logitech-g304-lightspeed.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/c/h/chuot-gaming-khong-day-logitech-g304-lightspeed_1_1.png",
@@ -3200,19 +3752,20 @@ const uniformCatalog = [
         "name": "Máy chơi game Sony PlayStation 5 Slim kèm 2 tay cầm DualSense",
         "brand": "Sony",
         "category": "Máy chơi game",
-        "price": 8990000,
-        "compareAtPrice": 9990000,
+        "price": 14990000,
+        "compareAtPrice": 16490000,
         "image": "/assets/uploads/products/ps5-slim-2-tay-cam.png",
         "images": [
             "/assets/uploads/products/ps5-slim-2-tay-cam.png"
         ],
-        "description": "Trải nghiệm Mixed Reality không gian sống động với chip Snapdragon XR2 Gen 2 thế hệ mới trong tầm giá dễ tiếp cận.",
+        "description": "Combo PS5 Slim chính hãng kèm sẵn 2 tay cầm không dây DualSense, sẵn sàng trải nghiệm các tựa game co-op đỉnh cao trên màn hình 4K 120Hz.",
         "specs": {
-            "cpu": "Qualcomm Snapdragon XR2 Gen 2",
-            "ram": "8GB",
-            "storage": "128GB",
-            "screen": "Màn hình kép độ phân giải 1832x1920 mỗi mắt 120Hz",
-            "weight": "514g"
+            "cpu": "AMD Zen 2 8 nhân",
+            "storage": "1TB Custom SSD",
+            "features": "Kèm 2 tay cầm DualSense",
+            "resolution": "Xuất hình 4K 120Hz",
+            "audio": "Tempest 3D AudioTech",
+            "gpu": "AMD RDNA 2"
         },
         "tags": [
             "Meta",
@@ -3226,7 +3779,7 @@ const uniformCatalog = [
         "reviewCount": 40,
         "soldCount": 325,
         "stock": 25,
-        "videoUrl": "https://www.youtube.com/embed/K8q3vj2v8q4",
+        "videoUrl": "https://www.youtube.com/embed/SyfuWvnr5XM",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-sony-playstation-5-slim-asia-00497-2-tay-cam.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/b/o/bo-may-choi-game-sony-playstation-5-slim-hai-tay-cam_1__1_2.png",
@@ -3242,13 +3795,14 @@ const uniformCatalog = [
         "images": [
             "/assets/uploads/products/msi-claw-8.png"
         ],
-        "description": "Phiên bản dung lượng tối đa 512GB thoải mái tải hàng trăm tựa game thực tế ảo VR/MR độ phân giải 4K+ sắc nét.",
+        "description": "Tiên phong tích hợp vi xử lý Intel Core Ultra Series 2 hỗ trợ AI, màn hình 8 inch 120Hz VRR và viên pin 80Wh bền bỉ.",
         "specs": {
-            "cpu": "Qualcomm Snapdragon XR2 Gen 2",
-            "ram": "8GB",
-            "storage": "512GB",
-            "screen": "Ống kính Pancake 4K+ Infinite Display (2064x2208 mỗi mắt)",
-            "weight": "515g"
+            "cpu": "Intel Core Ultra 7 258V",
+            "ram": "32GB LPDDR5X",
+            "storage": "1TB NVMe SSD",
+            "screen": "8 inch 120Hz VRR",
+            "battery": "80Wh",
+            "os": "Windows 11 Home"
         },
         "tags": [
             "Meta",
@@ -3262,7 +3816,7 @@ const uniformCatalog = [
         "reviewCount": 47,
         "soldCount": 342,
         "stock": 12,
-        "videoUrl": "https://www.youtube.com/embed/K8q3vj2v8q4",
+        "videoUrl": "https://www.youtube.com/embed/_swoJwSbOHU",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-msi-claw-8-ai-plus-a2vm-079vn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-choi-game-msi-claw-8-ai-plus-a2vm-079vn_1_.png",
@@ -3296,7 +3850,7 @@ const uniformCatalog = [
         "reviewCount": 54,
         "soldCount": 359,
         "stock": 30,
-        "videoUrl": "https://www.youtube.com/embed/7rPjJt3tKjU",
+        "videoUrl": "https://www.youtube.com/embed/HJD9JNujMHQ",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/chuot-khong-day-microsoft-arc-elg-00005.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/d/g/dgh.jpg",
@@ -3334,7 +3888,7 @@ const uniformCatalog = [
         "reviewCount": 61,
         "soldCount": 376,
         "stock": 15,
-        "videoUrl": "",
+        "videoUrl": "https://www.youtube.com/embed/TY7IpQTmJdM",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/laptop-surface-pro-12-inch-x-plus-16gb-512gb.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_2__13_102.png",
@@ -3372,7 +3926,7 @@ const uniformCatalog = [
         "reviewCount": 68,
         "soldCount": 393,
         "stock": 10,
-        "videoUrl": "https://www.youtube.com/embed/2_mF7z5Z03Y",
+        "videoUrl": "https://www.youtube.com/embed/4qi47l0XOJQ",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/surface-pro-12-inch-x-plus-8gb-256gb.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/e/text_ng_n_18_16.png",
@@ -3382,16 +3936,18 @@ const uniformCatalog = [
         "name": "Tai nghe chụp tai Gaming Sony Inzone H3",
         "brand": "Sony",
         "category": "Tai nghe",
-        "price": 2490000,
-        "compareAtPrice": 2890000,
+        "price": 1790000,
+        "compareAtPrice": 2290000,
         "image": "/assets/uploads/products/sony-inzone-h3.png",
         "images": [
             "/assets/uploads/products/sony-inzone-h3.png"
         ],
-        "description": "Biến máy chơi game cầm tay Steam Deck thành máy tính chơi game để bàn, xuất hình 4K 60Hz ra TV hoặc màn hình lớn.",
+        "description": "Tai nghe gaming có dây chuẩn âm thanh vòm 360 Spatial Sound for Gaming giúp định vị tiếng bước chân chính xác, đệm tai êm ái và micro boom gập tắt tiếng.",
         "specs": {
-            "connectivity": "1 DisplayPort 1.4, 1 HDMI 2.0, Gigabit Ethernet, 3 USB-A 3.1",
-            "weight": "120g"
+            "connectivity": "Kết nối dây 3.5mm & USB Audio Box",
+            "audio": "Âm thanh 360 Spatial Sound",
+            "mic": "Micro boom gập tắt tiếng",
+            "weight": "299g"
         },
         "tags": [
             "Valve",
@@ -3405,7 +3961,7 @@ const uniformCatalog = [
         "reviewCount": 75,
         "soldCount": 410,
         "stock": 25,
-        "videoUrl": "https://www.youtube.com/embed/K8q3vj2v8q4",
+        "videoUrl": "https://www.youtube.com/embed/3UMrVYCCR-8",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/tai-nghe-chup-tai-gaming-sony-inzone-h3.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/t/a/tai-nghe-chup-tai-gaming-sony-inzone-h3-spa.png",
@@ -3421,14 +3977,15 @@ const uniformCatalog = [
         "images": [
             "/assets/uploads/products/lenovo-legion-go-2.jpg"
         ],
-        "description": "Màn hình OLED HDR 90Hz kính khắc chống chói cao cấp nhất, pin tăng 50% và kết nối Wi-Fi 6E tải game siêu tốc.",
+        "description": "Máy chơi game cầm tay màn hình lớn 8.8 inch QHD+ 144Hz siêu sắc nét, tay cầm TrueStrike tháo rời linh hoạt tích hợp chế độ FPS Mode.",
         "specs": {
-            "cpu": "AMD APU 6nm (Zen 2 4C/8T + RDNA 2 8 CUs)",
-            "ram": "16GB LPDDR5",
-            "storage": "1TB NVMe SSD Tốc độ cao",
-            "screen": "7.4 inch OLED HDR 90Hz 1000 nits",
-            "battery": "50Wh (3 - 12 giờ chơi)",
-            "weight": "640g"
+            "cpu": "AMD Ryzen Z1 Extreme",
+            "ram": "16GB LPDDR5X",
+            "storage": "1TB PCIe Gen4 SSD",
+            "screen": "8.8 inch QHD+ 144Hz",
+            "features": "Tay cầm TrueStrike tháo rời tích hợp FPS Mode",
+            "battery": "49.2Wh",
+            "os": "Windows 11 Home"
         },
         "tags": [
             "Valve",
@@ -3442,7 +3999,7 @@ const uniformCatalog = [
         "reviewCount": 82,
         "soldCount": 427,
         "stock": 8,
-        "videoUrl": "https://www.youtube.com/embed/K8q3vj2v8q4",
+        "videoUrl": "https://www.youtube.com/embed/552xHi_XamM",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/lenovo-legion-go-2.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/l/e/legion-go-8asp2.jpg",
@@ -3456,7 +4013,10 @@ const uniformCatalog = [
         "compareAtPrice": 3990000,
         "image": "/assets/uploads/products/samsung-galaxy-a05s.png",
         "images": [
-            "/assets/uploads/products/samsung-galaxy-a05s.png"
+            "/assets/uploads/products/samsung-galaxy-a05s.png",
+            "/assets/uploads/products/samsung-a05s-black.png",
+            "/assets/uploads/products/samsung-a05s-green.png",
+            "/assets/uploads/products/samsung-a05s-silver.png"
         ],
         "description": "Màn hình lớn 6.7 inch FHD+ mượt mà 90Hz, pin trâu 5.000mAh và sạc nhanh 25W lý tưởng cho học tập giải trí.",
         "specs": {
@@ -3480,11 +4040,46 @@ const uniformCatalog = [
         "reviewCount": 89,
         "soldCount": 94,
         "stock": 35,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/qkmt9zTOzxo",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/samsung-galaxy-a05s.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/s/a/samsung-galaxy-a05s_1_2.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00101-BLACK",
+                "color": "Đen (Black)",
+                "colorHex": "#1f2937",
+                "image": "/assets/uploads/products/samsung-a05s-black.png",
+                "compareAtPrice": 3990000,
+                "ram": "",
+                "storage": "",
+                "price": 3290000,
+                "stock": 45
+            },
+            {
+                "sku": "TECH-00101-GREEN",
+                "color": "Xanh Nhạt (Light Green)",
+                "colorHex": "#86efac",
+                "image": "/assets/uploads/products/samsung-a05s-green.png",
+                "compareAtPrice": 3990000,
+                "ram": "",
+                "storage": "",
+                "price": 3290000,
+                "stock": 30
+            },
+            {
+                "sku": "TECH-00101-SILVER",
+                "color": "Bạc (Silver)",
+                "colorHex": "#cbd5e1",
+                "image": "/assets/uploads/products/samsung-a05s-silver.png",
+                "compareAtPrice": 3990000,
+                "ram": "",
+                "storage": "",
+                "price": 3290000,
+                "stock": 25
+            }
+        ]
     },
     {
         "name": "Điện thoại Samsung Galaxy A55 5G 8GB/128GB Viền Kim Loại",
@@ -3494,7 +4089,10 @@ const uniformCatalog = [
         "compareAtPrice": 9990000,
         "image": "/assets/uploads/products/samsung-galaxy-a55-5g.png",
         "images": [
-            "/assets/uploads/products/samsung-galaxy-a55-5g.png"
+            "/assets/uploads/products/samsung-galaxy-a55-5g.png",
+            "/assets/uploads/products/samsung-a55-iceblue.png",
+            "/assets/uploads/products/samsung-a55-navy.png",
+            "/assets/uploads/products/samsung-a55-lilac.png"
         ],
         "description": "Khung viền kim loại sang trọng, kính cường lực Gorilla Glass Victus+ và kháng nước chuẩn IP67 cao cấp.",
         "specs": {
@@ -3518,11 +4116,46 @@ const uniformCatalog = [
         "reviewCount": 96,
         "soldCount": 111,
         "stock": 25,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/3Dh8WYFOgWQ",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/samsung-galaxy-a55.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/s/a/samsung-galaxy-a55.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00102-ICEBLUE",
+                "color": "Xanh Iceblue (Awesome Iceblue)",
+                "colorHex": "#7dd3fc",
+                "image": "/assets/uploads/products/samsung-a55-iceblue.png",
+                "compareAtPrice": 9990000,
+                "ram": "",
+                "storage": "",
+                "price": 8990000,
+                "stock": 35
+            },
+            {
+                "sku": "TECH-00102-NAVY",
+                "color": "Xanh Navy (Awesome Navy)",
+                "colorHex": "#0f172a",
+                "image": "/assets/uploads/products/samsung-a55-navy.png",
+                "compareAtPrice": 9990000,
+                "ram": "",
+                "storage": "",
+                "price": 8990000,
+                "stock": 28
+            },
+            {
+                "sku": "TECH-00102-LILAC",
+                "color": "Tím Lilac (Awesome Lilac)",
+                "colorHex": "#c084fc",
+                "image": "/assets/uploads/products/samsung-a55-lilac.png",
+                "compareAtPrice": 9990000,
+                "ram": "",
+                "storage": "",
+                "price": 8990000,
+                "stock": 20
+            }
+        ]
     },
     {
         "name": "Vòng đeo tay thông minh Xiaomi Smart Band 9 Màn Hình AMOLED",
@@ -3552,7 +4185,7 @@ const uniformCatalog = [
         "reviewCount": 103,
         "soldCount": 128,
         "stock": 50,
-        "videoUrl": "https://www.youtube.com/embed/iMqw8lEgEhE",
+        "videoUrl": "https://www.youtube.com/embed/jy5SKAhxdAA",
         "warranty": "Chính hãng 12 tháng",
         "sourceUrl": "https://cellphones.com.vn/vong-deo-tay-thong-minh-xiaomi-mi-band-9.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/v/o/vong-deo-tay-thong-minh-xiaomi-mi-band-9_2__1_1.png",
@@ -3566,7 +4199,10 @@ const uniformCatalog = [
         "compareAtPrice": 7290000,
         "image": "/assets/uploads/products/xiaomi-redmi-note-13-pro.png",
         "images": [
-            "/assets/uploads/products/xiaomi-redmi-note-13-pro.png"
+            "/assets/uploads/products/xiaomi-redmi-note-13-pro.png",
+            "/assets/uploads/products/redmi-note-13-pro-black.png",
+            "/assets/uploads/products/redmi-note-13-pro-green.png",
+            "/assets/uploads/products/redmi-note-13-pro-purple.png"
         ],
         "description": "Camera khủng 200MP chống rung OIS, sạc siêu nhanh Turbo Charge 67W đầy pin trong 45 phút.",
         "specs": {
@@ -3590,11 +4226,440 @@ const uniformCatalog = [
         "reviewCount": 110,
         "soldCount": 145,
         "stock": 30,
-        "videoUrl": "https://www.youtube.com/embed/6Mf6gZRTrwg",
+        "videoUrl": "https://www.youtube.com/embed/KE5YdR1f59o",
         "warranty": "Chính hãng 18 tháng",
         "sourceUrl": "https://cellphones.com.vn/xiaomi-redmi-note-13-pro.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/x/i/xiaomi-redmi-note-13-pro-4g_13__1.png",
-        "sourceFetchedAt": "2026-10-03T06:10:15.906Z"
+        "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
+        "variants": [
+            {
+                "sku": "TECH-00104-BLACK",
+                "color": "Đen Bán Dạ (Midnight Black)",
+                "colorHex": "#18181b",
+                "image": "/assets/uploads/products/redmi-note-13-pro-black.png",
+                "compareAtPrice": 7290000,
+                "ram": "",
+                "storage": "",
+                "price": 6490000,
+                "stock": 35
+            },
+            {
+                "sku": "TECH-00104-GREEN",
+                "color": "Xanh Lá Rừng Sâu (Forest Green)",
+                "colorHex": "#22c55e",
+                "image": "/assets/uploads/products/redmi-note-13-pro-green.png",
+                "compareAtPrice": 7290000,
+                "ram": "",
+                "storage": "",
+                "price": 6490000,
+                "stock": 30
+            },
+            {
+                "sku": "TECH-00104-PURPLE",
+                "color": "Tím Oải Hương (Lavender Purple)",
+                "colorHex": "#a855f7",
+                "image": "/assets/uploads/products/redmi-note-13-pro-purple.png",
+                "compareAtPrice": 7290000,
+                "ram": "",
+                "storage": "",
+                "price": 6490000,
+                "stock": 22
+            }
+        ]
+    },
+    {
+        "name": "iPhone 17 Pro Max 256GB",
+        "brand": "Apple",
+        "category": "Điện thoại",
+        "price": 37990000,
+        "compareAtPrice": 39990000,
+        "image": "/assets/images/products/hero-iphone-17-pro-max.png",
+        "images": [
+            "/assets/images/products/hero-iphone-17-pro-max.png",
+            "/assets/images/products/iphone-17-pro-deep-blue.jpg",
+            "/assets/images/products/iphone-17-pro-silver.jpg"
+        ],
+        "description": "Siêu phẩm iPhone 17 Pro Max thế hệ mới nhất với khung Titan Cosmic Orange đẳng cấp, chip Apple A19 Pro 2nm đột phá hiệu năng AI và hệ thống 3 camera 48MP Fusion quay ProRes 4K 120fps.",
+        "specs": {
+            "cpu": "Apple A19 Pro 6 nhân (Tiến trình 2nm)",
+            "ram": "12GB",
+            "storage": "256GB",
+            "screen": "Super Retina XDR OLED 6.9 inch ProMotion 120Hz",
+            "camera": "48MP Fusion + 48MP Ultra Wide + 48MP Telephoto 5x",
+            "battery": "4.850 mAh (Sạc nhanh MagSafe 35W)",
+            "os": "iOS 19 với Apple Intelligence",
+            "weight": "225g"
+        },
+        "tags": [
+            "Apple",
+            "iPhone 17 Pro Max",
+            "Mới ra mắt",
+            "Flagship",
+            "Điện thoại",
+            "5G"
+        ],
+        "featured": true,
+        "rating": 5,
+        "reviewCount": 68,
+        "soldCount": 215,
+        "stock": 22,
+        "warranty": "Chính hãng Apple Việt Nam (VN/A) 12 tháng",
+        "videoUrl": "https://www.youtube.com/embed/VoBBKzE1O1s",
+        "sourceUrl": "https://cellphones.com.vn/iphone-17-pro-max.html",
+        "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/i/p/iphone-17-pro-256-gb.png",
+        "sourceFetchedAt": "2026-11-03T04:00:00.000Z",
+        "variants": [
+            {
+                "sku": "TECH-00105-ORG",
+                "color": "Cam Vũ Trụ (Cosmic Orange)",
+                "colorHex": "#e06b3a",
+                "image": "/assets/images/products/hero-iphone-17-pro-max.png",
+                "compareAtPrice": 39990000,
+                "ram": "",
+                "storage": "",
+                "price": 37990000,
+                "stock": 22
+            },
+            {
+                "sku": "TECH-00105-BLU",
+                "color": "Titan Xanh Đậm (Deep Blue)",
+                "colorHex": "#1e3a8a",
+                "image": "/assets/images/products/iphone-17-pro-deep-blue.jpg",
+                "compareAtPrice": 39990000,
+                "ram": "",
+                "storage": "",
+                "price": 37990000,
+                "stock": 15
+            },
+            {
+                "sku": "TECH-00105-SLV",
+                "color": "Titan Bạc (Silver)",
+                "colorHex": "#cbd5e1",
+                "image": "/assets/images/products/iphone-17-pro-silver.jpg",
+                "compareAtPrice": 39990000,
+                "ram": "",
+                "storage": "",
+                "price": 37990000,
+                "stock": 18
+            }
+        ]
+    },
+    {
+        "name": "iPhone 17 Pro 256GB",
+        "brand": "Apple",
+        "category": "Điện thoại",
+        "price": 31990000,
+        "compareAtPrice": 33990000,
+        "image": "/assets/images/products/iphone-17-pro-silver.jpg",
+        "images": [
+            "/assets/images/products/iphone-17-pro-silver.jpg",
+            "/assets/images/products/iphone-17-pro-deep-blue.jpg",
+            "/assets/images/products/hero-iphone-17-pro-max.png"
+        ],
+        "description": "Thiết kế nhỏ gọn chuẩn Pro với viền màn hình siêu mỏng, khung Titan bền nhẹ, chip A19 Pro mạnh mẽ cùng nút Camera Control thông minh thế hệ mới.",
+        "specs": {
+            "cpu": "Apple A19 Pro 6 nhân (Tiến trình 2nm)",
+            "ram": "12GB",
+            "storage": "256GB",
+            "screen": "Super Retina XDR OLED 6.3 inch ProMotion 120Hz",
+            "camera": "48MP Fusion + 48MP Ultra Wide + 48MP Telephoto 5x",
+            "battery": "3.790 mAh (Sạc nhanh 35W)",
+            "os": "iOS 19 với Apple Intelligence",
+            "weight": "196g"
+        },
+        "tags": [
+            "Apple",
+            "iPhone 17 Pro",
+            "Mới ra mắt",
+            "Flagship",
+            "Điện thoại",
+            "5G"
+        ],
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 46,
+        "soldCount": 142,
+        "stock": 18,
+        "warranty": "Chính hãng Apple Việt Nam (VN/A) 12 tháng",
+        "videoUrl": "https://www.youtube.com/embed/ralLalssto8",
+        "sourceUrl": "https://cellphones.com.vn/iphone-17-pro.html",
+        "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/i/p/iphone-17-pro-3.jpg",
+        "sourceFetchedAt": "2026-11-03T04:00:00.000Z",
+        "variants": [
+            {
+                "sku": "TECH-00106-SLV",
+                "color": "Titan Bạc (Silver)",
+                "colorHex": "#cbd5e1",
+                "image": "/assets/images/products/iphone-17-pro-silver.jpg",
+                "compareAtPrice": 33990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 16
+            },
+            {
+                "sku": "TECH-00106-BLU",
+                "color": "Titan Xanh Đậm (Deep Blue)",
+                "colorHex": "#1e3a8a",
+                "image": "/assets/images/products/iphone-17-pro-deep-blue.jpg",
+                "compareAtPrice": 33990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 12
+            },
+            {
+                "sku": "TECH-00106-ORG",
+                "color": "Cam Vũ Trụ (Cosmic Orange)",
+                "colorHex": "#e06b3a",
+                "image": "/assets/images/products/hero-iphone-17-pro-max.png",
+                "compareAtPrice": 33990000,
+                "ram": "",
+                "storage": "",
+                "price": 31990000,
+                "stock": 9
+            }
+        ]
+    },
+    {
+        "name": "Samsung Galaxy Z Fold7 5G 512GB",
+        "brand": "Samsung",
+        "category": "Điện thoại",
+        "price": 43990000,
+        "compareAtPrice": 46990000,
+        "image": "/assets/images/products/samsung-z-fold6.jpg",
+        "images": [
+            "/assets/images/products/samsung-z-fold6.jpg",
+            "/assets/uploads/products/samsung-z-fold-silver.jpg",
+            "/assets/uploads/products/samsung-z-fold-navy.jpg",
+            "/assets/uploads/products/samsung-z-fold-black.png",
+            "/assets/uploads/products/samsung-z-fold-pink.jpg"
+        ],
+        "description": "Tuyệt tác điện thoại gập thế hệ thứ 7 mỏng nhẹ kỷ lục với bản lề FlexHinge không nếp gấp, màn hình lớn 8.0 inch đa nhiệm đỉnh cao cùng quyền năng Galaxy AI tiếng Việt toàn diện.",
+        "specs": {
+            "cpu": "Snapdragon 8 Elite for Galaxy",
+            "ram": "12GB",
+            "storage": "512GB",
+            "screen": "Chính 8.0\" + Phụ 6.5\" Dynamic AMOLED 2X 120Hz",
+            "camera": "200MP OIS + 12MP Ultra Wide + 10MP Tele 3x",
+            "battery": "4.600 mAh (Sạc nhanh 45W)",
+            "os": "One UI 8 (Android 16)",
+            "weight": "226g"
+        },
+        "tags": [
+            "Samsung",
+            "Galaxy Z Fold7",
+            "Mới ra mắt",
+            "Điện thoại gập",
+            "Flagship",
+            "5G"
+        ],
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 34,
+        "soldCount": 89,
+        "stock": 12,
+        "warranty": "Chính hãng Samsung Care+ 12 tháng",
+        "videoUrl": "https://www.youtube.com/embed/Me2nA2DNUZ0",
+        "originalImageUrl": "/assets/images/products/samsung-z-fold6.jpg",
+        "sourceFetchedAt": "2026-11-03T04:00:00.000Z",
+        "variants": [
+            {
+                "sku": "TECH-00107-SILVER",
+                "color": "Xám Metal (Silver Shadow)",
+                "colorHex": "#78716c",
+                "image": "/assets/uploads/products/samsung-z-fold-silver.jpg",
+                "compareAtPrice": 46990000,
+                "ram": "",
+                "storage": "",
+                "price": 43990000,
+                "stock": 18
+            },
+            {
+                "sku": "TECH-00107-NAVY",
+                "color": "Xanh Navy (Navy)",
+                "colorHex": "#1e293b",
+                "image": "/assets/uploads/products/samsung-z-fold-navy.jpg",
+                "compareAtPrice": 46990000,
+                "ram": "",
+                "storage": "",
+                "price": 43990000,
+                "stock": 15
+            },
+            {
+                "sku": "TECH-00107-BLACK",
+                "color": "Đen Phantom (Crafted Black)",
+                "colorHex": "#1c1917",
+                "image": "/assets/uploads/products/samsung-z-fold-black.png",
+                "compareAtPrice": 46990000,
+                "ram": "",
+                "storage": "",
+                "price": 43990000,
+                "stock": 12
+            },
+            {
+                "sku": "TECH-00107-PINK",
+                "color": "Hồng Rose (Pink)",
+                "colorHex": "#f43f5e",
+                "image": "/assets/uploads/products/samsung-z-fold-pink.jpg",
+                "compareAtPrice": 46990000,
+                "ram": "",
+                "storage": "",
+                "price": 43990000,
+                "stock": 10
+            }
+        ]
+    },
+    {
+        "name": "OPPO Find X8 Pro 5G 16GB/512GB",
+        "brand": "OPPO",
+        "category": "Điện thoại",
+        "price": 26990000,
+        "compareAtPrice": 29990000,
+        "image": "/assets/uploads/products/oppo-find-x8-pro-black.png",
+        "images": [
+            "/assets/uploads/products/oppo-find-x8-pro-black.png",
+            "/assets/uploads/products/oppo-find-x8-pro-white.png"
+        ],
+        "description": "Đỉnh cao nhiếp ảnh di động với hệ thống 4 camera 50MP Hasselblad cùng kính tiềm vọng kép, vi xử lý Dimensity 9400 3nm và siêu pin Silicon-Carbon 5.910 mAh.",
+        "specs": {
+            "cpu": "MediaTek Dimensity 9400 8 nhân (3nm)",
+            "ram": "16GB",
+            "storage": "512GB",
+            "screen": "AMOLED LTPO 6.78 inch 1.5K 120Hz (4500 nits)",
+            "camera": "4 Camera 50MP Hasselblad (2 Kính tiềm vọng 3x & 6x)",
+            "battery": "5.910 mAh (Siêu sạc SuperVOOC 80W + AirVOOC 50W)",
+            "os": "ColorOS 15 AI",
+            "weight": "215g"
+        },
+        "tags": [
+            "OPPO",
+            "OPPO Find X8 Pro",
+            "Mới ra mắt",
+            "Flagship",
+            "Camera Phone",
+            "5G"
+        ],
+        "featured": true,
+        "rating": 4.9,
+        "reviewCount": 29,
+        "soldCount": 76,
+        "stock": 16,
+        "warranty": "Chính hãng OPPO Việt Nam 24 tháng",
+        "videoUrl": "https://www.youtube.com/embed/aCFytPx5Drs",
+        "originalImageUrl": "/assets/uploads/products/p82-oppo-find-x8-16gb-512gb.png",
+        "sourceFetchedAt": "2026-11-03T04:00:00.000Z",
+        "variants": [
+            {
+                "sku": "TECH-00108-BLACK",
+                "color": "Đen Không Gian (Space Black)",
+                "colorHex": "#18181b",
+                "image": "/assets/uploads/products/oppo-find-x8-pro-black.png",
+                "price": 29990000,
+                "compareAtPrice": 32990000,
+                "stock": 18,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00108-WHITE",
+                "color": "Trắng Ngọc Trai (Pearl White)",
+                "colorHex": "#f8fafc",
+                "image": "/assets/uploads/products/oppo-find-x8-pro-white.png",
+                "price": 29990000,
+                "compareAtPrice": 32990000,
+                "stock": 15,
+                "ram": "",
+                "storage": ""
+            }
+        ]
+    },
+    {
+        "name": "HONOR Magic7 Pro 5G 12GB/512GB",
+        "brand": "HONOR",
+        "category": "Điện thoại",
+        "price": 25990000,
+        "compareAtPrice": 27990000,
+        "image": "/assets/uploads/products/honor-magic7-pro-black.png",
+        "images": [
+            "/assets/uploads/products/honor-magic7-pro-black.png",
+            "/assets/uploads/products/honor-magic7-pro-white.png",
+            "/assets/uploads/products/honor-magic7-pro-blue.png",
+            "/assets/uploads/products/honor-magic7-pro-gray.png"
+        ],
+        "description": "Flagship HONOR Magic7 Pro sở hữu camera tele tiềm vọng 200MP Falcon AI chụp đêm xuất sắc, màn hình bảo vệ mắt Natural Light AI và pin Silicon-Carbon thế hệ 3 bền bỉ.",
+        "specs": {
+            "cpu": "Snapdragon 8 Elite 8 nhân (3nm)",
+            "ram": "12GB",
+            "storage": "512GB",
+            "screen": "LTPO OLED 6.8 inch 120Hz (Kính NanoCrystal Shield)",
+            "camera": "200MP Tele Periscope + 50MP OIS khẩu độ biến thiên + 50MP",
+            "battery": "5.850 mAh (Sạc nhanh 100W + Không dây 80W)",
+            "os": "MagicOS 9.0 AI",
+            "weight": "223g"
+        },
+        "tags": [
+            "HONOR",
+            "HONOR Magic7 Pro",
+            "Mới ra mắt",
+            "Flagship",
+            "5G"
+        ],
+        "featured": true,
+        "rating": 4.8,
+        "reviewCount": 21,
+        "soldCount": 64,
+        "stock": 15,
+        "warranty": "Chính hãng HONOR Việt Nam 18 tháng",
+        "videoUrl": "https://www.youtube.com/embed/lXck1yGErGY",
+        "originalImageUrl": "/assets/uploads/products/honor-x9d-5g.jpg",
+        "sourceFetchedAt": "2026-11-03T04:00:00.000Z",
+        "variants": [
+            {
+                "sku": "TECH-00109-BLACK",
+                "color": "Đen Bóng Đêm (Shadow Black)",
+                "colorHex": "#111827",
+                "image": "/assets/uploads/products/honor-magic7-pro-black.png",
+                "price": 26990000,
+                "compareAtPrice": 29990000,
+                "stock": 20,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00109-WHITE",
+                "color": "Trắng Tuyết Sơn (Snow White)",
+                "colorHex": "#f8fafc",
+                "image": "/assets/uploads/products/honor-magic7-pro-white.png",
+                "price": 26990000,
+                "compareAtPrice": 29990000,
+                "stock": 16,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00109-BLUE",
+                "color": "Xanh Nguyệt Ảnh (Breeze Blue)",
+                "colorHex": "#93c5fd",
+                "image": "/assets/uploads/products/honor-magic7-pro-blue.png",
+                "price": 26990000,
+                "compareAtPrice": 29990000,
+                "stock": 14,
+                "ram": "",
+                "storage": ""
+            },
+            {
+                "sku": "TECH-00109-GRAY",
+                "color": "Xám Ánh Kim (Moonlight Gray)",
+                "colorHex": "#64748b",
+                "image": "/assets/uploads/products/honor-magic7-pro-gray.png",
+                "price": 26990000,
+                "compareAtPrice": 29990000,
+                "stock": 12,
+                "ram": "",
+                "storage": ""
+            }
+        ]
     }
 ];
 
