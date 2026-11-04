@@ -3333,16 +3333,9 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
 @media (max-width: 768px) {
     #themeToggle.theme-toggle.u021-sw-host,
     .theme-toggle.u021-sw-host {
-        display: inline-flex !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        width: 64px !important;
-        height: 27px !important;
-        left: 10px !important;
-        bottom: 84px !important;
-    }
-    .theme-toggle.u021-sw-host .u021-stage {
-        transform: scale(0.285);
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 }
 
