@@ -13,13 +13,13 @@
 const axios = require('axios');
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
 const CANDIDATE_MODELS = Array.from(new Set([
     DEFAULT_MODEL,
+    'gemini-flash-lite-latest',
     'gemini-3-flash-preview',
     'gemini-3.5-flash',
-    'gemini-3.1-flash-lite-preview',
-    'gemini-flash-lite-latest'
+    'gemini-3.1-flash-lite-preview'
 ]));
 const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 10000);
 
@@ -172,7 +172,8 @@ async function generateGroundedConsultation({
     } else {
         actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (ĐỀ XUẤT & TƯ VẤN THEO NHU CẦU):
 - Mở đầu bằng 1 - 2 đoạn văn ngắn gọn, thân thiện (không dùng số thứ tự hay gạch đầu dòng ở đoạn mở đầu) dẫn dắt vào nhu cầu/ngân sách của khách hàng để hệ thống đọc giọng nói.
-- Tiếp theo, xuống dòng dùng danh sách đánh số (1., 2., 3.) và gạch đầu dòng để trình bày từng sản phẩm, ưu điểm và điểm đánh đổi để khách hàng tự quan sát trên màn hình.`;
+- Tiếp theo, xuống dòng dùng danh sách đánh số (1., 2., 3.) và gạch đầu dòng để trình bày từng sản phẩm, phân tích rõ ưu điểm nổi bật và "Điểm đánh đổi" để khách hàng quan sát trên màn hình.
+- Ở phần cuối, bắt buộc có tiêu đề "**GỢI Ý QUYẾT ĐỊNH CHO BẠN:**" đưa ra lời khuyên chọn mua có điều kiện rõ ràng (Ví dụ: Nếu bạn ưu tiên... -> Chọn Máy 1; Nếu bạn ưu tiên... -> Chọn Máy 2) để khách hàng dễ dàng ra quyết định.`;
     }
 
     const systemInstruction = `Bạn là Chuyên gia Tư vấn Mua sắm Công nghệ cấp cao (AI Smart Consultant) của hệ thống bán lẻ TechEcommerce.

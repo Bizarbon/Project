@@ -58,37 +58,174 @@ function money(value) {
 // TỪ ĐIỂN DANH MỤC, THƯƠNG HIỆU VÀ CÁC MẶT HÀNG NGOÀI HỆ THỐNG
 // -------------------------------------------------------------
 const CATALOG_BRANDS = [
-    { key: 'apple', name: 'Apple', categories: ['Điện thoại (iPhone)', 'Laptop (MacBook)', 'Tablet (iPad)', 'Đồng hồ (Apple Watch)', 'Tai nghe (AirPods)'] },
-    { key: 'samsung', name: 'Samsung', categories: ['Điện thoại (Galaxy S/Z)', 'Tablet (Galaxy Tab)', 'Đồng hồ (Galaxy Watch)', 'Tai nghe (Galaxy Buds)'] },
-    { key: 'dell', name: 'Dell', categories: ['Laptop văn phòng & Gaming (Inspiron, Vostro, XPS, G15)'] },
-    { key: 'asus', name: 'ASUS', categories: ['Laptop Gaming (ROG, TUF)', 'Laptop văn phòng (Zenbook, Vivobook)'] },
-    { key: 'acer', name: 'Acer', categories: ['Laptop Gaming (Nitro V, Predator)', 'Laptop học tập (Aspire)'] },
-    { key: 'hp', name: 'HP', categories: ['Laptop học tập & văn phòng (Pavilion, Envy)', 'Laptop Gaming (Victus)'] },
-    { key: 'lenovo', name: 'Lenovo', categories: ['Laptop (IdeaPad Slim, ThinkPad, Legion)', 'Máy tính bảng (Tab M11)'] },
-    { key: 'msi', name: 'MSI', categories: ['Laptop Gaming (Katana, Modern, Stealth, Cyborg)'] },
-    { key: 'xiaomi', name: 'Xiaomi', categories: ['Điện thoại Xiaomi', 'Tablet (Xiaomi Pad)', 'Đồng hồ thông minh', 'Tai nghe', 'Pin sạc'] },
-    { key: 'poco', name: 'POCO', categories: ['Điện thoại POCO', 'Tablet POCO Pad'] },
-    { key: 'oppo', name: 'OPPO', categories: ['Điện thoại thông minh (Reno12, Find X8)'] },
-    { key: 'honor', name: 'HONOR', categories: ['Điện thoại thông minh (HONOR 200, Magic6 Pro)'] },
-    { key: 'huawei', name: 'Huawei', categories: ['Máy tính bảng (MatePad)', 'Đồng hồ thông minh (Watch GT4)'] },
-    { key: 'sony', name: 'Sony', categories: ['Máy chơi game (PlayStation 5)', 'Tai nghe cao cấp (WH-1000XM5, WF-C700N)'] },
-    { key: 'jbl', name: 'JBL', categories: ['Loa Bluetooth chống nước (Flip 6, Charge 5)', 'Tai nghe True Wireless (Tour Pro 2)'] },
-    { key: 'marshall', name: 'Marshall', categories: ['Tai nghe & Loa thời trang (Emberton II, Major IV)'] },
-    { key: 'logitech', name: 'Logitech', categories: ['Chuột máy tính (MX Master 3S, G502)', 'Bàn phím cơ & không dây (MX Keys, POP Keys)'] },
-    { key: 'baseus', name: 'Baseus', categories: ['Củ sạc nhanh GaN', 'Pin sạc dự phòng dung lượng cao'] },
-    { key: 'ugreen', name: 'UGREEN', categories: ['Hub chuyển đổi Type-C đa năng', 'Cáp sạc, phụ kiện'] },
-    { key: 'anker', name: 'Anker', categories: ['Củ sạc nhanh 100W/65W', 'Pin sạc dự phòng Anker Prime'] },
-    { key: 'garmin', name: 'Garmin', categories: ['Đồng hồ thể thao chuyên nghiệp GPS (Forerunner 265, Venu 3)'] },
-    { key: 'nintendo', name: 'Nintendo', categories: ['Máy chơi game cầm tay (Switch OLED, Switch Lite)'] },
-    { key: 'valve', name: 'Valve', categories: ['Máy chơi game cầm tay PC (Steam Deck OLED, Dock)'] },
-    { key: 'meta', name: 'Meta', categories: ['Kính thực tế ảo VR (Meta Quest 3, Quest 3S, Elite Strap)'] },
-    { key: 'microsoft', name: 'Microsoft', categories: ['Máy tính bảng & Laptop 2-in-1 (Surface Pro 11, Surface Laptop Go 3)'] },
-    { key: 'dji', name: 'DJI', categories: ['Camera Gimbal 4K bỏ túi (Osmo Pocket 3)', 'Gimbal điện thoại chống rung (Osmo Mobile 6)'] }
+    {
+        key: 'apple',
+        name: 'Apple',
+        aliases: ['apple', 'tao khuyet', 'tao', 'iphone', 'ip', 'macbook', 'ipad', 'airpods', 'apple watch', 'applewatch'],
+        categories: ['Điện thoại (iPhone)', 'Laptop (MacBook)', 'Tablet (iPad)', 'Đồng hồ (Apple Watch)', 'Tai nghe (AirPods)']
+    },
+    {
+        key: 'samsung',
+        name: 'Samsung',
+        aliases: ['samsung', 'galaxy', 'galaxy s', 'galaxy z', 'galaxy a', 'galaxy tab', 'galaxy buds', 'galaxy watch'],
+        categories: ['Điện thoại (Galaxy S/Z)', 'Tablet (Galaxy Tab)', 'Đồng hồ (Galaxy Watch)', 'Tai nghe (Galaxy Buds)']
+    },
+    {
+        key: 'asus',
+        name: 'ASUS',
+        aliases: ['asus', 'rog', 'rog strix', 'tuf', 'zenbook', 'vivobook', 'rog ally'],
+        categories: ['Laptop Gaming (ROG, TUF)', 'Laptop văn phòng (Zenbook, Vivobook)']
+    },
+    {
+        key: 'acer',
+        name: 'Acer',
+        aliases: ['acer', 'nitro', 'predator', 'aspire'],
+        categories: ['Laptop Gaming (Nitro V, Predator)', 'Laptop học tập (Aspire)']
+    },
+    {
+        key: 'dell',
+        name: 'Dell',
+        aliases: ['dell', 'xps', 'inspiron', 'vostro', 'alienware'],
+        categories: ['Laptop văn phòng & Gaming (Inspiron, Vostro, XPS, G15)']
+    },
+    {
+        key: 'hp',
+        name: 'HP',
+        aliases: ['hp', 'pavilion', 'envy', 'victus', 'omen'],
+        categories: ['Laptop học tập & văn phòng (Pavilion, Envy)', 'Laptop Gaming (Victus)']
+    },
+    {
+        key: 'lenovo',
+        name: 'Lenovo',
+        aliases: ['lenovo', 'thinkpad', 'legion', 'ideapad', 'loq'],
+        categories: ['Laptop (IdeaPad Slim, ThinkPad, Legion)', 'Máy tính bảng (Tab M11)']
+    },
+    {
+        key: 'msi',
+        name: 'MSI',
+        aliases: ['msi', 'katana', 'modern', 'stealth', 'cyborg', 'claw'],
+        categories: ['Laptop Gaming (Katana, Modern, Stealth, Cyborg)']
+    },
+    {
+        key: 'xiaomi',
+        name: 'Xiaomi',
+        aliases: ['xiaomi', 'redmi', 'mi', 'poco'],
+        categories: ['Điện thoại Xiaomi', 'Tablet (Xiaomi Pad)', 'Đồng hồ thông minh', 'Tai nghe', 'Pin sạc']
+    },
+    {
+        key: 'poco',
+        name: 'POCO',
+        aliases: ['poco'],
+        categories: ['Điện thoại POCO', 'Tablet POCO Pad']
+    },
+    {
+        key: 'oppo',
+        name: 'OPPO',
+        aliases: ['oppo', 'reno', 'find x'],
+        categories: ['Điện thoại thông minh (Reno12, Find X8)']
+    },
+    {
+        key: 'honor',
+        name: 'HONOR',
+        aliases: ['honor', 'magic'],
+        categories: ['Điện thoại thông minh (HONOR 200, Magic6 Pro)']
+    },
+    {
+        key: 'huawei',
+        name: 'Huawei',
+        aliases: ['huawei', 'matepad'],
+        categories: ['Máy tính bảng (MatePad)', 'Đồng hồ thông minh (Watch GT4)']
+    },
+    {
+        key: 'sony',
+        name: 'Sony',
+        aliases: ['sony', 'playstation', 'ps5', 'dualsense'],
+        categories: ['Máy chơi game (PlayStation 5)', 'Tai nghe cao cấp (WH-1000XM5, WF-C700N)']
+    },
+    {
+        key: 'jbl',
+        name: 'JBL',
+        aliases: ['jbl'],
+        categories: ['Loa Bluetooth chống nước (Flip 6, Charge 5)', 'Tai nghe True Wireless (Tour Pro 2)']
+    },
+    {
+        key: 'marshall',
+        name: 'Marshall',
+        aliases: ['marshall'],
+        categories: ['Tai nghe & Loa thời trang (Emberton II, Major IV)']
+    },
+    {
+        key: 'logitech',
+        name: 'Logitech',
+        aliases: ['logitech', 'logi'],
+        categories: ['Chuột máy tính (MX Master 3S, G502)', 'Bàn phím cơ & không dây (MX Keys, POP Keys)']
+    },
+    {
+        key: 'baseus',
+        name: 'Baseus',
+        aliases: ['baseus'],
+        categories: ['Củ sạc nhanh GaN', 'Pin sạc dự phòng dung lượng cao']
+    },
+    {
+        key: 'ugreen',
+        name: 'UGREEN',
+        aliases: ['ugreen'],
+        categories: ['Hub chuyển đổi Type-C đa năng', 'Cáp sạc, phụ kiện']
+    },
+    {
+        key: 'anker',
+        name: 'Anker',
+        aliases: ['anker'],
+        categories: ['Củ sạc nhanh 100W/65W', 'Pin sạc dự phòng Anker Prime']
+    },
+    {
+        key: 'garmin',
+        name: 'Garmin',
+        aliases: ['garmin'],
+        categories: ['Đồng hồ thể thao chuyên nghiệp GPS (Forerunner 265, Venu 3)']
+    },
+    {
+        key: 'nintendo',
+        name: 'Nintendo',
+        aliases: ['nintendo', 'switch'],
+        categories: ['Máy chơi game cầm tay (Switch OLED, Switch Lite)']
+    },
+    {
+        key: 'valve',
+        name: 'Valve',
+        aliases: ['valve', 'steam deck'],
+        categories: ['Máy chơi game cầm tay PC (Steam Deck OLED, Dock)']
+    },
+    {
+        key: 'meta',
+        name: 'Meta',
+        aliases: ['meta', 'oculus', 'quest'],
+        categories: ['Kính thực tế ảo VR (Meta Quest 3, Quest 3S, Elite Strap)']
+    },
+    {
+        key: 'microsoft',
+        name: 'Microsoft',
+        aliases: ['microsoft', 'surface'],
+        categories: ['Máy tính bảng & Laptop 2-in-1 (Surface Pro 11, Surface Laptop Go 3)']
+    },
+    {
+        key: 'dji',
+        name: 'DJI',
+        aliases: ['dji', 'osmo'],
+        categories: ['Camera Gimbal 4K bỏ túi (Osmo Pocket 3)', 'Gimbal điện thoại chống rung (Osmo Mobile 6)']
+    }
 ];
 
 // Loại sản phẩm thực tế trong catalog. Các loại cụ thể phải đứng trước danh mục rộng
 // để "bàn phím", "loa", "tay cầm"... không bị hiểu thành một từ khóa lạ.
 const PRODUCT_TYPE_INTENTS = [
+    { key: 'iphone', label: 'iPhone', aliases: ['iphone', 'ip', 'dt iphone', 'dien thoai iphone', 'tao khuyet'], category: 'Điện thoại', brand: 'Apple', name: /iphone/i },
+    { key: 'galaxy', label: 'Samsung Galaxy', aliases: ['samsung galaxy', 'galaxy z', 'galaxy s', 'galaxy a', 'galaxy'], category: 'Điện thoại', brand: 'Samsung', name: /galaxy/i },
+    { key: 'macbook', label: 'MacBook', aliases: ['macbook', 'mac book'], category: 'Laptop', brand: 'Apple', name: /macbook/i },
+    { key: 'rog', label: 'ASUS ROG', aliases: ['asus rog', 'rog strix', 'laptop rog', 'rog'], category: 'Laptop', brand: 'ASUS', name: /rog/i },
+    { key: 'ipad', label: 'iPad', aliases: ['ipad', 'ipads', 'may tinh bang ipad'], category: 'Tablet', brand: 'Apple', name: /ipad/i },
+    { key: 'airpods', label: 'AirPods', aliases: ['airpods', 'airpod', 'air pods'], category: 'Tai nghe', brand: 'Apple', name: /airpods/i },
+    { key: 'apple_watch', label: 'Apple Watch', aliases: ['apple watch', 'applewatch'], category: 'Đồng hồ thông minh', brand: 'Apple', name: /apple watch/i },
     { key: 'keyboard', label: 'bàn phím', aliases: ['ban phim', 'keyboard'], category: 'Phụ kiện', name: /bàn phím|keyboard/i },
     { key: 'mouse', label: 'chuột máy tính', aliases: ['chuot may tinh', 'chuot khong day', 'chuot gaming', 'chuot', 'mouse'], category: 'Phụ kiện', name: /chuột|mouse/i },
     { key: 'power_bank', label: 'pin sạc dự phòng', aliases: ['pin sac du phong', 'pin du phong', 'sac du phong', 'power bank', 'powerbank'], category: 'Phụ kiện', name: /pin sạc dự phòng|sạc dự phòng|power ?bank/i },
@@ -100,13 +237,13 @@ const PRODUCT_TYPE_INTENTS = [
     { key: 'gimbal', label: 'gimbal chống rung', aliases: ['gimbal chong rung', 'gimbal dien thoai', 'gimbal'], category: 'Phụ kiện', name: /gimbal/i },
     { key: 'camera', label: 'camera bỏ túi', aliases: ['camera bo tui', 'osmo pocket', 'camera vlog'], category: 'Phụ kiện', name: /camera|osmo pocket/i },
     { key: 'speaker', label: 'loa Bluetooth', aliases: ['loa bluetooth', 'loa khong day', 'loa'], category: 'Tai nghe', name: /^loa\b/i },
-    { key: 'headphones', label: 'tai nghe', aliases: ['tai nghe', 'airpods', 'headphone', 'earbuds', 'headset', 'galaxy buds'], category: 'Tai nghe', name: /^tai nghe\b/i },
+    { key: 'headphones', label: 'tai nghe', aliases: ['tai nghe', 'headphone', 'earbuds', 'headset', 'galaxy buds'], category: 'Tai nghe', name: /^tai nghe\b/i },
     { key: 'hearing_aid', label: 'máy trợ thính', aliases: ['may tro thinh', 'may nghe tro thinh', 'thiet bi tro thinh', 'tro thinh', 'hearing aid', 'hearing aids', 'nghe kem', 'kho nghe', 'nghenh ngang'], category: 'Máy trợ thính' },
-    { key: 'smartwatch', label: 'đồng hồ thông minh', aliases: ['dong ho thong minh', 'smartwatch', 'apple watch', 'galaxy watch', 'garmin watch', 'vong deo tay thong minh', 'dong ho'], category: 'Đồng hồ thông minh' },
+    { key: 'smartwatch', label: 'đồng hồ thông minh', aliases: ['dong ho thong minh', 'smartwatch', 'galaxy watch', 'garmin watch', 'vong deo tay thong minh', 'dong ho'], category: 'Đồng hồ thông minh' },
     { key: 'console', label: 'máy chơi game', aliases: ['may choi game', 'playstation', 'ps5', 'nintendo switch', 'steam deck', 'rog ally'], category: 'Máy chơi game' },
-    { key: 'tablet', label: 'máy tính bảng', aliases: ['may tinh bang', 'tablet', 'ipad', 'galaxy tab', 'matepad'], category: 'Tablet' },
-    { key: 'laptop', label: 'laptop', aliases: ['laptop', 'may tinh xach tay', 'macbook', 'notebook'], category: 'Laptop' },
-    { key: 'phone', label: 'điện thoại', aliases: ['dien thoai', 'smartphone', 'iphone'], category: 'Điện thoại' },
+    { key: 'tablet', label: 'máy tính bảng', aliases: ['may tinh bang', 'tablet', 'galaxy tab', 'matepad'], category: 'Tablet' },
+    { key: 'laptop', label: 'laptop', aliases: ['laptop', 'may tinh xach tay', 'notebook'], category: 'Laptop' },
+    { key: 'phone', label: 'điện thoại', aliases: ['dien thoai', 'smartphone'], category: 'Điện thoại' },
     { key: 'accessory', label: 'phụ kiện', aliases: ['phu kien'], category: 'Phụ kiện' }
 ];
 
@@ -648,7 +785,11 @@ function inferCategory(text) {
 
 function extractBrandMention(text) {
     const norm = normalizeText(text);
-    return CATALOG_BRANDS.find(b => hasWordOrPhrase(norm, b.key)) || null;
+    return CATALOG_BRANDS.find(b => {
+        if (hasWordOrPhrase(norm, b.key)) return true;
+        if (Array.isArray(b.aliases) && b.aliases.some(a => hasWordOrPhrase(norm, a))) return true;
+        return false;
+    }) || null;
 }
 
 function extractEliminatedBrand(text) {
@@ -663,7 +804,11 @@ function extractEliminatedBrand(text) {
         const match = norm.match(pat);
         if (match) {
             const candidate = normalizeText(match[1]);
-            const matchedBrand = CATALOG_BRANDS.find(b => candidate.includes(b.key));
+            const matchedBrand = CATALOG_BRANDS.find(b => {
+                if (candidate.includes(b.key)) return true;
+                if (Array.isArray(b.aliases) && b.aliases.some(a => candidate.includes(a))) return true;
+                return false;
+            });
             if (matchedBrand) return matchedBrand.name;
         }
     }
@@ -743,6 +888,8 @@ function isOldDeviceDiagnosis(text) {
 
 function isBrandOnlyQuery(text) {
     const norm = normalizeText(text);
+    // Don't treat specific product lines (iphone, macbook, etc.) as brand-only query
+    if (/\b(iphone|macbook|ipad|airpods|apple watch|galaxy|rog)\b/i.test(norm)) return false;
     const brand = CATALOG_BRANDS.find(b => hasWordOrPhrase(norm, b.key));
     if (!brand) return false;
 
@@ -1066,7 +1213,7 @@ async function handleBrandWithCategory(brandName, category, context = {}) {
 
     return {
         reply,
-        products: [], // Không trả về thẻ sản phẩm khi chỉ mới hỏi thương hiệu chung; chỉ giới thiệu bằng văn bản và gợi ý các dòng máy
+        products: finalProducts,
         suggestions,
         context: {
             ...context,
@@ -1334,7 +1481,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     const extractedBudget = extractBudget(message);
     const budget = extractedBudget || (isExplicitReset ? 0 : (previousQualification.budget || context.budget || 0));
 
-    const brand = extractBrandPreference(message) || (isExplicitReset ? '' : (previousQualification.brand || context.brand || ''));
+    const brand = productType.brand || extractBrandPreference(message) || (isExplicitReset ? '' : (previousQualification.brand || context.brand || ''));
     const directUseCase = /van phong|luot web|word|excel|hoc tap|sinh vien|văn phòng|lướt web|học tập|sinh viên/i.test(normalizedMessage + ' ' + message)
         ? 'làm việc văn phòng / học tập'
         : /lap trinh|code|docker|cntt|cong nghe thong tin|ide/.test(normalizedMessage)
@@ -1451,9 +1598,32 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             if (nearestBudgetProduct) matchingProducts = [nearestBudgetProduct];
         }
 
-        // FAST-TRACK: Nếu khách đã nêu ít nhất 2 tiêu chí (Category + Ngân sách HOẶC Category + Nhu cầu sử dụng),
+        // Nếu khách đã cung cấp cả ngân sách lẫn nhu cầu sử dụng, chuyển thẳng sang phân tích đánh đổi chuyên sâu
+        if (budget > 0 && useCase) {
+            return await handleRecommendWithTradeOffs({
+                category: productType.category,
+                brand,
+                budget,
+                isHardBudget: isHardBudgetLimit(message),
+                useCase,
+                preference,
+                userProficiency: context.techProficiency || 'intermediate',
+                context: {
+                    ...context,
+                    category: productType.category,
+                    productType: productType.key,
+                    brand,
+                    budget,
+                    useCase,
+                    preference
+                }
+            });
+        }
+
+        // FAST-TRACK: Nếu khách đã nêu ít nhất 2 tiêu chí (Category + Ngân sách HOẶC Category + Nhu cầu sử dụng)
+        // hoặc đã chỉ định thương hiệu / dòng máy cụ thể (ví dụ: iPhone, Samsung, MacBook...),
         // Lập tức đề xuất ngay 2-3 sản phẩm MongoDB phù hợp nhất kèm phân tích & lý do, không bắt trả lời nốt khảo sát!
-        const hasEnoughSignals = Boolean(budget > 0 || useCase || (brand && brand !== 'Tất cả thương hiệu' && budget > 0));
+        const hasEnoughSignals = Boolean(budget > 0 || useCase || (brand && brand !== 'Tất cả thương hiệu') || Boolean(productType.brand || productType.name));
 
         if (hasEnoughSignals && matchingProducts.length > 0) {
             matchingProducts.sort((a, b) => {
@@ -1487,8 +1657,13 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                 intro = `Dạ với mức ngân sách **dưới ${money(budget)}** phục vụ nhu cầu **${useCase}**, mình xin đề xuất ngay **${selected.length} phương án tối ưu nhất** tại kho TechEcommerce:\n\n`;
             } else if (budget > 0) {
                 intro = `Dạ với mức ngân sách **dưới ${money(budget)}**, mình đã chọn lọc ngay **${selected.length} mẫu ${productType.label}** chính hãng có cấu hình và độ bền xuất sắc nhất:\n\n`;
-            } else {
+            } else if (useCase) {
                 intro = `Dạ với nhu cầu **${useCase}**, mình xin đề xuất **${selected.length} mẫu ${productType.label}** phù hợp nhất để bạn cân nhắc:\n\n`;
+            } else if (productType.name || (brand && brand !== 'Tất cả thương hiệu')) {
+                const targetBrandOrLabel = productType.label || brand;
+                intro = `Dạ tuyệt vời ạ! Với dòng **${targetBrandOrLabel} chính hãng**, TechEcommerce hiện đang có sẵn đầy đủ các mẫu máy mới nguyên seal 100%, bảo hành chính hãng và hỗ trợ trả góp 0%:\n\n`;
+            } else {
+                intro = `Dạ tại TechEcommerce, mình xin đề xuất ngay **${selected.length} mẫu ${productType.label}** nổi bật và bán chạy nhất hiện nay để bạn tham khảo:\n\n`;
             }
 
             const productDetails = selected.map((p, idx) => {
@@ -1507,27 +1682,32 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                     `   • **Chính sách:** Bảo hành chính hãng ${p.warranty || '12 - 24 tháng'}, lỗi 1 đổi 1 trong 30 ngày, trả góp 0% chỉ từ ~${money(monthlyInst)}/tháng.`;
             }).join('\n\n');
 
-            const outro = `\n\n👉 Bạn đang ưng ý mẫu nào trong các lựa chọn trên, hoặc bạn muốn mình so sánh sâu hơn giữa 2 máy để dễ chốt hơn không ạ? 😊`;
+            let outro = `\n\n👉 Bạn đang ưng ý mẫu nào trong các lựa chọn trên, hoặc bạn muốn mình so sánh sâu hơn giữa 2 máy để dễ chốt hơn không ạ? 😊`;
+            if (!budget) {
+                outro = `\n\n👉 Bạn đang ưu tiên phiên bản cao cấp nhất hay tối ưu chi phí, và mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu để mình tư vấn cấu hình và ưu đãi vừa vặn nhất nhé! 😊`;
+            }
 
             const defaultReply = `${intro}${productDetails}${outro}`;
             const grounded = await aiModelService.generateGroundedConsultation({
                 userMessage: message,
                 dialogueAct: 'recommend',
                 verifiedProducts: selected,
-                context: { ...context, category: productType.category, budget, useCase, preference },
+                context: { ...context, category: productType.category, brand, budget, useCase, preference },
                 fallbackText: defaultReply
             });
+
+            const dynamicSuggestions = [
+                selected[0] ? `Xem ${selected[0].name.replace(/(Điện thoại|Laptop|Máy tính bảng)\s*/gi, '').slice(0, 22)}` : null,
+                selected[1] ? `Xem ${selected[1].name.replace(/(Điện thoại|Laptop|Máy tính bảng)\s*/gi, '').slice(0, 22)}` : null,
+                selected.length >= 2 ? `So sánh 2 máy trên` : null,
+                'Tính trả góp 0%',
+                'Săn mã giảm giá'
+            ].filter(Boolean).slice(0, 5);
 
             return {
                 reply: grounded.reply,
                 products: selected,
-                suggestions: [
-                    selected.length >= 2 ? 'So sánh 2 máy trên' : null,
-                    `Xem chi tiết ${selected[0].name.replace(/(Điện thoại|Laptop)\s*/gi, '').slice(0, 18)}`,
-                    selected[1] ? `Xem chi tiết ${selected[1].name.replace(/(Điện thoại|Laptop)\s*/gi, '').slice(0, 18)}` : null,
-                    'Tính trả góp 0%',
-                    'Săn mã giảm giá'
-                ].filter(Boolean),
+                suggestions: dynamicSuggestions,
                 context: {
                     ...context,
                     stage: 'recommended',
@@ -3119,7 +3299,7 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
         prev.lastProducts = [];
     }
 
-    if (requestedProductType && (requestedProductType.key !== prev.productType || (isExplicitConsultationRestart && !extractBudget(message) && !extractQualificationUseCase(message) && !extractBrandPreference(message)))) {
+    if (requestedProductType && !extractBudget(message) && (requestedProductType.key !== prev.productType || (isExplicitConsultationRestart && !extractBudget(message) && !extractQualificationUseCase(message) && !extractBrandPreference(message)))) {
         const switchedContext = {
             pageCategory: prev.pageCategory,
             category: requestedProductType.category,
@@ -3171,7 +3351,7 @@ async function coordinateConsultation({ message, user = null, context = {} }) {
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở
     // trên, nhánh exact lookup đã ưu tiên trả sản phẩm ngay lập tức.
     if (Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
-        /may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text)) {
+        (/may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text) || extractEliminatedBrand(message))) {
         const earlyContextualResponse = await handleContextualFollowUp(message, prev);
         if (earlyContextualResponse) return earlyContextualResponse;
     }

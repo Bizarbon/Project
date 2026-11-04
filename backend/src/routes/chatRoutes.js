@@ -2373,7 +2373,7 @@ Trả về JSON thuần:
                     : (classificationReason || 'Ảnh chưa cho thấy rõ thiết bị công nghệ trong hệ thống cửa hàng.'),
                 reply: detectionStatus === 'unclear'
                     ? 'Ảnh chưa đủ rõ nét để nhận diện chính xác model. TechEcommerce gợi ý các sản phẩm công nghệ bán chạy hàng đầu dành cho bạn:'
-                    : 'Chưa nhận diện được thiết bị công nghệ rõ ràng từ ảnh này. Bạn có thể tham khảo các sản phẩm thịnh hành tại cửa hàng:',
+                    : 'Ảnh này chưa cho thấy thiết bị công nghệ của TechEcommerce. Bạn có thể tham khảo các sản phẩm thịnh hành tại cửa hàng:',
                 products: popularProducts,
                 suggestions: ['Điện thoại', 'Laptop & MacBook', 'Tai nghe & Âm thanh', 'Phụ kiện máy tính']
             });
