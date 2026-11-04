@@ -25,12 +25,30 @@
     }
 
     function ensureStylesheet() {
-        if (document.querySelector('link[data-ai-chat-style]')) return;
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `${root}assets/css/chatbox.css?v=20260925-v3`;
-        link.dataset.aiChatStyle = 'true';
-        document.head.appendChild(link);
+        if (!document.querySelector('link[data-ai-chat-style]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `${root}assets/css/chatbox.css?v=20260925-v3`;
+            link.dataset.aiChatStyle = 'true';
+            document.head.appendChild(link);
+        }
+        ensureMascotAssets();
+    }
+
+    function ensureMascotAssets() {
+        if (!document.querySelector('link[data-tm-mascot-style]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `${root}assets/css/mascot.css?v=20261104-v1`;
+            link.dataset.tmMascotStyle = 'true';
+            document.head.appendChild(link);
+        }
+        if (!window.TechMascot && !document.querySelector('script[data-tm-mascot-script]')) {
+            const script = document.createElement('script');
+            script.src = `${root}assets/js/mascot.js?v=20261104-v1`;
+            script.dataset.tmMascotScript = 'true';
+            document.body.appendChild(script);
+        }
     }
 
     function escapeHTML(value) {
@@ -310,7 +328,7 @@
                         <button class="ai-chat-close" type="button" aria-label="Đóng chat">×</button>
                     </div>
                 </header>
-                <main class="ai-chat-body" id="aiChatBody" aria-live="polite"></main>
+                <main class="ai-chat-body" id="aiChatBody" role="log" aria-live="polite"></main>
                 <nav class="ai-chat-suggestions-nav" id="aiChatSuggestionsNav" aria-label="Gợi ý tác vụ nhanh">
                     <button type="button" class="ai-suggestions-arrow ai-suggestions-prev" aria-label="Cuộn gợi ý sang trái" hidden>‹</button>
                     <div class="ai-chat-suggestions-bar" id="aiChatSuggestions"></div>
@@ -2160,6 +2178,7 @@
             const typing = appendMessage(body, 'ai ai-typing', 'Đang tìm kiếm thông tin tối ưu...');
             sendButton.disabled = true;
             panel.dataset.state = 'loading';
+            window.TechMascot?.setState('thinking');
 
             try {
                 consultationContext.conversationHistory = chatHistory.slice(-7, -1).filter(item => item && item.text && !item.proactive).map(item => ({ role: item.role === 'user' ? 'user' : 'assistant', text: String(item.text).slice(0, 320) }));
@@ -2185,6 +2204,7 @@
                 typing.remove();
 
                 const reply = data.reply || 'Mình chưa có câu trả lời phù hợp.';
+                window.TechMascot?.onReplyStart();
                 streamAIMessage(body, reply, () => {
                     chatHistory.push({
                         role: 'ai',
@@ -2228,6 +2248,7 @@
                     renderSuggestions(suggestionsBar, data.suggestions, send);
                     scrollToBottom(body);
                     scheduleReengagement();
+                    window.TechMascot?.onReplyComplete(reply.length);
                 });
 
                 speak(reply);
@@ -2236,6 +2257,7 @@
                 typing.remove();
                 appendMessage(body, 'ai', error.message || 'Có lỗi xảy ra, bạn thử lại giúp mình nhé.');
                 panel.dataset.state = 'error';
+                window.TechMascot?.onReplyError();
             } finally {
                 sendButton.disabled = false;
                 input.focus();

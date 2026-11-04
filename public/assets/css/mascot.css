@@ -1,0 +1,385 @@
+/* ==========================================================================
+   TechEcommerce AI Chatbot Mascot Styles
+   File: assets/css/mascot.css
+   Mọi class/id sử dụng tiền tố tm- theo quy chuẩn dự án
+   ========================================================================== */
+
+/* --- Khung chứa linh vật (Mascot Wrapper) --- */
+.tm-mascot-wrapper {
+    position: fixed;
+    right: 50px;
+    bottom: calc(600px + 6px);
+    width: 84px;
+    height: 94px;
+    z-index: 2001;
+    pointer-events: auto;
+    user-select: none;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.16));
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Ẩn khi chatbox đóng, thu nhỏ hoặc người dùng tắt hiển thị linh vật */
+.ai-chat:not(.open) .tm-mascot-wrapper,
+.ai-chat.minimized .tm-mascot-wrapper,
+.tm-mascot-wrapper.tm-hidden {
+    opacity: 0 !important;
+    transform: translateY(14px) scale(0.85) !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+/* Hiển thị mượt mà khi chatbox mở */
+.ai-chat.open .tm-mascot-wrapper:not(.tm-hidden) {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+/* --- SVG Định dạng cơ bản --- */
+.tm-svg {
+    display: block;
+    width: 84px;
+    height: 84px;
+    overflow: visible;
+}
+
+/* --- Điểm neo chuyển động (Transform Origins) --- */
+.tm-head {
+    transform-origin: 50px 58px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tm-tail {
+    transform-origin: 22px 78px;
+    transition: transform 0.3s ease;
+}
+
+.tm-ears {
+    transform-origin: 50px 30px;
+    transition: transform 0.25s ease;
+}
+
+.tm-eyes {
+    transform-origin: 50px 41px;
+}
+
+.tm-pupil {
+    transition: transform 0.2s ease;
+}
+
+.tm-arm {
+    transform-origin: 50px 82px;
+    transition: transform 0.25s ease;
+}
+
+/* --- Trạng thái mặc định của các lớp nét mặt --- */
+.tm-mouth-default { display: block; }
+.tm-mouth-open { display: none; }
+.tm-mouth-happy { display: none; }
+.tm-mouth-sorry { display: none; }
+
+.tm-eyes-normal { display: block; }
+.tm-eyes-happy { display: none; }
+.tm-eyes-sorry { display: none; }
+
+/* --- Bóng suy nghĩ (Thinking Bubble) --- */
+.tm-bubble {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #ffffff;
+    border: 1.5px solid #0068FF;
+    border-radius: 12px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transform: scale(0.6) translateY(6px);
+    transform-origin: bottom left;
+    transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 10px rgba(0, 104, 255, 0.25);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.tm-dot {
+    width: 5px;
+    height: 5px;
+    background: #0068FF;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* --- Hoạt ảnh tinh gọn (Chỉ animate transform & opacity) --- */
+@keyframes tm-tail-idle {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(10deg); }
+}
+
+@keyframes tm-blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    94% { transform: scaleY(0.1); }
+}
+
+@keyframes tm-look-around {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-2.5px, -1px); }
+    75% { transform: translate(2.5px, -1px); }
+}
+
+@keyframes tm-bubble-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+@keyframes tm-dot-pulse {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-2px); }
+}
+
+@keyframes tm-nod {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(3px) rotate(1deg); }
+}
+
+@keyframes tm-talk {
+    0%, 100% { transform: scale(0.85); }
+    50% { transform: scale(1.18); }
+}
+
+@keyframes tm-tail-fast {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(18deg); }
+}
+
+/* ==========================================================================
+   TRẠNG THÁI 1: IDLE (chớp mắt, đuôi vẫy nhẹ)
+   ========================================================================== */
+.tm-mascot-wrapper[data-state="idle"] .tm-tail {
+    animation: tm-tail-idle 2.6s ease-in-out infinite;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-eyes-normal {
+    animation: tm-blink 4s infinite;
+    transform-origin: 50px 41px;
+}
+
+/* ==========================================================================
+   TRẠNG THÁI 2: LISTENING (nghiêng đầu, tai dựng)
+   ========================================================================== */
+.tm-mascot-wrapper[data-state="listening"] .tm-head {
+    transform: rotate(8deg) translateY(-1px);
+}
+
+.tm-mascot-wrapper[data-state="listening"] .tm-ears {
+    transform: scale(1.08) translateY(-2px);
+}
+
+.tm-mascot-wrapper[data-state="listening"] .tm-pupil {
+    transform: translate(0, 1px);
+}
+
+.tm-mascot-wrapper[data-state="listening"] .tm-tail {
+    animation: tm-tail-idle 1.6s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   TRẠNG THÁI 3: THINKING (mắt liếc quanh, hiện dấu "...")
+   ========================================================================== */
+.tm-mascot-wrapper[data-state="thinking"] .tm-head {
+    transform: rotate(-4deg) translateY(-1px);
+}
+
+.tm-mascot-wrapper[data-state="thinking"] .tm-pupil {
+    animation: tm-look-around 1.8s infinite ease-in-out;
+}
+
+.tm-mascot-wrapper[data-state="thinking"] .tm-bubble {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    animation: tm-bubble-pulse 1.4s ease-in-out infinite;
+}
+
+.tm-mascot-wrapper[data-state="thinking"] .tm-dot-1 {
+    animation: tm-dot-pulse 0.9s infinite ease-in-out 0s;
+}
+.tm-mascot-wrapper[data-state="thinking"] .tm-dot-2 {
+    animation: tm-dot-pulse 0.9s infinite ease-in-out 0.2s;
+}
+.tm-mascot-wrapper[data-state="thinking"] .tm-dot-3 {
+    animation: tm-dot-pulse 0.9s infinite ease-in-out 0.4s;
+}
+
+/* ==========================================================================
+   TRẠNG THÁI 4: ANSWERING (miệng mở/đóng, gật đầu nhẹ)
+   ========================================================================== */
+.tm-mascot-wrapper[data-state="answering"] .tm-head {
+    animation: tm-nod 0.9s ease-in-out infinite;
+}
+
+.tm-mascot-wrapper[data-state="answering"] .tm-mouth-default {
+    display: none;
+}
+
+.tm-mascot-wrapper[data-state="answering"] .tm-mouth-open {
+    display: block;
+    transform-origin: 50px 55px;
+    animation: tm-talk 0.35s ease-in-out infinite alternate;
+}
+
+.tm-mascot-wrapper[data-state="answering"] .tm-tail {
+    animation: tm-tail-idle 1.8s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   TRẠNG THÁI 5: HAPPY (mắt híp cười, miệng cười tươi)
+   ========================================================================== */
+.tm-mascot-wrapper[data-state="happy"] .tm-head {
+    transform: translateY(-2px);
+}
+
+.tm-mascot-wrapper[data-state="happy"] .tm-eyes-normal {
+    display: none;
+}
+
+.tm-mascot-wrapper[data-state="happy"] .tm-eyes-happy {
+    display: block;
+}
+
+.tm-mascot-wrapper[data-state="happy"] .tm-mouth-default {
+    display: none;
+}
+
+.tm-mascot-wrapper[data-state="happy"] .tm-mouth-happy {
+    display: block;
+}
+
+.tm-mascot-wrapper[data-state="happy"] .tm-tail {
+    animation: tm-tail-fast 0.4s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   TRẠNG THÁI 6: SORRY (tai rủ, miệng buồn mếu, giọt mồ hôi)
+   ========================================================================== */
+.tm-mascot-wrapper[data-state="sorry"] .tm-head {
+    transform: translateY(3px) rotate(-3deg);
+}
+
+.tm-mascot-wrapper[data-state="sorry"] .tm-ears {
+    transform: translateY(3px) scale(0.94);
+}
+
+.tm-mascot-wrapper[data-state="sorry"] .tm-eyes-normal {
+    display: none;
+}
+
+.tm-mascot-wrapper[data-state="sorry"] .tm-eyes-sorry {
+    display: block;
+}
+
+.tm-mascot-wrapper[data-state="sorry"] .tm-mouth-default {
+    display: none;
+}
+
+.tm-mascot-wrapper[data-state="sorry"] .tm-mouth-sorry {
+    display: block;
+}
+
+/* ==========================================================================
+   NÚT BẬT / TẮT LINH VẬT TRÊN THANH TIÊU ĐỀ CHATBOX
+   ========================================================================== */
+.tm-mascot-toggle-btn {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 50% !important;
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    cursor: pointer !important;
+    font-size: 0.8rem !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    backdrop-filter: blur(4px) !important;
+    box-sizing: border-box !important;
+}
+
+.tm-mascot-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.32) !important;
+    transform: scale(1.08);
+}
+
+.tm-mascot-toggle-btn.tm-off {
+    opacity: 0.55;
+    background: rgba(0, 0, 0, 0.25) !important;
+    filter: grayscale(1);
+}
+
+/* ==========================================================================
+   HỖ TRỢ DARK THEME
+   ========================================================================== */
+html[data-theme='dark'] .tm-bubble {
+    background: #0f172a;
+    border-color: #38bdf8;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
+}
+
+html[data-theme='dark'] .tm-dot {
+    background: #38bdf8;
+}
+
+html[data-theme='dark'] .tm-mascot-wrapper {
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+}
+
+/* ==========================================================================
+   RESPONSIVE: VIEWPORT DI ĐỘNG (<= 768px, bao gồm 375px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .tm-mascot-wrapper {
+        right: 24px;
+        bottom: calc(min(500px, calc(100dvh - 120px)) + 52px + env(safe-area-inset-bottom, 0px));
+        width: 72px;
+        height: 80px;
+    }
+
+    .tm-svg {
+        width: 72px;
+        height: 72px;
+    }
+
+    .tm-bubble {
+        top: -8px;
+        right: -10px;
+        padding: 3px 6px;
+    }
+
+    .tm-dot {
+        width: 4px;
+        height: 4px;
+    }
+}
+
+/* ==========================================================================
+   KHẢ NĂNG TIẾP CẬN (ACCESSIBILITY): PREFERS-REDUCED-MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .tm-mascot-wrapper,
+    .tm-mascot-wrapper *,
+    .tm-bubble,
+    .tm-dot {
+        animation: none !important;
+        transition: none !important;
+    }
+}
