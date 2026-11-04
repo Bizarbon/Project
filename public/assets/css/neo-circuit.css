@@ -1204,9 +1204,22 @@ html[data-theme='dark'] .product-card {
     backdrop-filter: blur(18px);
 }
 
+html[data-theme='light'] .storefront-header {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 8px 28px rgba(47, 128, 237, 0.08) !important;
+}
+
 html[data-theme='dark'] .storefront-header {
-    background: rgba(8, 18, 32, 0.96);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.26);
+    background: rgba(8, 18, 32, 0.96) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[data-theme='high-contrast'] .storefront-header {
+    background: #000000 !important;
+    border-bottom: 2px solid #00ffff !important;
+    box-shadow: none !important;
 }
 
 .header-shell {
@@ -1218,6 +1231,24 @@ html[data-theme='dark'] .storefront-header {
     min-height: 38px;
     border-bottom: 1px solid var(--neo-border);
     background: rgba(47, 128, 237, 0.08);
+}
+
+html[data-theme='light'] .header-promotion {
+    background: rgba(47, 128, 237, 0.08) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+html[data-theme='dark'] .header-promotion {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='high-contrast'] .header-promotion {
+    background: #000000 !important;
+    border-bottom: 2px solid #ffff00 !important;
+    color: #ffffff !important;
 }
 
 .promotion-inner,
@@ -1431,6 +1462,24 @@ html[data-theme='dark'] .storefront-logo-text {
     overflow: hidden;
 }
 
+html[data-theme='light'] .header-search {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+html[data-theme='dark'] .header-search {
+    background: rgba(15, 23, 42, 0.9) !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-theme='high-contrast'] .header-search {
+    background: #000000 !important;
+    border: 2px solid #00ffff !important;
+    box-shadow: none !important;
+}
+
 .header-search:focus-within {
     border-color: var(--neo-primary);
     box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.14);
@@ -1457,7 +1506,19 @@ html[data-theme='dark'] .storefront-logo-text {
     background: transparent !important;
     box-shadow: none !important;
     font-size: 0.9rem;
-    color: var(--neo-text, inherit);
+    color: var(--neo-text, inherit) !important;
+}
+
+html[data-theme='light'] .header-search input {
+    color: #0f172a !important;
+}
+
+html[data-theme='dark'] .header-search input {
+    color: #f1f5f9 !important;
+}
+
+html[data-theme='high-contrast'] .header-search input {
+    color: #ffffff !important;
 }
 
 .header-search-camera-btn {
@@ -3528,9 +3589,31 @@ body:has(.tracking-page) .header-categories {
     text-decoration: none !important;
 }
 
+html[data-theme='light'] .header-categories {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+}
+
 html[data-theme='dark'] .header-categories {
-    background: rgba(15, 23, 42, 0.75) !important;
+    background: rgba(15, 23, 42, 0.92) !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme='high-contrast'] .header-categories {
+    background: #000000 !important;
+    border-bottom: 2px solid #00ffff !important;
+}
+
+html[data-theme='dark'] .category-scroll-arrow {
+    background: rgba(15, 23, 42, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #f1f5f9 !important;
+}
+
+html[data-theme='high-contrast'] .category-scroll-arrow {
+    background: #000000 !important;
+    border-color: #00ffff !important;
+    color: #00ffff !important;
 }
 
 html[data-theme='dark'] .header-category-list button,
@@ -3539,6 +3622,14 @@ html[data-theme='dark'] .header-category-list > li > a {
     color: #e2e8f0 !important;
     background: rgba(255, 255, 255, 0.05) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme='high-contrast'] .header-category-list button,
+html[data-theme='high-contrast'] .header-category-list > a,
+html[data-theme='high-contrast'] .header-category-list > li > a {
+    color: #ffffff !important;
+    background: #000000 !important;
+    border-color: #00ffff !important;
 }
 
 .header-category-list button:hover,
@@ -5609,8 +5700,8 @@ html[data-theme='dark'] .wishlist-btn {
     transform: translate(-50%, -50%) scale(0.96);
     z-index: 2147483000;
     width: min(1180px, 96vw);
-    max-height: min(90vh, 880px);
-    height: auto;
+    max-height: min(90vh, 840px);
+    height: min(90vh, 840px);
     padding: 0;
     background: #ffffff;
     border-radius: 16px;
@@ -5622,7 +5713,7 @@ html[data-theme='dark'] .wishlist-btn {
     transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 body.cart-no-transition .cart-drawer,
@@ -5678,8 +5769,9 @@ body.cart-open .cart-overlay[aria-hidden='false'] {
 
 .cart-drawer .cart-section {
     position: static !important;
-    max-height: min(90vh, 880px) !important;
+    max-height: 100% !important;
     height: 100% !important;
+    min-height: 0 !important;
     overflow: hidden !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -5822,11 +5914,13 @@ body.cart-open .cart-overlay[aria-hidden='false'] {
 }
 
 .cart-step-view {
-    flex: 1 1 auto;
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden !important;
     overscroll-behavior: contain;
-    padding: 24px 28px;
-    max-height: calc(min(90vh, 880px) - 78px);
+    padding: 20px 24px;
+    max-height: none;
 }
 
 /* Grids */
@@ -5836,6 +5930,9 @@ body.cart-open .cart-overlay[aria-hidden='false'] {
     grid-template-columns: 1fr 340px;
     gap: 24px;
     align-items: start;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
 }
 
 /* Items Column */
@@ -6055,14 +6152,19 @@ html[data-theme='dark'] .cart-item-line-total {
 .cart-summary-column {
     position: sticky;
     top: 0;
+    min-width: 0 !important;
+    max-width: 100% !important;
 }
 
 .cart-summary-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 16px;
-    padding: 22px;
+    padding: 20px 22px;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .cart-summary-heading {
@@ -6133,10 +6235,15 @@ html[data-theme='dark'] .cart-grand-amount {
 }
 
 /* Coupon */
-.cart-coupon-fieldset {
+.cart-coupon-fieldset,
+fieldset.cart-coupon-fieldset,
+.u230-box {
     border: 0;
     padding: 0;
     margin: 0 0 16px;
+    min-width: 0 !important;
+    min-inline-size: 0 !important;
+    max-width: 100% !important;
 }
 
 .coupon-label {
@@ -6147,13 +6254,17 @@ html[data-theme='dark'] .cart-grand-amount {
     color: var(--neo-text);
 }
 
-.coupon-input-group {
+.coupon-input-group,
+.u230-rw {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 8px;
+    min-width: 0 !important;
+    max-width: 100% !important;
 }
 
-.coupon-input-group input {
+.coupon-input-group input,
+.u230-in {
     height: 40px;
     border-radius: 8px;
     border: 1px solid var(--neo-border-strong);
@@ -6163,6 +6274,9 @@ html[data-theme='dark'] .cart-grand-amount {
     font-size: 0.88rem;
     font-weight: 600;
     text-transform: uppercase;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .btn-coupon-apply {
@@ -11984,10 +12098,15 @@ html[data-theme="dark"] .u230-applied-pill {
 
 .u298-tickets-list {
     display: flex;
+    flex-direction: column;
     gap: 8px;
-    overflow-x: auto;
     margin-top: 10px;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
+    max-height: 125px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: 0;
+    max-width: 100%;
     scrollbar-width: thin;
 }
 
@@ -11995,8 +12114,11 @@ html[data-theme="dark"] .u230-applied-pill {
     flex: 0 0 auto;
     display: flex;
     align-items: stretch;
-    min-width: 215px;
-    border-radius: 11px;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    border-radius: 9px;
     border: 1px solid rgba(47, 128, 237, 0.28);
     background: linear-gradient(135deg, rgba(47, 128, 237, 0.08), rgba(56, 189, 248, 0.04));
     overflow: hidden;

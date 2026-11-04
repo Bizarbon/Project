@@ -50,6 +50,15 @@ function mergeStoredCarts(primaryCart, incomingCart) {
     return [...merged.values()];
 }
 
+// Immediate Theme Initialization
+(function initTheme() {
+    try {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.dataset.theme = savedTheme;
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+})();
+
 const auth = {
     getToken: () => localStorage.getItem('token'),
     getUser: () => {
@@ -166,10 +175,7 @@ function setTheme(theme) {
 
 function toggleTheme() {
     const current = document.documentElement.dataset.theme || localStorage.getItem('theme') || 'light';
-    let nextTheme = 'dark';
-    if (current === 'light') nextTheme = 'dark';
-    else if (current === 'dark') nextTheme = 'high-contrast';
-    else nextTheme = 'light';
+    const nextTheme = current === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
 }
 
@@ -185,14 +191,11 @@ function updateThemeToggle() {
     button.classList.toggle('is-high-contrast', isHighContrast);
     button.setAttribute('aria-checked', isDark || isHighContrast ? 'true' : 'false');
 
-    let label = 'Chuyển sang giao diện tối';
-    let title = 'Giao diện: Sáng. Bấm để chuyển sang Tối';
-    if (isDark) {
-        label = 'Chuyển sang giao diện tương phản cao';
-        title = 'Giao diện: Tối. Bấm để chuyển sang Tương phản cao (High Contrast)';
-    } else if (isHighContrast) {
+    let label = isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối';
+    let title = isDark ? 'Giao diện: Tối. Bấm để chuyển sang Sáng' : 'Giao diện: Sáng. Bấm để chuyển sang Tối';
+    if (isHighContrast) {
         label = 'Chuyển sang giao diện sáng';
-        title = 'Giao diện: Tương phản cao (WCAG AAA). Bấm để chuyển sang Sáng';
+        title = 'Giao diện: Tương phản cao. Bấm để chuyển sang Sáng';
     }
 
     button.setAttribute('aria-label', label);
