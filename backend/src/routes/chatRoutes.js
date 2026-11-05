@@ -141,13 +141,35 @@ function detectGreetingOrSmallTalk(text) {
     }
 
     // 3. Small talk / câu hỏi chung về cửa hàng
+    const storeInquiryPatterns = [
+        /(?:cua hang|shop|ben ban|ben shop|ben minh|ban|cac ban)\s+(?:ban|co|kinh doanh|phan phoi)\s+(?:nhung\s+)?(?:gi|mat hang gi|san pham gi|do gi|thiet bi gi)/i,
+        /^(?:shop|cua hang)\s+ban\s+(?:nhung\s+)?gi[?!.\s]*$/i,
+        /^(?:ban|co)\s+(?:ban\s+)?(?:nhung\s+)?gi[?!.\s]*$/i,
+        /^(?:o day|cho nay)\s+(?:ban|co)\s+gi[?!.\s]*$/i,
+        /^(?:danh muc|cac loai)\s+san pham[?!.\s]*$/i
+    ];
+    if (storeInquiryPatterns.some(p => p.test(norm))) {
+        return {
+            reply: 'Dạ chào bạn! 👋 **TechEcommerce** là hệ sinh thái bán lẻ thiết bị công nghệ chính hãng 100%, bảo hành 1 đổi 1 trong 30 ngày và hỗ trợ trả góp 0% lãi suất.\n\n' +
+                'Hiện tại cửa hàng tụi mình phân phối đầy đủ 7 nhóm sản phẩm công nghệ hàng đầu:\n' +
+                '• 📱 **Điện thoại:** iPhone (Apple), Samsung Galaxy, Xiaomi, POCO, OPPO, HONOR.\n' +
+                '• 💻 **Laptop & MacBook:** MacBook Air/Pro, Asus ROG Strix, Acer Nitro, Lenovo, Dell, HP.\n' +
+                '• 📲 **Tablet (Máy tính bảng):** iPad Pro M4, iPad Air, iPad Gen 10, Samsung Galaxy Tab, Surface Pro.\n' +
+                '• ⌚ **Đồng hồ thông minh:** Apple Watch Series 10/SE, Samsung Galaxy Watch, Garmin, Huawei, Xiaomi Band.\n' +
+                '• 🎮 **Máy chơi game:** Sony PS5 Slim, Nintendo Switch OLED/Lite, ASUS ROG Ally, MSI Claw, Legion Go.\n' +
+                '• 🎧 **Tai nghe cao cấp:** Apple AirPods, Samsung Galaxy Buds 3 Pro, Marshall, Sony chống ồn.\n' +
+                '• 🔌 **Phụ kiện & Đồ chơi công nghệ:** Củ sạc nhanh Anker, Hub Ugreen, Gimbal DJI Pocket 3, Chuột & Bàn phím Logitech.\n\n' +
+                '👉 Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách dự kiến bao nhiêu để mình tư vấn chi tiết cho bạn nhé! 😊',
+            suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Tablet & iPad', 'Mã giảm giá hôm nay'],
+            context: { stage: 'asking_category' }
+        };
+    }
+
     const smallTalkPatterns = [
         /^ban\s+(la\s+)?ai[?!.\s]*$/,
         /^(ai\s+)?day\s+la\s+(gi|dau|cua hang gi)[?!.\s]*$/,
         /^ban\s+(co\s+the\s+)?(lam|giup)\s+(duoc\s+)?gi[?!.\s]*$/,
-        /^(ban\s+)?giup\s+(duoc\s+)?gi[?!.\s]*$/,
-        /^(cua hang|shop|ban)\s+ban\s+(nhung\s+)?gi[?!.\s]*$/,
-        /^ban\s+gi[?!.\s]*$/
+        /^(ban\s+)?giup\s+(duoc\s+)?gi[?!.\s]*$/
     ];
     if (smallTalkPatterns.some(p => p.test(norm))) {
         return {
@@ -412,7 +434,7 @@ async function buildProductFilter(text) {
 }
 
 /**
- * Tích hợp Google Gemini API với AbortSignal timeout 8s & Catalog-Grounded Prompt
+ * Tích hợp Google Gemini API với AbortSignal timeout 10s, Multi-Model Failover & Catalog-Grounded Prompt
  */
 async function askGeminiIfConfigured(systemPrompt, userPrompt) {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -421,41 +443,67 @@ async function askGeminiIfConfigured(systemPrompt, userPrompt) {
         return null;
     }
 
-    const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-    try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const body = {
-            contents: [
-                {
-                    role: 'user',
-                    parts: [{ text: `${systemPrompt}\n\nNgười dùng: "${userPrompt}"\nHãy trả lời bằng tiếng Việt tự nhiên, trung thực với thông số và giá trong catalog cung cấp, không suy đoán hoặc bịa thông số ngoài danh mục:` }]
+    const preferredModel = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
+    const modelsToTry = [preferredModel, 'gemini-flash-lite-latest', 'gemini-flash-latest'];
+
+    for (const model of modelsToTry) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const body = {
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: `${systemPrompt}\n\nNgười dùng: "${userPrompt}"\nHãy trả lời bằng tiếng Việt tự nhiên, trung thực với thông số và giá trong catalog cung cấp, không suy đoán hoặc bịa thông số ngoài danh mục:` }]
+                    }
+                ],
+                generationConfig: {
+                    temperature: 0.35,
+                    maxOutputTokens: 1024
                 }
-            ],
-            generationConfig: {
-                temperature: 0.25,
-                maxOutputTokens: 800
+            };
+
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: AbortSignal.timeout(10000)
+            });
+
+            if (!res.ok) {
+                console.warn(`[Gemini API] Model ${model} returned status: ${res.status}. Trying next...`);
+                continue;
             }
-        };
 
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-            signal: AbortSignal.timeout(8000)
-        });
-
-        if (!res.ok) {
-            console.warn(`[Gemini API] Request error status: ${res.status}. Fallback to deterministic engine.`);
-            return null;
+            const data = await res.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text && text.trim()) return text.trim();
+        } catch (err) {
+            console.warn(`[Gemini API] Model ${model} call error (${err.message}). Trying next...`);
         }
-
-        const data = await res.json();
-        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-        return text ? text.trim() : null;
-    } catch (err) {
-        console.warn(`[Gemini API] Call error/timeout (${err.message}). Fallback to deterministic engine.`);
-        return null;
     }
+
+    return null;
+}
+
+/**
+ * Trò chuyện tự nhiên mở (Open-ended Chit-chat & Smart Assistance)
+ * Trả lời thông minh, thân thiện các câu hỏi xã giao, toán học, hỏi vui mà không bao giờ spam hay lặp lại.
+ */
+async function askGeminiOpenChat(message, context = {}) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+
+    const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và am hiểu công nghệ của cửa hàng TechEcommerce.
+TechEcommerce chuyên bán chính hãng 100%: Điện thoại (iPhone, Samsung, Xiaomi...), Laptop (MacBook, ROG, Dell...), Tablet (iPad, Galaxy Tab...), Máy chơi game (PS5, Nintendo Switch, ROG Ally...), Smartwatch (Apple Watch, Garmin...), Tai nghe và Phụ kiện cao cấp.
+Chính sách: Bảo hành 12-24 tháng, lỗi 1 đổi 1 trong 30 ngày, trả góp 0% lãi suất.
+
+NGUYÊN TẮC TRẢ LỜI:
+1. Giao tiếp tự nhiên, thân thiện như một người bạn am hiểu công nghệ. Dùng đại từ xưng hô "mình" hoặc "em" và "bạn".
+2. Nếu khách hỏi vui, chào hỏi, đố vui, toán học (ví dụ: "1+1", "bạn có người yêu chưa", "kể chuyện cười"), hãy trả lời dí dỏm, khéo léo và tự nhiên. Tuyệt đối không spam kịch bản bán hàng máy móc!
+3. Nếu khách hỏi câu hỏi khó hoặc nằm ngoài khả năng, hãy nhẹ nhàng thông báo: "Dạ câu này mình chưa hiểu rõ ý bạn lắm nè 😅" và gợi ý khách diễn đạt lại nhu cầu công nghệ để hỗ trợ tốt nhất.
+4. Giữ câu trả lời ngắn gọn, súc tích (khoảng 2 - 4 câu), có thể kèm emoji phù hợp.`;
+
+    return await askGeminiIfConfigured(systemPrompt, message);
 }
 
 /**
@@ -2106,10 +2154,11 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const gameCapability = await evaluateGameOrTaskCapability(message, req.body.context);
         const isBargainOrBundle = ['bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem', 'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot', 'co giam them', 'combo phu kien', 'co khuyen mai kem'].some(k => text.includes(k));
 
-        if (specialAdvisor) {
+        const smallTalk = detectGreetingOrSmallTalk(text);
+        if (smallTalk) {
+            response = smallTalk;
+        } else if (specialAdvisor) {
             response = specialAdvisor;
-        } else if (!isInConversationFlow && detectGreetingOrSmallTalk(text)) {
-            response = detectGreetingOrSmallTalk(text);
         } else if (await handleActionExecution(message, req.body.context)) {
             response = await handleActionExecution(message, req.body.context);
         } else if (isBargainOrBundle) {
@@ -2132,6 +2181,16 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             };
         } else {
             response = await coordinateConsultation({ message, user: req.user, context: req.body.context });
+            if (!response || response.isFallback || response.notFound || response.context?.stage === 'out_of_catalog') {
+                const openReply = await askGeminiOpenChat(message, req.body.context);
+                if (openReply) {
+                    response = {
+                        reply: openReply,
+                        suggestions: response?.suggestions?.length ? response.suggestions : ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Mã giảm giá hôm nay'],
+                        context: { ...(req.body.context || {}), stage: 'conversational' }
+                    };
+                }
+            }
         }
 
         // Record conversation history asynchronously

@@ -821,9 +821,9 @@ function extractUseCase(text) {
         ['lập trình & công nghệ', ['lap trinh', 'code', 'hoc it', 'cong nghe thong tin', 'cntt', 'developer', 'python', 'docker', 'backend', 'frontend']],
         ['học tập sinh viên / văn phòng', ['sinh vien', 'hoc sinh', 'kinh te', 'marketing', 'ke toan', 'quan tri', 'hoc tap', 'di hoc', 'van phong', 'word', 'excel', 'powerpoint', 'hoc online']],
         ['thiết kế đồ họa & video', ['do hoa', 'thiet ke', 'photoshop', 'illustrator', 'premiere', 'edit video', 'dung phim', 'render', 'autocad', '2d', '3d']],
-        ['chơi game giải trí', ['choi game', 'gaming', 'game nang', 'fps', 'lien minh', 'genshin', 'valorant', 'steam']],
-        ['di chuyển nhiều & mỏng nhẹ', ['di chuyen', 'mang di hoc', 'mang di lam', 'nhe', 'mong nhe', 'pin trau', 'pin ca ngay']],
-        ['chụp ảnh & quay video', ['chup anh', 'quay video', 'camera', 'vlog', 'tiktok', 'selfie', 'chup hinh', 'song ao']]
+        ['chơi game giải trí', ['choi game', 'chien game', 'game', 'gaming', 'game nang', 'game muot', 'cau hinh manh', 'hieu nang manh', 'chip manh', 'fps', 'lien minh', 'genshin', 'valorant', 'steam']],
+        ['di chuyển nhiều & mỏng nhẹ', ['di chuyen', 'mang di hoc', 'mang di lam', 'nhe', 'mong nhe', 'pin trau', 'pin ca ngay', 'pin lau', 'dung lau']],
+        ['chụp ảnh & quay video', ['chup anh', 'quay phim', 'sac net', 'quay video', 'camera', 'vlog', 'tiktok', 'selfie', 'chup hinh', 'song ao', 'chup dep']]
     ];
 
     const found = cases.find(([, keywords]) => keywords.some(k => norm.includes(k)));
@@ -1338,8 +1338,8 @@ function extractQualificationUseCase(text) {
 function extractQualificationPreference(text) {
     const norm = normalizeText(text);
     const preferences = [
-        ['camera đẹp', ['camera', 'chup anh', 'quay phim', 'selfie']],
-        ['hiệu năng mạnh', ['hieu nang', 'cau hinh', 'manh', 'muot', 'gaming', 'choi game', 'chip manh', 'ram lon', 'toc do']],
+        ['camera đẹp', ['camera', 'chup anh', 'quay phim', 'sac net', 'selfie', 'chup dep', 'chup hinh', 'quay phim sac net', 'chup anh quay phim']],
+        ['hiệu năng mạnh', ['hieu nang', 'cau hinh', 'cau hinh manh', 'chien game', 'manh', 'muot', 'gaming', 'choi game', 'chip manh', 'ram lon', 'toc do', 'game muot']],
         ['pin lâu & bền bỉ', ['pin trau', 'pin lau', 'dung lau', 'thoi luong pin', 'uu tien pin', 'sac nhanh', 'pin']],
         ['mỏng nhẹ, dễ mang theo', ['mong nhe', 'nhe', 'de mang', 'di chuyen', 'gon nhe', 'thiet ke dep', 'sang trong', 'thiet ke']],
         ['không dây', ['khong day', 'bluetooth', 'wireless']],
@@ -1486,9 +1486,13 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
         ? 'làm việc văn phòng / học tập'
         : /lap trinh|code|docker|cntt|cong nghe thong tin|ide/.test(normalizedMessage)
             ? 'lập trình & công nghệ'
-            : /gaming|choi game|fps|genshin|valorant/.test(normalizedMessage)
+            : /gaming|choi game|chien game|fps|genshin|valorant|cau hinh manh|hieu nang/.test(normalizedMessage)
                 ? 'chơi game giải trí'
-                : '';
+                : /chup anh|quay phim|sac net|camera/.test(normalizedMessage)
+                    ? 'chụp ảnh & quay video'
+                    : /pin trau|luot web|pin lau/.test(normalizedMessage)
+                        ? 'sử dụng hằng ngày & cơ bản'
+                        : '';
     const useCase = extractQualificationUseCase(message) || directUseCase || (isExplicitReset ? '' : (previousQualification.useCase || context.useCase || ''));
     const preference = extractQualificationPreference(message) || (isExplicitReset ? '' : (previousQualification.preference || ''));
 
@@ -1956,15 +1960,35 @@ async function handleClarifyNeeds(category, existingSlots = {}, userProficiency 
         }
 
         case 'Điện thoại': {
-            question = `Dạ chào bạn! Để mình tư vấn mẫu **điện thoại** chuẩn nhất với nhu cầu của bạn, bạn có thể chia sẻ thêm giúp mình:\n` +
-                `1. Mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu?\n` +
-                `2. Bạn ưu tiên tiêu chí nào nhất (chụp ảnh quay phim sắc nét, cấu hình mạnh chiến game mượt, hay pin trâu bền bỉ cả ngày) ạ? 😊`;
-            suggestions = [
-                'Chụp ảnh quay phim sắc nét',
-                'Cấu hình mạnh chiến game',
-                'Pin trâu, lướt web mượt',
-                'Tầm giá dưới 15 triệu'
-            ];
+            if (existingSlots.useCase || existingSlots.preference) {
+                const intentName = existingSlots.useCase || existingSlots.preference;
+                question = `Dạ tuyệt vời! Với tiêu chí **${intentName}** cho dòng **Điện thoại**, TechEcommerce đang có sẵn các mẫu đầu bảng như **iPhone 16 Pro Max**, **Samsung Galaxy S25 Ultra** hay **OPPO Find X8 Pro**.\n` +
+                    `Bạn dự kiến mức **ngân sách khoảng bao nhiêu triệu** để mình lọc ra các phiên bản máy vừa vặn và tối ưu nhất cho bạn nhé! 😊`;
+                suggestions = [
+                    'Dưới 10 triệu',
+                    '10 - 20 triệu',
+                    'Trên 20 triệu',
+                    'Xem các mẫu cao cấp nhất'
+                ];
+            } else if (!existingSlots.budget) {
+                question = `Dạ chào bạn! Để mình tư vấn mẫu **điện thoại** chuẩn nhất với nhu cầu của bạn, bạn có thể chia sẻ thêm giúp mình:\n` +
+                    `1. Mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu?\n` +
+                    `2. Bạn ưu tiên tiêu chí nào nhất (chụp ảnh quay phim sắc nét, cấu hình mạnh chiến game mượt, hay pin trâu bền bỉ cả ngày) ạ? 😊`;
+                suggestions = [
+                    'Chụp ảnh quay phim sắc nét',
+                    'Cấu hình mạnh chiến game',
+                    'Pin trâu, lướt web mượt',
+                    'Tầm giá dưới 15 triệu'
+                ];
+            } else {
+                question = `Dạ với tầm ngân sách **${money(existingSlots.budget)}**, bạn ưu tiên tiêu chí nào nhất (chụp ảnh đẹp, cấu hình chiến game hay pin trâu bền bỉ) để mình chọn máy ưng ý nhất cho bạn nhé! 😊`;
+                suggestions = [
+                    'Chụp ảnh quay phim sắc nét',
+                    'Cấu hình mạnh chiến game',
+                    'Pin trâu bền bỉ',
+                    'Xem mẫu bán chạy nhất'
+                ];
+            }
             break;
         }
 
@@ -3075,21 +3099,224 @@ async function handleFeatureOrFormFactorQuery(message, category, prev = {}) {
         }
     }
 
+
+    // 3. Phân loại ĐIỆN THOẠI theo tính năng: Camera / Gaming / Pin trâu
+    if (cat === 'Điện thoại' || (!cat && /\b(chup anh|quay phim|camera|sac net|chup dep|quay video|chien game|choi game|cau hinh manh|game muot|pin trau|pin lau)\b/i.test(norm))) {
+        const isCamera = /\b(chup anh|quay phim|camera|sac net|chup dep|quay video|zoom|song ao|cinematic)\b/i.test(norm);
+        const isGaming = /\b(chien game|choi game|cau hinh manh|game muot|gaming|hieu nang|chip manh|snapdragon|a18|genshin|lien quan|pubg)\b/i.test(norm);
+        const isBattery = /\b(pin trau|pin lau|luot web|pin khung|ben bi|xai ca ngay)\b/i.test(norm);
+
+        if (isCamera) {
+            const candidates = await Product.find({
+                category: 'Điện thoại',
+                active: { $ne: false },
+                stock: { $gt: 0 },
+                $or: [
+                    { name: /iPhone 16 Pro Max|Galaxy S25 Ultra|Find X8|Xiaomi 14/i },
+                    { description: /camera|chụp ảnh|quay phim/i }
+                ]
+            }).sort({ price: -1 }).limit(4);
+
+            return {
+                reply: `Dạ chào bạn! Nếu bạn ưu tiên **chụp ảnh và quay phim sắc nét chuyên nghiệp**, TechEcommerce hiện có các mẫu flagship sở hữu hệ thống camera đỉnh cao nhất thị trường:\n\n` +
+                    `• 📸 **iPhone 16 Pro Max 256GB (34.990.000 đ):** Camera Fusion 48MP thế hệ mới, ống kính Telephoto 5x tiềm vọng, quay video 4K 120fps Dolby Vision chuẩn rạp chiếu phim và nút điều khiển Camera Control tiện lợi.\n` +
+                    `• 🌟 **Samsung Galaxy S25 Ultra 256GB (31.990.000 đ):** Cảm biến siêu nét 200MP kết hợp ProVisual Engine AI, zoom quang học 5x và Space Zoom 100x sắc nét, chụp đêm Nightography xuất sắc.\n` +
+                    `• 🎨 **OPPO Find X8 Pro 5G (26.990.000 đ):** Hệ thống 4 camera 50MP tinh chỉnh bởi huyền thoại Hasselblad, chụp chân dung xóa phông cực nghệ.\n\n` +
+                    `👉 Bạn đang nghiêng về phong cách màu chân thực chuẩn rạp của **iPhone** hay màu sắc sống động, zoom siêu xa của **Samsung Galaxy** để mình tư vấn chi tiết hơn nhé! 😊`,
+                products: candidates,
+                suggestions: ['iPhone 16 Pro Max', 'Samsung Galaxy S25 Ultra', 'OPPO Find X8 Pro', 'Tầm giá dưới 20 triệu'],
+                context: {
+                    ...prev,
+                    category: 'Điện thoại',
+                    currentIntent: 'feature_showcase',
+                    featureKeyword: 'chụp ảnh',
+                    useCase: 'chụp ảnh & quay video',
+                    lastProducts: candidates
+                }
+            };
+        }
+
+        if (isGaming) {
+            const candidates = await Product.find({
+                category: 'Điện thoại',
+                active: { $ne: false },
+                stock: { $gt: 0 },
+                $or: [
+                    { name: /iPhone 16 Pro Max|Galaxy S25 Ultra|Magic7|POCO|Xiaomi 14/i },
+                    { description: /hiệu năng|gaming|game|Snapdragon|A18/i }
+                ]
+            }).sort({ price: -1 }).limit(4);
+
+            return {
+                reply: `Dạ chào bạn! Để **chiến game mượt mà, cấu hình mạnh mẽ và FPS cực kỳ ổn định không lo giật lag**, TechEcommerce xin gợi ý các cỗ máy hiệu năng đỉnh nhất hiện nay:\n\n` +
+                    `• 🚀 **iPhone 16 Pro Max 256GB (34.990.000 đ):** Chip Apple A18 Pro tiến trình 3nm thế hệ mới, hỗ trợ Ray Tracing đồ họa phần cứng, cân mọi tựa game nặng như Genshin Impact mượt mà ở 60 - 120 FPS.\n` +
+                    `• 🔥 **Samsung Galaxy S25 Ultra 256GB (31.990.000 đ):** Vi xử lý Snapdragon 8 Elite for Galaxy mạnh nhất giới Android, buồng hơi tản nhiệt lớn hơn 40%, màn hình Dynamic AMOLED 2X 120Hz chống chói.\n` +
+                    `• ⚡ **HONOR Magic7 Pro 5G (25.990.000 đ):** Chip Snapdragon 8 Elite, màn hình 120Hz mượt mà và sạc siêu nhanh 100W cày game cả ngày.\n\n` +
+                    `👉 Bạn thường chơi những tựa game nào và dự kiến mức ngân sách khoảng bao nhiêu để mình tư vấn cấu hình chuẩn nhất cho bạn nhé! 😊`,
+                products: candidates,
+                suggestions: ['iPhone 16 Pro Max', 'Samsung Galaxy S25 Ultra', 'HONOR Magic7 Pro', 'Tầm giá dưới 15 triệu'],
+                context: {
+                    ...prev,
+                    category: 'Điện thoại',
+                    currentIntent: 'feature_showcase',
+                    featureKeyword: 'chiến game',
+                    useCase: 'chơi game giải trí',
+                    lastProducts: candidates
+                }
+            };
+        }
+
+        if (isBattery) {
+            const candidates = await Product.find({
+                category: 'Điện thoại',
+                active: { $ne: false },
+                stock: { $gt: 0 },
+                $or: [
+                    { name: /Galaxy A05s|HONOR 200|iPhone 16 Pro Max/i },
+                    { description: /pin trâu|5000mAh|dung lượng cao/i }
+                ]
+            }).sort({ price: -1 }).limit(3);
+
+            return {
+                reply: `Dạ chào bạn! Với tiêu chí **pin trâu bền bỉ, lướt web mượt mà cả ngày dài**, TechEcommerce có những lựa chọn tiêu biểu từ phân khúc kinh tế đến cao cấp:\n\n` +
+                    `• 🔋 **Samsung Galaxy A05s (3.290.000 đ):** Pin khủng 5.000 mAh, sạc nhanh 25W, màn hình lớn 6.7 inch 90Hz mượt mà, xài thoải mái 1.5 - 2 ngày.\n` +
+                    `• ⚡ **HONOR 200 5G (11.990.000 đ):** Pin 5.200 mAh Silicon-Carbon thế hệ mới, sạc siêu tốc 100W đầy pin chỉ trong 35 phút.\n` +
+                    `• 👑 **iPhone 16 Pro Max (34.990.000 đ):** Thời lượng xem video lên đến 33 giờ liên tục - chiếc iPhone pin trâu nhất lịch sử Apple.\n\n` +
+                    `👉 Bạn đang nhắm đến tầm giá phổ thông tiết kiệm hay phân khúc cao cấp để mình gửi chi tiết nhé! 😊`,
+                products: candidates,
+                suggestions: ['Dưới 5 triệu', 'Tầm 10 - 15 triệu', 'Flagship cao cấp', 'Săn mã giảm giá'],
+                context: {
+                    ...prev,
+                    category: 'Điện thoại',
+                    currentIntent: 'feature_showcase',
+                    featureKeyword: 'pin trâu',
+                    useCase: 'pin trâu, lướt web',
+                    lastProducts: candidates
+                }
+            };
+        }
+    }
+
+    // 4. Phân loại TABLET theo tính năng: Học tập ghi chép bút cảm ứng / Đồ họa màn hình đẹp
+    if (cat === 'Tablet' || (!cat && /\b(but cam ung|ghi chep|hoc tap|sinh vien|take note|ve do hoa|man hinh dep|liquid retina|dung phim)\b/i.test(norm))) {
+        const isNote = /\b(but cam ung|ghi chep|hoc tap|sinh vien|take note|viet ve)\b/i.test(norm);
+        const isGraphics = /\b(ve do hoa|do hoa|man hinh dep|liquid retina|dung phim|oled|m4)\b/i.test(norm);
+
+        if (isNote || isGraphics) {
+            const candidates = await Product.find({
+                category: 'Tablet',
+                active: { $ne: false },
+                stock: { $gt: 0 },
+                $or: [
+                    { name: /iPad Gen 10|Lenovo Tab M11|MatePad 11|iPad Pro 11|Tab S9/i },
+                    { description: /bút|học tập|ghi chép|đồ họa|vẽ/i }
+                ]
+            }).sort({ price: 1 }).limit(4);
+
+            return {
+                reply: `Dạ chào bạn! Để phục vụ **học tập ghi chép bằng bút cảm ứng, vẽ đồ họa và giải trí**, TechEcommerce có sẵn các dòng tablet xuất sắc:\n\n` +
+                    `• 📝 **Lenovo Tab M11 Kèm Bút Cảm Ứng (4.490.000 đ):** Mẫu tablet kinh tế nhất tặng kèm sẵn bút cảm ứng trong hộp, màn hình 11 inch 90Hz, 4 loa Dolby Atmos.\n` +
+                    `• 🍎 **iPad Gen 10 10.9 inch (8.990.000 đ):** Thiết kế viền mỏng hiện đại, chip A14 Bionic mạnh mẽ, hỗ trợ Apple Pencil và Magic Keyboard Folio.\n` +
+                    `• 💼 **Huawei MatePad 11.5 S Kèm Bàn Phím (11.990.000 đ):** Màn hình nhám chống lóa PaperMatte viết như trên giấy thật, kèm sẵn bàn phím thông minh.\n` +
+                    `• 🎨 **iPad Pro 11 inch M4 (26.990.000 đ):** Siêu phẩm chip M4 đỉnh cao, màn hình Ultra Retina XDR Tandem OLED tuyệt mỹ chuyên cho Designer và Creator.\n\n` +
+                    `👉 Bạn dự kiến mức ngân sách khoảng bao nhiêu triệu để mình chọn phiên bản dung lượng phù hợp nhất nhé! 😊`,
+                products: candidates,
+                suggestions: ['Lenovo Tab M11 (Kèm bút)', 'iPad Gen 10 (8.99tr)', 'Huawei MatePad 11.5 S', 'iPad Pro M4'],
+                context: {
+                    ...prev,
+                    category: 'Tablet',
+                    currentIntent: 'feature_showcase',
+                    featureKeyword: 'bút cảm ứng',
+                    useCase: 'học tập & ghi chép',
+                    lastProducts: candidates
+                }
+            };
+        }
+    }
+
+    // 5. Phân loại ĐỒNG HỒ THÔNG MINH: Sức khỏe & GPS / Nghe gọi & Pin trâu
+    if (cat === 'Đồng hồ thông minh' || (!cat && /\b(suc khoe|gps|the thao|chay bo|do tim|nghe goi|thong bao|pin trau)\b/i.test(norm))) {
+        const isHealth = /\b(suc khoe|gps|the thao|chay bo|do tim|tap luyen|nhip tim|spo2)\b/i.test(norm);
+        const isCall = /\b(nghe goi|thong bao|pin trau|pin lau|thoi trang|sang trong)\b/i.test(norm);
+
+        if (isHealth || isCall) {
+            const candidates = await Product.find({
+                category: 'Đồng hồ thông minh',
+                active: { $ne: false },
+                stock: { $gt: 0 },
+                $or: [
+                    { name: /Garmin|Galaxy Watch|Apple Watch|Huawei Fit|Band 9/i },
+                    { description: /GPS|sức khỏe|thể thao|nghe gọi/i }
+                ]
+            }).sort({ price: -1 }).limit(4);
+
+            return {
+                reply: `Dạ chào bạn! Để đồng hành cùng bạn **theo dõi sức khỏe, tập luyện thể thao GPS và nhận cuộc gọi thông minh**, TechEcommerce có những mẫu Smartwatch tiêu biểu:\n\n` +
+                    `• 🏃 **Garmin Forerunner 165 (6.990.000 đ) & Forerunner 55 (4.990.000 đ):** Chuyên gia chạy bộ và thể thao ngoài trời, định vị GPS chuẩn xác, gợi ý bài tập thích ứng và pin 11 - 14 ngày.\n` +
+                    `• 🍎 **Apple Watch Series 10 (10.490.000 đ) & SE (5.990.000 đ):** Đồng bộ hoàn hảo với iPhone, màn hình OLED góc nhìn rộng, nghe gọi loa ngoài cực to rõ và đo ECG nhịp tim.\n` +
+                    `• 💫 **Samsung Galaxy Watch 7 (6.490.000 đ):** Cảm biến BioActive thế hệ mới theo dõi chỉ số cơ thể, AI huấn luyện viên sức khỏe cá nhân.\n` +
+                    `• 🔋 **Huawei Watch Fit 3 (2.790.000 đ) & Xiaomi Band 9 (890.000 đ):** Thiết kế vuông thời thượng, pin cực trâu 7 - 14 ngày liên tục.\n\n` +
+                    `👉 Bạn dùng điện thoại iPhone hay Android, và ưu tiên tập thể thao chuyên sâu hay nghe gọi đàm thoại hàng ngày nhé! 😊`,
+                products: candidates,
+                suggestions: ['Garmin Forerunner 165', 'Apple Watch Series 10', 'Galaxy Watch 7', 'Huawei Fit 3'],
+                context: {
+                    ...prev,
+                    category: 'Đồng hồ thông minh',
+                    currentIntent: 'feature_showcase',
+                    featureKeyword: 'sức khỏe & GPS',
+                    lastProducts: candidates
+                }
+            };
+        }
+    }
+
+    // 6. Phân loại MÁY CHƠI GAME: Cầm tay di động vs Console cắm TV 4K
+    if (cat === 'Máy chơi game' || (!cat && /\b(cam tay|di dong|mang di|du lich|cam tv|tivi|console|4k|ps5|playstation|switch|rog ally|steam deck)\b/i.test(norm))) {
+        const isHandheld = /\b(cam tay|di dong|mang di|du lich|nho gon|switch|rog ally|steam deck|msi claw|legion go)\b/i.test(norm);
+        const isConsole = /\b(cam tv|tivi|console|4k|choi phong khach|ps5|playstation)\b/i.test(norm);
+
+        if (isHandheld || isConsole) {
+            const candidates = await Product.find({
+                category: 'Máy chơi game',
+                active: { $ne: false },
+                stock: { $gt: 0 }
+            }).sort({ price: -1 }).limit(4);
+
+            return {
+                reply: `Dạ chào bạn! Để thỏa mãn niềm đam mê **chiến game đỉnh cao**, TechEcommerce cung cấp đầy đủ cả hai hệ máy chính hãng:\n\n` +
+                    `• 📺 **Hệ Console Cắm TV 4K Đồ Họa Đỉnh Cao:**\n` +
+                    `  - **Sony PlayStation 5 (PS5) Slim Standard (13.490.000 đ):** Đồ họa 4K 120fps Ray Tracing chân thực, ổ SSD siêu tốc tải game tích tắc, tay cầm DualSense phản hồi xúc giác đỉnh cao.\n\n` +
+                    `• 🎮 **Hệ Máy Cầm Tay Di Động (Chơi mọi lúc mọi nơi):**\n` +
+                    `  - **Nintendo Switch OLED (7.490.000 đ) & Switch Lite (4.290.000 đ):** Màn hình OLED rực rỡ, kho game gia đình độc quyền phong phú (Mario, Zelda, Pokemon).\n` +
+                    `  - **ASUS ROG Ally Z1 Extreme (13.990.000 đ) & MSI Claw 8 (19.990.000 đ):** PC Handheld chạy Windows 11 mượt mà, chơi mượt các tựa game AAA từ Steam, Epic Games.\n\n` +
+                    `👉 Bạn thích trải nghiệm cắm màn hình lớn phòng khách cùng người thân hay thích máy nhỏ gọn mang theo di chuyển nhé! 😊`,
+                products: candidates,
+                suggestions: ['PlayStation 5 Slim 4K', 'Nintendo Switch OLED', 'ASUS ROG Ally Z1 Extreme', 'Nintendo Switch Lite'],
+                context: {
+                    ...prev,
+                    category: 'Máy chơi game',
+                    currentIntent: 'feature_showcase',
+                    featureKeyword: 'máy chơi game',
+                    lastProducts: candidates
+                }
+            };
+        }
+    }
     return null;
 }
 
 async function checkUncarriedItemForCategory(message, category) {
     if (!category) return null;
 
-    // Nếu người dùng đang nêu nhu cầu sử dụng hoặc ngành học -> Không phải hỏi thương hiệu lạ
-    if (extractUseCase(message) || extractMajorOrField(message)) {
+    // Nếu người dùng đang nêu nhu cầu sử dụng, ngành học hoặc tiêu chí tính năng -> Tuyệt đối không phải hỏi thương hiệu lạ
+    if (extractUseCase(message) || extractMajorOrField(message) || extractQualificationUseCase(message) || extractQualificationPreference(message)) {
         return null;
     }
 
     const norm = normalizeText(message);
 
     // Bỏ qua nếu tin nhắn chứa các từ khóa tính năng, kiểu dáng, kỹ thuật phổ biến
-    const FEATURE_REGEX = /\b(khong day|co day|bluetooth|chong on|truewireless|true wireless|tws|chup tai|nhet tai|in ear|over ear|on ear|gaming|van phong|ban phim co|phim co|chuot khong day|chuot co day|sac nhanh|pin trau|mong nhe|do hoa|lap trinh|hoc tap|sinh vien|gia re|cao cap|chinh hang|chong nuoc|the thao|dam thoai)\b/i;
+    const FEATURE_REGEX = /\b(khong day|co day|bluetooth|chong on|truewireless|true wireless|tws|chup tai|nhet tai|in ear|over ear|on ear|gaming|game|chien game|cau hinh|hieu nang|chip|ram|sac net|chup anh|quay phim|van phong|ban phim co|phim co|chuot khong day|chuot co day|sac nhanh|pin trau|mong nhe|do hoa|lap trinh|hoc tap|sinh vien|gia re|cao cap|chinh hang|chong nuoc|the thao|dam thoai|re|tot|dep|muot|manh|gia|tien|ngan sach|trieu|tr|chup|quay|camera|man hinh|loa|mic)\b/i;
     if (FEATURE_REGEX.test(norm)) {
         return null;
     }
@@ -3125,6 +3352,7 @@ async function checkUncarriedItemForCategory(message, category) {
     ]);
     const words = stripped.toLowerCase().split(/\s+/);
     if (words.every(w => PROTECTED_TERMS.has(w))) return null;
+    if (words.length > 2) return null; // Thương hiệu lạ chỉ từ 1-2 từ, câu miêu tả dài không phải thương hiệu
 
     // Kiểm tra xem token này có khớp với bất kỳ sản phẩm nào trong kho không
     const count = await Product.countDocuments({
