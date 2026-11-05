@@ -49,7 +49,64 @@ function applyPreGuardrails({ nluResult, rawMessage, context = {} }) {
         };
     }
 
-    // 3. Khóa cờ không cho phép Gemini tự ý hứa giảm giá riêng
+    // 3. Xử lý MẶT HÀNG NGOÀI DANH MỤC (Out of catalog: Thú cưng / Hamster / Gia dụng / Xe cộ...)
+    if (nluResult.entities?.isPetHamster) {
+        return {
+            intercepted: true,
+            action: 'out_of_catalog_pet_hamster',
+            response: {
+                reply: 'Dạ TechEcommerce là cửa hàng chuyên về thiết bị công nghệ chính hãng nên em chưa có chuột hamster hay thú cưng đâu ạ! 🐹\n\nTuy nhiên, nếu bạn đang cần tìm **chuột máy tính** (chuột văn phòng không dây, chuột gaming) để phục vụ học tập và làm việc thì em luôn có sẵn những mẫu rất xịn nhé!',
+                products: [],
+                suggestions: ['Chuột gaming Logitech', 'Chuột văn phòng không dây', 'Xem tất cả phụ kiện', 'Mã giảm giá hôm nay'],
+                context: {
+                    ...(context || {}),
+                    stage: 'out_of_catalog_redirect',
+                    category: 'Phụ kiện',
+                    productType: 'mouse',
+                    lastQuestionKey: 'pet_hamster_redirect'
+                }
+            }
+        };
+    }
+
+    if (nluResult.intents.includes('out_of_catalog')) {
+        return {
+            intercepted: true,
+            action: 'out_of_catalog_general',
+            response: {
+                reply: 'Dạ TechEcommerce chỉ chuyên kinh doanh các thiết bị công nghệ chính hãng (Điện thoại, Laptop, Tablet, Phụ kiện, Máy chơi game...) nên em chưa có mặt hàng này đâu ạ! 🙏 Nếu bạn cần tìm thiết bị công nghệ nào thì cứ bảo em nhé.',
+                products: [],
+                suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Xem Phụ kiện công nghệ', 'Mã giảm giá hôm nay'],
+                context: {
+                    ...(context || {}),
+                    stage: 'out_of_catalog_redirect',
+                    lastQuestionKey: 'out_of_catalog_general'
+                }
+            }
+        };
+    }
+
+    // 4. Xử lý TỪ MƠ HỒ ("chuột" đứng một mình)
+    if (nluResult.intents.includes('clarify_ambiguous_mouse') || nluResult.entities?.isAmbiguousMouse) {
+        return {
+            intercepted: true,
+            action: 'clarify_ambiguous_mouse',
+            response: {
+                reply: 'Dạ bạn đang tìm **chuột máy tính** (như chuột văn phòng không dây hay chuột gaming) để dùng cho máy tính/laptop phải không ạ? Bạn chia sẻ thêm nhu cầu để em gửi mẫu phù hợp nhất nhé! 😊',
+                products: [],
+                suggestions: ['Chuột văn phòng không dây', 'Chuột gaming Logitech', 'Chuột dưới 1 triệu', 'Tất cả chuột máy tính'],
+                context: {
+                    ...(context || {}),
+                    stage: 'qualifying_needs',
+                    category: 'Phụ kiện',
+                    productType: 'mouse',
+                    lastQuestionKey: 'clarify_ambiguous_mouse'
+                }
+            }
+        };
+    }
+
+    // 5. Khóa cờ không cho phép Gemini tự ý hứa giảm giá riêng
     if (nluResult.intents.includes('promotion_negotiation')) {
         context.prohibitUnauthorizedDiscount = true;
     }

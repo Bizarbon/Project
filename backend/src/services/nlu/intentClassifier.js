@@ -5,9 +5,10 @@
 
 const { parseBudget } = require('./budgetParser');
 const { SUPPORTED_BRANDS, SUPPORTED_CATEGORIES } = require('./config');
+const outOfCatalogDict = require('./outOfCatalogDictionary.json');
 
 /**
- * Danh sách 11 nhãn ý định chuẩn:
+ * Danh sách 12 nhãn ý định chuẩn:
  * - product_search
  * - product_compare
  * - price_question
@@ -18,6 +19,8 @@ const { SUPPORTED_BRANDS, SUPPORTED_CATEGORIES } = require('./config');
  * - complaint
  * - smalltalk_offtopic
  * - prompt_injection
+ * - out_of_catalog
+ * - clarify_ambiguous_mouse
  * - unknown
  */
 
@@ -87,7 +90,9 @@ function extractCategory(text) {
     if (/máy chơi game|may choi game|console|playstation|ps5|switch|nintendo switch|rog ally|legion go|claw/i.test(s)) {
         return 'Máy chơi game';
     }
-    if (/chuột|bàn phím|ban phim|củ sạc|cu sac|dây sạc|day sac|cáp|hub usb|gimbal|osmo pocket|phụ kiện|phu kien/i.test(s)) {
+    // Kiểm tra loại trừ nếu là chuột thú cưng / hamster
+    const isPetMouse = /hamster|thú cưng|thu cung|nuôi|nuoi|lồng|long|chuồng|chuong|chuột bạch|chuot bach|chuột lang|chuot lang|bọ ú|bo u/i.test(s);
+    if (!isPetMouse && /chuột|chuot|bàn phím|ban phim|củ sạc|cu sac|dây sạc|day sac|cáp|hub usb|gimbal|osmo pocket|phụ kiện|phu kien/i.test(s)) {
         return 'Phụ kiện';
     }
     return null;
@@ -259,15 +264,62 @@ function classifyIntent(normalizedText, unaccentedText) {
         }
     }
 
-    // 11. Xử lý sản phẩm ngoài danh mục hoặc không xác định (Unknown)
-    const outOfCatalogKeywords = [
-        /tủ lạnh|tu lanh|máy giặt|may giat|điều hòa|dieu hoa|máy lạnh|may lanh|nồi cơm|noi com/i,
-        /xe máy|xe may|ô tô|o to|xe đạp|xe dap|vé máy bay|ve may bay|khách sạn|khach san/i,
-        /quần áo|quan ao|giày dép|giay dep|mỹ phẩm|my pham|thức ăn|thuc an|thực phẩm|thuc pham|sách kinh tế|sach kinh te/i
-    ];
-    if (outOfCatalogKeywords.some(p => p.test(text) || p.test(noAcc))) {
+    // 11. Xử lý sản phẩm ngoài danh mục (Out of catalog / Thú cưng / Hamster)
+    const isPetHamster = /hamster/i.test(text) ||
+        (/chuột|chuot/i.test(text) && /thú cưng|thu cung|nuôi|nuoi|lồng|long|chuồng|chuong|bạch|bach|lang|bọ ú|bo u/i.test(text));
+
+    let isOutOfCatalog = isPetHamster;
+    let outOfCatalogType = isPetHamster ? 'pets' : null;
+
+    if (!isOutOfCatalog) {
+        // Kiểm tra danh từ điển outOfCatalogDictionary.json
+        for (const [groupName, words] of Object.entries(outOfCatalogDict)) {
+            if (groupName === 'pet_indicators') continue;
+            for (const w of words) {
+                const regex = new RegExp(`(^|[^a-zA-Z0-9à-ỹÀ-Ỹ])${w}([^a-zA-Z0-9à-ỹÀ-Ỹ]|$)`, 'i');
+                if (regex.test(text) || regex.test(noAcc)) {
+                    isOutOfCatalog = true;
+                    outOfCatalogType = groupName;
+                    break;
+                }
+            }
+            if (isOutOfCatalog) break;
+        }
+    }
+
+    if (!isOutOfCatalog) {
+        const outOfCatalogKeywords = [
+            /tủ lạnh|tu lanh|máy giặt|may giat|điều hòa|dieu hoa|máy lạnh|may lanh|nồi cơm|noi com/i,
+            /xe máy|xe may|ô tô|o to|xe đạp|xe dap|vé máy bay|ve may bay|khách sạn|khach san/i,
+            /quần áo|quan ao|giày dép|giay dep|mỹ phẩm|my pham|thức ăn|thuc an|thực phẩm|thuc pham|sách kinh tế|sach kinh te/i
+        ];
+        if (outOfCatalogKeywords.some(p => p.test(text) || p.test(noAcc))) {
+            isOutOfCatalog = true;
+            outOfCatalogType = 'general';
+        }
+    }
+
+    if (isOutOfCatalog) {
         detectedIntents.length = 0;
-        detectedIntents.push('unknown');
+        detectedIntents.push('out_of_catalog');
+        detectedIntents.push('unknown'); // Giữ nhãn unknown để đảm bảo tương thích 100% bộ test Giai đoạn A
+        entities.category = null;
+        entities.outOfCatalogType = outOfCatalogType;
+        entities.isPetHamster = isPetHamster;
+        return {
+            intents: detectedIntents,
+            confidence: 0.95,
+            entities
+        };
+    }
+
+    // 12. Kiểm tra từ "chuột" đứng một mình (Mơ hồ giữa chuột máy tính và chuột thú cưng)
+    const isBareMouse = /^(?:chuột|chuot|mua chuột|mua chuot|tìm chuột|tim chuot|xem chuột|xem chuot|chuột máy|chuot may)$/i.test(text.trim());
+    if (isBareMouse && !entities.brand && !entities.budget) {
+        entities.isAmbiguousMouse = true;
+        if (!detectedIntents.includes('clarify_ambiguous_mouse')) {
+            detectedIntents.unshift('clarify_ambiguous_mouse');
+        }
     }
 
     // Nếu vẫn rỗng

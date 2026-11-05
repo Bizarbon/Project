@@ -122,7 +122,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (greetingPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Xin chào bạn! 👋 Mình là Trợ lý Tư vấn Mua sắm AI của TechEcommerce. Bạn đang quan tâm đến sản phẩm công nghệ nào, hoặc có mức ngân sách khoảng bao nhiêu để mình tư vấn chi tiết nhất nhé?',
+            reply: 'Xin chào bạn! 👋 Em là Trợ lý Tư vấn Mua sắm AI của TechEcommerce. Bạn đang quan tâm đến sản phẩm công nghệ nào, hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?',
             suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Đồng hồ thông minh', 'Mã giảm giá hôm nay'],
             context: { stage: 'asking_category' }
         };
@@ -135,7 +135,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (thankPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Dạ không có gì ạ! 😊 Nếu bạn cần tư vấn thêm bất kỳ sản phẩm nào hoặc có thắc mắc gì, cứ nhắn mình nhé!',
+            reply: 'Dạ không có gì ạ! 😊 Nếu bạn cần tư vấn thêm bất kỳ sản phẩm nào hoặc có thắc mắc gì, cứ nhắn em nhé!',
             suggestions: ['Tư vấn sản phẩm mới', 'Mã giảm giá hôm nay', 'Chính sách bảo hành', 'Kiểm tra đơn hàng'],
             context: { stage: 'idle' }
         };
@@ -152,7 +152,7 @@ function detectGreetingOrSmallTalk(text) {
     if (storeInquiryPatterns.some(p => p.test(norm))) {
         return {
             reply: 'Dạ chào bạn! 👋 **TechEcommerce** là hệ sinh thái bán lẻ thiết bị công nghệ chính hãng 100%, bảo hành 1 đổi 1 trong 30 ngày và hỗ trợ trả góp 0% lãi suất.\n\n' +
-                'Hiện tại cửa hàng tụi mình phân phối đầy đủ 7 nhóm sản phẩm công nghệ hàng đầu:\n' +
+                'Hiện tại TechEcommerce phân phối đầy đủ 7 nhóm sản phẩm công nghệ hàng đầu:\n' +
                 '• 📱 **Điện thoại:** iPhone (Apple), Samsung Galaxy, Xiaomi, POCO, OPPO, HONOR.\n' +
                 '• 💻 **Laptop & MacBook:** MacBook Air/Pro, Asus ROG Strix, Acer Nitro, Lenovo, Dell, HP.\n' +
                 '• 📲 **Tablet (Máy tính bảng):** iPad Pro M4, iPad Air, iPad Gen 10, Samsung Galaxy Tab, Surface Pro.\n' +
@@ -160,7 +160,7 @@ function detectGreetingOrSmallTalk(text) {
                 '• 🎮 **Máy chơi game:** Sony PS5 Slim, Nintendo Switch OLED/Lite, ASUS ROG Ally, MSI Claw, Legion Go.\n' +
                 '• 🎧 **Tai nghe cao cấp:** Apple AirPods, Samsung Galaxy Buds 3 Pro, Marshall, Sony chống ồn.\n' +
                 '• 🔌 **Phụ kiện & Đồ chơi công nghệ:** Củ sạc nhanh Anker, Hub Ugreen, Gimbal DJI Pocket 3, Chuột & Bàn phím Logitech.\n\n' +
-                '👉 Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách dự kiến bao nhiêu để mình tư vấn chi tiết cho bạn nhé! 😊',
+                '👉 Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách dự kiến bao nhiêu để em tư vấn chi tiết cho bạn nhé! 😊',
             suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Tablet & iPad', 'Mã giảm giá hôm nay'],
             context: { stage: 'asking_category' }
         };
@@ -174,7 +174,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (smallTalkPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Mình là Trợ lý AI Mua sắm của **TechEcommerce** – cửa hàng chuyên phân phối chính hãng 100% các sản phẩm công nghệ: 📱 Điện thoại, 💻 Laptop, 📲 Tablet, ⌚ Đồng hồ thông minh, 🎮 Máy chơi game, 🎧 Tai nghe và Phụ kiện.\n\nMình có thể giúp bạn:\n• Tìm kiếm và tư vấn sản phẩm theo ngân sách\n• So sánh cấu hình chi tiết\n• Tra cứu mã giảm giá, tính trả góp 0%\n• Kiểm tra đơn hàng và chính sách bảo hành\n\nBạn cần hỗ trợ gì hôm nay?',
+            reply: 'Em là Trợ lý AI Mua sắm của **TechEcommerce** – cửa hàng chuyên phân phối chính hãng 100% các sản phẩm công nghệ: 📱 Điện thoại, 💻 Laptop, 📲 Tablet, ⌚ Đồng hồ thông minh, 🎮 Máy chơi game, 🎧 Tai nghe và Phụ kiện.\n\nEm có thể hỗ trợ bạn:\n• Tìm kiếm và tư vấn sản phẩm theo ngân sách\n• So sánh cấu hình chi tiết\n• Tra cứu mã giảm giá, tính trả góp 0%\n• Kiểm tra đơn hàng và chính sách bảo hành\n\nBạn cần hỗ trợ gì hôm nay?',
             suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Mã giảm giá hôm nay', 'Kiểm tra đơn hàng'],
             context: { stage: 'asking_category' }
         };
@@ -186,7 +186,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (byePatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Cảm ơn bạn đã ghé thăm TechEcommerce! 🙏 Chúc bạn một ngày tốt lành, hẹn gặp lại! Nếu cần tư vấn bất kỳ lúc nào, mình luôn sẵn sàng hỗ trợ nhé! 😊',
+            reply: 'Cảm ơn bạn đã ghé thăm TechEcommerce! 🙏 Chúc bạn một ngày tốt lành, hẹn gặp lại! Nếu cần tư vấn bất kỳ lúc nào, em luôn sẵn sàng hỗ trợ nhé! 😊',
             suggestions: ['Tư vấn sản phẩm', 'Mã giảm giá', 'Kiểm tra đơn hàng'],
             context: { stage: 'idle' }
         };
@@ -201,7 +201,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (vaguePatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Chào bạn! Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để mình tư vấn chi tiết nhất nhé?',
+            reply: 'Chào bạn! Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?',
             suggestions: [
                 'Tư vấn Laptop',
                 'Tư vấn Điện thoại',
@@ -541,7 +541,7 @@ async function evaluateUpgradeVsNew(message, context = {}, user = null) {
         `• **${budgetOffice?.name || 'Lenovo IdeaPad Slim 3'}** - **${money(budgetOffice?.price)}**: Giải pháp mỏng nhẹ kinh tế, RAM 16GB, SSD 512GB mượt mà cho học tập & làm việc.\n` +
         (midLaptop ? `• **${midLaptop.name}** - **${money(midLaptop.price)}**: Màn hình rõ nét, hiệu năng ổn định, độ bền cao.\n` : '') +
         (premiumLaptop ? `• **${premiumLaptop.name}** - **${money(premiumLaptop.price)}**: Chuẩn mực mỏng nhẹ, pin hãng công bố tới 18h (thực tế hỗn hợp khoảng 10-14h), màn Liquid Retina cho lập trình & đồ họa.\n\n` : '\n') +
-        `👉 Cửa hàng có hỗ trợ **Trả góp 0% lãi suất** qua thẻ tín dụng và đối tác tài chính (trả trước từ 30%). Bạn chia sẻ thêm về cấu hình máy cũ để mình tư vấn sát nhất nhé!`;
+        `👉 Cửa hàng có hỗ trợ **Trả góp 0% lãi suất** qua thẻ tín dụng và đối tác tài chính (trả trước từ 30%). Bạn chia sẻ thêm về cấu hình máy cũ để em tư vấn sát nhất nhé!`;
 
     return {
         reply,
@@ -580,10 +580,10 @@ async function answerComparison(message, context = {}) {
 
     // Nếu không tách được trực tiếp từ câu hỏi, ưu tiên lấy 2 sản phẩm gần nhất trong context
     if ((!p1 || !p2 || String(p1._id) === String(p2._id)) && Array.isArray(context?.lastProducts) && context.lastProducts.length >= 2) {
-        const id1 = context.lastProducts[0]._id || context.lastProducts[0];
-        const id2 = context.lastProducts[1]._id || context.lastProducts[1];
-        p1 = await Product.findOne({ _id: id1, active: { $ne: false } });
-        p2 = await Product.findOne({ _id: id2, active: { $ne: false } });
+        const id1 = context.lastProducts[0]._id || context.lastProducts[0].id || (typeof context.lastProducts[0] === 'number' || typeof context.lastProducts[0] === 'string' ? context.lastProducts[0] : null);
+        const id2 = context.lastProducts[1]._id || context.lastProducts[1].id || (typeof context.lastProducts[1] === 'number' || typeof context.lastProducts[1] === 'string' ? context.lastProducts[1] : null);
+        if (id1) p1 = await Product.findOne({ _id: id1, active: { $ne: false } });
+        if (id2) p2 = await Product.findOne({ _id: id2, active: { $ne: false } });
     }
 
     // Nếu vẫn chưa đủ, tìm 2 sản phẩm nổi bật cùng danh mục
@@ -662,7 +662,7 @@ async function answerComparison(message, context = {}) {
         `👉 **Nên chọn ${p1.name} KHI:** ${conclusionP1}\n` +
         `👉 **Nên chọn ${p2.name} KHI:** ${conclusionP2}\n\n` +
         `🛡️ **QUYỀN LỢI ĐẢM BẢO KHI MUA TẠI TECHECOMMERCE:**\n` +
-        `• Hàng chính hãng mới 100% nguyên seal, bảo hành chính hãng toàn quốc.\n` +
+        `• Hàng chính hãng mới 100%, bảo hành chính hãng toàn quốc.\n` +
         `• Lỗi 1 đổi 1 trong 30 ngày đầu tiên nếu có lỗi kỹ thuật.\n` +
         `• Hỗ trợ trả góp 0% lãi suất — xét duyệt nhanh chỉ 3 phút.\n\n` +
         `Bạn có thể bấm **"Chọn máy này"** trên bảng hoặc bấm **"+ Giỏ"** ngay bên dưới để đặt mua nhé!`;
@@ -789,7 +789,7 @@ async function evaluateGameOrTaskCapability(message, context = {}) {
                 reply: `🎮 **TƯ VẤN CẤU HÌNH CHIẾN GAME & ĐỒ HỌA MƯỢT MÀ:**\n\n` +
                     `Để chơi tốt các tựa game như Genshin Impact, Valorant, CS2 hay dựng phim Capcut / Premiere 4K, bạn nên chọn các dòng máy có **Card đồ họa rời NVIDIA GeForce RTX** và hệ thống tản nhiệt kép.\n\n` +
                     `Dưới đây là các mẫu máy tối ưu nhất đang có sẵn tại kho cửa hàng:\n\n${list}\n\n` +
-                    `👉 Bạn đang quan tâm mức ngân sách khoảng bao nhiêu triệu để mình tư vấn chi tiết cấu hình và mức FPS thực tế nhé! 😊`,
+                    `👉 Bạn đang quan tâm mức ngân sách khoảng bao nhiêu triệu để em tư vấn chi tiết cấu hình và mức FPS thực tế nhé! 😊`,
                 products: matched,
                 suggestions: matched.map(p => `Xem chi tiết ${p.name.replace(/(Laptop|Điện thoại)\s*/gi, '').slice(0, 18)}`)
             };
@@ -874,8 +874,8 @@ async function answerOrderQuestion(req, message) {
     if (!orders.length) {
         return {
             reply: orderId
-                ? `Mình chưa tìm thấy đơn #${orderId} trong tài khoản của bạn. Bạn kiểm tra lại mã đơn hoặc vào mục Đơn hàng của tôi để xem danh sách đầy đủ nhé.`
-                : 'Tài khoản của bạn hiện chưa có đơn hàng nào. Bạn có thể nói nhu cầu mua sắm, mình sẽ gợi ý sản phẩm phù hợp.',
+                ? `Em chưa tìm thấy đơn #${orderId} trong tài khoản của bạn. Bạn kiểm tra lại mã đơn hoặc vào mục Đơn hàng của tôi để xem danh sách đầy đủ nhé.`
+                : 'Tài khoản của bạn hiện chưa có đơn hàng nào. Bạn có thể nói nhu cầu mua sắm, em sẽ gợi ý sản phẩm phù hợp.',
             suggestions: ['Tư vấn laptop học tập', 'Gợi ý điện thoại chụp ảnh', 'Sản phẩm đang còn hàng']
         };
     }
@@ -1260,8 +1260,8 @@ async function answerProductQuestion(message, user, previousContext = {}) {
 
         if (cat === 'Laptop') {
             question = prev.budget
-                ? `Dạ rất rõ ràng ạ! Với nhu cầu **${useCase}** trong khoảng ngân sách **${money(prev.budget)}**, bạn có ưu tiên thêm yếu tố nào sau đây không để mình chọn dòng máy vừa vặn nhất cho bạn?`
-                : `Dạ rất rõ ràng ạ! Với nhu cầu **${useCase}**, bạn có ưu tiên thêm yếu tố nào sau đây (như kích thước màn hình hay độ mỏng nhẹ khi di chuyển) không để mình chọn dòng máy vừa vặn nhất cho bạn?`;
+                ? `Dạ rất rõ ràng ạ! Với nhu cầu **${useCase}** trong khoảng ngân sách **${money(prev.budget)}**, bạn có ưu tiên thêm yếu tố nào sau đây không để em chọn dòng máy phù hợp nhất cho bạn?`
+                : `Dạ rất rõ ràng ạ! Với nhu cầu **${useCase}**, bạn có ưu tiên thêm yếu tố nào sau đây (như kích thước màn hình hay độ mỏng nhẹ khi di chuyển) không để em chọn dòng máy phù hợp nhất cho bạn?`;
             suggestions = [
                 'Mỏng nhẹ, pin trâu (14 inch)',
                 'Màn hình lớn 15.6 inch',
@@ -1378,11 +1378,11 @@ async function answerProductQuestion(message, user, previousContext = {}) {
         const downPayment = Math.round((lowestLaptop?.price || 13990000) * 0.3);
         const monthlyInstallment = Math.round(((lowestLaptop?.price || 13990000) - downPayment) / 12);
 
-        const reply = `Dạ hiện tại TechEcommerce **chuyên phân phối 100% laptop mới chính hãng nguyên seal** với tiêu chuẩn bảo hành 12 - 24 tháng. Mẫu laptop chính hãng có giá tốt nhất tại cửa hàng hiện là **${lowestLaptop?.name || 'Lenovo IdeaPad Slim 3 14 inch'}** với mức giá **${money(lowestLaptop?.price || 13990000)}**.\n\n` +
-            `Với mức ngân sách **${money(budget)}**, mình xin đề xuất 2 giải pháp tối ưu cho bạn:\n\n` +
+        const reply = `Dạ hiện tại TechEcommerce **chuyên phân phối 100% laptop mới chính hãng** với tiêu chuẩn bảo hành 12 - 24 tháng. Mẫu laptop chính hãng có giá tốt nhất tại cửa hàng hiện là **${lowestLaptop?.name || 'Lenovo IdeaPad Slim 3 14 inch'}** với mức giá **${money(lowestLaptop?.price || 13990000)}**.\n\n` +
+            `Với mức ngân sách **${money(budget)}**, em xin đề xuất 2 giải pháp tối ưu cho bạn:\n\n` +
             `1. 💳 **Mua trả góp 0% lãi suất:** Bạn chỉ cần trả trước khoảng 30% (tương đương **${money(downPayment)}**), số tiền còn lại chia nhỏ trả góp chỉ khoảng **${money(monthlyInstallment)}/tháng** với thủ tục duyệt CCCD chỉ 15 phút.\n` +
             `2. 📲 **Tham khảo Máy tính bảng chính hãng:** Nếu nhu cầu chủ yếu là học online, xem tài liệu PDF và lướt web, các dòng tablet trong kho như **${tablets[0]?.name || 'HONOR Pad 10'}** (${money(tablets[0]?.price)}) hoàn toàn đáp ứng tốt trong tầm ngân sách.\n\n` +
-            `👉 Bạn có muốn mình tính chi tiết bảng trả góp 0% cho mẫu laptop trên, hay xem các dòng máy tính bảng giá tiết kiệm không ạ?`;
+            `👉 Bạn có muốn em tính chi tiết bảng trả góp 0% cho mẫu laptop trên, hay xem các dòng máy tính bảng giá tiết kiệm không ạ?`;
 
         const returnProducts = [lowestLaptop, ...tablets].filter(Boolean);
         return {
@@ -1536,7 +1536,7 @@ async function answerProductQuestion(message, user, previousContext = {}) {
         if (category === 'Máy chơi game') {
             const reply = budget
                 ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn đang tìm máy chơi game phục vụ trải nghiệm nào là chính ạ?`
-                : `Chào bạn! Để mình tư vấn thiết bị chơi game phù hợp nhất, bạn đang tìm máy chơi game phục vụ trải nghiệm nào là chính ạ?`;
+                : `Chào bạn! Để em tư vấn thiết bị chơi game phù hợp nhất, bạn đang tìm máy chơi game phục vụ trải nghiệm nào là chính ạ?`;
             const suggestions = [
                 'Máy chơi game cầm tay linh hoạt',
                 'Đồ họa 4K đỉnh cao (PS5)',
@@ -1559,7 +1559,7 @@ async function answerProductQuestion(message, user, previousContext = {}) {
         if (category === 'Phụ kiện') {
             const reply = budget
                 ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn đang quan tâm loại phụ kiện nào (như bàn phím máy tính, chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) ạ?`
-                : `Chào bạn! Với danh mục Phụ kiện, bạn đang quan tâm loại sản phẩm nào (như bàn phím máy tính, chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) để mình tư vấn mẫu tốt nhất nhé?`;
+                : `Chào bạn! Với danh mục Phụ kiện, bạn đang quan tâm loại sản phẩm nào (như bàn phím máy tính, chuột máy tính, pin sạc dự phòng, củ sạc nhanh hay hub chuyển đổi) để em tư vấn mẫu tốt nhất nhé?`;
             const suggestions = [
                 'Bàn phím cơ & không dây',
                 'Chuột không dây & gaming',
@@ -1620,7 +1620,7 @@ async function answerProductQuestion(message, user, previousContext = {}) {
 
     // Nếu không có danh mục cụ thể và câu hỏi rất chung (ví dụ "tư vấn mua hàng", "gợi ý sản phẩm")
     if (!category && !useCase && !budget) {
-        const reply = `Chào bạn! Mình là Trợ lý Tư vấn Mua sắm AI của TechEcommerce. Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để mình tư vấn chi tiết nhất nhé?`;
+        const reply = `Chào bạn! Em là Trợ lý Tư vấn Mua sắm AI của TechEcommerce. Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?`;
         const suggestions = [
             'Tư vấn laptop 15 triệu',
             'Tư vấn điện thoại',
@@ -1737,7 +1737,7 @@ async function answerPolicyQuestion(message) {
     // 3. Chính sách bảo hành & Đổi mới 1-1
     if (text.includes('bao hanh') || text.includes('doi tra') || text.includes('hoan tra') || text.includes('tra hang') || text.includes('loi 1 doi 1')) {
         return '🛡️ **CHÍNH SÁCH BẢO HÀNH & ĐỔI TRẢ CHÍNH HÃNG:**\n\n' +
-            '• 🏆 **Cam kết 100% chính hãng:** Toàn bộ sản phẩm là máy mới nguyên seal, có hóa đơn VAT và bảo hành điện tử chính hãng từ 12 - 24 tháng.\n' +
+            '• 🏆 **Cam kết 100% chính hãng:** Toàn bộ sản phẩm là hàng mới chính hãng, có hóa đơn VAT và bảo hành điện tử chính hãng từ 12 - 24 tháng.\n' +
             '• 🔄 **Lỗi 1 đổi 1 trong 30 ngày:** Đổi ngay máy mới cùng model nếu phát sinh lỗi phần cứng do nhà sản xuất (màn hình, nguồn, mainboard...).\n' +
             '• 🛠️ **Trung tâm bảo hành toàn quốc:** Tiếp nhận bảo hành tại tất cả các Trung tâm bảo hành ủy quyền (Apple Care, Samsung Service, ASUS, Dell, HP, Lenovo...) hoặc tiếp nhận trực tiếp tại Showroom của shop.\n' +
             '• 🚚 **Tiếp nhận bảo hành tận nơi:** Cửa hàng hỗ trợ gửi ship nhận bảo hành 2 chiều hoàn toàn miễn phí cho khách hàng ở xa.';
@@ -2200,7 +2200,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             };
         } else {
             response = await coordinateConsultation({ message, user: req.user, context: req.body.context });
-            if (!response || response.isFallback || response.notFound || response.context?.stage === 'out_of_catalog') {
+            if (!response || !response.reply) {
                 const openReply = await askGeminiOpenChat(message, req.body.context);
                 if (openReply) {
                     response = {

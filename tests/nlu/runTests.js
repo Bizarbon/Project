@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const nlu = require('../../backend/src/services/nlu');
 
-function runAllTests() {
+async function runAllTests() {
     const testCasesPath = path.join(__dirname, 'testCases.json');
     if (!fs.existsSync(testCasesPath)) {
         console.error('Không tìm thấy file test cases tại:', testCasesPath);
@@ -17,7 +17,7 @@ function runAllTests() {
 
     const testCases = JSON.parse(fs.readFileSync(testCasesPath, 'utf-8'));
     console.log(`\n======================================================`);
-    console.log(`🚀 BẮT ĐẦU CHẠY BỘ KIỂM THỬ NLU (${testCases.length} CÂU HỎI TIẾNG VIỆT)`);
+    console.log(`🚀 BẮT ĐẦU CHẠY BỘ KIỂM THỬ NLU GIAI ĐOẠN A (${testCases.length} CÂU HỎI TIẾNG VIỆT)`);
     console.log(`======================================================\n`);
 
     const groupStats = {};
@@ -42,7 +42,7 @@ function runAllTests() {
                 budgetMatched = result.entities.budget === null;
             } else {
                 const target = result.entities.budget ? (result.entities.budget.target || result.entities.budget.max) : null;
-                // Dung sai cho phép ±10% nếu là phép xấp xỉ
+                // Dung sai cho phép ±15% nếu là phép xấp xỉ
                 budgetMatched = target !== null && Math.abs(target - tc.expectedBudget) <= (tc.expectedBudget * 0.15);
             }
         }
@@ -87,7 +87,7 @@ function runAllTests() {
     }
 
     // In bảng thống kê theo từng nhóm
-    console.log(`📊 BẢNG TỶ LỆ ĐÚNG THEO TỪNG NHÓM:`);
+    console.log(`📊 BẢNG TỶ LỆ ĐÚNG THEO TỪNG NHÓM (ĐƠN LƯỢT):`);
     console.log(`---------------------------------------------------------------------------------`);
     console.log(`| STT | Nhóm Kiểm Thử (Group)        | Số Câu | Đúng | Tỷ Lệ Đạt  | Trạng Thái     |`);
     console.log(`---------------------------------------------------------------------------------`);
@@ -113,7 +113,7 @@ function runAllTests() {
     console.log(`---------------------------------------------------------------------------------`);
 
     const overallRate = ((totalPassed / testCases.length) * 100).toFixed(1);
-    console.log(`\n🏆 TỔNG KẾT: ${totalPassed}/${testCases.length} CÂU ĐẠT (${overallRate}% CHÍNH XÁC)\n`);
+    console.log(`\n🏆 TỔNG KẾT PHẦN 1: ${totalPassed}/${testCases.length} CÂU ĐẠT (${overallRate}% CHÍNH XÁC)\n`);
 
     if (failures.length > 0) {
         console.log(`❌ DANH SÁCH ${failures.length} CÂU CHƯA ĐẠT:`);
@@ -123,16 +123,141 @@ function runAllTests() {
             console.log(`    + Thực tế:`, JSON.stringify(f.actual));
         });
         console.log('');
-    } else {
-        console.log(`🎉 TẤT CẢ CÁC TEST CASES ĐÃ ĐẠT 100%!\n`);
     }
 
-    if (totalPassed === testCases.length) {
+    // =========================================================================
+    // PHẦN 2: KIỂM THỬ HỒI QUY HỘI THOẠI NHIỀU LƯỢT (MULTI-TURN REGRESSION SUITE)
+    // =========================================================================
+    const multiTurnPath = path.join(__dirname, 'multiTurnTestCases.json');
+    let multiPassed = 0;
+    let multiTotal = 0;
+    const multiFailures = [];
+
+    if (fs.existsSync(multiTurnPath)) {
+        const multiCases = JSON.parse(fs.readFileSync(multiTurnPath, 'utf-8'));
+        multiTotal = multiCases.length;
+        console.log(`================================================================`);
+        console.log(`🔄 BẮT ĐẦU CHẠY KIỂM THỬ HỒI QUY HỘI THOẠI NHIỀU LƯỢT (${multiTotal} CA KIỂM CHỨNG)`);
+        console.log(`================================================================\n`);
+
+        for (const tc of multiCases) {
+            try {
+                const res = await fetch('http://localhost:5000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: tc.input,
+                        context: tc.context || {}
+                    })
+                });
+
+                if (!res.ok) {
+                    throw new Error(`API HTTP Error: ${res.status}`);
+                }
+
+                const data = await res.json();
+                const reply = data.reply || '';
+                const suggestions = data.suggestions || [];
+                const products = data.products || [];
+                const context = data.context || {};
+
+                let passed = true;
+                const reasons = [];
+
+                // 1. Kiểm tra các cụm từ BẮT BUỘC có trong reply
+                if (tc.expected.replyMustInclude) {
+                    for (const phrase of tc.expected.replyMustInclude) {
+                        if (!reply.toLowerCase().includes(phrase.toLowerCase())) {
+                            passed = false;
+                            reasons.push(`Thiếu cụm từ bắt buộc: "${phrase}"`);
+                        }
+                    }
+                }
+
+                // 2. Kiểm tra các cụm từ CẤM có trong reply (chống xưng hô sai, chống hứa suông)
+                if (tc.expected.replyMustNotInclude) {
+                    for (const phrase of tc.expected.replyMustNotInclude) {
+                        if (reply.toLowerCase().includes(phrase.toLowerCase())) {
+                            passed = false;
+                            reasons.push(`Chứa cụm từ bị cấm: "${phrase}"`);
+                        }
+                    }
+                }
+
+                // 3. Kiểm tra suggestions không chứa cụm từ vô lý (vd giá 10tr cho chuột)
+                if (tc.expected.suggestionsMustNotInclude) {
+                    for (const phrase of tc.expected.suggestionsMustNotInclude) {
+                        const hasForbidden = suggestions.some(s => s.toLowerCase().includes(phrase.toLowerCase()));
+                        if (hasForbidden) {
+                            passed = false;
+                            reasons.push(`Suggestions chứa mốc bị cấm: "${phrase}"`);
+                        }
+                    }
+                }
+
+                // 4. Kiểm tra chống lặp lại slot questionKey cũ
+                if (tc.expected.notRepeatQuestionKey) {
+                    if (context.lastQuestionKey === tc.expected.notRepeatQuestionKey) {
+                        passed = false;
+                        reasons.push(`Lặp lại questionKey cũ: "${tc.expected.notRepeatQuestionKey}"`);
+                    }
+                }
+
+                // 5. Kiểm tra số lượng sản phẩm trả về
+                if (tc.expected.productsMinCount !== undefined) {
+                    if (products.length < tc.expected.productsMinCount) {
+                        passed = false;
+                        reasons.push(`Số sản phẩm trả về (${products.length}) ít hơn yêu cầu (${tc.expected.productsMinCount})`);
+                    }
+                }
+
+                if (tc.expected.productsMaxCount !== undefined) {
+                    if (products.length > tc.expected.productsMaxCount) {
+                        passed = false;
+                        reasons.push(`Số sản phẩm trả về (${products.length}) vượt quá mức cho phép (${tc.expected.productsMaxCount})`);
+                    }
+                }
+
+                if (passed) {
+                    multiPassed++;
+                    console.log(`  ✅ [ID #${tc.id} - ${tc.group}] ${tc.title}`);
+                } else {
+                    multiFailures.push({
+                        id: tc.id,
+                        group: tc.group,
+                        title: tc.title,
+                        reasons,
+                        replyPreview: reply.slice(0, 100) + '...'
+                    });
+                    console.log(`  ❌ [ID #${tc.id} - ${tc.group}] ${tc.title}`);
+                    reasons.forEach(r => console.log(`     -> ${r}`));
+                }
+            } catch (err) {
+                multiFailures.push({
+                    id: tc.id,
+                    group: tc.group,
+                    title: tc.title,
+                    reasons: [`Lỗi kết nối / thực thi: ${err.message}`]
+                });
+                console.log(`  ❌ [ID #${tc.id} - ${tc.group}] ${tc.title} -> ${err.message}`);
+            }
+        }
+
+        const multiRate = ((multiPassed / multiTotal) * 100).toFixed(1);
+        console.log(`\n🏆 TỔNG KẾT PHẦN 2 (KIỂM THỬ HỒI QUY): ${multiPassed}/${multiTotal} CA ĐẠT (${multiRate}% THÀNH CÔNG)\n`);
+    }
+
+    const allPassed = failures.length === 0 && multiFailures.length === 0;
+    if (allPassed) {
+        console.log(`🎉 CHÚC MỪNG: TOÀN BỘ ${testCases.length + multiTotal} TEST CASES ĐÃ ĐẠT 100% HOÀN HẢO!\n`);
         process.exit(0);
     } else {
+        console.log(`⚠️ CÒN ${failures.length + multiFailures.length} TEST CASES CẦN ĐIỀU CHỈNH.\n`);
         process.exit(1);
     }
 }
 
-runAllTests();
-
+runAllTests().catch(err => {
+    console.error('Lỗi thực thi kiểm thử:', err);
+    process.exit(1);
+});

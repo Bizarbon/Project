@@ -1,0 +1,229 @@
+[
+  {
+    "id": 101,
+    "group": "multi_turn_anti_loop",
+    "title": "Chống lặp: Bot đã hỏi slot chuột, khách trả lời lạc (chuột hamster) -> bot giải thích hóm hỉnh, không lặp câu hỏi",
+    "input": "chuột hamster",
+    "context": {
+      "category": "Phụ kiện",
+      "productType": "mouse",
+      "stage": "qualifying_needs",
+      "lastQuestionKey": "qualifying_mouse",
+      "askedSlots": ["qualifying_mouse"],
+      "repeatCount": 0
+    },
+    "expected": {
+      "replyMustInclude": ["chưa có chuột hamster", "chuột máy tính"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "máy vừa vặn nhất", "nguyên seal 100%"],
+      "notRepeatQuestionKey": "qualifying_mouse"
+    }
+  },
+  {
+    "id": 102,
+    "group": "multi_turn_anti_loop",
+    "title": "Chống lặp: Bot đã hỏi slot chuột, khách lặp lại câu mơ hồ -> bot nói chưa hiểu rõ ý và trả về sản phẩm thật",
+    "input": "chưa biết nữa",
+    "context": {
+      "category": "Phụ kiện",
+      "productType": "mouse",
+      "stage": "qualifying_needs",
+      "lastQuestionKey": "qualifying_mouse",
+      "askedSlots": ["qualifying_mouse"],
+      "repeatCount": 1
+    },
+    "expected": {
+      "replyMustInclude": ["chưa nắm rõ", "chuột máy tính"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "máy vừa vặn nhất"],
+      "productsMinCount": 2,
+      "notRepeatQuestionKey": "qualifying_mouse"
+    }
+  },
+  {
+    "id": 103,
+    "group": "multi_turn_anti_loop",
+    "title": "Chống lặp: Bot đã hỏi slot điện thoại, khách hỏi chung chung -> bot không lặp lại nguyên văn mà gợi ý sản phẩm bán chạy",
+    "input": "chưa biết chọn sao",
+    "context": {
+      "category": "Điện thoại",
+      "stage": "asking_needs",
+      "lastQuestionKey": "clarify_needs_Điện thoại",
+      "askedSlots": ["clarify_needs_Điện thoại"],
+      "repeatCount": 1
+    },
+    "expected": {
+      "replyMustInclude": ["chưa hiểu rõ ý cụ thể", "bán chạy và được ưa chuộng"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "Để mình tư vấn"],
+      "productsMinCount": 2,
+      "notRepeatQuestionKey": "clarify_needs_Điện thoại"
+    }
+  },
+  {
+    "id": 104,
+    "group": "store_overview",
+    "title": "Hỏi danh mục cửa hàng sau khi đang ở danh mục điện thoại -> bot giới thiệu tổng quan 7 danh mục",
+    "input": "shop bạn bán những gì",
+    "context": {
+      "category": "Điện thoại",
+      "lastQuestionKey": "clarify_needs_Điện thoại"
+    },
+    "expected": {
+      "replyMustInclude": ["Điện thoại", "Laptop", "Tablet", "Đồng hồ thông minh", "Máy chơi game", "Tai nghe", "Phụ kiện"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "Mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu"],
+      "notRepeatQuestionKey": "clarify_needs_Điện thoại"
+    }
+  },
+  {
+    "id": 105,
+    "group": "multi_turn_spec",
+    "title": "Khách nêu tiêu chí 'cấu hình mạnh chiến game' -> bot hiểu đúng nhu cầu gaming, không xem là tên thương hiệu lạ",
+    "input": "Cấu hình mạnh chiến game",
+    "context": {
+      "category": "Điện thoại",
+      "lastQuestionKey": "clarify_needs_Điện thoại"
+    },
+    "expected": {
+      "replyMustInclude": ["chiến game", "cấu hình"],
+      "replyMustNotInclude": ["chưa phân phối dòng sản phẩm Cấu Hình Mạnh Chiến Game", "tụi mình", "chúng mình"],
+      "productsMinCount": 1
+    }
+  },
+  {
+    "id": 106,
+    "group": "multi_turn_spec",
+    "title": "Khách nêu tiêu chí 'chụp ảnh quay phim sắc nét' -> bot gợi ý flagship camera, không lặp lại câu chào",
+    "input": "Chụp ảnh quay phim sắc nét",
+    "context": {
+      "category": "Điện thoại",
+      "lastQuestionKey": "clarify_needs_Điện thoại"
+    },
+    "expected": {
+      "replyMustInclude": ["chụp ảnh", "quay phim"],
+      "replyMustNotInclude": ["Mức ngân sách dự kiến của bạn khoảng bao nhiêu triệu?\n2. Bạn ưu tiên tiêu chí", "tụi mình", "chúng mình"],
+      "productsMinCount": 1
+    }
+  },
+  {
+    "id": 107,
+    "group": "out_of_catalog",
+    "title": "Từ ngoài danh mục: 'chuột hamster' ngay lượt đầu -> bot nhận diện thú cưng, giải thích hóm hỉnh",
+    "input": "chuột hamster",
+    "context": {},
+    "expected": {
+      "replyMustInclude": ["chưa có chuột hamster hay thú cưng", "chuột máy tính"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "nguyên seal 100%"],
+      "productsMaxCount": 0
+    }
+  },
+  {
+    "id": 108,
+    "group": "out_of_catalog",
+    "title": "Từ ngoài danh mục: 'mua cho em cái lồng hamster' -> bot nhận diện phụ kiện thú cưng",
+    "input": "mua cho em cái lồng hamster",
+    "context": {},
+    "expected": {
+      "replyMustInclude": ["chưa có chuột hamster hay thú cưng", "chuột máy tính"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình"],
+      "productsMaxCount": 0
+    }
+  },
+  {
+    "id": 109,
+    "group": "out_of_catalog",
+    "title": "Từ ngoài danh mục: 'shop có bán xe máy sh không' -> bot lịch sự hướng dẫn chuyên đồ công nghệ",
+    "input": "shop có bán xe máy sh không",
+    "context": {},
+    "expected": {
+      "replyMustInclude": ["thiết bị công nghệ chính hãng", "chưa có mặt hàng này"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình"]
+    }
+  },
+  {
+    "id": 110,
+    "group": "out_of_catalog",
+    "title": "Từ ngoài danh mục: 'ở đây có bán váy đầm không' -> bot nhận diện thời trang không kinh doanh",
+    "input": "ở đây có bán váy đầm không",
+    "context": {},
+    "expected": {
+      "replyMustInclude": ["thiết bị công nghệ chính hãng"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình"]
+    }
+  },
+  {
+    "id": 111,
+    "group": "ambiguous_term",
+    "title": "Từ mơ hồ: 'chuột' đứng một mình -> bot hỏi lại một câu ngắn xác nhận chuột văn phòng hay gaming",
+    "input": "chuột",
+    "context": {},
+    "expected": {
+      "replyMustInclude": ["chuột máy tính", "chuột văn phòng", "chuột gaming"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "máy vừa vặn nhất"],
+      "suggestionsMustNotInclude": ["10 triệu", "20 triệu"]
+    }
+  },
+  {
+    "id": 112,
+    "group": "category_chips",
+    "title": "Chip gợi ý phụ kiện: 'chuột gaming dưới 1 triệu' -> mốc giá phụ kiện hợp lý, không có mốc chục triệu",
+    "input": "chuột gaming dưới 1 triệu",
+    "context": {},
+    "expected": {
+      "replyMustNotInclude": ["tụi mình", "chúng mình"],
+      "suggestionsMustNotInclude": ["chuột máy tính 10 - 20 triệu", "chuột máy tính trên 20 triệu"],
+      "productsMinCount": 1
+    }
+  },
+  {
+    "id": 113,
+    "group": "category_chips",
+    "title": "Chip gợi ý bàn phím: 'bàn phím cơ' -> gợi ý bàn phím cơ/văn phòng, không có mốc chục triệu của laptop",
+    "input": "tư vấn bàn phím cơ",
+    "context": {},
+    "expected": {
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "máy vừa vặn nhất"],
+      "suggestionsMustNotInclude": ["dưới 15 triệu", "15 - 25 triệu"]
+    }
+  },
+  {
+    "id": 114,
+    "group": "persona_consistency",
+    "title": "Xưng hô nhất quán: Bot xưng 'em', gọi khách 'bạn', tuyệt đối không xưng 'mình' hay 'tụi mình'",
+    "input": "laptop 15tr học online",
+    "context": {},
+    "expected": {
+      "replyMustInclude": ["em"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình", "cửa hàng tụi mình", "mình xin đề xuất"]
+    }
+  },
+  {
+    "id": 115,
+    "group": "contextual_follow_up",
+    "title": "Lượt kế tiếp theo ngữ cảnh: 'đắt quá có con nào rẻ hơn không' sau khi đã gợi ý laptop",
+    "input": "đắt quá có con nào rẻ hơn không",
+    "context": {
+      "category": "Laptop",
+      "budget": 20000000,
+      "lastProducts": [{ "id": 20, "name": "Laptop Lenovo IdeaPad Slim 3", "price": 13990000 }]
+    },
+    "expected": {
+      "replyMustInclude": ["tiết kiệm", "giá"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình"]
+    }
+  },
+  {
+    "id": 116,
+    "group": "contextual_follow_up",
+    "title": "Lượt kế tiếp theo ngữ cảnh: 'so sánh 2 máy vừa rồi'",
+    "input": "so sánh 2 máy vừa rồi",
+    "context": {
+      "category": "Laptop",
+      "lastProducts": [
+        { "id": 20, "name": "Laptop Lenovo IdeaPad Slim 3 14 inch", "price": 13990000, "brand": "Lenovo" },
+        { "id": 62, "name": "Laptop ASUS Vivobook Go 14 E1404FA", "price": 8990000, "brand": "Asus" }
+      ]
+    },
+    "expected": {
+      "replyMustInclude": ["Lenovo", "ASUS", "so sánh"],
+      "replyMustNotInclude": ["tụi mình", "chúng mình"]
+    }
+  }
+]
