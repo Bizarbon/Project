@@ -27,8 +27,59 @@ async function repairCanonicalProductAssets() {
     return result.modifiedCount || 0;
 }
 
+async function syncAllProductVariantsAndAssets() {
+    let updatedCount = 0;
+    try {
+        const itemsWithVariants = uniformCatalog.filter(item => item && item.name && Array.isArray(item.variants) && item.variants.length > 0);
+        if (itemsWithVariants.length === 0) return 0;
+
+        const dbProds = await Product.find({
+            name: { $in: itemsWithVariants.map(i => i.name) }
+        }).select('_id name variants image images');
+
+        const dbMap = new Map();
+        for (const p of dbProds) {
+            dbMap.set(p.name, p);
+        }
+
+        const bulkOps = [];
+        for (const item of itemsWithVariants) {
+            const dbProd = dbMap.get(item.name);
+            if (!dbProd) continue;
+
+            const dbVariantsLen = Array.isArray(dbProd.variants) ? dbProd.variants.length : 0;
+            const catalogVariantsLen = item.variants.length;
+
+            if (dbVariantsLen !== catalogVariantsLen || dbProd.image !== item.image) {
+                bulkOps.push({
+                    updateOne: {
+                        filter: { _id: dbProd._id },
+                        update: {
+                            $set: {
+                                variants: item.variants,
+                                image: item.image,
+                                images: item.images || [item.image]
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        if (bulkOps.length > 0) {
+            const res = await Product.bulkWrite(bulkOps);
+            updatedCount = res.modifiedCount || bulkOps.length;
+            console.log(`[CatalogSync] Tự động đồng bộ variants cho ${updatedCount} sản phẩm từ catalog chuẩn via bulkWrite.`);
+        }
+    } catch (err) {
+        console.warn('[CatalogSync] syncAllProductVariantsAndAssets warning:', err.message);
+    }
+    return updatedCount;
+}
+
 async function syncUniformCatalog({ force = false } = {}) {
-    const repairedAssetCount = await repairCanonicalProductAssets();
+    const variantUpdatedCount = await syncAllProductVariantsAndAssets();
+    const repairedAssetCount = (await repairCanonicalProductAssets()) + variantUpdatedCount;
     const count = await Product.countDocuments();
     const missingVideoCount = count > 0 ? await Product.countDocuments({
         $or: [

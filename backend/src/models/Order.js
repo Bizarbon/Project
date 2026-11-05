@@ -64,6 +64,18 @@ const orderSchema = new mongoose.Schema({
             type: String,
             default: ''
         },
+        color: {
+            type: String,
+            default: ''
+        },
+        storage: {
+            type: String,
+            default: ''
+        },
+        image: {
+            type: String,
+            default: ''
+        },
         quantity: {
             type: Number,
             required: true,

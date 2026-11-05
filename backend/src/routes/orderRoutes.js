@@ -124,34 +124,72 @@ async function buildOrderProducts(items) {
 
     const merged = new Map();
     for (const item of items) {
-        const productId = Number(item.product);
+        const productId = Number(item.product || item.productId);
         const quantity = Number(item.quantity);
         if (!productId || !Number.isInteger(quantity) || quantity < 1) {
             const error = new Error('Dữ liệu sản phẩm không hợp lệ!');
             error.statusCode = 400;
             throw error;
         }
-        merged.set(productId, (merged.get(productId) || 0) + quantity);
+
+        const color = String(item.color || item.selectedColor || '').trim();
+        const storage = String(item.storage || item.selectedStorage || '').trim();
+        const image = String(item.image || item.selectedImage || '').trim();
+        const customPrice = Number(item.price);
+        const lineKey = `${productId}__${color}__${storage}`;
+
+        if (!merged.has(lineKey)) {
+            merged.set(lineKey, {
+                productId,
+                quantity,
+                color,
+                storage,
+                image,
+                price: Number.isFinite(customPrice) && customPrice > 0 ? customPrice : null
+            });
+        } else {
+            merged.get(lineKey).quantity += quantity;
+        }
     }
 
     const productsWithNames = [];
     let subtotal = 0;
 
-    for (const [productId, quantity] of merged.entries()) {
-        const product = await Product.findById(productId);
+    for (const line of merged.values()) {
+        const product = await Product.findById(line.productId);
         if (!product) {
-            const error = new Error(`Không tìm thấy sản phẩm #${productId}!`);
+            const error = new Error(`Không tìm thấy sản phẩm #${line.productId}!`);
             error.statusCode = 404;
             throw error;
         }
 
+        let effectivePrice = line.price;
+        if (!effectivePrice) {
+            if (line.color && Array.isArray(product.variants) && product.variants.length > 0) {
+                const matchedVar = product.variants.find(v => (v.color || '').toLowerCase() === line.color.toLowerCase());
+                if (matchedVar && Number(matchedVar.price) > 0) {
+                    effectivePrice = matchedVar.price;
+                }
+            }
+            if (!effectivePrice) {
+                effectivePrice = product.price;
+            }
+        }
+
+        const effectiveImage = line.image || (line.color && Array.isArray(product.variants)
+            ? product.variants.find(v => (v.color || '').toLowerCase() === line.color.toLowerCase())?.image
+            : null) || product.image;
+
         productsWithNames.push({
             product: product._id,
             productName: product.name,
-            quantity,
-            price: product.price
+            color: line.color,
+            storage: line.storage,
+            image: effectiveImage,
+            quantity: line.quantity,
+            price: effectivePrice
         });
-        subtotal += product.price * quantity;
+        subtotal += effectivePrice * line.quantity;
     }
 
     return { productsWithNames, subtotal };
@@ -330,7 +368,10 @@ router.get('/export', protect, admin, async (req, res) => {
             const customerName = o.recipientName || o.customer?.name || o.customerName || 'N/A';
             const customerPhone = o.recipientPhone || o.customer?.phone || o.customerPhone || '';
             const customerEmail = o.guestEmail || o.customer?.email || '';
-            const productsList = (o.products || []).map(p => `${p.productName || 'Sản phẩm'} (x${p.quantity})`).join('; ');
+            const productsList = (o.products || []).map(p => {
+                const variantInfo = [p.color, p.storage].filter(Boolean).join(' - ');
+                return `${p.productName || 'Sản phẩm'}${variantInfo ? ` [${variantInfo}]` : ''} (x${p.quantity})`;
+            }).join('; ');
             const totalQty = (o.products || []).reduce((sum, p) => sum + (p.quantity || 1), 0);
             const shipperName = o.shipper?.name || o.shipperAssignedByName || (o.shipper ? `Shipper #${o.shipper}` : 'Chưa phân công');
             const shipperPhone = o.shipper?.phone || '';
@@ -522,7 +563,7 @@ router.post('/', optionalAuth, async (req, res) => {
             return res.status(400).json({ message: 'Vui lòng nhập email hợp lệ để nhận xác nhận đơn hàng!' });
         }
 
-        const { productsWithNames, subtotal } = await buildOrderProducts(req.body.products);
+        const { productsWithNames, subtotal } = await buildOrderProducts(req.body.products || req.body.items);
         const shippingQuote = quoteShipping({
             provinceCode: req.body.shippingProvinceCode,
             address: req.body.shippingAddress || customer?.address

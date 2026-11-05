@@ -3579,6 +3579,14 @@ function getCart() {
     }
 }
 
+function getCartItemKey(item) {
+    if (!item) return '';
+    const pid = String(item.productId || '');
+    const col = encodeURIComponent(String(item.selectedColor || '').trim());
+    const sto = encodeURIComponent(String(item.selectedStorage || '').trim());
+    return `${pid}__${col}__${sto}`;
+}
+
 function setCart(cart) {
     localStorage.setItem(auth.getCartStorageKey(), JSON.stringify(cart));
 }
@@ -3793,12 +3801,22 @@ function addToCart(id) {
     if (product.stock <= 0) return showToast('Sản phẩm đã hết hàng!', 'error');
 
     const cart = getCart();
-    const item = cart.find(i => String(i.productId) === String(id));
+    const item = cart.find(i => String(i.productId) === String(id) && !i.selectedColor && !i.selectedStorage);
     const nextQty = item ? item.quantity + 1 : 1;
     if (nextQty > product.stock) return showToast('Số lượng trong giỏ đã chạm tồn kho!', 'error');
 
-    if (item) item.quantity = nextQty;
-    else cart.push({ productId: Number(id), quantity: 1 });
+    if (item) {
+        item.quantity = nextQty;
+    } else {
+        cart.push({
+            productId: Number(id),
+            quantity: 1,
+            selectedColor: null,
+            selectedStorage: null,
+            selectedImage: product.image,
+            price: product.price
+        });
+    }
     setCart(cart);
     appliedCoupon = null;
     animateAddCartFeedback(id, product.image);
@@ -3809,14 +3827,16 @@ function addToCart(id) {
 }
 
 /* Lucian UX/UI Prompt #018, #230, #298 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#230 */
-function changeQty(id, delta) {
+function changeCartItemQty(itemKey, delta) {
     let cart = getCart();
-    const item = cart.find(i => String(i.productId) === String(id));
-    const product = allProducts.find(p => String(p._id) === String(id));
-    if (!item || !product) return;
+    const item = cart.find(i => getCartItemKey(i) === itemKey || String(i.productId) === itemKey);
+    if (!item) return;
+    const product = allProducts.find(p => String(p._id) === String(item.productId));
+    if (!product) return;
 
     if (delta > 0 && item.quantity >= product.stock) {
-        const stepperEl = document.querySelector(`#cartList .cart-item-card[data-product-id="${id}"] .cart-stepper`);
+        const stepperEl = document.querySelector(`#cartList .cart-item-card[data-item-key="${itemKey}"] .cart-stepper`)
+            || document.querySelector(`#cartList .cart-item-card[data-product-id="${item.productId}"] .cart-stepper`);
         if (stepperEl) {
             stepperEl.classList.remove('u018-shake');
             void stepperEl.offsetWidth;
@@ -3831,17 +3851,20 @@ function changeQty(id, delta) {
         item.quantity = product.stock;
         showToast(`Số lượng tối đa có thể mua là ${product.stock}`, 'info');
     }
-    if (item.quantity <= 0) cart = cart.filter(i => String(i.productId) !== String(id));
-    window.__lastQtyChanged = { id: String(id), dir: delta > 0 ? 'up' : 'dn' };
+    if (item.quantity <= 0) {
+        cart = cart.filter(i => getCartItemKey(i) !== itemKey && String(i.productId) !== itemKey);
+    }
+    window.__lastQtyChanged = { id: itemKey, dir: delta > 0 ? 'up' : 'dn' };
     setCart(cart);
     appliedCoupon = null;
     renderCart();
 }
 
-function removeItem(id) {
-    const cardEl = document.querySelector(`#cartList .cart-item-card[data-product-id="${id}"]`);
+function removeCartItem(itemKey) {
+    const cardEl = document.querySelector(`#cartList .cart-item-card[data-item-key="${itemKey}"]`)
+        || document.querySelector(`#cartList .cart-item-card[data-product-id="${itemKey}"]`);
     const finalizeRemove = () => {
-        setCart(getCart().filter(i => String(i.productId) !== String(id)));
+        setCart(getCart().filter(i => getCartItemKey(i) !== itemKey && String(i.productId) !== itemKey));
         appliedCoupon = null;
         renderCart();
         showToast('Đã xóa khỏi giỏ hàng');
@@ -3854,11 +3877,25 @@ function removeItem(id) {
     }
 }
 
+function changeQty(id, delta) {
+    changeCartItemQty(String(id), delta);
+}
+
+function removeItem(id) {
+    removeCartItem(String(id));
+}
+
+window.changeCartItemQty = changeCartItemQty;
+window.removeCartItem = removeCartItem;
+window.changeQty = changeQty;
+window.removeItem = removeItem;
+
 function currentCartSubtotal() {
     return getCart().reduce((sum, item) => {
         const product = allProducts.find(p => String(p._id) === String(item.productId));
         if (!product) return sum;
-        return sum + product.price * (Number(item.quantity) || 1);
+        const unitPrice = (Number(item.price) > 0) ? Number(item.price) : product.price;
+        return sum + unitPrice * (Number(item.quantity) || 1);
     }, 0);
 }
 
@@ -4003,16 +4040,21 @@ function renderCheckoutRecap() {
 
     let subtotal = 0;
     miniList.innerHTML = cart.map(item => {
-        const lineTotal = item.product.price * item.quantity;
+        const unitPrice = (Number(item.price) > 0) ? Number(item.price) : item.product.price;
+        const lineTotal = unitPrice * item.quantity;
         subtotal += lineTotal;
+        const itemImg = item.selectedImage || item.product.image;
+        const variantText = [item.selectedColor, item.selectedStorage].filter(Boolean).join(' • ');
+
         return `
             <article class="checkout-mini-item">
                 <figure class="mini-item-thumb">
-                    <img src="${escapeHTML(item.product.image)}" alt="${escapeHTML(item.product.name)}" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg'" />
+                    <img src="${escapeHTML(itemImg)}" alt="${escapeHTML(item.product.name)}" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg'" />
                 </figure>
                 <div class="mini-item-info">
                     <h5 class="mini-item-title">${escapeHTML(item.product.name)}</h5>
-                    <div class="mini-item-qty-price">${fmt(item.product.price)} × <strong>${item.quantity}</strong></div>
+                    ${variantText ? `<div class="mini-item-variant-tag" style="font-size:0.78rem; color:#2563eb; font-weight:600; margin:2px 0;">${escapeHTML(variantText)}</div>` : ''}
+                    <div class="mini-item-qty-price">${fmt(unitPrice)} × <strong>${item.quantity}</strong></div>
                 </div>
                 <strong class="mini-item-total">${fmt(lineTotal)}</strong>
             </article>
@@ -4049,7 +4091,14 @@ function renderCart() {
         const quantity = Math.min(Number(item.quantity) || 1, product.stock);
         return { ...item, quantity, product };
     }).filter(Boolean);
-    setCart(cart.map(item => ({ productId: item.productId, quantity: item.quantity })));
+    setCart(cart.map(item => ({
+        productId: Number(item.productId),
+        quantity: item.quantity,
+        selectedColor: item.selectedColor || null,
+        selectedStorage: item.selectedStorage || null,
+        selectedImage: item.selectedImage || null,
+        price: (Number(item.price) > 0) ? Number(item.price) : item.product.price
+    })));
 
     const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
     if (countBadge) countBadge.textContent = `(${totalQty})`;
@@ -4096,33 +4145,44 @@ function renderCart() {
     const lastQtyChange = window.__lastQtyChanged || null;
     window.__lastQtyChanged = null;
     cartDiv.innerHTML = cart.map(item => {
-        const lineTotal = item.product.price * item.quantity;
+        const unitPrice = (Number(item.price) > 0) ? Number(item.price) : item.product.price;
+        const lineTotal = unitPrice * item.quantity;
         subtotal += lineTotal;
+        const itemKey = getCartItemKey(item);
+        const itemImg = item.selectedImage || item.product.image;
         const isMaxStock = item.quantity >= item.product.stock;
-        const isFlashed = flashId && String(item.productId) === flashId;
-        const rollCls = lastQtyChange && lastQtyChange.id === String(item.productId)
+        const isFlashed = flashId && (String(item.productId) === flashId || itemKey === flashId);
+        const rollCls = lastQtyChange && (lastQtyChange.id === itemKey || lastQtyChange.id === String(item.productId))
             ? (lastQtyChange.dir === 'up' ? ' u018-roll-up' : ' u018-roll-dn')
             : '';
 
+        const colorBadge = item.selectedColor
+            ? `<span class="cart-variant-pill color" title="Màu sắc đã chọn">🎨 ${escapeHTML(item.selectedColor)}</span>`
+            : '';
+        const storageBadge = item.selectedStorage
+            ? `<span class="cart-variant-pill storage" title="Dung lượng đã chọn">💾 ${escapeHTML(item.selectedStorage)}</span>`
+            : '';
+
         return `
-            <article class="cart-item-card${isFlashed ? ' u240-fl' : ''}" data-product-id="${item.productId}">
+            <article class="cart-item-card${isFlashed ? ' u240-fl' : ''}" data-product-id="${item.productId}" data-item-key="${escapeHTML(itemKey)}">
                 <figure class="cart-item-thumb">
-                    <img src="${escapeHTML(item.product.image)}" alt="${escapeHTML(item.product.name)}" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg'" />
+                    <img src="${escapeHTML(itemImg)}" alt="${escapeHTML(item.product.name)}${item.selectedColor ? ` - ${escapeHTML(item.selectedColor)}` : ''}" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg'" />
                 </figure>
                 <div class="cart-item-details">
                     <span class="cart-item-brand">${escapeHTML(item.product.brand || item.product.category)}</span>
                     <h4 class="cart-item-title">${escapeHTML(item.product.name)}</h4>
-                    <div class="cart-item-unit-price">${fmt(item.product.price)}</div>
+                    ${(colorBadge || storageBadge) ? `<div class="cart-item-variant-pills">${colorBadge} ${storageBadge}</div>` : ''}
+                    <div class="cart-item-unit-price">${fmt(unitPrice)}</div>
                     ${isMaxStock ? `<p class="cart-item-stock-limit">Đã đạt tối đa tồn kho (${item.product.stock} máy)</p>` : ''}
                 </div>
                 <div class="cart-item-actions">
                     <div class="cart-stepper">
-                        <button type="button" class="stepper-btn minus" onclick="changeQty('${item.productId}', -1)" aria-label="Giảm">-</button>
+                        <button type="button" class="stepper-btn minus" onclick="changeCartItemQty('${escapeHTML(itemKey)}', -1)" aria-label="Giảm">-</button>
                         <span class="stepper-val${rollCls}">${item.quantity}</span>
-                        <button type="button" class="stepper-btn plus" onclick="changeQty('${item.productId}', 1)" ${isMaxStock ? 'disabled' : ''} aria-label="Tăng">+</button>
+                        <button type="button" class="stepper-btn plus" onclick="changeCartItemQty('${escapeHTML(itemKey)}', 1)" ${isMaxStock ? 'disabled' : ''} aria-label="Tăng">+</button>
                     </div>
                     <strong class="cart-item-line-total">${fmt(lineTotal)}</strong>
-                    <button type="button" class="cart-item-remove-btn" onclick="removeItem('${item.productId}')" aria-label="Xóa ${escapeHTML(item.product.name)}">
+                    <button type="button" class="cart-item-remove-btn" onclick="removeCartItem('${escapeHTML(itemKey)}')" aria-label="Xóa ${escapeHTML(item.product.name)}">
                         Xóa
                     </button>
                 </div>
@@ -4467,7 +4527,19 @@ async function createOrder() {
 
     const checkoutAddress = checkoutAddressValue();
     const payload = {
-        products: cart.map(item => ({ product: item.productId, quantity: item.quantity })),
+        products: cart.map(item => {
+            const product = allProducts.find(p => String(p._id) === String(item.productId));
+            const unitPrice = (Number(item.price) > 0) ? Number(item.price) : (product?.price || 0);
+            return {
+                product: Number(item.productId),
+                productId: Number(item.productId),
+                quantity: item.quantity,
+                color: item.selectedColor || '',
+                storage: item.selectedStorage || '',
+                image: item.selectedImage || (product?.image || ''),
+                price: unitPrice
+            };
+        }),
         paymentMethod: document.getElementById('paymentMethod').value,
         shippingProvinceCode: checkoutAddress.provinceCode,
         shippingProvince: checkoutAddress.province,

@@ -230,18 +230,23 @@ function addToCart(id, shouldRedirect = false) {
     const activeStorage = (currentStorageOptions && currentStorageOptions[activeStorageIndex]) || null;
     const selectedColor = activeVar?.colorName || null;
     const selectedStorage = activeStorage?.label || null;
+    const selectedImage = (activeVar?.image)
+        ? resolveProductImage(activeVar.image, '/')
+        : resolveProductImage(product.image, '/');
     const item = cart.find(i => String(i.productId) === String(id) && i.selectedColor === selectedColor && i.selectedStorage === selectedStorage);
     const nextQty = (item?.quantity || 0) + qty;
     if (nextQty > product.stock) return showToast('Số lượng trong giỏ hàng đã chạm giới hạn tồn kho!', 'error');
 
     if (item) {
         item.quantity = nextQty;
+        item.selectedImage = selectedImage;
     } else {
         cart.push({
             productId: Number(id),
             quantity: qty,
             selectedColor: selectedColor,
             selectedStorage: selectedStorage,
+            selectedImage: selectedImage,
             price: (Number(activeVar?.price) > 0 ? activeVar.price : product.price) + (activeStorage?.delta || 0)
         });
     }
@@ -353,6 +358,14 @@ let currentProductVariants = [];
 let activeVariantIndex = 0;
 let currentStorageOptions = [];
 let activeStorageIndex = 0;
+
+/**
+ * Extract concise Vietnamese color name for compact chip labels
+ */
+function getShortColorLabel(colorName) {
+    if (!colorName) return '';
+    return String(colorName).replace(/\s*\([^)]*\)/g, '').trim();
+}
 
 /**
  * Resolve high-fidelity hex color codes for swatches (Lucian #020 & Image 2)
@@ -953,7 +966,7 @@ function renderProduct() {
                                 <div class="thumb-img-wrapper">
                                     <img src="${escapeHTML(v.image)}" alt="${escapeHTML(product.name)} - ${escapeHTML(v.colorName)}" loading="lazy" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';">
                                 </div>
-                                <span class="color-item-label">${escapeHTML(v.colorName)}</span>
+                                <span class="color-item-label">${escapeHTML(getShortColorLabel(v.colorName))}</span>
                                 ${v.isOutOfStock ? '<span class="variant-out-badge">Hết</span>' : ''}
                             </button>
                         `).join('')}
@@ -1220,6 +1233,9 @@ function renderProduct() {
             ? currentProductVariants.map(v => v.image)
             : uniqueGallery;
         setupProductLoupeAndLightbox(activeGallery);
+        if (currentProductVariants.length > 1) {
+            selectColorVariant(0);
+        }
 
         // Keyboard navigation for color variant thumbnails (Lucian #020)
         const variantTrack = document.querySelector('.product-color-variant-track');
@@ -2104,20 +2120,37 @@ async function submitExpressCheckout() {
     }
 
     try {
+        const hasVariants = currentProductVariants && currentProductVariants.length > 1;
+        const activeVar = hasVariants ? currentProductVariants[activeVariantIndex] : null;
+        const activeStorage = (currentStorageOptions && currentStorageOptions[activeStorageIndex]) || null;
+        const storageDelta = activeStorage ? activeStorage.delta : 0;
+        const basePrice = (activeVar && Number(activeVar.price) > 0) ? activeVar.price : product.price;
+        const unitPrice = basePrice + storageDelta;
+        const selectedImg = (activeVar && activeVar.image) ? resolveProductImage(activeVar.image, '/') : resolveProductImage(product.image, '/');
+
+        const orderItem = {
+            product: Number(product._id),
+            productId: Number(product._id),
+            productName: product.name,
+            color: activeVar?.colorName || '',
+            storage: activeStorage?.label || '',
+            image: selectedImg,
+            quantity: qty,
+            price: unitPrice
+        };
+
         const orderData = {
-            items: [{
-                productId: Number(product._id),
-                quantity: qty,
-                price: Number(product.price)
-            }],
-            shippingAddress: {
-                fullName,
-                phone,
-                address,
-                city: 'Hồ Chí Minh',
-                note: note ? `[Đặt hàng nhanh 2H] ${note}` : '[Đặt hàng nhanh 2H]'
-            },
+            products: [orderItem],
+            items: [orderItem],
+            recipientName: fullName,
+            recipientPhone: phone,
+            shippingAddress: address,
+            shippingProvinceCode: '79',
+            shippingProvince: 'Hồ Chí Minh',
+            shippingWardCode: '001',
+            shippingWard: 'Phường Bến Nghé',
             paymentMethod,
+            note: note ? `[Đặt hàng nhanh 2H] ${note}` : '[Đặt hàng nhanh 2H]',
             source: 'express_checkout'
         };
 

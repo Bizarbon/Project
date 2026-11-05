@@ -303,6 +303,17 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET trigger catalog sync (variants, assets)
+router.get('/sync-catalog', async (req, res) => {
+    try {
+        const { syncUniformCatalog } = require('../utils/catalogSync');
+        const result = await syncUniformCatalog({ force: false });
+        res.json({ success: true, result });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // GET product by ID
 router.get('/:id', optionalAuth, async (req, res) => {
     try {

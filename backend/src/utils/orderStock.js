@@ -22,16 +22,30 @@ async function reserveStock(items) {
             throw error;
         }
 
-        reserved.push({ product: item.product, quantity });
+        if (item.color) {
+            await Product.updateOne(
+                { _id: item.product, 'variants.color': item.color },
+                { $inc: { 'variants.$.stock': -quantity } }
+            ).catch(() => {});
+        }
+
+        reserved.push(item);
     }
 }
 
 async function rollbackStock(items) {
     for (const item of items) {
+        const quantity = Number(item.quantity);
         await Product.updateOne(
             { _id: item.product },
-            { $inc: { stock: Number(item.quantity) } }
+            { $inc: { stock: quantity } }
         );
+        if (item.color) {
+            await Product.updateOne(
+                { _id: item.product, 'variants.color': item.color },
+                { $inc: { 'variants.$.stock': quantity } }
+            ).catch(() => {});
+        }
     }
 }
 
