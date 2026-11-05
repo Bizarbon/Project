@@ -7,6 +7,7 @@
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
 const aiModelService = require('./aiModelService');
+const nlu = require('./nlu');
 
 // -------------------------------------------------------------
 // TIỆN ÍCH CHUẨN HÓA VĂN BẢN VÀ ĐỊNH DẠNG TIỀN TỆ
@@ -3402,6 +3403,59 @@ function buildHearingAidSafetyResponse() {
 }
 
 async function coordinateConsultation({ message, user = null, context = {} }) {
+    let nluResult = null;
+    const isNluEnabled = process.env.NLU_PIPELINE !== 'off';
+
+    if (isNluEnabled) {
+        try {
+            nluResult = nlu.processInput(message, context);
+            const preGuard = nlu.applyPreGuardrails({
+                nluResult,
+                rawMessage: message,
+                context
+            });
+            if (preGuard && preGuard.intercepted) {
+                return preGuard.response;
+            }
+
+            // Đồng bộ dữ liệu ngân sách đã bóc tách từ NLU vào context
+            if (nluResult.entities?.budget && !context.budget) {
+                context.budget = nluResult.entities.budget.target || nluResult.entities.budget.max;
+                if (nluResult.entities.budget.max && !nluResult.entities.budget.min) {
+                    context.budgetType = 'hard';
+                }
+            }
+            if (nluResult.entities?.category && !context.category) {
+                context.category = nluResult.entities.category;
+            }
+            if (nluResult.entities?.brand && !context.brand) {
+                context.brand = nluResult.entities.brand;
+            }
+            context.nluIntents = nluResult.intents;
+            context.nlu = nluResult;
+        } catch (nluErr) {
+            console.warn('[NLU Pipeline Warning] Chuyển về luồng điều phối tiêu chuẩn:', nluErr.message);
+        }
+    }
+
+    let response = await _coordinateConsultationCore({ message, user, context });
+
+    if (isNluEnabled && nluResult && response) {
+        try {
+            response = nlu.applyPostGuardrails({
+                response,
+                nluResult,
+                context
+            });
+        } catch (postErr) {
+            console.warn('[NLU Post-Guardrail Warning]:', postErr.message);
+        }
+    }
+
+    return response;
+}
+
+async function _coordinateConsultationCore({ message, user = null, context = {} }) {
     const text = normalizeText(message);
     const prev = { ...(context || {}), currentMessage: message };
 

@@ -101,8 +101,8 @@
                 <section class="cps-footer-col cps-col-contact" aria-labelledby="footerContactTitle">
                     <h3 class="cps-footer-title" id="footerContactTitle">Liên hệ & Hỗ trợ</h3>
                     <ul class="cps-hotline-list">
-                        <li>Mua hàng: <a href="tel:18002097"><strong>1800.2097</strong></a> <span class="cps-time-badge">(7h30 - 22h00)</span></li>
-                        <li>Khiếu nại: <a href="tel:18002063"><strong>1800.2063</strong></a> <span class="cps-time-badge">(8h00 - 21h30)</span></li>
+                        <li>Mua hàng: <a href="tel:0842331606"><strong>0842.331.606</strong></a> <span class="cps-time-badge">(7h30 - 22h00)</span></li>
+                        <li>Khiếu nại: <a href="tel:0842331606"><strong>0842.331.606</strong></a> <span class="cps-time-badge">(8h00 - 21h30)</span></li>
                     </ul>
                     <address class="cps-address-list">
                         <p>📍 <a href="${root}index.html?openAddress=1">64 Nguyễn Văn Bảo, Gò Vấp, TP.HCM</a> <a class="cps-map-link" href="https://www.google.com/maps/search/?api=1&query=64+Nguyen+Van+Bao+Go+Vap+Ho+Chi+Minh" target="_blank" rel="noopener">(xem bản đồ)</a></p>

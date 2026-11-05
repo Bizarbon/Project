@@ -1221,9 +1221,9 @@ function renderProduct() {
                             <span class="u022-heart-glyph" aria-hidden="true">${liked ? '♥' : '♡'}</span>
                             <span class="u022-heart-text">${liked ? 'Đã lưu yêu thích' : 'Lưu vào yêu thích'}</span>
                         </button>
-                        <a class="hotline-support-link" href="tel:18002097">
+                        <a class="hotline-support-link" href="tel:0842331606">
                             <span aria-hidden="true">📞</span>
-                            <span>Tư vấn miễn phí: <strong>1800.2097</strong></span>
+                            <span>Tư vấn miễn phí: <strong>0842.331.606</strong></span>
                         </a>
                     </div>
                 </section>

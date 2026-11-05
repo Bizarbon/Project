@@ -11,6 +11,7 @@ const { findKnowledgeArticle } = require('../services/knowledgeService');
 const { optionalAuth, protect, admin } = require('../middleware/auth');
 const { recommendProducts } = require('../utils/recommendations');
 const { coordinateConsultation, checkUnsupportedProduct, buildOutOfCatalogResponse, extractBudget } = require('../services/consultationCoordinator');
+const nlu = require('../services/nlu');
 
 const chatLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
@@ -2137,6 +2138,24 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
     try {
         const message = String(req.body.message || '').trim();
         if (!message) return res.status(400).json({ message: 'Vui lòng nhập nội dung cần tư vấn.' });
+
+        // NLU Pre-Guardrails check: Chặn ngay prompt injection và khiếu nại (Giai đoạn A)
+        if (process.env.NLU_PIPELINE !== 'off') {
+            try {
+                const nluResult = nlu.processInput(message, req.body.context);
+                const preGuard = nlu.applyPreGuardrails({
+                    nluResult,
+                    rawMessage: message,
+                    context: req.body.context
+                });
+                if (preGuard && preGuard.intercepted) {
+                    recordConversation(req, message, preGuard.response).catch(e => console.warn('recordConversation error:', e.message));
+                    return res.json(preGuard.response);
+                }
+            } catch (err) {
+                console.warn('[chatRoutes NLU Pre-Guardrail Warning]:', err.message);
+            }
+        }
 
         const text = normalizeText(message);
         const context = req.body.context || {};

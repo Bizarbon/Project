@@ -1,0 +1,68 @@
+{
+  "exactWords": {
+    "ip": "iphone",
+    "ss": "samsung",
+    "mbp": "macbook pro",
+    "mba": "macbook air",
+    "lap": "laptop",
+    "dt": "điện thoại",
+    "đt": "điện thoại",
+    "ko": "không",
+    "k": "không",
+    "hong": "không",
+    "hông": "không",
+    "hok": "không",
+    "hem": "không",
+    "dc": "được",
+    "đc": "được",
+    "bn": "bao nhiêu",
+    "bnhieu": "bao nhiêu",
+    "bnh": "bao nhiêu",
+    "pk": "phụ kiện",
+    "mh": "màn hình",
+    "sp": "sản phẩm",
+    "vs": "với",
+    "mk": "mình",
+    "b": "bạn",
+    "e": "em",
+    "ad": "shop",
+    "rep": "phản hồi",
+    "ib": "nhắn tin",
+    "inbox": "nhắn tin",
+    "tks": "cảm ơn",
+    "thx": "cảm ơn",
+    "cmon": "cảm ơn",
+    "cam on": "cảm ơn",
+    "ch": "chính hãng",
+    "bh": "bảo hành",
+    "tg": "trả góp",
+    "ship": "giao hàng",
+    "cod": "thanh toán khi nhận hàng",
+    "km": "khuyến mãi",
+    "gg": "giảm giá",
+    "vc": "voucher",
+    "tl": "tai nghe",
+    "tn": "tai nghe",
+    "dh": "đồng hồ",
+    "đh": "đồng hồ",
+    "mcg": "máy chơi game",
+    "mtb": "máy tính bảng",
+    "tab": "tablet",
+    "pm": "pro max"
+  },
+  "phraseReplacements": [
+    {
+      "pattern": "pro max",
+      "replacement": "pro max"
+    },
+    {
+      "pattern": "z fold",
+      "replacement": "galaxy z fold"
+    },
+    {
+      "pattern": "z flip",
+      "replacement": "galaxy z flip"
+    }
+  ]
+}
+
