@@ -1145,7 +1145,7 @@ const uniformCatalog = [
         "category": "Tablet",
         "price": 16990000,
         "compareAtPrice": 17990000,
-        "image": "/assets/uploads/products/ipad-air-11-m2.png",
+        "image": "/assets/uploads/products/ipad-air-11-m2-spacegray.jpg",
         "images": [
             "/assets/uploads/products/ipad-air-11-m2.png",
             "/assets/uploads/products/ipad-air-11-m2-spacegray.jpg",
@@ -1177,48 +1177,36 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
         "variants": [
             {
-                "sku": "TECH-00023-SPACEGRAY",
                 "color": "Xám Không Gian (Space Gray)",
+                "colorName": "Xám Không Gian (Space Gray)",
                 "colorHex": "#68696e",
                 "image": "/assets/uploads/products/ipad-air-11-m2-spacegray.jpg",
-                "compareAtPrice": 17990000,
-                "ram": "8GB",
-                "storage": "128GB",
+                "price": 16990000,
+                "stock": 30
+            },
+            {
+                "color": "Ánh Sao (Starlight)",
+                "colorName": "Ánh Sao (Starlight)",
+                "colorHex": "#e5dcc5",
+                "image": "/assets/uploads/products/ipad-air-11-m2-starlight.jpg",
                 "price": 16990000,
                 "stock": 25
             },
             {
-                "sku": "TECH-00023-STARLIGHT",
-                "color": "Ánh Sao (Starlight)",
-                "colorHex": "#e5dcc5",
-                "image": "/assets/uploads/products/ipad-air-11-m2-starlight.jpg",
-                "compareAtPrice": 17990000,
-                "ram": "8GB",
-                "storage": "128GB",
+                "color": "Xanh Dương (Blue)",
+                "colorName": "Xanh Dương (Blue)",
+                "colorHex": "#bed3db",
+                "image": "/assets/uploads/products/ipad-air-11-m2-blue.jpg",
                 "price": 16990000,
                 "stock": 20
             },
             {
-                "sku": "TECH-00023-BLUE",
-                "color": "Xanh Dương (Blue)",
-                "colorHex": "#bed3db",
-                "image": "/assets/uploads/products/ipad-air-11-m2-blue.jpg",
-                "compareAtPrice": 17990000,
-                "ram": "8GB",
-                "storage": "128GB",
-                "price": 16990000,
-                "stock": 19
-            },
-            {
-                "sku": "TECH-00023-PURPLE",
                 "color": "Tím (Purple)",
+                "colorName": "Tím (Purple)",
                 "colorHex": "#d0c8d7",
                 "image": "/assets/uploads/products/ipad-air-11-m2-purple.jpg",
-                "compareAtPrice": 17990000,
-                "ram": "8GB",
-                "storage": "128GB",
                 "price": 16990000,
-                "stock": 16
+                "stock": 18
             }
         ]
     },
@@ -1228,7 +1216,7 @@ const uniformCatalog = [
         "category": "Tablet",
         "price": 8990000,
         "compareAtPrice": 9990000,
-        "image": "/assets/uploads/products/ipad-gen-10.png",
+        "image": "/assets/uploads/products/ipad-gen-10-silver.png",
         "images": [
             "/assets/uploads/products/ipad-gen-10.png",
             "/assets/uploads/products/ipad-gen-10-silver.png",
@@ -1261,48 +1249,36 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
         "variants": [
             {
-                "sku": "TECH-00024-SILVER",
                 "color": "Bạc (Silver)",
+                "colorName": "Bạc (Silver)",
                 "colorHex": "#e3e4e5",
                 "image": "/assets/uploads/products/ipad-gen-10-silver.png",
-                "compareAtPrice": 9990000,
-                "ram": "4GB",
-                "storage": "64GB",
                 "price": 8990000,
                 "stock": 35
             },
             {
-                "sku": "TECH-00024-BLUE",
                 "color": "Xanh Dương (Blue)",
+                "colorName": "Xanh Dương (Blue)",
                 "colorHex": "#236f9a",
                 "image": "/assets/uploads/products/ipad-gen-10-blue.jpg",
-                "compareAtPrice": 9990000,
-                "ram": "4GB",
-                "storage": "64GB",
                 "price": 8990000,
                 "stock": 28
             },
             {
-                "sku": "TECH-00024-PINK",
                 "color": "Hồng (Pink)",
+                "colorName": "Hồng (Pink)",
                 "colorHex": "#e25e75",
                 "image": "/assets/uploads/products/ipad-gen-10-pink.png",
-                "compareAtPrice": 9990000,
-                "ram": "4GB",
-                "storage": "64GB",
                 "price": 8990000,
                 "stock": 22
             },
             {
-                "sku": "TECH-00024-YELLOW",
                 "color": "Vàng (Yellow)",
+                "colorName": "Vàng (Yellow)",
                 "colorHex": "#f7d046",
                 "image": "/assets/uploads/products/ipad-gen-10-yellow.jpg",
-                "compareAtPrice": 9990000,
-                "ram": "4GB",
-                "storage": "64GB",
                 "price": 8990000,
-                "stock": 18
+                "stock": 15
             }
         ]
     },
@@ -1342,30 +1318,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/samsung-galaxy-tab-s9-ultra.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/s/s/ss-tab-s9-ultra_1_.png",
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
-        "variants": [
-            {
-                "sku": "TECH-00025-GRAPHITE",
-                "color": "Xám Graphite (Graphite)",
-                "colorHex": "#3a3b3c",
-                "image": "/assets/uploads/products/galaxy-tab-s9-ultra-graphite.png",
-                "compareAtPrice": 32990000,
-                "ram": "12GB",
-                "storage": "256GB",
-                "price": 25990000,
-                "stock": 20
-            },
-            {
-                "sku": "TECH-00025-BEIGE",
-                "color": "Kem Beige (Beige)",
-                "colorHex": "#ece8de",
-                "image": "/assets/uploads/products/galaxy-tab-s9-ultra-beige.png",
-                "compareAtPrice": 32990000,
-                "ram": "12GB",
-                "storage": "256GB",
-                "price": 25990000,
-                "stock": 15
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Xiaomi Pad 8 Pro 8GB 128GB",
@@ -1462,30 +1415,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/may-tinh-bang-huawei-matepad-11-5-s.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/h/u/huawei-matepad-11-5-s.jpg",
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
-        "variants": [
-            {
-                "sku": "TECH-00027-GRAY",
-                "color": "Xám Không Gian (Space Gray)",
-                "colorHex": "#46494e",
-                "image": "/assets/uploads/products/huawei-matepad-11-5s-gray.png",
-                "compareAtPrice": 14990000,
-                "ram": "12GB",
-                "storage": "256GB",
-                "price": 13490000,
-                "stock": 16
-            },
-            {
-                "sku": "TECH-00027-SILVER",
-                "color": "Bạc Sương Mù (Frost Silver)",
-                "colorHex": "#d8dade",
-                "image": "/assets/uploads/products/huawei-matepad-11-5s-silver.jpg",
-                "compareAtPrice": 14990000,
-                "ram": "12GB",
-                "storage": "256GB",
-                "price": 13490000,
-                "stock": 14
-            }
-        ]
+        "variants": []
     },
     {
         "name": "HONOR Pad 10 Wifi 8GB 256GB",
@@ -1522,30 +1452,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/tablet/honor.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x//media/catalog/product/m/a/may-tinh-bang-honor-pad-x8b.jpg",
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
-        "variants": [
-            {
-                "sku": "TECH-00028-GRAY",
-                "color": "Xám Tinh Vân (Nebula Gray)",
-                "colorHex": "#4b4f56",
-                "image": "/assets/uploads/products/honor-pad-10-gray.png",
-                "compareAtPrice": 8990000,
-                "ram": "8GB",
-                "storage": "256GB",
-                "price": 7990000,
-                "stock": 24
-            },
-            {
-                "sku": "TECH-00028-BLUE",
-                "color": "Xanh Đại Dương (Ocean Blue)",
-                "colorHex": "#2b5c8f",
-                "image": "/assets/uploads/products/honor-pad-10-blue.jpg",
-                "compareAtPrice": 8990000,
-                "ram": "8GB",
-                "storage": "256GB",
-                "price": 7990000,
-                "stock": 20
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Xiaomi Poco Pad M1 Wifi 256GB",
@@ -1836,7 +1743,7 @@ const uniformCatalog = [
         "category": "Đồng hồ thông minh",
         "price": 10490000,
         "compareAtPrice": 10990000,
-        "image": "/assets/uploads/products/apple-watch-series-10.png",
+        "image": "/assets/uploads/products/apple-watch-s10-jetblack.png",
         "images": [
             "/assets/uploads/products/apple-watch-series-10.png",
             "/assets/uploads/products/apple-watch-s10-jetblack.png",
@@ -1865,37 +1772,28 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
         "variants": [
             {
-                "sku": "TECH-00037-JETBLACK",
                 "color": "Đen Bóng (Jet Black)",
+                "colorName": "Đen Bóng (Jet Black)",
                 "colorHex": "#0a0a0a",
                 "image": "/assets/uploads/products/apple-watch-s10-jetblack.png",
-                "compareAtPrice": 10990000,
-                "ram": "",
-                "storage": "",
                 "price": 10490000,
                 "stock": 25
             },
             {
-                "sku": "TECH-00037-ROSEGOLD",
                 "color": "Vàng Hồng (Rose Gold)",
+                "colorName": "Vàng Hồng (Rose Gold)",
                 "colorHex": "#e0a899",
                 "image": "/assets/uploads/products/apple-watch-s10-rosegold.webp",
-                "compareAtPrice": 10990000,
-                "ram": "",
-                "storage": "",
-                "price": 10490000,
-                "stock": 22
-            },
-            {
-                "sku": "TECH-00037-SILVER",
-                "color": "Bạc (Silver)",
-                "colorHex": "#e3e4e5",
-                "image": "/assets/uploads/products/apple-watch-s10-silver.jpg",
-                "compareAtPrice": 10990000,
-                "ram": "",
-                "storage": "",
                 "price": 10490000,
                 "stock": 20
+            },
+            {
+                "color": "Bạc (Silver)",
+                "colorName": "Bạc (Silver)",
+                "colorHex": "#e3e4e5",
+                "image": "/assets/uploads/products/apple-watch-s10-silver.jpg",
+                "price": 10490000,
+                "stock": 15
             }
         ]
     },
@@ -1905,7 +1803,7 @@ const uniformCatalog = [
         "category": "Đồng hồ thông minh",
         "price": 5790000,
         "compareAtPrice": 6490000,
-        "image": "/assets/uploads/products/apple-watch-se-2023.png",
+        "image": "/assets/uploads/products/apple-watch-se-midnight.png",
         "images": [
             "/assets/uploads/products/apple-watch-se-2023.png",
             "/assets/uploads/products/apple-watch-se-midnight.png",
@@ -1934,37 +1832,28 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
         "variants": [
             {
-                "sku": "TECH-00038-MIDNIGHT",
                 "color": "Đen Midnight (Midnight)",
-                "colorHex": "#1c2530",
+                "colorName": "Đen Midnight (Midnight)",
+                "colorHex": "#181b20",
                 "image": "/assets/uploads/products/apple-watch-se-midnight.png",
-                "compareAtPrice": 6490000,
-                "ram": "",
-                "storage": "",
                 "price": 5790000,
-                "stock": 30
+                "stock": 25
             },
             {
-                "sku": "TECH-00038-STARLIGHT",
                 "color": "Ánh Sao (Starlight)",
-                "colorHex": "#f2eee9",
+                "colorName": "Ánh Sao (Starlight)",
+                "colorHex": "#e5dcc5",
                 "image": "/assets/uploads/products/apple-watch-se-starlight.png",
-                "compareAtPrice": 6490000,
-                "ram": "",
-                "storage": "",
                 "price": 5790000,
-                "stock": 28
+                "stock": 20
             },
             {
-                "sku": "TECH-00038-SILVER",
                 "color": "Bạc (Silver)",
+                "colorName": "Bạc (Silver)",
                 "colorHex": "#e3e4e5",
                 "image": "/assets/uploads/products/apple-watch-se-silver.png",
-                "compareAtPrice": 6490000,
-                "ram": "",
-                "storage": "",
                 "price": 5790000,
-                "stock": 24
+                "stock": 18
             }
         ]
     },
@@ -1974,7 +1863,7 @@ const uniformCatalog = [
         "category": "Đồng hồ thông minh",
         "price": 6490000,
         "compareAtPrice": 6990000,
-        "image": "/assets/uploads/products/samsung-galaxy-watch-7.png",
+        "image": "/assets/uploads/products/galaxy-watch-7-green.png",
         "images": [
             "/assets/uploads/products/samsung-galaxy-watch-7.png",
             "/assets/uploads/products/galaxy-watch-7-green.png",
@@ -2002,26 +1891,20 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
         "variants": [
             {
-                "sku": "TECH-00039-GREEN",
                 "color": "Xanh Quân Đội (Green)",
-                "colorHex": "#3e4e43",
+                "colorName": "Xanh Quân Đội (Green)",
+                "colorHex": "#4d5b4a",
                 "image": "/assets/uploads/products/galaxy-watch-7-green.png",
-                "compareAtPrice": 6990000,
-                "ram": "",
-                "storage": "",
                 "price": 6490000,
-                "stock": 25
+                "stock": 22
             },
             {
-                "sku": "TECH-00039-SILVER",
                 "color": "Bạc Ánh Kem (Cream)",
-                "colorHex": "#f1ede2",
+                "colorName": "Bạc Ánh Kem (Cream)",
+                "colorHex": "#ece8de",
                 "image": "/assets/uploads/products/galaxy-watch-7-silver.png",
-                "compareAtPrice": 6990000,
-                "ram": "",
-                "storage": "",
                 "price": 6490000,
-                "stock": 20
+                "stock": 18
             }
         ]
     },
@@ -2226,7 +2109,7 @@ const uniformCatalog = [
         "category": "Đồng hồ thông minh",
         "price": 2790000,
         "compareAtPrice": 3290000,
-        "image": "/assets/uploads/products/huawei-watch-fit-3.png",
+        "image": "/assets/uploads/products/huawei-fit-3-black.png",
         "images": [
             "/assets/uploads/products/huawei-watch-fit-3.png",
             "/assets/uploads/products/huawei-fit-3-black.png",
@@ -2256,48 +2139,36 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T11:18:39.281Z",
         "variants": [
             {
-                "sku": "TECH-00043-BLACK",
-                "color": "Đen Không Gian (Space Black)",
+                "color": "Đen (Black)",
+                "colorName": "Đen (Black)",
                 "colorHex": "#18181b",
                 "image": "/assets/uploads/products/huawei-fit-3-black.png",
-                "compareAtPrice": 3290000,
-                "ram": "",
-                "storage": "",
                 "price": 2790000,
                 "stock": 30
             },
             {
-                "sku": "TECH-00043-PINK",
-                "color": "Hồng Nữ Tính (Moonlight Pink)",
-                "colorHex": "#f3b4c2",
-                "image": "/assets/uploads/products/huawei-fit-3-pink.webp",
-                "compareAtPrice": 3290000,
-                "ram": "",
-                "storage": "",
+                "color": "Trắng (Moon White)",
+                "colorName": "Trắng (Moon White)",
+                "colorHex": "#f4f4f5",
+                "image": "/assets/uploads/products/huawei-fit-3-white.png",
                 "price": 2790000,
                 "stock": 25
             },
             {
-                "sku": "TECH-00043-WHITE",
-                "color": "Trắng Trăng Non (Moon White)",
-                "colorHex": "#f5f5f5",
-                "image": "/assets/uploads/products/huawei-fit-3-white.png",
-                "compareAtPrice": 3290000,
-                "ram": "",
-                "storage": "",
-                "price": 2790000,
-                "stock": 22
-            },
-            {
-                "sku": "TECH-00043-MINT",
-                "color": "Xanh Bạc Hà (Mint Green)",
-                "colorHex": "#b5e2cb",
-                "image": "/assets/uploads/products/huawei-fit-3-green.webp",
-                "compareAtPrice": 3290000,
-                "ram": "",
-                "storage": "",
+                "color": "Hồng (Pink)",
+                "colorName": "Hồng (Pink)",
+                "colorHex": "#f472b6",
+                "image": "/assets/uploads/products/huawei-fit-3-pink.webp",
                 "price": 2790000,
                 "stock": 20
+            },
+            {
+                "color": "Xanh Lá (Green)",
+                "colorName": "Xanh Lá (Green)",
+                "colorHex": "#84cc16",
+                "image": "/assets/uploads/products/huawei-fit-3-green.webp",
+                "price": 2790000,
+                "stock": 15
             }
         ]
     },
@@ -2431,7 +2302,7 @@ const uniformCatalog = [
         "category": "Máy chơi game",
         "price": 7990000,
         "compareAtPrice": 8990000,
-        "image": "/assets/uploads/products/nintendo-switch-oled.jpg",
+        "image": "/assets/uploads/products/nintendo-switch-oled-white.jpg",
         "images": [
             "/assets/uploads/products/nintendo-switch-oled.jpg",
             "/assets/uploads/products/nintendo-switch-oled-white.jpg",
@@ -2462,37 +2333,28 @@ const uniformCatalog = [
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
         "variants": [
             {
-                "sku": "TECH-00048-WHITE",
                 "color": "Trắng Tiêu Chuẩn (White)",
-                "colorHex": "#f3f4f6",
+                "colorName": "Trắng Tiêu Chuẩn (White)",
+                "colorHex": "#ffffff",
                 "image": "/assets/uploads/products/nintendo-switch-oled-white.jpg",
-                "compareAtPrice": 8990000,
-                "ram": "",
-                "storage": "64GB (hỗ trợ thẻ MicroSD)",
+                "price": 7990000,
+                "stock": 30
+            },
+            {
+                "color": "Neon Đỏ Xanh (Neon Red / Neon Blue)",
+                "colorName": "Neon Đỏ Xanh (Neon Red / Neon Blue)",
+                "colorHex": "#ef4444",
+                "image": "/assets/uploads/products/nintendo-switch-oled-neon.jpg",
                 "price": 7990000,
                 "stock": 25
             },
             {
-                "sku": "TECH-00048-NEON",
-                "color": "Neon Đỏ Xanh (Neon Red / Neon Blue)",
-                "colorHex": "#e60012",
-                "image": "/assets/uploads/products/nintendo-switch-oled-neon.jpg",
-                "compareAtPrice": 8990000,
-                "ram": "",
-                "storage": "64GB (hỗ trợ thẻ MicroSD)",
-                "price": 7990000,
-                "stock": 20
-            },
-            {
-                "sku": "TECH-00048-MARIO",
                 "color": "Mario Đỏ Đặc Biệt (Mario Red)",
-                "colorHex": "#b80018",
+                "colorName": "Mario Đỏ Đặc Biệt (Mario Red)",
+                "colorHex": "#b91c1c",
                 "image": "/assets/uploads/products/nintendo-switch-oled-mario.jpg",
-                "compareAtPrice": 8990000,
-                "ram": "",
-                "storage": "64GB (hỗ trợ thẻ MicroSD)",
                 "price": 7990000,
-                "stock": 15
+                "stock": 12
             }
         ]
     },
@@ -2613,41 +2475,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-sony-playstation-5-slim.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-choi-game-sony-playstation-5-slim.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00050-WHITE",
-                "color": "Trắng Nguyên Bản (White)",
-                "colorHex": "#ffffff",
-                "image": "/assets/uploads/products/ps5-slim-white.png",
-                "compareAtPrice": 14990000,
-                "ram": "",
-                "storage": "1TB Custom High-Speed SSD",
-                "price": 13490000,
-                "stock": 20
-            },
-            {
-                "sku": "TECH-00050-BLACK",
-                "color": "Đen Midnight (Midnight Black)",
-                "colorHex": "#18181b",
-                "image": "/assets/uploads/products/ps5-slim-black.jpg",
-                "compareAtPrice": 14990000,
-                "ram": "",
-                "storage": "1TB Custom High-Speed SSD",
-                "price": 13490000,
-                "stock": 16
-            },
-            {
-                "sku": "TECH-00050-SILVER",
-                "color": "Bạc Sterling (Sterling Silver)",
-                "colorHex": "#94a3b8",
-                "image": "/assets/uploads/products/ps5-slim-silver.webp",
-                "compareAtPrice": 14990000,
-                "ram": "",
-                "storage": "1TB Custom High-Speed SSD",
-                "price": 13490000,
-                "stock": 14
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Máy chơi game cầm tay Sony Playstation Portal Remote Player",
@@ -2682,30 +2510,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-sony-playstation-portal.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-choi-game-sony-playstation-portal-1.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00051-WHITE",
-                "color": "Trắng Tiêu Chuẩn (Classic White)",
-                "colorHex": "#ffffff",
-                "image": "/assets/uploads/products/ps-portal-white.png",
-                "compareAtPrice": 7990000,
-                "ram": "",
-                "storage": "",
-                "price": 6990000,
-                "stock": 20
-            },
-            {
-                "sku": "TECH-00051-BLACK",
-                "color": "Đen Midnight (Midnight Black)",
-                "colorHex": "#18181b",
-                "image": "/assets/uploads/products/ps-portal-black.png",
-                "compareAtPrice": 7990000,
-                "ram": "",
-                "storage": "",
-                "price": 6990000,
-                "stock": 16
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Máy chơi game cầm tay ASUS ROG Ally Z1 Extreme",
@@ -2743,30 +2548,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/rog-xbox-ally.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/r/o/rog-xbox-ally_2_.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00052-WHITE",
-                "color": "Trắng Gaming (White)",
-                "colorHex": "#ffffff",
-                "image": "/assets/uploads/products/rog-ally-white.png",
-                "compareAtPrice": 16490000,
-                "ram": "16GB LPDDR5",
-                "storage": "512GB NVMe SSD",
-                "price": 14990000,
-                "stock": 18
-            },
-            {
-                "sku": "TECH-00052-BLACK",
-                "color": "Đen Stealth (Stealth Black)",
-                "colorHex": "#18181b",
-                "image": "/assets/uploads/products/rog-ally-black.jpg",
-                "compareAtPrice": 16490000,
-                "ram": "16GB LPDDR5",
-                "storage": "512GB NVMe SSD",
-                "price": 14990000,
-                "stock": 15
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Máy chơi game cầm tay ASUS ROG Ally X 24GB/1TB",
@@ -2805,30 +2587,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/rog-xbox-ally-x.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/r/o/rog-xbox-ally-x-1_1.jpg",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00053-BLACK",
-                "color": "Đen Nhám (Matte Black)",
-                "colorHex": "#18181b",
-                "image": "/assets/uploads/products/rog-ally-x-black.jpg",
-                "compareAtPrice": 24990000,
-                "ram": "24GB LPDDR5X",
-                "storage": "1TB PCIe 4.0 SSD",
-                "price": 22990000,
-                "stock": 20
-            },
-            {
-                "sku": "TECH-00053-WHITE",
-                "color": "Trắng Tinh Chế (Refined White)",
-                "colorHex": "#f4f4f5",
-                "image": "/assets/uploads/products/rog-ally-x-white.png",
-                "compareAtPrice": 24990000,
-                "ram": "24GB LPDDR5X",
-                "storage": "1TB PCIe 4.0 SSD",
-                "price": 22990000,
-                "stock": 15
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Tay cầm chơi game không dây Sony PS5 DualSense",
@@ -4526,30 +4285,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-sony-playstation-5-slim-asia-00497-2-tay-cam.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/b/o/bo-may-choi-game-sony-playstation-5-slim-hai-tay-cam_1__1_2.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00094-WHITE",
-                "color": "Trắng Tiêu Chuẩn (White)",
-                "colorHex": "#ffffff",
-                "image": "/assets/uploads/products/ps5-slim-2c-white.png",
-                "compareAtPrice": 16490000,
-                "ram": "",
-                "storage": "1TB Custom SSD",
-                "price": 14990000,
-                "stock": 25
-            },
-            {
-                "sku": "TECH-00094-BLACK",
-                "color": "Đen Midnight (Midnight Black)",
-                "colorHex": "#18181b",
-                "image": "/assets/uploads/products/ps5-slim-2c-black.jpg",
-                "compareAtPrice": 16490000,
-                "ram": "",
-                "storage": "1TB Custom SSD",
-                "price": 14990000,
-                "stock": 18
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Máy chơi game cầm tay MSI Claw 8 AI Plus A2VM Intel Core Ultra",
@@ -4589,30 +4325,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/may-choi-game-msi-claw-8-ai-plus-a2vm-079vn.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/a/may-choi-game-msi-claw-8-ai-plus-a2vm-079vn_1_.png",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00095-BLACK",
-                "color": "Đen Huyền Bí (Mystic Black)",
-                "colorHex": "#18181b",
-                "image": "/assets/uploads/products/msi-claw-8-black.png",
-                "compareAtPrice": 18990000,
-                "ram": "32GB LPDDR5X",
-                "storage": "1TB NVMe SSD",
-                "price": 16990000,
-                "stock": 15
-            },
-            {
-                "sku": "TECH-00095-WHITE",
-                "color": "Trắng Băng Giá (Glacier White)",
-                "colorHex": "#f8fafc",
-                "image": "/assets/uploads/products/msi-claw-8-white.png",
-                "compareAtPrice": 18990000,
-                "ram": "32GB LPDDR5X",
-                "storage": "1TB NVMe SSD",
-                "price": 16990000,
-                "stock": 12
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Chuột không dây Bluetooth Microsoft Arc Mouse Gập Phẳng",
@@ -4848,30 +4561,7 @@ const uniformCatalog = [
         "sourceUrl": "https://cellphones.com.vn/lenovo-legion-go-2.html",
         "originalImageUrl": "https://cdn2.cellphones.com.vn/x/media/catalog/product/l/e/legion-go-8asp2.jpg",
         "sourceFetchedAt": "2026-10-03T06:10:15.906Z",
-        "variants": [
-            {
-                "sku": "TECH-00100-BLACK",
-                "color": "Đen Bóng Đêm (Shadow Black)",
-                "colorHex": "#1f2937",
-                "image": "/assets/uploads/products/lenovo-legion-go-black.jpg",
-                "compareAtPrice": 21990000,
-                "ram": "16GB LPDDR5X",
-                "storage": "1TB PCIe Gen4 SSD",
-                "price": 19490000,
-                "stock": 12
-            },
-            {
-                "sku": "TECH-00100-GREY",
-                "color": "Xám Khói (Storm Grey)",
-                "colorHex": "#475569",
-                "image": "/assets/uploads/products/lenovo-legion-go-grey.jpg",
-                "compareAtPrice": 21990000,
-                "ram": "16GB LPDDR5X",
-                "storage": "1TB PCIe Gen4 SSD",
-                "price": 19490000,
-                "stock": 10
-            }
-        ]
+        "variants": []
     },
     {
         "name": "Điện thoại Samsung Galaxy A05s 128GB",

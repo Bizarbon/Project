@@ -30,11 +30,11 @@ async function repairCanonicalProductAssets() {
 async function syncAllProductVariantsAndAssets() {
     let updatedCount = 0;
     try {
-        const itemsWithVariants = uniformCatalog.filter(item => item && item.name && Array.isArray(item.variants) && item.variants.length > 0);
-        if (itemsWithVariants.length === 0) return 0;
+        const catalogItems = uniformCatalog.filter(item => item && item.name);
+        if (catalogItems.length === 0) return 0;
 
         const dbProds = await Product.find({
-            name: { $in: itemsWithVariants.map(i => i.name) }
+            name: { $in: catalogItems.map(i => i.name) }
         }).select('_id name variants image images');
 
         const dbMap = new Map();
@@ -43,20 +43,21 @@ async function syncAllProductVariantsAndAssets() {
         }
 
         const bulkOps = [];
-        for (const item of itemsWithVariants) {
+        for (const item of catalogItems) {
             const dbProd = dbMap.get(item.name);
             if (!dbProd) continue;
 
-            const dbVariantsLen = Array.isArray(dbProd.variants) ? dbProd.variants.length : 0;
-            const catalogVariantsLen = item.variants.length;
+            const targetVariants = Array.isArray(item.variants) ? item.variants : [];
+            const dbVariants = Array.isArray(dbProd.variants) ? dbProd.variants : [];
+            const variantsChanged = JSON.stringify(dbVariants) !== JSON.stringify(targetVariants);
 
-            if (dbVariantsLen !== catalogVariantsLen || dbProd.image !== item.image) {
+            if (variantsChanged || dbProd.image !== item.image) {
                 bulkOps.push({
                     updateOne: {
                         filter: { _id: dbProd._id },
                         update: {
                             $set: {
-                                variants: item.variants,
+                                variants: targetVariants,
                                 image: item.image,
                                 images: item.images || [item.image]
                             }
