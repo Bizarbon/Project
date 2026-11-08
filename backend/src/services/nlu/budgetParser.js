@@ -75,6 +75,7 @@ function parseBudget(text) {
                 min: minAmount,
                 max: maxAmount,
                 target: Math.round((minAmount + maxAmount) / 2),
+                type: 'range',
                 currency: 'VND',
                 confidence: 0.95
             };
@@ -91,6 +92,7 @@ function parseBudget(text) {
                 min: null,
                 max: amount,
                 target: amount,
+                type: 'max',
                 currency: 'VND',
                 confidence: 0.9
             };
@@ -106,6 +108,7 @@ function parseBudget(text) {
                 min: null,
                 max: amount,
                 target: amount,
+                type: 'max',
                 currency: 'VND',
                 confidence: 0.9
             };
@@ -122,6 +125,7 @@ function parseBudget(text) {
                 min: amount,
                 max: null,
                 target: amount,
+                type: 'min',
                 currency: 'VND',
                 confidence: 0.9
             };
@@ -139,6 +143,7 @@ function parseBudget(text) {
                 min: Math.max(0, amount - range),
                 max: amount + range,
                 target: amount,
+                type: 'approx',
                 currency: 'VND',
                 confidence: 0.85
             };
@@ -164,6 +169,7 @@ function parseBudget(text) {
                 min: Math.max(0, amount - range),
                 max: amount + range,
                 target: amount,
+                type: 'exact',
                 currency: 'VND',
                 confidence: 0.8
             };

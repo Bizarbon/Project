@@ -62,7 +62,7 @@
     }
 
     function humanizeStoreName(value) {
-        return String(value ?? '').replace(/TechEcommerce/gi, 'cửa hàng tụi mình');
+        return String(value ?? '');
     }
 
     function renderMarkdownTable(tableLines) {
@@ -874,7 +874,7 @@
             // Chỉ hiển thị sản phẩm vừa xem nếu thực sự có tương tác trong vòng 10 phút gần nhất và cùng danh mục
             if (profile.lastProduct && profile.updatedAt && (now - profile.updatedAt < 10 * 60 * 1000) && matchCategory) {
                 return {
-                    text: `Xin chào! Rất vui được gặp lại bạn 😊 Bạn đang quan tâm mẫu **${profile.lastProduct}**. Mẫu này hiện đang có sẵn tại showroom và hỗ trợ trả góp 0%. Bạn có muốn mình so sánh chi tiết hoặc kiểm tra gói combo trợ giá hôm nay không?`,
+                    text: `Xin chào! Rất vui được gặp lại bạn 😊 Bạn đang quan tâm mẫu **${profile.lastProduct}**. Mẫu này hiện đang có sẵn tại showroom và hỗ trợ trả góp 0%. Bạn có muốn em so sánh chi tiết hoặc kiểm tra gói combo trợ giá hôm nay không?`,
                     suggestions: [
                         `Xem giá ${profile.lastProduct}`,
                         'Combo phụ kiện giảm 30%',
@@ -1438,12 +1438,12 @@
             const category = consultationContext.category || 'sản phẩm vừa xem';
 
             if (products.length >= 2) {
-                return `Mình vẫn ở đây nha 😊 Bạn còn phân vân giữa các mẫu vừa xem ở điểm nào: giá, tính năng hay trải nghiệm sử dụng? Nói mình tiêu chí quan trọng nhất, mình sẽ so sánh thật gọn để bạn dễ chọn hơn.`;
+                return `Em vẫn ở đây nha 😊 Bạn còn phân vân giữa các mẫu vừa xem ở điểm nào: giá, tính năng hay trải nghiệm sử dụng? Nhắn em tiêu chí quan trọng nhất, em sẽ so sánh thật gọn để bạn dễ chọn hơn.`;
             }
             if (products.length === 1) {
-                return `Bạn còn băn khoăn gì về mẫu **${products[0].name || category}** không? Mình có thể kiểm tra thêm giá, tính năng, bảo hành hoặc phương án trả góp giúp bạn nhé.`;
+                return `Bạn còn băn khoăn gì về mẫu **${products[0].name || category}** không? Em có thể kiểm tra thêm giá, tính năng, bảo hành hoặc phương án trả góp giúp bạn nhé.`;
             }
-            return `Mình vẫn ở đây nếu bạn còn phân vân về **${category}** nhé 😊 Bạn cứ cho mình biết mức giá mong muốn hoặc nhu cầu quan trọng nhất, mình sẽ gợi ý sát hơn cho bạn.`;
+            return `Em vẫn ở đây nếu bạn còn phân vân về **${category}** nhé 😊 Bạn cứ cho em biết mức giá mong muốn hoặc nhu cầu quan trọng nhất, em sẽ gợi ý sát hơn cho bạn.`;
         }
 
         function scheduleReengagement() {
@@ -2157,7 +2157,7 @@
                 input.value = '';
                 appendMessage(body, 'user', message);
                 chatHistory.push({ role: 'user', text: message });
-                const reply = 'Đã mở Zalo để bạn trò chuyện trực tiếp cùng chuyên viên tư vấn TechEcommerce (Hotline/Zalo: 0842.331.606). Bạn cũng có thể hỏi tiếp mình bất kỳ thông tin nào khác nhé!';
+                const reply = 'Đã mở Zalo để bạn trò chuyện trực tiếp cùng chuyên viên tư vấn TechEcommerce (Hotline/Zalo: 0842.331.606). Bạn cũng có thể hỏi tiếp em bất kỳ thông tin nào khác nhé!';
                 appendMessage(body, 'ai', reply);
                 chatHistory.push({ role: 'ai', text: reply });
                 saveSession();
@@ -2255,7 +2255,7 @@
                 panel.dataset.state = 'success';
             } catch (error) {
                 typing.remove();
-                appendMessage(body, 'ai', error.message || 'Có lỗi xảy ra, bạn thử lại giúp mình nhé.');
+                appendMessage(body, 'ai', error.message || 'Có lỗi xảy ra, bạn thử lại giúp em nhé.');
                 panel.dataset.state = 'error';
                 window.TechMascot?.onReplyError();
             } finally {
@@ -2517,7 +2517,7 @@
 
             if (justRedirectedCategory) {
                 sessionStorage.removeItem('ai_chat_just_redirected_category');
-                const arrivalMsg = `✨ Mình đã mở trang danh mục **${justRedirectedCategory}** cho bạn! Bạn có thể xem toàn bộ các sản phẩm bên dưới, hoặc trao đổi thêm với mình để chọn được chiếc máy ưng ý nhất nhé.`;
+                const arrivalMsg = `✨ Em đã mở trang danh mục **${justRedirectedCategory}** cho bạn! Bạn có thể xem toàn bộ các sản phẩm bên dưới, hoặc trao đổi thêm với em để chọn được chiếc máy ưng ý nhất nhé.`;
                 appendMessage(body, 'ai', arrivalMsg);
                 chatHistory.push({ role: 'ai', text: arrivalMsg });
                 saveSession();
@@ -2525,7 +2525,7 @@
 
             if (justRedirectedName) {
                 sessionStorage.removeItem('ai_chat_just_redirected_name');
-                const arrivalMsg = `✨ Mình đã đưa bạn đến màn hình **${justRedirectedName}**! Bạn có thể xem thông số, lướt xuống xem video trên tay thực tế hoặc hỏi mình thêm nhé.`;
+                const arrivalMsg = `✨ Em đã đưa bạn đến màn hình **${justRedirectedName}**! Bạn có thể xem thông số, lướt xuống xem video trên tay thực tế hoặc hỏi em thêm nhé.`;
                 appendMessage(body, 'ai', arrivalMsg);
                 chatHistory.push({ role: 'ai', text: arrivalMsg });
                 saveSession();

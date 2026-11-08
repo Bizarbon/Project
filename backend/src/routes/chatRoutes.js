@@ -499,9 +499,9 @@ TechEcommerce chuyên bán chính hãng 100%: Điện thoại (iPhone, Samsung, 
 Chính sách: Bảo hành 12-24 tháng, lỗi 1 đổi 1 trong 30 ngày, trả góp 0% lãi suất.
 
 NGUYÊN TẮC TRẢ LỜI:
-1. Giao tiếp tự nhiên, thân thiện như một người bạn am hiểu công nghệ. Dùng đại từ xưng hô "mình" hoặc "em" và "bạn".
+1. Giao tiếp tự nhiên, tận tâm và chuyên nghiệp. Luôn xưng là "em" và gọi khách là "bạn". Tuyệt đối KHÔNG tự xưng "mình", "tụi mình", "chúng mình".
 2. Nếu khách hỏi vui, chào hỏi, đố vui, toán học (ví dụ: "1+1", "bạn có người yêu chưa", "kể chuyện cười"), hãy trả lời dí dỏm, khéo léo và tự nhiên. Tuyệt đối không spam kịch bản bán hàng máy móc!
-3. Nếu khách hỏi câu hỏi khó hoặc nằm ngoài khả năng, hãy nhẹ nhàng thông báo: "Dạ câu này mình chưa hiểu rõ ý bạn lắm nè 😅" và gợi ý khách diễn đạt lại nhu cầu công nghệ để hỗ trợ tốt nhất.
+3. Nếu khách hỏi câu hỏi khó hoặc nằm ngoài khả năng, hãy nhẹ nhàng thông báo: "Dạ câu này em chưa hiểu rõ ý bạn lắm nè 😅" và gợi ý khách diễn đạt lại nhu cầu công nghệ để hỗ trợ tốt nhất.
 4. Giữ câu trả lời ngắn gọn, súc tích (khoảng 2 - 4 câu), có thể kèm emoji phù hợp.`;
 
     return await askGeminiIfConfigured(systemPrompt, message);
@@ -527,7 +527,7 @@ async function evaluateUpgradeVsNew(message, context = {}, user = null) {
     const reply = `🔍 **TƯ VẤN KỸ THUẬT: ĐÁNH GIÁ NÂNG CẤP MÁY CŨ HAY ĐẦU TƯ MÁY MỚI?**\n\n` +
         `Chào bạn! Để giúp bạn đưa ra quyết định đúng đắn, tiết kiệm và phù hợp nhất với nhu cầu, TechEcommerce xin phân tích chi tiết:\n\n` +
         `1. 📋 **CÁC THÔNG TIN CẦN XÁC ĐỊNH TRƯỚC KHI QUYẾT ĐỊNH:**\n` +
-        `Để chẩn đoán chính xác nguyên nhân máy chậm, bạn có thể cho mình biết thêm:\n` +
+        `Để chẩn đoán chính xác nguyên nhân máy chậm, bạn có thể cho em biết thêm:\n` +
         `• **Model máy cụ thể:** Tên dòng laptop bạn đang dùng (Dell, HP, Lenovo, Asus...)?\n` +
         `• **Dung lượng RAM & Loại ổ cứng hiện tại:** Máy đang có bao nhiêu GB RAM và đang chạy ổ cơ HDD hay ổ SSD?\n` +
         `• **Phần mềm sử dụng & Triệu chứng chậm:** Máy chậm khi khởi động, khi mở nhiều ứng dụng văn phòng, hay khi chạy các tác vụ nặng (Photoshop, Premiere, Docker, Android Studio...)?\n\n` +
@@ -600,7 +600,7 @@ async function answerComparison(message, context = {}) {
 
     if (!p1 || !p2 || String(p1._id) === String(p2._id)) {
         return {
-            reply: 'Bạn muốn so sánh 2 sản phẩm cụ thể nào? Ví dụ: *"So sánh MacBook Air M2 và Laptop ASUS ROG Strix"* hoặc *"So sánh Lenovo IdeaPad Slim 3 và Dell Inspiron"* để mình lập bảng thông số thực tế và phân tích điểm được - mất cho bạn nhé!',
+            reply: 'Bạn muốn so sánh 2 sản phẩm cụ thể nào? Ví dụ: *"So sánh MacBook Air M2 và Laptop ASUS ROG Strix"* hoặc *"So sánh Lenovo IdeaPad Slim 3 và Dell Inspiron"* để em lập bảng thông số thực tế và phân tích điểm được - mất cho bạn nhé!',
             suggestions: ['So sánh MacBook Air và ROG Strix', 'So sánh Lenovo và Dell', 'Tư vấn laptop sinh viên', 'Mã giảm giá hôm nay']
         };
     }
@@ -716,7 +716,7 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
             `2. 💳 **Trả góp 0% lãi suất qua Thẻ tín dụng (Credit Card):**\n` +
             `   • **Ngân hàng hỗ trợ:** Hơn 25 ngân hàng liên kết (Techcombank, Vietcombank, VPBank, Sacombank, HSBC, TPBank, MB Bank...).\n` +
             `   • **Ưu điểm:** **0% lãi suất**, không cần chứng minh thu nhập hay duyệt hồ sơ, trả trước 0 đồng, kỳ hạn 3 - 6 - 9 - 12 tháng.\n\n` +
-            `👉 Bạn đang quan tâm mẫu máy nào (ví dụ: *iPhone 15*, *Laptop ASUS TUF*, *MacBook Air*...) để mình tính bảng trả góp và số tiền thanh toán hàng tháng chi tiết cho bạn nhé! 😊`;
+            `👉 Bạn đang quan tâm mẫu máy nào (ví dụ: *iPhone 15*, *Laptop ASUS TUF*, *MacBook Air*...) để em tính bảng trả góp và số tiền thanh toán hàng tháng chi tiết cho bạn nhé! 😊`;
 
         return {
             reply,
@@ -861,7 +861,7 @@ async function answerOrderQuestion(req, message) {
 
     if (!user) {
         return {
-            reply: 'Để mình kiểm tra đơn hàng chính xác, bạn hãy đăng nhập tài khoản đã đặt hàng rồi hỏi lại theo mẫu: "Kiểm tra đơn #123". Bạn cũng có thể vào mục "Đơn hàng của tôi" ở góc trang web.',
+            reply: 'Để em kiểm tra đơn hàng chính xác, bạn hãy đăng nhập tài khoản đã đặt hàng rồi hỏi lại theo mẫu: "Kiểm tra đơn #123". Bạn cũng có thể vào mục "Đơn hàng của tôi" ở góc trang web.',
             suggestions: ['Đăng nhập tài khoản', 'Chính sách vận chuyển', 'Chính sách đổi trả']
         };
     }
@@ -1105,7 +1105,7 @@ YÊU CẦU BẮT BUỘC:
             priority ? `ưu tiên **${priority}**` : '',
             budget ? `ngân sách khoảng **${money(budget)}**` : ''
         ].filter(Boolean).join(', ');
-        guidanceIntro = demandDesc ? `Chào bạn! Dựa trên ${demandDesc}, mình đã chọn lọc các mẫu máy chính hãng phù hợp nhất trong kho:` : `Chào bạn! Dưới đây là các lựa chọn chính hãng tối ưu nhất trong kho:`;
+        guidanceIntro = demandDesc ? `Chào bạn! Dựa trên ${demandDesc}, em đã chọn lọc các mẫu máy chính hãng phù hợp nhất trong kho:` : `Chào bạn! Dưới đây là các lựa chọn chính hãng tối ưu nhất trong kho:`;
     }
 
     const productDetails = products.map((p, idx) => {
@@ -1137,7 +1137,7 @@ YÊU CẦU BẮT BUỘC:
             `• **${p2.name}**: ${p2.price < p1.price ? `Mức giá kinh tế hơn (${money(p2.price)}).` : `Màn hình lớn hơn hoặc cấu hình mạnh mẽ hơn để mở rộng công việc sau này.`}`;
     }
 
-    const followUpQuestion = `\n\n👉 **Bạn còn phân vân gì giữa các mẫu trên không?** Bạn có muốn mình so sánh chi tiết ưu/nhược điểm điểm nào giữa 2 máy để bạn dễ chọn nhất không nhé?`;
+    const followUpQuestion = `\n\n👉 **Bạn còn phân vân gì giữa các mẫu trên không?** Bạn có muốn em so sánh chi tiết ưu/nhược điểm điểm nào giữa 2 máy để bạn dễ chọn nhất không nhé?`;
 
     const reply = `${guidanceIntro}\n\n${productDetails}${tradeOffSection}${followUpQuestion}`;
 
@@ -1421,7 +1421,7 @@ async function answerProductQuestion(message, user, previousContext = {}) {
         if (category === 'Tai nghe') {
             const reply = budget
                 ? `Chào bạn! Với mức ngân sách khoảng **${money(budget)}**, bạn dự định dùng tai nghe chủ yếu cho nhu cầu nào sau đây ạ?`
-                : `Chào bạn! Để mình giúp bạn chọn chiếc tai nghe phù hợp và ưng ý nhất, bạn dự định dùng tai nghe chủ yếu cho nhu cầu nào sau đây ạ?`;
+                : `Chào bạn! Để em giúp bạn chọn chiếc tai nghe phù hợp và ưng ý nhất, bạn dự định dùng tai nghe chủ yếu cho nhu cầu nào sau đây ạ?`;
             const suggestions = [
                 'Chống ồn chủ động (ANC)',
                 'Nghe nhạc bass mạnh',
@@ -1844,7 +1844,7 @@ async function handleActionExecution(message, context = {}) {
 
     if (!targetProduct) {
         return {
-            reply: 'Dạ mình rất sẵn sàng hỗ trợ bạn thêm vào giỏ và áp mã ưu đãi ngay! Bạn có thể cho mình biết rõ hơn tên model sản phẩm (ví dụ: *Logitech MX Keys S*, *iPhone 16 Pro Max*, *MacBook Air M3*...) được không ạ?',
+            reply: 'Dạ em rất sẵn sàng hỗ trợ bạn thêm vào giỏ và áp mã ưu đãi ngay! Bạn có thể cho em biết rõ hơn tên model sản phẩm (ví dụ: *Logitech MX Keys S*, *iPhone 16 Pro Max*, *MacBook Air M3*...) được không ạ?',
             suggestions: ['Xem mẫu Logitech MX Keys S', 'Xem iPhone 16 Pro Max', 'Xem MacBook Air M3', 'Mã giảm giá hôm nay']
         };
     }
@@ -2058,7 +2058,7 @@ async function handleBudgetAndSpecialAdvisorQueries(message, context = {}) {
                     `1. 🏆 **${topPick.name}** (${money(topPick.price)}):\n` +
                     `   • **Lý do tối ưu:** Sở hữu công nghệ chống ồn ANC hàng đầu thế giới với 2 chip xử lý và 8 micro triệt tiêu tạp âm tần số thấp cực sâu. Đệm tai siêu êm ái không gây đau tai suốt chuyến bay dài 8-12 tiếng. Pin 30 giờ và kèm sẵn cáp 3.5mm cắm trực tiếp vào hệ thống giải trí ghế máy bay.\n\n` +
                     (secondPick ? `2. 🌟 **${secondPick.name}** (${money(secondPick.price)}):\n   • **Lý do tối ưu:** Thiết kế True Wireless đút tai siêu gọn nhẹ bỏ túi áo. Chế độ xuyên âm thích ứng (Adaptive Audio) giúp nghe rõ thông báo từ cơ trưởng hoặc tiếp viên mà không cần tháo tai nghe.\n\n` : '') +
-                    `👉 Mình đã đính kèm danh thiếp sản phẩm bên dưới để bạn xem chi tiết hoặc bấm đặt hàng nhanh giao tận nơi nhé! 😊`,
+                    `👉 Em đã đính kèm danh thiếp sản phẩm bên dưới để bạn xem chi tiết hoặc bấm đặt hàng nhanh giao tận nơi nhé! 😊`,
                 products: selected,
                 suggestions: [
                     'Thêm vào giỏ hàng ngay',
@@ -2171,7 +2171,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const specialAdvisor = await handleBudgetAndSpecialAdvisorQueries(message, req.body.context);
         const policyAnswer = await answerPolicyQuestion(message);
         const gameCapability = await evaluateGameOrTaskCapability(message, req.body.context);
-        const isBargainOrBundle = ['bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem', 'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot', 'co giam them', 'combo phu kien', 'co khuyen mai kem'].some(k => text.includes(k));
+        const isBargainOrBundle = ['bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem', 'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot', 'co giam them', 'combo phu kien', 'co khuyen mai kem'].some(k => hasWordOrPhrase(text, k));
 
         const smallTalk = detectGreetingOrSmallTalk(text);
         if (smallTalk) {
@@ -2187,11 +2187,11 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             }
         } else if (gameCapability) {
             response = gameCapability;
-        } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => text.includes(k))) {
+        } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => hasWordOrPhrase(text, k))) {
             response = await answerVoucherQuestion();
-        } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => text.includes(k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => text.includes(k))) {
+        } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => hasWordOrPhrase(text, k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => hasWordOrPhrase(text, k))) {
             response = await answerInstallmentQuestion(message, req.body.context?.lastProducts);
-        } else if (['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi'].some(k => text.includes(k))) {
+        } else if (['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi'].some(k => hasWordOrPhrase(text, k))) {
             response = await answerOrderQuestion(req, message);
         } else if (policyAnswer) {
             response = {

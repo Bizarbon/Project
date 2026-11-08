@@ -289,9 +289,9 @@ function classifyIntent(normalizedText, unaccentedText) {
 
     if (!isOutOfCatalog) {
         const outOfCatalogKeywords = [
-            /tủ lạnh|tu lanh|máy giặt|may giat|điều hòa|dieu hoa|máy lạnh|may lanh|nồi cơm|noi com/i,
-            /xe máy|xe may|ô tô|o to|xe đạp|xe dap|vé máy bay|ve may bay|khách sạn|khach san/i,
-            /quần áo|quan ao|giày dép|giay dep|mỹ phẩm|my pham|thức ăn|thuc an|thực phẩm|thuc pham|sách kinh tế|sach kinh te/i
+            /\b(?:tủ lạnh|tu lanh|máy giặt|may giat|điều hòa|dieu hoa|máy lạnh|may lanh|nồi cơm|noi com)\b/i,
+            /\b(?:xe máy|xe may|ô tô|o to|xe đạp|xe dap|vé máy bay|ve may bay|khách sạn|khach san)\b/i,
+            /\b(?:quần áo|quan ao|giày dép|giay dep|mỹ phẩm|my pham|thức ăn|thuc an|thực phẩm|thuc pham|sách kinh tế|sach kinh te)\b/i
         ];
         if (outOfCatalogKeywords.some(p => p.test(text) || p.test(noAcc))) {
             isOutOfCatalog = true;
