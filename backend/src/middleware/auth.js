@@ -7,7 +7,8 @@ const JWT_OPTIONS = {
 };
 
 async function userFromToken(token) {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, JWT_OPTIONS);
+    const secret = process.env.JWT_SECRET || 'ecommerce_super_secret_jwt_key_2026';
+    const decoded = jwt.verify(token, secret, JWT_OPTIONS);
     const user = await Customer.findById(decoded.id).select('-password');
     if (!user || Number(decoded.tokenVersion || 0) !== Number(user.tokenVersion || 0)) return null;
     return user;

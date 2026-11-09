@@ -50,13 +50,14 @@ const otpVerifyLimiter = rateLimit({
 router.use(authLimiter);
 
 function signToken(customer) {
+    const secret = process.env.JWT_SECRET || 'ecommerce_super_secret_jwt_key_2026';
     return jwt.sign(
         {
             id: customer._id,
             isAdmin: customer.isAdmin,
             tokenVersion: Number(customer.tokenVersion || 0)
         },
-        process.env.JWT_SECRET,
+        secret,
         {
             expiresIn: process.env.JWT_EXPIRES_IN || '7d',
             issuer: 'techecommerce-api',

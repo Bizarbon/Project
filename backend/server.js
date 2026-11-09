@@ -1,4 +1,21 @@
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+const envPaths = [
+    path.join(__dirname, '.env'),
+    path.join(process.cwd(), '.env'),
+    path.join(process.cwd(), 'backend', '.env')
+];
+for (const p of envPaths) {
+    if (fs.existsSync(p)) {
+        require('dotenv').config({ path: p });
+        break;
+    }
+}
+if (!process.env.JWT_SECRET) {
+    require('dotenv').config();
+}
+
 const app = require('./src/app');
 const connectDB = require('./src/config/db');
 const { expireOverduePayments } = require('./src/utils/paymentExpiry');

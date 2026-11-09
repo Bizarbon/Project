@@ -1,4 +1,21 @@
 const path = require('path');
+const fs = require('fs');
+
+if (!process.env.JWT_SECRET) {
+    const envPaths = [
+        path.join(__dirname, '../.env'),
+        path.join(__dirname, '../../.env'),
+        path.join(process.cwd(), '.env'),
+        path.join(process.cwd(), 'backend', '.env')
+    ];
+    for (const p of envPaths) {
+        if (fs.existsSync(p)) {
+            require('dotenv').config({ path: p });
+            break;
+        }
+    }
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
