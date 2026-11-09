@@ -1826,7 +1826,9 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             const isForStudent = /sinh vien|hoc sinh|di hoc|hoc tap/i.test(normalizedMessage + ' ' + (useCase || ''));
             const isForDev = /lap trinh|code|cntt|it|developer|docker/i.test(normalizedMessage + ' ' + (useCase || ''));
 
-            if (isForMomOrElderly) {
+            if (nearestBudgetProduct) {
+                intro = `Dạ với mức ngân sách **${budgetType === 'min' ? 'từ ' : (budgetType === 'max' ? 'dưới ' : 'khoảng ')}${money(budget)}** mà bạn đang tìm kiếm, hiện tại hệ thống chưa có mẫu **${productType.label}** mới chính hãng trong tầm giá này. Tuy nhiên, để bạn dễ quan sát và cân nhắc, em xin phép **hiển thị ngay trên trang mẫu ${productType.label} có giá gần nhất và tốt nhất** hiện có sẵn tại cửa hàng là **${nearestBudgetProduct.name}** (${money(nearestBudgetProduct.price)}) nhé:\n\n`;
+            } else if (isForMomOrElderly) {
                 intro = `Dạ chọn ${productType.label} tặng mẹ là một món quà rất ý nghĩa và chu đáo ạ! ❤️ Với phụ huynh, tiêu chí quan trọng nhất là màn hình to rõ dễ nhìn, pin bền dùng cả ngày, camera chụp gia đình sắc nét và máy hoạt động ổn định, dễ dùng.\n\n` +
                     `Trong tầm giá ${budget > 0 ? (budgetType === 'min' ? `từ **${money(budget)} trở lên**` : `khoảng **${money(budget)}**`) : ''}, em xin gợi ý ngay **${selected.length} mẫu tối ưu nhất** tại kho TechEcommerce:\n\n`;
             } else if (isForStudent) {
@@ -1867,16 +1869,29 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             }).join('\n\n');
 
             let outro = `\n\n👉 Bạn đang ưng ý mẫu nào trong các lựa chọn trên, hoặc bạn cần em so sánh chi tiết hơn để dễ cân nhắc không ạ? 😊`;
-            if (!budget) {
+            if (nearestBudgetProduct) {
+                const downPay = Math.round(nearestBudgetProduct.price * 0.3);
+                const monthlyInst = Math.round((nearestBudgetProduct.price * 0.7) / 12);
+                outro = `\n\n💡 **Gợi ý hỗ trợ tài chính:** Để sở hữu thiết bị mà không bị áp lực ngân sách, bạn có thể tham gia chương trình **Trả góp 0% lãi suất** (trả trước 30% khoảng ~${money(downPay)}, góp chỉ ~${money(monthlyInst)}/tháng) hoặc áp mã giảm giá hôm nay nhé!\n👉 Bạn có muốn xem thêm chi tiết hoặc để em tính bảng trả góp 0% cho mẫu này không ạ? 😊`;
+            } else if (!budget) {
                 outro = `\n\n👉 Bạn đang ưu tiên phiên bản cao cấp hay tối ưu chi phí, và tầm giá dự kiến của bạn khoảng bao nhiêu để em tư vấn cấu hình và ưu đãi phù hợp nhất nhé! 😊`;
             }
 
             const defaultReply = `${intro}${productDetails}${outro}`;
             const grounded = await aiModelService.generateGroundedConsultation({
                 userMessage: message,
-                dialogueAct: 'recommend',
+                dialogueAct: nearestBudgetProduct ? 'nearest_budget_recommend' : 'recommend',
                 verifiedProducts: selected,
-                context: { ...context, category: productType.category, brand, budget, useCase, preference },
+                context: {
+                    ...context,
+                    category: productType.category,
+                    brand,
+                    budget,
+                    isNearestMatch: Boolean(nearestBudgetProduct),
+                    nearestProduct: nearestBudgetProduct ? nearestBudgetProduct.name : null,
+                    useCase,
+                    preference
+                },
                 fallbackText: defaultReply
             });
 
@@ -1905,7 +1920,8 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                     qualification,
                     lastProducts: selected,
                     topProduct: top,
-                    currentIntent: 'recommended'
+                    isNearestMatch: Boolean(nearestBudgetProduct),
+                    currentIntent: nearestBudgetProduct ? 'nearest_price_match' : 'recommended'
                 },
                 meta: {
                     provider: grounded.provider,
@@ -2457,7 +2473,7 @@ async function handleRecommendWithTradeOffs({
             const brandScope = brand ? ` của thương hiệu **${brand}**` : '';
             const reply = `Dạ hiện tại TechEcommerce chuyên phân phối **100% sản phẩm mới chính hãng** kèm bảo hành 12 - 24 tháng. 🙏\n\n` +
                 `Trong danh mục **${category}**${brandScope}, mức ngân sách dự kiến **${money(effectiveBudget)}** của bạn hiện thấp hơn mức giá của ${categoryItemNoun} có giá tốt nhất tại kho.\n` +
-                `${categoryItemNounCap} chính hãng có mức giá kinh tế nhất hiện nay là:\n` +
+                `Em xin phép **hiển thị ngay trên trang ${categoryItemNoun} có giá gần nhất và tiết kiệm nhất** để bạn dễ quan sát nhé:\n` +
                 `⭐ **${lowestInCat.name}** - Giá: **${money(lowestInCat.price)}** (chênh lệch khoảng +${money(diff)} so với dự kiến của bạn).\n\n` +
                 `Để hỗ trợ bạn sở hữu thiết bị tốt nhất mà không bị áp lực tài chính, cửa hàng có 3 giải pháp:\n` +
                 `1. 💳 **Trả góp 0% lãi suất:** Bạn chỉ cần trả trước 30% (${money(downPay)}), số tiền còn lại chia góp chỉ khoảng **${money(monthlyInst)}/tháng** (duyệt hồ sơ online 15 phút chỉ cần CCCD).\n` +
@@ -2482,6 +2498,8 @@ async function handleRecommendWithTradeOffs({
                     budgetMax,
                     budgetType: effectiveType,
                     lastProducts: [lowestInCat],
+                    topProduct: lowestInCat,
+                    isNearestMatch: true,
                     currentIntent: 'out_of_budget_scope'
                 }
             };

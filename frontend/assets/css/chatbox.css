@@ -2254,24 +2254,31 @@ html[data-theme='dark'] .ai-closing-prompt {
 /* CTAs */
 .ai-icard-footer {
     display: flex !important;
+    align-items: stretch !important;
     gap: 8px !important;
-    margin-top: 4px !important;
+    margin-top: 8px !important;
 }
 
 .ai-icard-btn-buy {
     flex: 1 1 auto !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
     background: linear-gradient(135deg, #0056cc 0%, #0068FF 100%) !important;
     color: #ffffff !important;
     border: none !important;
-    border-radius: 10px !important;
-    padding: 10px 14px !important;
-    font-size: 0.82rem !important;
+    border-radius: 12px !important;
+    padding: 0 14px !important;
+    font-size: 0.84rem !important;
     font-weight: 700 !important;
     cursor: pointer !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 6px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     box-shadow: 0 4px 14px rgba(0, 104, 255, 0.3) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
@@ -2282,25 +2289,32 @@ html[data-theme='dark'] .ai-closing-prompt {
 }
 
 .ai-icard-btn-cart {
-    background: #f1f5f9 !important;
-    color: #1e293b !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 10px !important;
-    padding: 10px 14px !important;
-    font-size: 0.82rem !important;
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    background: #f0f7ff !important;
+    color: #0068FF !important;
+    border: 1.5px solid #0068FF !important;
+    border-radius: 12px !important;
+    padding: 0 15px !important;
+    font-size: 0.84rem !important;
     font-weight: 700 !important;
     cursor: pointer !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .ai-icard-btn-cart:hover {
-    background: #e2e8f0 !important;
-    border-color: #94a3b8 !important;
+    background: #0068FF !important;
+    color: #ffffff !important;
+    border-color: #0068FF !important;
     transform: translateY(-2px) !important;
+    box-shadow: 0 4px 14px rgba(0, 104, 255, 0.35) !important;
 }
 
 .ai-icard-btn-cart.added {
@@ -2636,13 +2650,22 @@ html[data-theme='dark'] .ai-icard-installment {
 }
 
 html[data-theme='dark'] .ai-icard-btn-cart {
-    background: #334155 !important;
-    color: #f8fafc !important;
-    border-color: #475569 !important;
+    background: rgba(0, 104, 255, 0.15) !important;
+    color: #38bdf8 !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.5) !important;
 }
 
 html[data-theme='dark'] .ai-icard-btn-cart:hover {
-    background: #475569 !important;
+    background: #0284c7 !important;
+    color: #ffffff !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.45) !important;
+}
+
+html[data-theme='dark'] .ai-icard-btn-cart.added {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border-color: #10b981 !important;
+    color: #34d399 !important;
 }
 
 html[data-theme='dark'] .ai-bundle-main-row {

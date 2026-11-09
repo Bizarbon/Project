@@ -28,7 +28,7 @@
         if (!document.querySelector('link[data-ai-chat-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/chatbox.css?v=20260925-v3`;
+            link.href = `${root}assets/css/chatbox.css?v=20261109-nearest-v1`;
             link.dataset.aiChatStyle = 'true';
             document.head.appendChild(link);
         }
@@ -1089,13 +1089,13 @@
 
             <footer class="ai-icard-footer">
                 <button type="button" class="ai-icard-btn-buy" aria-label="Mua ngay và thanh toán nhanh">
-                    ⚡ Mua Ngay (Thanh toán 1 chạm)
+                    ⚡ Mua Ngay (1 chạm)
                 </button>
                 <button type="button" class="ai-icard-btn-cart" aria-label="Thêm vào giỏ hàng">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                    <span>+ Giỏ</span>
+                    <span>Thêm giỏ</span>
                 </button>
             </footer>
         `;
@@ -1167,10 +1167,10 @@
                 cartBtn.classList.add('added');
                 setTimeout(() => {
                     cartBtn.innerHTML = `
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
-                        <span>+ Giỏ</span>
+                        <span>Thêm giỏ</span>
                     `;
                     cartBtn.classList.remove('added');
                 }, 2000);
@@ -1972,39 +1972,27 @@
                 return;
             }
 
-            // D1. Khách hàng hỏi ngân sách nhưng thấp hơn mức giá tối thiểu của kho (out_of_budget_scope)
-            // TUYỆT ĐỐI không gán maxPrice thấp vào bộ lọc cửa hàng vì sẽ làm trắng màn hình ("Không tìm thấy sản phẩm phù hợp")
-            if (data.context?.currentIntent === 'out_of_budget_scope') {
-                if (isMainShop) {
-                    if (targetCategory && typeof window.setCategory === 'function') {
-                        window.setCategory(targetCategory, { scroll: false });
-                    }
-                    if (typeof window.setBrandFilter === 'function') {
-                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
-                    }
-                    if (typeof window.setShopPrice === 'function') {
-                        window.setShopPrice('', { scroll: false });
-                    }
-                    if (typeof window.setShopSearch === 'function') {
-                        window.setShopSearch(topProduct?.name || '', { scroll: true });
-                    }
-                } else if (targetCategory) {
-                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
-                }
-                return;
-            }
+            // D1. Khách hàng hỏi ngân sách ngoài phạm vi hoặc sản phẩm có giá gần nhất (Nearest Price Match)
+            // TUYỆT ĐỐI không gán maxPrice thấp vào bộ lọc cửa hàng vì sẽ làm trắng màn hình ("Không tìm thấy sản phẩm phù hợp").
+            // Thay vào đó: xóa bộ lọc khoảng giá, chọn đúng danh mục, xóa lọc hãng và hiển thị ngay sản phẩm gần nhất lên storefront!
+            const isNearestPriceMatch = Boolean(
+                data.context?.isNearestMatch ||
+                data.context?.currentIntent === 'nearest_price_match' ||
+                data.context?.currentIntent === 'out_of_budget_scope' ||
+                data.context?.currentIntent === 'product_type_no_match' ||
+                (topProduct && data.context?.budget > 0 && Number(topProduct.price) > Number(data.context.budget))
+            );
 
-            // D2. Khách hàng hỏi giá / ngân sách hoặc sản phẩm có giá gần nhất
-            if (data.context?.currentIntent === 'nearest_price_match' || data.context?.currentIntent === 'product_type_no_match') {
+            if (isNearestPriceMatch) {
                 if (isMainShop) {
                     if (targetCategory && typeof window.setCategory === 'function') {
                         window.setCategory(targetCategory, { scroll: false });
                     }
                     if (typeof window.setBrandFilter === 'function') {
-                        window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
+                        window.setBrandFilter('all', { scroll: false });
                     }
                     if (typeof window.setShopPrice === 'function') {
-                        // TUYỆT ĐỐI không gán maxPrice thấp hơn sản phẩm vì sẽ làm ẩn sản phẩm gần nhất
+                        // Xóa bộ lọc khoảng giá để không ẩn sản phẩm có giá cao hơn ngân sách dự kiến của khách
                         window.setShopPrice('', { scroll: false });
                     }
                     if (typeof window.setShopSearch === 'function') {

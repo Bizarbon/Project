@@ -173,6 +173,12 @@ async function generateGroundedConsultation({
   + **Quyền lợi & Giá trị đầu tư**: Nêu bật giá bán ưu đãi, chương trình trả góp 0%, quà tặng hoặc chính sách bảo hành chính hãng lỗi 1 đổi 1 trong 30 ngày.
   + **Đánh giá khách quan**: Điểm cần lưu ý chân thực để khách an tâm ra quyết định.
 - Kết luận bằng câu gợi mở thân thiện xem khách có muốn xem màu sắc sẵn có, phụ kiện kèm hoặc tính chi tiết bảng góp 0% không.`;
+    } else if (dialogueAct === 'nearest_budget_recommend' || context.isNearestMatch) {
+        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (TƯ VẤN SẢN PHẨM CÓ GIÁ GẦN NHẤT KHI KHÔNG CÓ GIÁ KHÁCH HỎI):
+- Mở đầu bằng sự đồng cảm và giải thích chân thành rằng các dòng sản phẩm mới chính hãng trong danh mục hiện tại có giá khởi điểm cao hơn con số khách dự kiến ("${userMessage}").
+- Khẳng định rõ ràng: Em xin phép **hiển thị ngay trên trang sản phẩm có mức giá gần bằng và tốt nhất** hiện có sẵn tại cửa hàng để bạn tiện quan sát và cân nhắc.
+- Xuống dòng dùng danh sách đánh số trình bày chi tiết sản phẩm được đề xuất: tên máy, giá bán thực tế, cấu hình nổi bật và lý do máy này tối ưu nhất cho chi phí.
+- Gợi ý giải pháp tài chính linh hoạt như Trả góp 0% lãi suất (chỉ cần trả trước 30%) hoặc áp mã giảm giá để khách dễ dàng sở hữu.`;
     } else {
         actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (ĐỀ XUẤT & TƯ VẤN THEO NHU CẦU):
 - Mở đầu bằng 1 - 2 đoạn văn ngắn gọn, thân thiện (không dùng số thứ tự hay gạch đầu dòng ở đoạn mở đầu) dẫn dắt vào nhu cầu/ngân sách của khách hàng để hệ thống đọc giọng nói.
