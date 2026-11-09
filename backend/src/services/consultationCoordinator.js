@@ -1754,7 +1754,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             }
 
             const dynamicSuggestions = buildDynamicCategoryChips(productType, productType.category);
-            const reply = `Dạ em chưa nắm rõ nhu cầu cụ thể của bạn lắm ạ! 😊 Để bạn dễ tham khảo, em gửi trước ${sampleProducts.length ? `${sampleProducts.length} mẫu` : 'các mẫu'} **${productType.label}** chính hãng đang được quan tâm nhiều nhất tại TechEcommerce nhé. Bạn xem thử có ưng mẫu nào dưới đây không ạ:`;
+            const reply = `Dạ em chưa nắm rõ nhu cầu cụ thể của bạn lắm ạ! 😊 Để bạn dễ tham khảo, em gửi trước ${sampleProducts.length ? `${sampleProducts.length} mẫu` : 'các mẫu'} **${productType.label}** chính hãng đang được quan tâm nhiều nhất tại cửa hàng nhé. Bạn xem thử có ưng mẫu nào dưới đây không ạ:`;
 
             return {
                 reply,
@@ -1785,7 +1785,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
             if (productType.name) availabilityQuery.name = productType.name;
             const hasAvailableProduct = await Product.exists(availabilityQuery);
             if (hasAvailableProduct) {
-                availabilityIntro = `Dạ có ạ! TechEcommerce hiện có sẵn **${productType.label}** chính hãng. `;
+                availabilityIntro = `Dạ có ạ! Cửa hàng hiện có sẵn **${productType.label}** chính hãng. `;
             }
         }
 
@@ -1801,7 +1801,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
         const questionPrompt = categoryQuestions[productType.category] ||
             `👉 Để em tìm sản phẩm ${productType.label} phù hợp nhất cho bạn, bạn dự kiến **tầm giá khoảng bao nhiêu** và dùng cho **nhu cầu nào** ạ? 😊`;
 
-        const introText = availabilityIntro || `Dạ hiện tại TechEcommerce có các mẫu **${productType.label}** chính hãng sẵn hàng tại kho. `;
+        const introText = availabilityIntro || `Dạ hiện tại cửa hàng có các mẫu **${productType.label}** chính hãng sẵn hàng tại kho. `;
         const reply = `${introText}\n\n${questionPrompt}`;
 
         return {
@@ -2343,7 +2343,7 @@ async function handleClarifyNeeds(category, existingSlots = {}, userProficiency 
         case 'Điện thoại': {
             if (existingSlots.useCase || existingSlots.preference) {
                 const intentName = existingSlots.useCase || existingSlots.preference;
-                question = `Dạ tuyệt vời! Với tiêu chí **${intentName}** cho dòng **Điện thoại**, TechEcommerce đang có sẵn các mẫu đầu bảng như **iPhone 16 Pro Max**, **Samsung Galaxy S25 Ultra** hay **OPPO Find X8 Pro**.\n` +
+                question = `Dạ tuyệt vời! Với tiêu chí **${intentName}** cho dòng **Điện thoại**, cửa hàng đang có sẵn các mẫu đầu bảng như **iPhone 16 Pro Max**, **Samsung Galaxy S25 Ultra** hay **OPPO Find X8 Pro**.\n` +
                     `Bạn dự kiến mức **ngân sách khoảng bao nhiêu triệu** để em lọc ra các phiên bản máy phù hợp và tối ưu nhất cho bạn nhé! 😊`;
                 suggestions = [
                     'Dưới 10 triệu',
@@ -2479,7 +2479,7 @@ async function handleOldDeviceDiagnosis(message, context = {}) {
             `Nguyên nhân máy chạy chậm thường do 2 "nút thắt cổ chai" phần cứng sau:\n` +
             `1. **Ổ cứng còn dùng HDD cơ truyền thống:** Tốc độ chỉ ~100MB/s, gây hiện tượng 100% Disk làm máy bị đơ giật. Nâng cấp lên **ổ SSD 256GB - 512GB** (chi phí chỉ khoảng 400.000 - 700.000 đ) sẽ giúp máy khởi động trong 10 giây và mở app tức thì.\n` +
             `2. **Dung lượng RAM chỉ 4GB - 8GB:** Các trình duyệt hiện đại ngốn khá nhiều RAM. Nâng lên **16GB RAM** (khoảng 400.000 đ) sẽ giải quyết triệt để tình trạng tràn bộ nhớ.\n\n` +
-            `👉 **Lời khuyên chân thành từ TechEcommerce:**\n` +
+            `👉 **Lời khuyên chân thành từ cửa hàng:**\n` +
             `• **Nên NÂNG CẤP (chỉ tốn khoảng 800k - 1.2tr):** Nếu nhu cầu của bạn chỉ là học tập, làm việc văn phòng, xem phim, làm kế toán.\n` +
             `• **Nên MUA MÁY MỚI:** Nếu bạn cần làm đồ họa 3D, dựng video 4K, lập trình chạy máy ảo Docker nặng, hoặc máy cũ đã chai pin hoàn toàn và màn hình xuống cấp.\n\n` +
             `Bạn có thể cho em biết máy của bạn hiện đang dùng ổ cứng loại nào và RAM bao nhiêu GB không ạ?`;
@@ -2614,7 +2614,7 @@ async function handleRecommendWithTradeOffs({
             const categoryItemNounCap = categoryItemNoun.charAt(0).toUpperCase() + categoryItemNoun.slice(1);
 
             const brandScope = brand ? ` của thương hiệu **${brand}**` : '';
-            const reply = `Dạ hiện tại TechEcommerce chuyên phân phối **100% sản phẩm mới chính hãng** kèm bảo hành 12 - 24 tháng. 🙏\n\n` +
+            const reply = `Dạ hiện tại cửa hàng chuyên phân phối **100% sản phẩm mới chính hãng** kèm bảo hành 12 - 24 tháng. 🙏\n\n` +
                 `Trong danh mục **${category}**${brandScope}, mức ngân sách dự kiến **${money(effectiveBudget)}** của bạn hiện thấp hơn mức giá của ${categoryItemNoun} có giá tốt nhất tại kho.\n` +
                 `Em xin phép **hiển thị ngay trên trang ${categoryItemNoun} có giá gần nhất và tiết kiệm nhất** để bạn dễ quan sát nhé:\n` +
                 `⭐ **${lowestInCat.name}** - Giá: **${money(lowestInCat.price)}** (chênh lệch khoảng +${money(diff)} so với dự kiến của bạn).\n\n` +
@@ -2649,7 +2649,7 @@ async function handleRecommendWithTradeOffs({
         }
 
         return {
-            reply: `Dạ hiện tại TechEcommerce chưa có sản phẩm nào trong danh mục **${category}** ở mức ngân sách **${money(effectiveBudget)}** ạ. Mức giá các dòng sản phẩm chính hãng tại kho hiện bắt đầu từ phân khúc cao hơn. Bạn có thể cân nhắc chuyển sang hình thức **Trả góp 0%** hoặc tham khảo các danh mục sản phẩm khác nhé! 😊`,
+            reply: `Dạ hiện tại cửa hàng chưa có sản phẩm nào trong danh mục **${category}** ở mức ngân sách **${money(effectiveBudget)}** ạ. Mức giá các dòng sản phẩm chính hãng tại kho hiện bắt đầu từ phân khúc cao hơn. Bạn có thể cân nhắc chuyển sang hình thức **Trả góp 0%** hoặc tham khảo các danh mục sản phẩm khác nhé! 😊`,
             products: [],
             suggestions: ['Tính trả góp 0%', 'Săn mã giảm giá', 'Tư vấn danh mục khác'],
             context: { ...context, category, budget: effectiveBudget, budgetMin, budgetMax, budgetType: effectiveType }
@@ -2680,7 +2680,7 @@ async function handleRecommendWithTradeOffs({
 
     if (!selected.length) {
         return {
-            reply: `Dạ hiện tại TechEcommerce chưa có sản phẩm nào phù hợp với bộ lọc này ạ. Bạn có thể mở rộng khoảng ngân sách hoặc chuyển sang dòng sản phẩm khác nhé! 😊`,
+            reply: `Dạ hiện tại cửa hàng chưa có sản phẩm nào phù hợp với bộ lọc này ạ. Bạn có thể mở rộng khoảng ngân sách hoặc chuyển sang dòng sản phẩm khác nhé! 😊`,
             products: [],
             suggestions: ['Tính trả góp 0%', 'Săn mã giảm giá', 'Tư vấn danh mục khác'],
             context: { ...context, category, budget }
@@ -2691,7 +2691,7 @@ async function handleRecommendWithTradeOffs({
     if (selected.length === 1) {
         const single = selected[0];
         const s = single.specs || {};
-        const defaultSingleReply = `Dạ trong tầm ngân sách và tiêu chí của bạn, hiện tại TechEcommerce có **duy nhất 1 lựa chọn chính hãng xuất sắc nhất** đáp ứng trọn vẹn là:\n\n` +
+        const defaultSingleReply = `Dạ trong tầm ngân sách và tiêu chí của bạn, hiện tại cửa hàng có **duy nhất 1 lựa chọn chính hãng xuất sắc nhất** đáp ứng trọn vẹn là:\n\n` +
             `⭐ **${single.name}** - Giá: **${money(single.price)}** (Kho còn ${single.stock} máy)\n` +
             `• Cấu hình: CPU ${s.cpu || ''} | RAM ${s.ram || ''} | Ổ cứng ${s.storage || ''} | Màn hình ${s.screen || ''}\n` +
             `• Điểm mạnh: Cấu hình ổn định, thời lượng pin tốt, bảo hành chính hãng ${single.warranty || '12 tháng'}.\n\n` +
@@ -2847,6 +2847,50 @@ async function handleContextualFollowUp(message, context = {}) {
     const norm = normalizeText(message);
     const lastProducts = context.lastProducts || [];
 
+    // A0-gaming: Người dùng hỏi về tư thế chơi game (hay nằm chơi game, nằm trên giường, nằm sofa, cầm tay chơi...)
+    const isLyingDownOrBedGaming = /\b(nam\s+(?:de\s+)?choi|nam\s+choi|nam\s+tren\s+giuong|nam\s+sofa|hay\s+nam|nam\s+nghi|nam\s+luoi)\b/i.test(norm)
+        || (/\bnam\b/i.test(norm) && /\bchoi\s+game\b/i.test(norm));
+
+    if (isLyingDownOrBedGaming) {
+        const switchProduct = await Product.findOne({ name: /Nintendo Switch/i, active: { $ne: false } }).lean();
+        const rogAllyProduct = await Product.findOne({ name: /ROG Ally/i, active: { $ne: false } }).lean();
+
+        const recProducts = [switchProduct, rogAllyProduct].filter(Boolean);
+
+        const reply = `Dạ nếu bạn **thường xuyên nằm trên giường hoặc ghế sofa để chơi game**, thì các dòng **Máy chơi game cầm tay (Handheld)** như **Nintendo Switch OLED** hoặc **ASUS ROG Ally** là sự lựa chọn chân ái nhất ạ! 😊\n\n` +
+            `⚠️ **Lưu ý quan trọng về PS5:** Mẫu **Sony PS5 Slim** là hệ console cắm TV cố định (cần màn hình TV và dây nguồn trực tiếp), nên bạn **không thể nằm cầm tay chơi độc lập** trên giường được.\n\n` +
+            `Để bạn dễ dàng chọn được chiếc máy phù hợp nhất khi nằm chơi, em xin phân tích ưu nhược điểm thực tế của 2 mẫu máy cầm tay đỉnh nhất tại shop:\n\n` +
+            `1. 🌟 **Nintendo Switch OLED Model** — Giá: **${switchProduct ? money(switchProduct.price) : '7.990.000 ₫'}** *(Top 1 lý tưởng khi nằm chơi)*\n` +
+            `   • **Ưu điểm khi nằm chơi:** Máy rất nhẹ (chỉ ~420g) nên cầm nằm lâu trên không trung **không hề bị mỏi cổ tay**. Đặc biệt, bạn có thể **tháo rời 2 tay cầm Joy-Con** ra hai bên để buông thõng hai tay tự do dưới chăn, dựng màn hình máy trên nệm/bàn bằng chân chống kickstand để chơi cực kỳ thư giãn và sướng tay!\n` +
+            `   • **Màn hình & Pin:** Màn OLED 7 inch rực rỡ, pin trâu từ 4.5 – 9 tiếng và vận hành êm ru, không bị nóng phả vào tay.\n` +
+            `   • **Điểm đánh đổi:** Phù hợp nhất cho các tựa game độc quyền của Nintendo (Mario, Zelda, Pokemon, Animal Crossing...) và game gia đình, không chơi được các game đồ họa nặng của PC.\n\n` +
+            `2. 🌟 **ASUS ROG Ally Z1 Extreme** — Giá: **${rogAllyProduct ? money(rogAllyProduct.price) : '14.990.000 ₫'}** *(Cỗ máy cày game PC cầm tay)*\n` +
+            `   • **Ưu điểm:** Chạy Windows 11 với chip AMD Ryzen Z1 Extreme cực mạnh, chiến mượt mà mọi tựa game PC khủng trên Steam, Epic, Game Pass (như Black Myth: Wukong, Cyberpunk 2077, GTA V, FC 24) với màn hình 120Hz siêu mượt.\n` +
+            `   • **Điểm đánh đổi khi nằm chơi:** Trọng lượng máy nặng hơn (~608g) nên giơ tay nằm chơi lâu sẽ dễ mỏi tay, máy tải nặng sẽ ấm hơn và pin chơi game AAA khoảng 1.5 – 2 tiếng nên thường cần cắm sạc khi nằm chơi lâu.\n\n` +
+            `🎯 **GỢI Ý QUYẾT ĐỊNH:**\n` +
+            `👉 Nếu bạn thích **nhẹ nhàng, nằm chơi lâu không mỏi tay, tháo tay cầm nằm lười thư giãn** -> Bạn chọn ngay **Nintendo Switch OLED** nhé!\n` +
+            `👉 Nếu bạn muốn **nằm trên giường nhưng phải cày được game nặng của PC / Steam** -> Hãy chọn **ASUS ROG Ally Z1 Extreme** nhé!\n\n` +
+            `Bạn đang nghiêng về trải nghiệm thư giãn nhẹ nhàng của Switch hay muốn cày game PC khủng của ROG Ally ạ? 😊`;
+
+        return {
+            reply,
+            products: recProducts.length > 0 ? recProducts : (lastProducts || []),
+            suggestions: [
+                'Xem Nintendo Switch OLED',
+                'Xem ASUS ROG Ally',
+                'Tư vấn trả góp 0%',
+                'Săn mã giảm giá'
+            ],
+            context: {
+                ...context,
+                category: 'Máy chơi game',
+                productType: 'máy chơi game',
+                lastProducts: recProducts.length > 0 ? recProducts : (lastProducts || []),
+                currentIntent: 'recommended_handheld_gaming'
+            }
+        };
+    }
+
     // A0. Khách đính chính / phàn nàn bot hiểu ngược hướng ngân sách ("Trên 20tr mà", "Cái này là dưới 20tr", "Tôi tìm trên 20tr mà bạn cứ gợi ý dưới 20tr là sao")
     const isBudgetDirectionCorrection = /\b(tren\s+\d+|tren\s+\d+tr|tren\s+\d+\s+trieu|tim\s+tren|bao\s+la\s+tren|noi\s+la\s+tren|goi\s+y\s+duoi|cai\s+nay\s+la\s+duoi)\b/i.test(norm)
         || (norm.includes('tren') && norm.includes('20') && (norm.includes('ma') || norm.includes('sao') || norm.includes('duoi')));
@@ -2882,7 +2926,7 @@ async function handleContextualFollowUp(message, context = {}) {
                     `   • **Quyền lợi:** Hàng mới nguyên seal 100%, bảo hành chính hãng ${p.warranty || '12 - 24 tháng'}, hỗ trợ trả góp 0% chỉ từ ~${money(Math.round(p.price * 0.7 / 12))}/tháng.`;
             }).join('\n\n');
 
-            const reply = `Dạ em thành thật xin lỗi bạn vì đã hiểu nhầm hướng ngân sách ở lượt trước ạ! 🙏 Em xin đính chính ngay: TechEcommerce hiện có đầy đủ các siêu phẩm **${category} đỉnh cao phân khúc từ ${money(correctedBudget)} trở lên** tại kho để bạn lựa chọn:\n\n` +
+            const reply = `Dạ em thành thật xin lỗi bạn vì đã hiểu nhầm hướng ngân sách ở lượt trước ạ! 🙏 Em xin đính chính ngay: cửa hàng hiện có đầy đủ các siêu phẩm **${category} đỉnh cao phân khúc từ ${money(correctedBudget)} trở lên** tại kho để bạn lựa chọn:\n\n` +
                 `${listText}\n\n` +
                 `👉 Bạn đang quan tâm đến mẫu máy nào trong các siêu phẩm trên để em tư vấn chi tiết các phiên bản màu và ưu đãi độc quyền hôm nay nhé! 😊`;
 
@@ -2999,7 +3043,7 @@ async function handleContextualFollowUp(message, context = {}) {
                     `   • **Hỗ trợ:** Bảo hành ${p.warranty || '12 tháng'}, trả góp 0% chỉ từ ~${money(Math.round(p.price * 0.7 / 12))}/tháng.`;
             }).join('\n\n');
 
-            const reply = `Dạ em hoàn toàn thấu hiểu băn khoăn về ngân sách của bạn! Để tối ưu tài chính tốt nhất cho bạn${savingText}, TechEcommerce có các phương án giá kinh tế hơn sẵn hàng tại kho:\n\n` +
+            const reply = `Dạ em hoàn toàn thấu hiểu băn khoăn về ngân sách của bạn! Để tối ưu tài chính tốt nhất cho bạn${savingText}, cửa hàng có các phương án giá kinh tế hơn sẵn hàng tại kho:\n\n` +
                 `${listText}\n\n` +
                 `👉 Bạn thấy phương án nào vừa vặn với túi tiền hơn, hoặc bạn có muốn em tính bảng trả góp 0% chi tiết cho bạn nhé? 😊`;
 
@@ -3083,8 +3127,16 @@ async function handleContextualFollowUp(message, context = {}) {
         return newRec;
     }
 
-    // E. Người dùng muốn so sánh ("so sánh hai máy vừa rồi", "so sánh 2 con trên", hoặc so sánh đích danh 2 máy)
-    if (['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', '2 may nay', 'hai may nay', 'phan van', 'nen chon may nao'].some(k => norm.includes(k))) {
+    // E. Người dùng muốn so sánh hoặc xin lời khuyên quyết định ("so sánh hai máy vừa rồi", "nên chọn mẫu nào phù hợp", "chọn con nào")
+    const isComparisonOrDecisionRequest = [
+        'so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', '2 may nay', 'hai may nay', '3 may nay',
+        'phan van', 'nen chon may nao', 'nen chon mau nao', 'nen lay con nao', 'nen mua con nao',
+        'nen chon con nao', 'chon con nao', 'mau nao phu hop', 'con nao phu hop', 'may nao phu hop',
+        'nen lay mau nao', 'nen mua mau nao', 'tu van chon', 'chon mau nao', 'nen chon con nao phu hop',
+        'nen lay mau nao phu hop'
+    ].some(k => norm.includes(k));
+
+    if (isComparisonOrDecisionRequest) {
         const getProdId = item => {
             if (!item) return null;
             if (typeof item === 'number' || typeof item === 'string') return item;
@@ -3114,13 +3166,40 @@ async function handleContextualFollowUp(message, context = {}) {
         }
 
         // 3. Nếu đang trong ngữ cảnh đã có >= 2 sản phẩm đề xuất gần nhất
-        if (lastProducts.length >= 2) {
+        if (lastProducts.length === 2) {
             const id1 = getProdId(lastProducts[0]);
             const id2 = getProdId(lastProducts[1]);
             const p1 = id1 ? await Product.findById(id1) : null;
             const p2 = id2 ? await Product.findById(id2) : null;
             if (p1 && p2) {
                 return await buildComparisonResponse(p1, p2, context);
+            }
+        } else if (lastProducts.length >= 3) {
+            const productIds = lastProducts.slice(0, 3).map(p => getProdId(p)).filter(Boolean);
+            const prods = await Product.find({ _id: { $in: productIds } });
+            if (prods.length >= 2) {
+                const breakdown = prods.map((p, idx) => {
+                    const s = p.specs || {};
+                    const high = [s.cpu && `Chip ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.screen && `Màn hình ${s.screen}`, s.battery && `Pin ${s.battery}`].filter(Boolean).slice(0, 2).join(' • ');
+                    return `${idx + 1}. 🌟 **${p.name}** — Giá: **${money(p.price)}**\n` +
+                        `   • **Điểm nổi bật:** ${high || 'Cấu hình tiêu chuẩn chính hãng'}.\n` +
+                        `   • **Phù hợp nhất cho:** ${p.description ? p.description.slice(0, 120) + '...' : 'Khách hàng có nhu cầu sử dụng lâu dài bền bỉ'}.`;
+                }).join('\n\n');
+
+                const reply = `Dạ để giúp bạn dễ dàng quyết định mẫu máy phù hợp nhất trong 3 lựa chọn trên, em xin tóm tắt tiêu chí lựa chọn nhanh cho bạn nhé:\n\n` +
+                    `${breakdown}\n\n` +
+                    `👉 Bạn đang ưu tiên tiêu chí nào nhất (như tối ưu chi phí tiết kiệm, hiệu năng mạnh mẽ hay tính cơ động di chuyển) để em tư vấn chốt mẫu chuẩn xác nhất cho bạn nhé! 😊`;
+
+                return {
+                    reply,
+                    products: prods,
+                    suggestions: prods.map(p => `Xem ${p.name.slice(0, 20)}`).concat(['Tính trả góp 0%']).slice(0, 4),
+                    context: {
+                        ...context,
+                        lastProducts: prods,
+                        currentIntent: 'decision_guidance'
+                    }
+                };
             }
         }
     }
@@ -4123,7 +4202,10 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     const hasExplicitProductQuery = Boolean(detectProductType(message)) || Boolean(inferCategory(message));
     const isConsultationSearch = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim|mua|co ban)\b/i.test(text);
 
-    if (!hasExplicitBudget && !(hasExplicitProductQuery && isConsultationSearch)) {
+    const isContextualFollowUpSignal = Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
+        /\b(nam\s+choi|nam|mau\s+nao|may\s+nao|con\s+nao|phu\s+hop|nen\s+chon|nen\s+mua|so\s+sanh|phan\s+van)\b/i.test(text);
+
+    if (!isContextualFollowUpSignal && !hasExplicitBudget && !(hasExplicitProductQuery && isConsultationSearch)) {
         const smartAnswer = matchSmartAnswer(message);
         if (smartAnswer) {
             return {

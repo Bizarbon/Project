@@ -618,12 +618,15 @@ const COMPARISON_AND_FENGSHUI_RULES = [
     {
         id: 'color_best_seller_trend',
         patterns: [
-            /(mau|mau sac).*(nao|gi).*(dep nhat|ban chay nhat|hot nhat|trend|sang nhat)/i,
-            /(nen chon|nen lay).*(mau nao|mau gi)/i
+            /(?:màu|màu sắc)\s+(?:nào|gì)\s+(?:đẹp|bán chạy|hot|trend|sang)/i,
+            /\b(?:màu\s+sắc|chọn\s+màu|thích\s+màu|lấy\s+màu|tư\s+vấn\s+màu)\b/i,
+            /\bmàu\s+(?:nào|gì)\b/i,
+            /\bmau\s+sac\s+(?:nao|gi)\b/i,
+            /\b(?:nen\s+chon|nen\s+lay|tu\s+van)\s+mau\s+sac\b/i
         ],
         keywords: [
-            'mau nao dep nhat', 'mau nao ban chay nhat', 'mau hot trend', 'nen chon mau titan nao',
-            'mau nao nhin sang nhat', 'nen mua mau nao', 'mau sac nao dep'
+            'mau sac nao dep', 'mau sac nao ban chay', 'mau sac dep nhat', 'mau sac ban chay nhat',
+            'mau hot trend', 'nen chon mau titan nao', 'mau sac nao nhin sang nhat'
         ],
         reply: `Dạ mỗi màu sắc đều mang một phong cách và cá tính riêng, nhưng theo dữ liệu bán chạy nhất tại hệ thống cửa hàng thì:\n\n` +
             `• 🌟 **Top 1 Bán Chạy Nhất (Hot Trend):** Màu **Titan Sa Mạc (Desert Titanium)** và **Titan Tự Nhiên (Natural Titanium)** — đây là 2 tone màu sang trọng bậc nhất, viền titan phay xước chống bám vân tay và nhận diện dòng máy mới cực kỳ đẳng cấp.\n` +
@@ -1223,6 +1226,13 @@ function matchSmartAnswer(message) {
     const unaccented = norm.unaccented;
 
     function ruleMatches(rule) {
+        if (rule.id === 'color_best_seller_trend') {
+            // Guard against "mẫu nào" (which model/machine) being confused with "màu nào" (color)
+            if (/\b(?:mẫu|mẫu\s+nào|mẫu\s+gì|mẫu\s+máy|mẫu\s+phù\s+hợp|con\s+nào|máy\s+nào)\b/i.test(cleanMsg) ||
+                /\b(?:mau\s+nao\s+phu\s+hop|mau\s+may|con\s+nao\s+phu\s+hop|may\s+nao\s+phu\s+hop|choi\s+game|nam\s+choi|hoc\s+tap|van\s+phong|do\s+hoa)\b/i.test(unaccented)) {
+                return false;
+            }
+        }
         if (Array.isArray(rule.patterns) && rule.patterns.some(p => p.test(cleanMsg) || p.test(unaccented))) {
             return true;
         }

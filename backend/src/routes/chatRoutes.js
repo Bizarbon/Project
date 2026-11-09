@@ -496,7 +496,7 @@ async function askGeminiOpenChat(message, context = {}) {
     if (!apiKey) return null;
 
     const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ cửa hàng. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối không dùng từ TechEcommerce trong lời thoại.
-THÔNG TIN VỀ TECHECOMMERCE:
+THÔNG TIN VỀ CỬA HÀNG:
 • Showroom: 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM & 78 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội (Mở cửa 08:30 – 21:30 hàng ngày).
 • Hotline tư vấn & kỹ thuật: 0842.331.606 | Zalo: https://zalo.me/0842331606.
 • Cam kết: 100% hàng mới chính hãng nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12 - 24 tháng.
@@ -666,7 +666,7 @@ async function answerComparison(message, context = {}) {
         `💡 **LỜI KHUYÊN CHỌN MUA ĐÚNG NHU CẦU:**\n` +
         `👉 **Nên chọn ${p1.name} KHI:** ${conclusionP1}\n` +
         `👉 **Nên chọn ${p2.name} KHI:** ${conclusionP2}\n\n` +
-        `🛡️ **QUYỀN LỢI ĐẢM BẢO KHI MUA TẠI TECHECOMMERCE:**\n` +
+        `🛡️ **QUYỀN LỢI ĐẢM BẢO KHI MUA TẠI CỬA HÀNG:**\n` +
         `• Hàng chính hãng mới 100%, bảo hành chính hãng toàn quốc.\n` +
         `• Lỗi 1 đổi 1 trong 30 ngày đầu tiên nếu có lỗi kỹ thuật.\n` +
         `• Hỗ trợ trả góp 0% lãi suất — xét duyệt nhanh chỉ 3 phút.\n\n` +
@@ -712,7 +712,7 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
     const isGeneralInquiry = !product || /thu tuc|the nao|can gi|co the tin dung|khong co the|cccd|cmnd|bao nhieu tuoi|co tra gop|lai suat|dieu kien/i.test(text);
 
     if (!product || (isGeneralInquiry && (!previousProducts || previousProducts.length === 0))) {
-        const reply = `💳 **CHÍNH SÁCH & THỦ TỤC TRẢ GÓP TẠI TECHECOMMERCE:**\n\n` +
+        const reply = `💳 **CHÍNH SÁCH & THỦ TỤC TRẢ GÓP TẠI CỬA HÀNG:**\n\n` +
             `Cửa hàng hỗ trợ **2 hình thức trả góp linh hoạt**, cực kỳ nhanh chóng và an tâm:\n\n` +
             `1. 🪪 **Trả góp qua CCCD gắn chip (Không cần thẻ tín dụng):**\n` +
             `   • **Đối tượng:** Công dân Việt Nam từ 18 tuổi trở lên.\n` +
@@ -1732,7 +1732,7 @@ async function answerPolicyQuestion(message) {
 
     // 1. Địa chỉ showroom / Cửa hàng xem máy trực tiếp
     if (['shop o dau', 'cua hang o dau', 'o dau vay', 'dia chi cua hang', 'dia chi shop', 'dia chi o dau', 'o dau', 'showroom', 'chi nhanh', 'den xem truc tiep', 'xem may o dau', 'co showroom khong', 'dia chi'].some(k => text.includes(k))) {
-        return '📍 **HỆ THỐNG SHOWROOM & ĐỊA CHỈ TRẢI NGHIỆM TECHECOMMERCE:**\n\n' +
+        return '📍 **HỆ THỐNG SHOWROOM & ĐỊA CHỈ TRẢI NGHIỆM CỬA HÀNG:**\n\n' +
             'Cửa hàng mở cửa từ **08:30 – 21:30** tất cả các ngày trong tuần (kể cả Thứ 7, Chủ Nhật & ngày lễ):\n\n' +
             '• **Showroom 1 (TP.HCM):** 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM\n' +
             '• **Showroom 2 (Hà Nội):** 78 Thái Hà, P. Trung Liệt, Q. Đống Đa, Hà Nội\n\n' +
