@@ -1376,6 +1376,124 @@ async function handleExactProductLookup(product, context = {}, userMessage = '')
     };
 }
 
+/**
+ * 2b. Khách yêu cầu tư vấn chuyên sâu / kỹ hơn về 1 sản phẩm cụ thể
+ * ("bạn tư vấn kỹ hơn cho tôi về gen 10", "tôi cần tư vấn kỹ hơn về ipad gen 10", "đánh giá chi tiết về...")
+ */
+async function handleDeepProductConsultation(product, context = {}, userMessage = '') {
+    const s = product.specs || {};
+    const stockStatus = product.stock > 0
+        ? `✅ **Tình trạng:** Sẵn hàng nguyên seal tại kho (**còn ${product.stock} máy** chính hãng)`
+        : `⚠️ **Tình trạng:** Tạm hết hàng (Hỗ trợ đặt trước nhận ưu đãi 500.000 đ)`;
+
+    const warrantyInfo = (!product.warranty || product.warranty === 'Không bảo hành' || product.warranty === 'Chưa có thông tin')
+        ? 'Bảo hành chính hãng 12 tháng, lỗi 1 đổi 1 trong 30 ngày đầu'
+        : (product.warranty.toLowerCase().startsWith('bảo hành') || product.warranty.toLowerCase().startsWith('chính hãng')
+            ? product.warranty
+            : `Bảo hành chính hãng ${product.warranty}`);
+
+    const installmentEstimate = Math.round((product.price * 0.7) / 12);
+    const pName = product.name;
+    const isIpadGen10 = /ipad gen 10|ipad 10/i.test(pName);
+    const isIpadAir = /ipad air/i.test(pName);
+    const isIpadPro = /ipad pro/i.test(pName);
+    const isMacbook = /macbook/i.test(pName);
+    const isIphone = /iphone/i.test(pName);
+
+    let overview = '';
+    let strengths = [];
+    let tradeOffs = [];
+    let targetUsers = [];
+
+    if (isIpadGen10) {
+        overview = `**${pName}** hiện là mẫu máy tính bảng "quốc dân" được săn đón nhất của Apple trong phân khúc dưới 10 triệu đồng. Với thiết kế viền mỏng toàn màn hình hiện đại, cổng sạc Type-C tiện lợi và cấu hình bền bỉ, máy đáp ứng trọn vẹn mọi nhu cầu học tập, làm việc và giải trí suốt 4 - 5 năm tới mà không lo lỗi thời.`;
+        strengths = [
+            `**Thiết kế lột xác hiện đại:** Viền màn hình mỏng đều 4 cạnh, loại bỏ hoàn toàn nút Home vật lý, khung viền nhôm vuông vức sang trọng chuẩn phong cách iPad Air/Pro. Máy có 4 tùy chọn màu sắc thời thượng: Bạc (Silver), Xanh dương (Blue), Hồng (Pink) và Vàng (Yellow).`,
+            `**Màn hình Liquid Retina 10.9 inch sắc nét:** Không gian hiển thị rộng rãi, độ phân giải cao 2360 x 1640 pixels với công nghệ True Tone dịu mắt, cực kỳ lý tưởng để đọc tài liệu học tập, xem phim Netflix, YouTube 4K và ghi chép bài giảng.`,
+            `**Hiệu năng chip Apple A14 Bionic & RAM 4GB:** Xử lý mượt mà mọi ứng dụng học tập online (Zoom, Google Meet, Teams, Canva), lướt web hàng chục tab không giật lag và chơi tốt các tựa game phổ biến (Liên Quân, Tốc Chiến, Free Fire).`,
+            `**Camera ngang Center Stage 12MP:** Camera trước góc siêu rộng được đặt ở cạnh ngang (lần đầu tiên trên iPad), tự động căn chỉnh và giữ bạn luôn ở trung tâm khung hình khi học online hoặc họp video call.`,
+            `**Cổng sạc Type-C & Phụ kiện đa năng:** Cổng sạc Type-C tiện lợi dùng chung sạc điện thoại/laptop; tương thích với bút Apple Pencil để vẽ, ghi chú và bàn phím Magic Keyboard Folio gõ văn bản êm ái.`
+        ];
+        tradeOffs = [
+            `**Màn hình Non-Laminated:** Tấm nền vẫn có một khoảng cách kính mỏng (không ép sát như iPad Air/Pro) và không có lớp phủ chống chói cao cấp, nên khi dùng dưới trời nắng gắt ngoài trời sẽ hơi bóng nhẹ.`,
+            `**Dung lượng 64GB cơ bản:** Rất thoải mái cho việc học tập, tài liệu và ứng dụng thường ngày. Nếu bạn có nhu cầu lưu trữ nhiều video nặng hay tải các tựa game 3D dung lượng lớn (trên 20GB), nên cân nhắc bản 256GB hoặc kết hợp lưu trữ đám mây iCloud.`,
+            `**Bút cảm ứng:** Hỗ trợ Apple Pencil (USB-C) hoặc Apple Pencil 1 (kèm adapter), không hỗ trợ hít sạc không dây của Apple Pencil Pro.`
+        ];
+        targetUsers = [
+            `**Học sinh, sinh viên:** Cần thiết bị bền bỉ để ghi chép bài giảng trên lớp, đọc file PDF/Slide, học ngoại ngữ và làm bài tập nhóm.`,
+            `**Dân văn phòng / Giáo viên:** Cần máy phụ gọn nhẹ mang đi họp, thuyết trình, check email, duyệt báo cáo và ghi chú cơ động.`,
+            `**Gia đình:** Cho con học trực tuyến, người lớn tuổi đọc báo, xem YouTube và giải trí mượt mà.`
+        ];
+    } else if (isIpadAir) {
+        overview = `**${pName}** là dòng tablet cận cao cấp hội tụ sức mạnh vượt trội từ chip Apple M2, mang lại hiệu năng tiệm cận dòng Pro với mức giá tiết kiệm hơn đáng kể.`;
+        strengths = [
+            `**Sức mạnh chip Apple M2 đỉnh cao:** 8-core CPU và 10-core GPU cân mượt các tác vụ đồ họa chuyên sâu, dựng video 4K và thiết kế Procreate.`,
+            `**Màn hình Liquid Retina ép kính sát:** Hiển thị nổi khối rực rỡ, dải màu rộng DCI-P3 và phủ lớp chống chói cao cấp.`,
+            `**Tương thích Apple Pencil Pro:** Hỗ trợ cảm ứng bóp (Squeeze), xoay thân bút (Barrel roll) và sạc nam châm không dây tiện lợi.`
+        ];
+        tradeOffs = [
+            `Mức giá đầu tư cao hơn phân khúc phổ thông.`,
+            `Màn hình tần số quét 60Hz tiêu chuẩn (chưa có 120Hz ProMotion như iPad Pro).`
+        ];
+        targetUsers = [
+            `Người làm đồ họa, sáng tạo nội dung, sinh viên kiến trúc/thiết kế và người dùng cần cấu hình mạnh dùng 5-6 năm.`
+        ];
+    } else {
+        overview = `**${pName}** là dòng sản phẩm chính hãng cao cấp tại cửa hàng, được trang bị cấu hình tối ưu cùng độ hoàn thiện vượt trội, mang lại trải nghiệm sử dụng ổn định và bền bỉ dài lâu.`;
+        if (s.cpu) strengths.push(`**Hiệu năng mạnh mẽ:** Trang bị vi xử lý **${s.cpu}** ${s.ram ? `kết hợp RAM **${s.ram}**` : ''} xử lý cực mượt các tác vụ đa nhiệm và tải nặng.`);
+        if (s.screen) strengths.push(`**Màn hình đỉnh cao:** Kích thước **${s.screen}** sắc nét, góc nhìn rộng và màu sắc trung thực.`);
+        if (s.battery) strengths.push(`**Thời lượng pin ấn tượng:** Viên pin **${s.battery}** tối ưu thời lượng sử dụng bền bỉ suốt cả ngày dài.`);
+        if (s.storage) strengths.push(`**Lưu trữ thoải mái:** Dung lượng **${s.storage}** lưu trữ trọn vẹn tài liệu, ứng dụng và nội dung giải trí.`);
+
+        tradeOffs = [
+            `Khoản đầu tư ban đầu cần cân đối với ngân sách dự kiến của bạn.`,
+            `Nên lựa chọn đúng phiên bản dung lượng bộ nhớ phù hợp với nhu cầu lưu trữ lâu dài trong 3 - 5 năm tới.`
+        ];
+        targetUsers = [
+            `Khách hàng tìm kiếm sản phẩm chính hãng 100%, bảo hành uy tín và độ bền cao để sử dụng lâu dài.`,
+            `Người dùng cần thiết bị ổn định để phục vụ công việc, học tập hoặc giải trí chất lượng cao.`
+        ];
+    }
+
+    const reply = `Dạ em xin gửi bạn bài tư vấn chi tiết và chuyên sâu nhất về **${pName}** để bạn có cái nhìn toàn diện trước khi đưa ra quyết định nhé: 🎯\n\n` +
+        `🌟 **TỔNG QUAN VỊ THẾ SẢN PHẨM:**\n${overview}\n\n` +
+        `💎 **NHỮNG ĐIỂM MẠNH ĐÁNG TIỀN NHẤT:**\n` + strengths.map((st, i) => `${i + 1}. ${st}`).join('\n') + `\n\n` +
+        `⚠️ **NHỮNG ĐIỂM ĐÁNH ĐỔI / LƯU Ý THỰC TẾ:**\n` + tradeOffs.map(to => `• ${to}`).join('\n') + `\n\n` +
+        `🎯 **ĐỐI TƯỢNG PHÙ HỢP NHẤT:**\n` + targetUsers.map(tu => `• ${tu}`).join('\n') + `\n\n` +
+        `💰 **CHÍNH SÁCH BÁN HÀNG & ƯU ĐÃI TẠI CỬA HÀNG:**\n` +
+        `• **Giá bán chính hãng:** **${money(product.price)}** ${product.compareAtPrice > product.price ? `(Giá gốc: ~~${money(product.compareAtPrice)}~~, tiết kiệm ngay ${money(product.compareAtPrice - product.price)})` : ''}\n` +
+        `• ${stockStatus}\n` +
+        `• 🎁 **Mã AI trợ giá:** Nhập mã **TECHVIP** giảm thêm 200.000 ₫\n` +
+        `• 🛡️ **Bảo hành:** ${warrantyInfo}\n` +
+        `• 💳 **Trả góp 0%:** Chỉ từ **~${money(installmentEstimate)}/tháng** (duyệt hồ sơ CCCD online 15 phút)\n\n` +
+        `👉 Bạn thấy mẫu máy này có đáp ứng đúng nhu cầu sử dụng của mình không, hoặc bạn đang thích phiên bản màu sắc nào để em hỗ trợ kiểm tra chi tiết và giữ máy cho bạn nhé! 😊`;
+
+    return {
+        reply,
+        products: [product],
+        suggestions: [
+            `Thêm ${product.name.slice(0, 20)} vào giỏ`,
+            'Tính trả góp 0%',
+            'Xem các màu có sẵn',
+            'So sánh với mẫu khác'
+        ],
+        context: {
+            ...context,
+            stage: 'deep_consultation',
+            category: product.category,
+            brand: product.brand,
+            missingSlots: [],
+            lastProducts: [product],
+            currentIntent: 'deep_consultation'
+        },
+        meta: {
+            provider: 'deterministic_engine',
+            model: 'none',
+            isFallback: false
+        }
+    };
+}
+
 function detectProductType(text) {
     const norm = normalizeText(text);
     const isPetMouse = /hamster|bach|lang|thu cung|nuoi|long|chuong|bo u/i.test(norm);
@@ -4228,12 +4346,30 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         }
     }
 
+    // 2a-pre. Khách yêu cầu tư vấn chuyên sâu / kỹ hơn về 1 sản phẩm
+    // ("bạn tư vấn kỹ hơn cho tôi về gen 10", "tôi cần tư vấn kỹ hơn về ipad gen 10", "nói rõ hơn về gen 10", "chi tiết hơn về...")
+    const isDeepConsultationRequest = /\b(tu van ky hon|tu van sau hon|tu van ky|tu van sau|tu van ro hon|noi ro hon|chi tiet hon|danh gia ky|danh gia chi tiet|tim hieu ky hon|tim hieu ro hon|co nen mua|co dang mua|thong tin chi tiet|tu van chi tiet)\b/i.test(text);
+    if (isDeepConsultationRequest) {
+        const deepTarget = await findExactProductInCatalog(message) ||
+            (Array.isArray(prev.lastProducts) && prev.lastProducts.length
+                ? await Product.findById(prev.lastProducts[0]._id || prev.lastProducts[0])
+                : null);
+        if (deepTarget) {
+            return await handleDeepProductConsultation(deepTarget, {
+                ...prev,
+                stage: 'deep_consultation',
+                currentIntent: 'deep_consultation'
+            }, message);
+        }
+    }
+
     // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix", "iPad Air 11inch với Gen 10 có j khác nhau", "so sánh gen 10 và air M2")
+    const hasComparisonKeywords = ['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', 'khac j', 'co j khac', 'co gi khac', 'co gi khac nhau', 'co j khac nhau', 'hay nen mua', 'phan van', 'nen chon may nao', 'giua'].some(k => text.includes(k));
+    const hasConjunction = /\b(?:va|voi|vs|hay|hoac)\b/i.test(text);
     const earlyComparingIntent = (
-        prev.stage === 'awaiting_comparison_products' ||
-        prev.currentIntent === 'compare_products' ||
-        ['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', 'khac j', 'co j khac', 'co gi khac', 'co gi khac nhau', 'co j khac nhau', 'hay nen mua', 'phan van', 'nen chon may nao', 'giua'].some(k => text.includes(k)) ||
-        /\b(?:va|voi|vs|hay|hoac)\b/i.test(text)
+        hasComparisonKeywords ||
+        (hasConjunction && !isDeepConsultationRequest) ||
+        ((prev.stage === 'awaiting_comparison_products' || prev.currentIntent === 'compare_products') && (hasComparisonKeywords || hasConjunction))
     );
 
     if (earlyComparingIntent) {
@@ -4306,7 +4442,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
 
     // Never downgrade an explicit comparison into a stale budget/recommendation
     // flow. If model resolution is ambiguous, ask for the missing model names.
-    if (isComparingIntent && matchedProducts.length < 2) {
+    if (isComparingIntent && matchedProducts.length < 2 && (hasComparisonKeywords || hasConjunction)) {
         return {
             reply: 'Em nhận ra bạn muốn so sánh sản phẩm, nhưng chưa xác định chắc chắn đủ hai mẫu trong catalog. Bạn gửi giúp em tên đầy đủ hoặc mã sản phẩm của hai mẫu cần so sánh nhé.',
             products: matchedProducts,
@@ -4621,6 +4757,7 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
 module.exports = {
     coordinateConsultation,
     handleExactProductLookup,
+    handleDeepProductConsultation,
     handleCatalogProductTypeQuery,
     detectProductType,
     handleBrandOnly,
