@@ -365,13 +365,13 @@
                 <span>AI tư vấn</span>
                 <span class="ai-chat-min-arrow" aria-hidden="true">▲</span>
             </button>
-            <!-- Store Contact Launcher Widget (Chuẩn ảnh 1: Nút đỏ Liên hệ + Popover menu Zalo & Tư vấn AI) -->
+            <!-- Store Contact Launcher Widget (Chuẩn ảnh 1: Nút đỏ Liên hệ + Popover menu Zalo & Tư vấn AI đồng bộ) -->
             <aside class="store-contact-launcher" id="storeContactLauncher" aria-label="Widget liên hệ hỗ trợ">
                 <!-- Popup menu sổ lên phía trên -->
                 <nav class="contact-popover" id="contactPopover" role="menu" aria-label="Menu liên hệ hỗ trợ" aria-hidden="true">
-                    <button type="button" class="contact-popover-item contact-item-ai ai-chat-toggle" id="contactItemAi" role="menuitem" title="Chat tư vấn cùng Trợ lý AI TechEcommerce">
+                    <button type="button" class="contact-popover-item contact-item-ai" id="contactItemAi" role="menuitem" title="Chat tư vấn cùng Trợ lý AI TechEcommerce">
                         <figure class="contact-item-icon ai-avatar-circle" aria-hidden="true">
-                            <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="24" height="24" class="contact-ai-avatar">
+                            <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="38" height="38" class="contact-ai-avatar">
                         </figure>
                         <div class="contact-item-text-group">
                             <span class="contact-item-title">Tư vấn AI</span>
@@ -380,11 +380,7 @@
                     </button>
                     <a href="https://zalo.me/0842331606" target="_blank" rel="noopener noreferrer" class="contact-popover-item contact-item-zalo" id="contactItemZalo" role="menuitem" title="Chat trực tiếp qua Zalo CSKH (0842.331.606)">
                         <figure class="contact-item-icon zalo-avatar-circle" aria-hidden="true">
-                            <svg viewBox="0 0 100 100" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="50" cy="50" r="48" fill="#0068FF"/>
-                                <path d="M50 20 C32 20 20 31.5 20 46 C20 53.5 24 60 30 64.5 C29.5 69 27 73.5 24 77 C30.5 75 36.5 72 40.5 69.5 C43.5 70.5 46.5 71 50 71 C68 71 80 59.5 80 46 C80 31.5 68 20 50 20 Z" fill="#FFFFFF"/>
-                                <text x="50" y="52" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="24" text-anchor="middle" dominant-baseline="middle">Zalo</text>
-                            </svg>
+                            <img src="${root}assets/images/logo/zalo-badge.svg" alt="" width="38" height="38" class="contact-zalo-avatar">
                         </figure>
                         <div class="contact-item-text-group">
                             <span class="contact-item-title">Liên hệ Zalo</span>

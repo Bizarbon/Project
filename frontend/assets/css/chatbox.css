@@ -2873,122 +2873,156 @@ button#contactMainBtn:active,
 
 /* Popover Menu màu trắng mở lên phía trên (Ảnh 1) */
 .contact-popover {
-    position: absolute;
-    bottom: calc(100% + 12px);
-    right: 0;
-    width: 230px;
-    background: #ffffff;
-    border-radius: 18px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06);
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transform: translateY(12px) scale(0.94);
-    transform-origin: bottom right;
-    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 10;
+    position: absolute !important;
+    bottom: calc(100% + 12px) !important;
+    right: 0 !important;
+    width: 236px !important;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    padding: 8px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(12px) scale(0.94) !important;
+    transform-origin: bottom right !important;
+    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    z-index: 10 !important;
+    box-sizing: border-box !important;
 }
 
 .store-contact-launcher.is-open .contact-popover {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
 }
 
-/* Các mục trong Popover */
-.contact-popover-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 12px;
-    text-decoration: none;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    text-align: left;
-    transition: background 0.18s ease, transform 0.15s ease;
-    -webkit-tap-highlight-color: transparent;
+/* Các mục trong Popover - Đồng bộ 100% màu sắc và bố cục, cả trên web và mobile */
+.contact-popover-item,
+button.contact-popover-item,
+a.contact-popover-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 10px 12px !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 52px !important;
+    text-align: left !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: background 0.18s ease, transform 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-sizing: border-box !important;
 }
 
-.contact-popover-item:hover {
-    background: #f8fafc;
-    transform: translateX(-2px);
+.contact-popover-item:hover,
+button.contact-popover-item:hover,
+a.contact-popover-item:hover {
+    background: #f1f5f9 !important;
+    transform: translateX(-2px) !important;
+}
+
+.contact-popover-item:active,
+button.contact-popover-item:active,
+a.contact-popover-item:active {
+    transform: scale(0.98) !important;
 }
 
 .contact-item-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden !important;
 }
 
 .ai-avatar-circle {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-    border: 1.5px solid #fca5a5;
+    background: #ffffff !important;
+    border: 1.5px solid rgba(0, 104, 255, 0.25) !important;
 }
 
 .contact-ai-avatar {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 .zalo-avatar-circle {
-    background: #0068FF;
-    border: 1.5px solid rgba(255, 255, 255, 0.8);
-    overflow: hidden;
+    background: #0068FF !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+.contact-zalo-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 .contact-item-text-group {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
 }
 
 .contact-item-title {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #1e293b;
-    line-height: 1.25;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 0.94rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
 }
 
 .contact-item-sub {
-    font-size: 0.72rem;
-    color: #64748b;
-    line-height: 1.2;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 0.74rem !important;
+    font-weight: 400 !important;
+    color: #64748b !important;
+    line-height: 1.2 !important;
 }
 
 /* Dark mode theme */
 html[data-theme='dark'] .contact-popover {
-    background: #1e293b;
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    background: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45) !important;
 }
 
-html[data-theme='dark'] .contact-popover-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+html[data-theme='dark'] .contact-popover-item:hover,
+html[data-theme='dark'] button.contact-popover-item:hover,
+html[data-theme='dark'] a.contact-popover-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
 html[data-theme='dark'] .contact-item-title {
-    color: #f1f5f9;
+    color: #f1f5f9 !important;
 }
 
 html[data-theme='dark'] .contact-item-sub {
-    color: #94a3b8;
+    color: #94a3b8 !important;
 }
 
 /* Hiệu ứng rung nhẹ thu hút sự chú ý của nút Liên hệ */
@@ -3031,8 +3065,33 @@ html[data-theme='dark'] .contact-item-sub {
     }
 
     .contact-popover {
-        width: 215px !important;
+        width: 220px !important;
         bottom: calc(100% + 10px) !important;
+    }
+
+    .contact-popover-item,
+    button.contact-popover-item,
+    a.contact-popover-item {
+        padding: 8px 10px !important;
+        gap: 10px !important;
+        min-height: 48px !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        border-radius: 10px !important;
+    }
+
+    .contact-item-icon {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+    }
+
+    .contact-item-title {
+        font-size: 0.9rem !important;
+    }
+
+    .contact-item-sub {
+        font-size: 0.7rem !important;
     }
 }
 
