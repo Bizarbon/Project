@@ -254,14 +254,14 @@
             mascotWrapper.setAttribute('aria-hidden', 'true');
             mascotWrapper.innerHTML = createMascotSVG();
 
-            // Tương tác chạm/click nhẹ linh vật để chú mèo vui vẻ (happy) trong 2 giây
+            // Tương tác chạm/click nhẹ linh vật để chú mèo nhảy bật vui vẻ (happy) trong 2 giây
             mascotWrapper.addEventListener('click', () => {
-                if (currentState === 'idle') {
-                    setState('happy');
-                    setTimeout(() => {
-                        if (currentState === 'happy') setState('idle');
-                    }, 2000);
-                }
+                mascotWrapper.classList.add('tm-clicked');
+                setState('happy', { force: true });
+                setTimeout(() => {
+                    mascotWrapper.classList.remove('tm-clicked');
+                    if (currentState === 'happy') setState('idle');
+                }, 2000);
             });
 
             chat.appendChild(mascotWrapper);

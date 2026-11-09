@@ -13044,25 +13044,27 @@ body:has(#cartDrawer:not([aria-hidden='true'])) .floating-buy-sticker {
 }
 
 .buy-sticker-link {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-decoration: none;
     position: relative;
     cursor: pointer;
-    animation: buyStickerFloat 3.2s ease-in-out infinite;
+    animation: buyStickerFloat 3.4s ease-in-out infinite;
     -webkit-tap-highlight-color: transparent;
 }
 
 .buy-sticker-close {
     position: absolute;
-    top: -4px;
+    top: -6px;
     right: -4px;
     z-index: 10;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: #ffffff;
-    border: 1px solid rgba(0, 104, 255, 0.2);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(0, 104, 255, 0.25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     color: #0284c7;
     display: flex;
     align-items: center;
@@ -13075,121 +13077,149 @@ body:has(#cartDrawer:not([aria-hidden='true'])) .floating-buy-sticker {
 .buy-sticker-close:hover {
     background: #e0f2fe;
     transform: scale(1.18);
-    color: #0369a1;
+    color: #ef4444;
 }
 
 .buy-sticker-close:active {
     transform: scale(0.95);
 }
 
-.buy-sticker-badge {
-    width: 86px;
-    height: 86px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #7dd3fc 0%, #38bdf8 38%, #0ea5e9 70%, #0284c7 100%);
-    border: 2.5px solid #ffffff;
-    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.45), 0 3px 8px rgba(0, 0, 0, 0.18);
+/* Comic speech bubble */
+.buy-sticker-speech-bubble {
+    background: linear-gradient(135deg, #0284c7 0%, #0068FF 65%, #00C2FF 100%);
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    padding: 4px 10px;
+    box-shadow: 0 4px 14px rgba(0, 104, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding-top: 8px;
+    line-height: 1.1;
     position: relative;
-    overflow: hidden;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
-}
-
-.buy-sticker-link:hover .buy-sticker-badge {
-    transform: scale(1.08) translateY(-3px);
-    box-shadow: 0 12px 30px rgba(14, 165, 233, 0.6), 0 4px 12px rgba(0, 0, 0, 0.22);
-}
-
-.buy-sticker-pulse {
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    animation: buyStickerPulseRing 2.4s ease-out infinite;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.buy-sticker-text {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    line-height: 1.05;
+    margin-bottom: 6px;
+    animation: buyStickerBubblePulse 2.4s ease-in-out infinite;
     text-align: center;
-    z-index: 2;
-    position: relative;
 }
 
-.buy-sticker-text .text-line-1 {
+.buy-sticker-speech-bubble .bubble-line-1 {
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 900;
     color: #ffffff;
-    letter-spacing: -0.01em;
-    text-shadow: 0 1px 0 #0369a1, 0 2px 3px rgba(0, 0, 0, 0.45);
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
 }
 
-.buy-sticker-text .text-line-2 {
+.buy-sticker-speech-bubble .bubble-line-2 {
     font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 900;
     color: #fef08a;
-    letter-spacing: 0.03em;
-    text-shadow: 0 1px 0 #0284c7, 0 2px 4px rgba(0, 0, 0, 0.55);
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
 }
 
-.buy-sticker-mascot {
-    width: 68px;
-    height: auto;
-    margin-top: 2px;
-    z-index: 1;
+.buy-sticker-speech-bubble .bubble-tail {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #0068FF;
+}
+
+/* Freestanding Mascot Figure - Không đóng khung hình tròn */
+.buy-sticker-mascot-figure {
+    width: 78px;
+    height: 78px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
-    transition: transform 0.25s ease;
+    position: relative;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.28));
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: visible;
 }
 
-.buy-sticker-mascot img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
+.buy-sticker-cat-svg {
     display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
-.buy-sticker-link:hover .buy-sticker-mascot {
-    transform: scale(1.08);
+.buy-sticker-link:hover .buy-sticker-mascot-figure {
+    transform: scale(1.1) translateY(-3px);
+}
+
+.buy-sticker-link:hover .buy-sticker-speech-bubble {
+    transform: scale(1.06);
+    box-shadow: 0 6px 18px rgba(0, 104, 255, 0.55);
+}
+
+/* Hoạt ảnh sinh động cho con mèo sticker */
+.buy-sticker-cat-svg .sticker-head {
+    transform-origin: 50px 58px;
+    animation: stickerCatHeadTilt 4s ease-in-out infinite;
+}
+
+.buy-sticker-cat-svg .sticker-paw-waving {
+    transform-origin: 66px 78px;
+    animation: stickerCatPawWave 1.4s ease-in-out infinite;
+}
+
+.buy-sticker-cat-svg .sticker-tail {
+    transform-origin: 22px 78px;
+    animation: stickerCatTailWag 1.8s ease-in-out infinite;
+}
+
+.buy-sticker-cat-svg .sticker-ear-left {
+    transform-origin: 26px 38px;
+    animation: tm-ear-twitch-left 3.6s ease-in-out infinite;
+}
+
+.buy-sticker-cat-svg .sticker-ear-right {
+    transform-origin: 74px 38px;
+    animation: tm-ear-twitch-right 4.2s ease-in-out infinite;
+}
+
+@keyframes stickerCatHeadTilt {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    25% { transform: rotate(-4.5deg) translateY(-1px); }
+    75% { transform: rotate(4.5deg) translateY(-1px); }
+}
+
+@keyframes stickerCatPawWave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-18deg) translateY(-2px); }
+    75% { transform: rotate(12deg) translateY(1px); }
+}
+
+@keyframes stickerCatTailWag {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(18deg); }
 }
 
 @keyframes buyStickerFloat {
     0%, 100% {
         transform: translateY(0) rotate(0deg);
     }
-    25% {
-        transform: translateY(-5px) rotate(-2.5deg);
+    30% {
+        transform: translateY(-6px) rotate(-2deg);
     }
-    75% {
-        transform: translateY(3px) rotate(2deg);
+    70% {
+        transform: translateY(3px) rotate(1.5deg);
     }
 }
 
-@keyframes buyStickerPulseRing {
-    0% {
-        transform: scale(0.92);
-        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7);
-    }
-    70% {
-        transform: scale(1.06);
-        box-shadow: 0 0 0 14px rgba(14, 165, 233, 0);
-    }
-    100% {
-        transform: scale(0.92);
-        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0);
-    }
+@keyframes buyStickerBubblePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 /* Responsive trên mobile */
@@ -13200,30 +13230,28 @@ body:has(#cartDrawer:not([aria-hidden='true'])) .floating-buy-sticker {
         bottom: 122px !important;
     }
 
-    .buy-sticker-badge {
-        width: 76px !important;
-        height: 76px !important;
-        padding-top: 5px !important;
+    .buy-sticker-mascot-figure {
+        width: 68px !important;
+        height: 68px !important;
     }
 
-    .buy-sticker-text .text-line-1 {
-        font-size: 8.8px !important;
+    .buy-sticker-speech-bubble {
+        padding: 3px 8px !important;
     }
 
-    .buy-sticker-text .text-line-2 {
-        font-size: 10.2px !important;
+    .buy-sticker-speech-bubble .bubble-line-1 {
+        font-size: 8.5px !important;
     }
 
-    .buy-sticker-mascot {
-        width: 58px !important;
-        margin-top: 1px !important;
+    .buy-sticker-speech-bubble .bubble-line-2 {
+        font-size: 9.8px !important;
     }
 
     .buy-sticker-close {
         width: 19px !important;
         height: 19px !important;
-        top: -3px !important;
-        right: -3px !important;
+        top: -6px !important;
+        right: -4px !important;
     }
 }
 

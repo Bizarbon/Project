@@ -39,13 +39,13 @@
         if (!document.querySelector('link[data-tm-mascot-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/mascot.css?v=20261104-v1`;
+            link.href = `${root}assets/css/mascot.css?v=20261109-playful-cat-v1`;
             link.dataset.tmMascotStyle = 'true';
             document.head.appendChild(link);
         }
         if (!window.TechMascot && !document.querySelector('script[data-tm-mascot-script]')) {
             const script = document.createElement('script');
-            script.src = `${root}assets/js/mascot.js?v=20261104-v1`;
+            script.src = `${root}assets/js/mascot.js?v=20261109-playful-cat-v1`;
             script.dataset.tmMascotScript = 'true';
             document.body.appendChild(script);
         }

@@ -117,6 +117,159 @@
 }
 
 /* --- Hoạt ảnh tinh gọn (Chỉ animate transform & opacity) --- */
+@keyframes tm-float-bouncy {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-4px);
+    }
+    55% {
+        transform: translateY(1px);
+    }
+    75% {
+        transform: translateY(-2px);
+    }
+}
+
+@keyframes tm-head-playful-idle {
+    0%, 100% {
+        transform: rotate(0deg) translateY(0);
+    }
+    18% {
+        transform: rotate(-4.5deg) translateY(-2px);
+    }
+    36% {
+        transform: rotate(0deg) translateY(0);
+    }
+    54% {
+        transform: rotate(5deg) translateY(-1.5px);
+    }
+    72% {
+        transform: rotate(-2deg) translateY(-0.5px);
+    }
+    88% {
+        transform: rotate(1deg) translateY(0);
+    }
+}
+
+@keyframes tm-ear-twitch-left {
+    0%, 78%, 100% {
+        transform: rotate(0deg);
+    }
+    81% {
+        transform: rotate(-12deg) scale(1.08);
+    }
+    84% {
+        transform: rotate(4deg);
+    }
+    87% {
+        transform: rotate(-9deg);
+    }
+    90% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes tm-ear-twitch-right {
+    0%, 38%, 100% {
+        transform: rotate(0deg);
+    }
+    41% {
+        transform: rotate(12deg) scale(1.08);
+    }
+    44% {
+        transform: rotate(-4deg);
+    }
+    47% {
+        transform: rotate(9deg);
+    }
+    50% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes tm-pupil-idle-playful {
+    0%, 25%, 100% {
+        transform: translate(0, 0);
+    }
+    30%, 46% {
+        transform: translate(-2px, 0.6px);
+    }
+    52%, 68% {
+        transform: translate(2px, -0.6px);
+    }
+    74%, 88% {
+        transform: translate(0, 1.4px);
+    }
+}
+
+@keyframes tm-blink-playful {
+    0%, 86%, 92%, 100% {
+        transform: scaleY(1);
+    }
+    88% {
+        transform: scaleY(0.08);
+    }
+    94% {
+        transform: scaleY(0.08);
+    }
+}
+
+@keyframes tm-tail-playful {
+    0%, 100% {
+        transform: rotate(-6deg);
+    }
+    25% {
+        transform: rotate(16deg);
+    }
+    50% {
+        transform: rotate(-3deg);
+    }
+    75% {
+        transform: rotate(20deg);
+    }
+}
+
+@keyframes tm-paw-left-tap {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    22% {
+        transform: translateY(-2.5px);
+    }
+    42% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes tm-paw-right-tap {
+    0%, 48%, 100% {
+        transform: translateY(0);
+    }
+    65% {
+        transform: translateY(-2.5px);
+    }
+    85% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes tm-click-bounce {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    30% {
+        transform: translateY(-14px) scale(1.16) rotate(-6deg);
+    }
+    60% {
+        transform: translateY(-4px) scale(1.08) rotate(5deg);
+    }
+    100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+    }
+}
+
 @keyframes tm-tail-idle {
     0%, 100% { transform: rotate(0deg); }
     50% { transform: rotate(10deg); }
@@ -159,15 +312,90 @@
 }
 
 /* ==========================================================================
-   TRẠNG THÁI 1: IDLE (chớp mắt, đuôi vẫy nhẹ)
+   TRẠNG THÁI 1: IDLE (vui nhộn: lắc đầu, vẫy đuôi, giật tai, đảo mắt, nhấp chân)
    ========================================================================== */
+.tm-mascot-wrapper[data-state="idle"] {
+    animation: tm-float-bouncy 3.6s ease-in-out infinite;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-head {
+    animation: tm-head-playful-idle 4.5s ease-in-out infinite;
+    transform-origin: 50px 58px;
+}
+
 .tm-mascot-wrapper[data-state="idle"] .tm-tail {
-    animation: tm-tail-idle 2.6s ease-in-out infinite;
+    animation: tm-tail-playful 1.8s ease-in-out infinite;
+    transform-origin: 22px 78px;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-ear-left {
+    animation: tm-ear-twitch-left 3.8s ease-in-out infinite;
+    transform-origin: 26px 38px;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-ear-right {
+    animation: tm-ear-twitch-right 4.4s ease-in-out infinite;
+    transform-origin: 74px 38px;
 }
 
 .tm-mascot-wrapper[data-state="idle"] .tm-eyes-normal {
-    animation: tm-blink 4s infinite;
+    animation: tm-blink-playful 4s infinite;
     transform-origin: 50px 41px;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-pupil {
+    animation: tm-pupil-idle-playful 5s ease-in-out infinite;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-paw-left {
+    animation: tm-paw-left-tap 2.8s ease-in-out infinite;
+    transform-origin: 34px 82px;
+}
+
+.tm-mascot-wrapper[data-state="idle"] .tm-paw-right {
+    animation: tm-paw-right-tap 2.8s ease-in-out infinite;
+    transform-origin: 66px 82px;
+}
+
+/* Tương tác di chuột & nhấp chuột vui nhộn */
+.tm-mascot-wrapper:hover {
+    cursor: pointer;
+}
+
+.tm-mascot-wrapper:hover .tm-head {
+    transform: rotate(6deg) translateY(-4px) scale(1.05) !important;
+}
+
+.tm-mascot-wrapper:hover .tm-tail {
+    animation: tm-tail-fast 0.3s ease-in-out infinite !important;
+}
+
+.tm-mascot-wrapper:hover .tm-ear-left {
+    transform: rotate(-10deg) scale(1.1) !important;
+}
+
+.tm-mascot-wrapper:hover .tm-ear-right {
+    transform: rotate(10deg) scale(1.1) !important;
+}
+
+.tm-mascot-wrapper:hover .tm-eyes-normal {
+    display: none !important;
+}
+
+.tm-mascot-wrapper:hover .tm-eyes-happy {
+    display: block !important;
+}
+
+.tm-mascot-wrapper:hover .tm-mouth-default {
+    display: none !important;
+}
+
+.tm-mascot-wrapper:hover .tm-mouth-happy {
+    display: block !important;
+}
+
+.tm-mascot-wrapper.tm-clicked {
+    animation: tm-click-bounce 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
 
 /* ==========================================================================
