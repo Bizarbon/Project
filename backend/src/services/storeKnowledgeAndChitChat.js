@@ -220,6 +220,90 @@ const STORE_POLICY_RULES = [
             `5. 📄 **Trả góp:** Hỗ trợ Trả góp 0% qua thẻ tín dụng và Trả góp qua CCCD gắn chip xét duyệt 15 phút.\n\n` +
             `👉 Bạn dự kiến thanh toán bằng hình thức nào để em hướng dẫn nhận ưu đãi tốt nhất nhé! 😊`,
         suggestions: ['Tư vấn Trả góp 0%', 'Săn mã giảm giá VNPAY', 'Hotline 0842.331.606']
+    },
+
+    // 1.12 Kiểm tra hàng & Đồng kiểm khi nhận hàng (Inspection Policy)
+    {
+        id: 'policy_check_package_inspection',
+        patterns: [
+            /(kiem tra hang|dong kiem|xem hang|mo hop|boc seal).*(truoc khi|khi nhan|thanh toan|duoc khong)/i,
+            /(co duoc|co cho).*(kiem tra hang|dong kiem|xem may|mo hop|thu may)/i
+        ],
+        keywords: [
+            'co duoc kiem tra hang khong', 'cho xem hang khong', 'dong kiem', 'mo hop kiem tra',
+            'co cho kiem hang khong', 'kiem tra truoc khi thanh toan', 'kiem tra may truoc',
+            'shipper co cho xem hang khong', 'nhan hang co duoc kiem tra khong'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm 100% nha! TechEcommerce áp dụng chính sách **ĐỒNG KIỂM MINH BẠCH** với tất cả đơn hàng toàn quốc: 📦✨\n\n` +
+            `• 🔍 **Quyền lợi khi nhận hàng:** Shipper giao tới, bạn được quyền **mở kiện hàng bên ngoài để kiểm tra đúng model, màu sắc, tình trạng nguyên hộp niêm phong, phụ kiện và quà tặng đi kèm** trước khi thanh toán tiền.\n` +
+            `• 🛡️ **Bảo vệ người mua:** Nếu sản phẩm có bất kỳ dấu hiệu cấn móp vỏ hộp hoặc không đúng đơn bạn đã đặt, bạn có quyền từ chối nhận hàng ngay lập tức mà **hoàn toàn không tốn bất kỳ chi phí nào**.\n` +
+            `• ⚡ **Sau khi kích hoạt máy:** Bạn vẫn được bảo vệ tối đa với chính sách **1 đổi 1 trong 30 ngày đầu tiên** nếu máy phát sinh lỗi từ nhà sản xuất!\n\n` +
+            `👉 Bạn có thể hoàn toàn yên tâm đặt hàng trực tiếp trên website để nhận máy sớm nhất nhé! 😊`,
+        suggestions: ['Chính sách đổi trả 30 ngày', 'Giao hàng hỏa tốc 2 giờ', 'Hotline 0842.331.606']
+    },
+
+    // 1.13 Hỗ trợ dán cường lực & chuyển dữ liệu miễn phí
+    {
+        id: 'policy_free_setup_and_transfer',
+        patterns: [
+            /(ho tro|co).*(chuyen du lieu|cai dat|dan cuong luc|dan man hinh|tang op)/i,
+            /(chuyen du lieu).*(tu may cu|sang may moi)/i
+        ],
+        keywords: [
+            'chuyen du lieu', 'chuyen du lieu may cu', 'co ho tro chuyen du lieu khong',
+            'dan cuong luc mien phi', 'cai dat phan mem mien phi', 'cai office mien phi',
+            'tang kem gi', 'qua tang kem', 'co dan man hinh khong'
+        ],
+        reply: `Dạ khi mua điện thoại hoặc laptop tại TechEcommerce, bạn sẽ được nhận trọn bộ **DỊCH VỤ CHĂM SÓC TOÀN DIỆN MIỄN PHÍ 100%** ạ: 🎁📱\n\n` +
+            `• 🔄 **Chuyển dữ liệu 1-1 chuyên nghiệp:** Kỹ thuật viên hỗ trợ chuyển toàn bộ hình ảnh, video, danh bạ, tin nhắn, tài khoản Zalo/Viber từ máy cũ sang máy mới cực kỳ an toàn, bảo mật tuyệt đối và không lo mất dữ liệu.\n` +
+            `• 📱 **Dán màn hình & Tặng ốp lưng:** Tặng kèm dán cường lực chống trầy cao cấp và ốp lưng bảo vệ máy.\n` +
+            `• 💻 **Cài đặt trọn gói cho Laptop:** Hỗ trợ cài đặt Windows bản quyền, bộ ứng dụng văn phòng Office (Word, Excel, PowerPoint), phần mềm đồ họa cơ bản và dọn dẹp tối ưu máy hoàn toàn miễn phí.\n\n` +
+            `👉 Nếu bạn mua online, kỹ thuật viên có thể gọi video call hướng dẫn bạn chuyển dữ liệu chỉ trong 10 phút cực kỳ đơn giản nhé! 😊`,
+        suggestions: ['Tư vấn iPhone chính hãng', 'Tư vấn Laptop sinh viên', 'Hotline 0842.331.606']
+    },
+
+    // 1.14 Mã giảm giá, Voucher bí mật & Xin bớt giá
+    {
+        id: 'policy_voucher_secret_discount',
+        patterns: [
+            /(co|xin|cho|lay).*(ma giam gia|voucher|khuyen mai|ma uu dai|coupon)/i,
+            /(giam gia|bot gia|bot them|giam them).*(duoc khong|nua khong|chut nao khong)/i
+        ],
+        keywords: [
+            'ma giam gia', 'xin ma giam gia', 'co ma giam gia khong', 'voucher hom nay',
+            'bot gia chut duoc khong', 'giam them duoc khong', 'ma khuyen mai', 'co voucher khong',
+            'xin voucher', 'san deal', 'co duoc giam gia nua khong'
+        ],
+        reply: `Dạ hihi, mua sắm là phải có quà và săn deal hời mới thích đúng không nè! 🎁✨\n\n` +
+            `Em xin bật mí ngay các **MÃ GIẢM GIÁ ĐỘC QUYỀN** bạn có thể áp dụng trực tiếp ở giỏ hàng hôm nay nha:\n` +
+            `• 🔥 Mã **TECHWELCOME**: Giảm ngay **200.000 đ** cho khách hàng lần đầu mua sắm tại TechEcommerce.\n` +
+            `• 🎓 Mã **TECHSTUDENT**: Trợ giá thêm **500.000 đ** cho Học sinh, Sinh viên khi mua Laptop & Tablet.\n` +
+            `• ⚡ **Flash Sale Giá Sốc:** Giảm thẳng đến **30% - 50%** với số lượng giới hạn ở ngay đầu trang chủ.\n` +
+            `• 💳 **Thanh toán qua VNPAY / Quét QR:** Giảm thêm đến **300.000 đ** khi nhập mã khuyến mãi tại cổng thanh toán.\n\n` +
+            `👉 Bạn đang ưng ý mẫu sản phẩm nào để em chỉ bạn cách gộp voucher nhận mức giá tốt nhất nhé! 😊`,
+        suggestions: ['Xem Flash Sale giá sốc', 'Ưu đãi Sinh viên', 'Hotline 0842.331.606']
+    },
+
+    // 1.15 Trung tâm bảo hành chính hãng ở đâu?
+    {
+        id: 'policy_official_warranty_center',
+        patterns: [
+            /(bao hanh).*(o dau|tai dau|hang hay shop|trung tam nao|dia chi bao hanh)/i,
+            /(co duoc bao hanh).*(tai hang|apple|samsung|asus)/i
+        ],
+        keywords: [
+            'bao hanh o dau', 'trung tam bao hanh apple', 'bao hanh chinh hang o dau',
+            'bao hanh tai hang hay shop', 'trung tam bao hanh samsung', 'gui may bao hanh the nao',
+            'dia chi trung tam bao hanh'
+        ],
+        reply: `Dạ 100% sản phẩm tại TechEcommerce là **hàng chính hãng phân phối chính thức (mã VN/A cho Apple)** nên bạn có hai lựa chọn bảo hành cực kỳ tiện lợi ạ: 🛡️🏢\n\n` +
+            `1. 🏛️ **Bảo hành trực tiếp tại Hãng:** Bạn có thể mang máy tới bất kỳ Trung tâm bảo hành ủy quyền chính thức nào trên toàn quốc:\n` +
+            `   • **Apple:** Thakral One, CareS, TopCare, AASP trên toàn quốc.\n` +
+            `   • **Samsung:** Tất cả Trung tâm chăm sóc khách hàng Samsung Service Center trên 63 tỉnh thành.\n` +
+            `   • **Laptop Asus, Dell, Acer, Lenovo:** Các trung tâm bảo hành ủy quyền chính hãng tại Hà Nội, TP.HCM, Đà Nẵng, Cần Thơ...\n` +
+            `2. 🏪 **Gửi qua TechEcommerce:** Nếu bạn bận rộn, chỉ cần mang máy đến Showroom shop hoặc gửi qua bưu điện, shop sẽ tiếp nhận và gửi hãng thẩm định, theo dõi tiến độ và giao tận tay bạn hoàn toàn miễn phí!\n\n` +
+            `👉 Mọi thắc mắc về tình trạng bảo hành, bạn có thể gọi hotline kỹ thuật **0842.331.606** để được hỗ trợ tức thì nhé!`,
+        suggestions: ['Chính sách bảo hành vàng', 'Hotline hỗ trợ 0842.331.606', 'Địa chỉ Showroom']
     }
 ];
 
@@ -290,7 +374,98 @@ const OBJECTION_RULES = [
 ];
 
 // -------------------------------------------------------------
-// 3. CHI TIẾT PHẦN CỨNG, MỞ RỘNG & PHẦN MỀM / GAME
+// 3. TƯ VẤN MUA HÀNG THEO NGÂN SÁCH & ĐỐI TƯỢNG (BUDGET & PERSONA)
+// -------------------------------------------------------------
+
+const BUDGET_AND_CONSULTATION_RULES = [
+    // 3.1 Điện thoại dưới 5 triệu (Phổ thông, Pin trâu, Học sinh & Người lớn tuổi)
+    {
+        id: 'budget_phone_under_5m',
+        patterns: [
+            /(dien thoai|may).*(duoi 5 trieu|duoi 5tr|tam 3|tam 4|tam 5 trieu|gia re|hoc sinh)/i,
+            /(3 trieu|4 trieu|5 trieu).*(mua dien thoai gi|nen mua may nao)/i
+        ],
+        keywords: [
+            'dien thoai duoi 5 trieu', 'dien thoai duoi 5tr', 'tam 3 den 5 trieu nen mua gi',
+            'dien thoai gia re pin trau', 'mua dien thoai cho bo me', 'dien thoai cho hoc sinh cap 3',
+            'dien thoai tam 4 trieu', 'dien thoai tam 3 trieu'
+        ],
+        reply: `Dạ trong tầm giá **dưới 5 triệu**, tiêu chí quan trọng nhất là **Pin trâu, màn hình to rõ và phần mềm ổn định mượt mà** nè! 📱🔋\n\n` +
+            `Em xin gợi ý các 'ứng cử viên' số 1 trong tầm giá này tại shop:\n` +
+            `• 👑 **Samsung Galaxy A15 / A05s (Từ 3.490.000 đ – 4.290.000 đ):** Điểm mạnh thương hiệu lớn, màn hình sắc nét 90Hz, pin 5.000mAh dùng 1.5 ngày thoải mái, giao diện One UI cực kỳ thân thiện với người lớn tuổi và học sinh.\n` +
+            `• 🚀 **Xiaomi Redmi Note 13 (Tầm 4.490.000 đ):** Vua cấu hình tầm giá rẻ! Màn hình AMOLED 120Hz viền siêu mỏng, camera 108MP sắc nét và sạc nhanh 33W đi kèm sẵn củ sạc trong hộp.\n` +
+            `• 🛡️ 100% máy mới nguyên seal, bảo hành chính hãng 12 – 18 tháng tận nhà.\n\n` +
+            `👉 Bạn dự định mua máy cho bản thân hay mua tặng phụ huynh / học sinh để em tư vấn màu sắc và gói cài đặt sẵn phù hợp nhất nhé! 😊`,
+        suggestions: ['Xem Samsung Galaxy A15', 'Xem Xiaomi Redmi Note 13', 'Tư vấn Trả góp 0%', 'Hotline 0842.331.606']
+    },
+
+    // 3.2 Điện thoại tầm trung 7 - 10 triệu (Phân khúc 'quốc dân' đáng mua nhất)
+    {
+        id: 'budget_phone_7_to_10m',
+        patterns: [
+            /(tam 7|tam 8|tam 9|tam 10|7 den 10|7-10|duoi 10).*(trieu|tr)/i,
+            /(7 trieu|8 trieu|9 trieu|10 trieu).*(mua|dien thoai|may|chup anh|choi game)/i,
+            /(dien thoai|may).*(tam 7|tam 8|tam 9|tam 10|7 den 10|7-10|duoi 10).*(trieu|tr)/i
+        ],
+        keywords: [
+            'dien thoai tam 7 den 10 trieu', 'dien thoai tam 8 trieu', 'dien thoai tam 10 trieu',
+            '10 trieu nen mua dien thoai gi', 'dien thoai tam trung chup anh dep', 'tam 8tr mua may gi',
+            'duoi 10 trieu nen mua dien thoai gi'
+        ],
+        reply: `Dạ tầm giá **7 – 10 triệu** là phân khúc 'vàng' được khách hàng săn đón nhiều nhất vì máy sở hữu trải nghiệm gần như Flagship cao cấp luôn ạ! 🌟📱\n\n` +
+            `✨ **Top lựa chọn xuất sắc nhất hiện nay:**\n` +
+            `1. 🏆 **Samsung Galaxy A55 5G:** Khung viền kim loại sang trọng nguyên khối, màn hình Super AMOLED 120Hz rực rỡ, kháng nước kháng bụi chuẩn IP67 an toàn khi đi mưa và hỗ trợ cập nhật phần mềm 4-5 năm.\n` +
+            `2. ⚡ **Xiaomi 13T / Redmi Note 13 Pro+:** Cấu hình cực khủng, ống kính hợp tác Leica chuyên nghiệp, sạc siêu tốc 67W - 120W cắm 20 phút đầy pin, màn hình 1.5K sắc nét.\n` +
+            `3. 🍏 **iPhone 12 / iPhone 13 Like New 99%:** Dành cho bạn thích hệ điều hành iOS mượt mà, camera quay video TikTok / Reels chân thực và giữ giá cực tốt.\n\n` +
+            `👉 Bạn ưu tiên chụp ảnh, chơi game hay pin trâu để em chọn chiếc máy chuẩn xác nhất cho bạn nha! 😊`,
+        suggestions: ['Xem Samsung Galaxy A55 5G', 'Xem Xiaomi 13T', 'Xem iPhone 13 chính hãng', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.3 Điện thoại Flagship cao cấp trên 20 - 30 triệu (Đỉnh cao công nghệ)
+    {
+        id: 'budget_phone_flagship_above_20m',
+        patterns: [
+            /(tren 20|tren 25|tren 30|30 trieu|20 trieu|25 trieu).*(mua|dien thoai|may|flagship|cao cap)/i,
+            /(dien thoai|may).*(tren 20|tren 25|tren 30|cao cap|flagship|tot nhat|dinh nhat).*(trieu|tr)/i,
+            /(co 20 trieu|co 25 trieu|co 30 trieu).*(mua|dien thoai|may)/i
+        ],
+        keywords: [
+            'dien thoai tren 20 trieu', 'dien thoai cao cap nhat', 'flagship tot nhat hien nay',
+            'co 30 trieu nen mua dien thoai nao', 'iphone dinh nhat', 'samsung ultra',
+            'dien thoai dat nhat', 'top dien thoai cao cap'
+        ],
+        reply: `Dạ ở phân khúc **Flagship cao cấp trên 20 – 30 triệu**, bạn sẽ được sở hữu những tinh hoa công nghệ hiện đại nhất hành tinh: 💎👑\n\n` +
+            `• 🍏 **iPhone 16 Pro Max:** Khung viền Titan sa mạc đẳng cấp, viền màn hình mỏng nhất lịch sử Apple, chip A18 Pro 3nm mạnh vô đối, nút Camera Control thế hệ mới và tính năng Apple Intelligence thông minh vượt trội.\n` +
+            `• 🤖 **Samsung Galaxy S25 Ultra:** 'Quái vật' camera mắt thần bóng đêm zoom quang 100x, bút S-Pen ghi chú tiện lợi, màn hình chống chói Dynamic AMOLED 2X và trí tuệ nhân tạo Galaxy AI phiên dịch trực tiếp cuộc gọi.\n` +
+            `• 💼 **Samsung Galaxy Z Fold7 5G:** Kiệt tác công nghệ màn hình gập mỏng nhẹ thời thượng, mở ra thành máy tính bảng đa nhiệm làm việc văn phòng và giải trí đỉnh cao.\n\n` +
+            `🎁 Cả 3 dòng máy đều được shop trợ giá **Thu cũ đổi mới thêm 2.000.000đ** và tặng gói **Bảo hành VIP rơi vỡ** kèm theo ạ! Bạn đang nghiêng về iPhone hay Samsung để em chuẩn bị quà nhé? 😊`,
+        suggestions: ['Xem iPhone 16 Pro Max', 'Xem Galaxy S25 Ultra', 'Xem Galaxy Z Fold7 5G', 'Hotline 0842.331.606']
+    },
+
+    // 3.4 Laptop Học tập, Sinh viên, Văn phòng dưới 15 triệu
+    {
+        id: 'budget_laptop_student_under_15m',
+        patterns: [
+            /(laptop|may tinh).*(duoi 15|duoi 12|tam 10|tam 12|tam 15|sinh vien|van phong).*(trieu|tr)/i,
+            /(sinh vien kinh te|van phong).*(mua laptop gi|laptop nao hop)/i
+        ],
+        keywords: [
+            'laptop duoi 15 trieu', 'laptop sinh vien duoi 15tr', 'laptop van phong gia re',
+            'laptop hoc tap gia tot', 'laptop cho sinh vien kinh te', 'laptop mong nhe gia re'
+        ],
+        reply: `Dạ đối với học tập và làm việc văn phòng trong tầm giá **10 – 15 triệu**, bạn hoàn toàn có thể chọn được một chiếc laptop **Mỏng nhẹ, sang trọng, pin 7 - 9 tiếng và ổ cứng SSD cực nhanh** ạ: 💻✨\n\n` +
+            `✨ **Tiêu chuẩn cấu hình vàng em khuyên chọn:**\n` +
+            `• **CPU:** Intel Core i5 thế hệ 12/13 hoặc AMD Ryzen 5 thế hệ 7000-series (mở hàng chục tab không giật lag).\n` +
+            `• **RAM:** Tối thiểu 16GB (để chạy mượt mà nhiều ứng dụng cùng lúc suốt 4 năm học).\n` +
+            `• **Ổ cứng:** SSD NVMe 512GB tốc độ cao (khởi động máy trong 5 giây).\n` +
+            `• **Gợi ý model xuất sắc:** ASUS Vivobook 14/15, Lenovo IdeaPad Slim 3, Dell Inspiron 3520 (màn hình 120Hz mượt mà).\n\n` +
+            `🎁 **Ưu đãi sinh viên:** Nhập mã **TECHSTUDENT** giảm thêm **500.000đ** + Tặng kèm Balo chống sốc & Chuột không dây cao cấp nha! 😊`,
+        suggestions: ['Xem ASUS Vivobook 14', 'Xem Lenovo IdeaPad Slim', 'Ưu đãi Sinh viên', 'Hotline 0842.331.606']
+    }
+];
+
+// -------------------------------------------------------------
+// 4. CHI TIẾT PHẦN CỨNG, MỞ RỘNG & PHẦN MỀM / GAME
 // -------------------------------------------------------------
 
 const HARDWARE_AND_SOFTWARE_RULES = [
@@ -497,6 +672,54 @@ const COMPARISON_AND_FENGSHUI_RULES = [
             `• 🪟 **Nên chọn Laptop Windows:** Nếu bạn cần **chơi game (mọi tựa game)**, làm đồ họa 3D/AutoCAD/Revit chuyên sâu, dùng phần mềm kế toán (MISA), hoặc cần khả năng nâng cấp RAM/SSD dễ dàng và cổng kết nối đa dạng.\n\n` +
             `👉 Ngành nghề hoặc nhu cầu chính của bạn là gì để em tư vấn chiếc máy 'chân ái' phục vụ bạn tốt nhất nhé! 😊`,
         suggestions: ['Tư vấn MacBook Air M3', 'Tư vấn Laptop Windows mỏng nhẹ', 'Tư vấn Laptop Gaming']
+    },
+
+    // 4.5 So sánh iPhone 15 Pro Max vs iPhone 16 Pro Max (Có đáng lên đời không?)
+    {
+        id: 'compare_iphone_15_vs_16',
+        patterns: [
+            /(so sanh|khac gi|nen mua|co nen len doi).*(iphone 15.*iphone 16|15 pro max.*16 pro max|16 pro max.*15 pro max)/i,
+            /(iphone 16).*(khac gi|co gi moi|hon gi).*(iphone 15)/i
+        ],
+        keywords: [
+            'so sanh iphone 15 va 16', 'iphone 15 pro max va 16 pro max khac gi nhau',
+            'co nen len doi iphone 16 pro max', 'iphone 16 co gi moi', '16 pro max hon gi 15 pro max',
+            'nen mua 15 pro max hay 16 pro max', 'so sanh 15 pro max va 16 pro max'
+        ],
+        reply: `Dạ đây là câu hỏi được rất nhiều iFan quan tâm hiện nay nè! Em xin tóm tắt **4 điểm nâng cấp đắt giá nhất trên iPhone 16 Pro Max** so với 15 Pro Max nha: 🍏✨\n\n` +
+            `1. 📸 **Nút Camera Control cảm ứng lực mới:** Cho phép bạn trượt ngón tay để zoom, đổi tiêu cự và chụp ảnh/quay video tức thì chuyên nghiệp như máy ảnh cơ DSLR.\n` +
+            `2. 📱 **Màn hình lớn hơn, viền mỏng kỷ lục:** Tăng kích thước từ **6.7 inch lên 6.9 inch** với viền màn hình mỏng nhất lịch sử Apple, cầm máy trên tay cảm giác như cầm cả tấm kính vô cực.\n` +
+            `3. 🚀 **Chip Apple A18 Pro 3nm & Apple Intelligence:** Xử lý trí tuệ nhân tạo AI tạo sinh trực tiếp trên máy, dịch ngôn ngữ tức thì, xóa vật thể thông minh và tốc độ chơi game đồ họa Ray Tracing tăng 20%.\n` +
+            `4. 🔋 **Thời lượng pin tăng thêm 4 giờ:** Sử dụng xem video liên tục lên đến 33 giờ, hỗ trợ sạc nhanh MagSafe 25W.\n\n` +
+            `💡 **Lời khuyên từ em:**\n` +
+            `• Nếu bạn đang dùng **iPhone 12, 13, 14 series**: Lên thẳng **iPhone 16 Pro Max** là một bước nhảy vọt toàn diện không thể tuyệt vời hơn!\n` +
+            `• Nếu bạn đang dùng **iPhone 15 Pro Max**: Máy hiện tại vẫn quá mạnh mẽ. Bạn chỉ nên nâng cấp nếu mê nút Camera Control và màu Titan Sa Mạc thời thượng nhé!\n\n` +
+            `👉 TechEcommerce đang có chương trình **Thu cũ đổi mới trợ giá 2.000.000đ** cho iPhone 16 Pro Max, bạn có muốn định giá thử máy cũ của mình không nè? 😊`,
+        suggestions: ['Xem iPhone 16 Pro Max', 'Thu cũ đổi mới lên đời iPhone 16', 'Hotline 0842.331.606']
+    },
+
+    // 4.6 So sánh Tai nghe chống ồn: AirPods Pro 2 vs Sony WF-1000XM5
+    {
+        id: 'compare_earphones_airpods_vs_sony',
+        patterns: [
+            /(so sanh|nen mua).*(airpods.*sony|sony.*airpods|airpods pro 2.*wf-1000xm5)/i,
+            /(tai nghe chong on).*(tot nhat|nen mua cai nao)/i
+        ],
+        keywords: [
+            'nen mua airpods pro 2 hay sony wf-1000xm5', 'so sanh airpods pro va sony',
+            'tai nghe chong on nao tot nhat', 'airpods pro 2 hay sony wf 1000xm5',
+            'tai nghe true wireless cao cap', 'so sanh tai nghe chong on'
+        ],
+        reply: `Dạ đây là cuộc đối đầu kinh điển giữa 2 chiếc tai nghe chống ồn (True Wireless ANC) đỉnh nhất hành tinh hiện nay nè! 🎧✨\n\n` +
+            `• 🍏 **Nên chọn Apple AirPods Pro 2 (USB-C):**\n` +
+            `  - **Hệ sinh thái:** Chân ái nếu bạn dùng iPhone, iPad, MacBook vì chuyển đổi thiết bị liền mạch 1 chạm tức thì.\n` +
+            `  - **Đàm thoại:** Mic thu âm lọc tiếng gió và tiếng ồn xung quanh tốt nhất thế giới, gọi điện/họp Meet cực kỳ rõ tiếng.\n` +
+            `  - **Âm thanh:** Âm thanh vòm cá nhân hóa Spatial Audio theo dõi cử động đầu sống động như rạp phim.\n\n` +
+            `• 🎵 **Nên chọn Sony WF-1000XM5:**\n` +
+            `  - **Chất âm Audiophile:** Màng loa Dynamic Driver X cao cấp hỗ trợ Codec Hi-Res LDAC cho dải bass sâu uy lực và độ chi tiết nhạc cụ tuyệt đỉnh.\n` +
+            `  - **Chống ồn ANC đỉnh chóp:** Đệm mút bọt biển cách âm độc quyền kết hợp chip xử lý kép V2 & QN2e triệt tiêu tiếng ồn môi trường gần như tuyệt đối.\n\n` +
+            `👉 Bạn đang dùng điện thoại iPhone hay Android để em chọn chiếc tai nghe đồng bộ hoàn hảo nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem AirPods Pro 2 USB-C', 'Xem tai nghe Sony chính hãng', 'Tư vấn phụ kiện âm thanh']
     }
 ];
 
@@ -654,6 +877,70 @@ const TECH_TIP_RULES = [
             `• ☀️ **Hạ độ sáng màn hình thủ công:** Màn hình chiếm tới 50% - 70% điện năng tiêu thụ của máy đó ạ.\n\n` +
             `💡 Để an tâm tuyệt đối chụp ảnh check-in suốt chuyến đi, bạn nên thủ sẵn một cục **Pin sạc dự phòng Anker 10.000mAh – 20.000mAh** nhỏ gọn nhé!`,
         suggestions: ['Xem pin sạc dự phòng Anker', 'Điện thoại pin trâu 5000mAh', 'Mã giảm giá hôm nay']
+    },
+
+    // 5.9 Mua MacBook 8GB RAM có đủ dùng không hay nên lấy 16GB?
+    {
+        id: 'advice_macbook_ram_8gb_vs_16gb',
+        patterns: [
+            /(macbook|mac).*(8gb.*16gb|8gb ram.*du khong|8gb.*du dung)/i,
+            /(nen mua macbook).*(8gb hay 16gb|16gb hay 8gb)/i
+        ],
+        keywords: [
+            'macbook 8gb ram co du khong', 'nen mua macbook 8gb hay 16gb',
+            'macbook 8gb co yeu khong', '8gb ram macbook co thieu khong',
+            'co nen mua macbook 8gb ram khong'
+        ],
+        reply: `Dạ đây là nỗi băn khoăn lớn nhất của hầu hết người dùng khi chọn mua MacBook nè! Em xin phân tích thẳng thắn và khách quan nha: 🍏💻\n\n` +
+            `• 📂 **Khi nào 8GB RAM là đủ?** Nếu bạn chỉ làm việc văn phòng cơ bản, gõ Word/Excel, lướt web 10 – 15 tab, xem YouTube 4K, gọi họp Zoom/Meet và chỉnh sửa ảnh Canva nhẹ nhàng. Nhờ kiến trúc bộ nhớ hợp nhất (Unified Memory) và macOS tối ưu rất tốt, 8GB vẫn chạy mượt mà.\n\n` +
+            `• 🚀 **KHI NÀO BẮT BUỘC NÊN LẤY 16GB RAM?**\n` +
+            `  1. Bạn làm Marketing, Content Creator cần mở 30 – 50 tab trình duyệt cùng lúc kèm Photoshop, Illustrator, Premiere hoặc CapCut 4K.\n` +
+            `  2. Bạn học/làm Lập trình CNTT (chạy Docker, VS Code, máy ảo iOS Simulator).\n` +
+            `  3. Bạn muốn đầu tư một chiếc máy dùng bền bỉ, mượt mà **suốt 4 – 6 năm tới** mà không lo đầy RAM hay máy phải hoán đổi bộ nhớ (Swap) vào ổ SSD làm giảm tuổi thọ ổ cứng.\n\n` +
+            `💡 Đặc biệt, từ dòng M3/M4, Apple đã nâng tiêu chuẩn khởi điểm lên 16GB RAM với mức giá không đổi. Bạn dự kiến dùng máy cho ngành nghề gì để em tư vấn bản tiết kiệm nhất nhé! 😊`,
+        suggestions: ['Xem MacBook Air M3 16GB', 'Xem MacBook Pro M3', 'Hotline 0842.331.606']
+    },
+
+    // 5.10 Sạc nhanh 67W, 100W, 120W có làm chai pin điện thoại không?
+    {
+        id: 'advice_fast_charging_battery_harm',
+        patterns: [
+            /(sac nhanh).*(chai pin|hai pin|hai may|chay no|co sao khong)/i,
+            /(sac 67w|sac 100w|sac 120w).*(co hai pin khong|co chai pin)/i
+        ],
+        keywords: [
+            'sac nhanh co chai pin khong', 'dung sac nhanh co hai may khong',
+            'sac 120w co chai pin nhanh khong', 'sac nhanh co no khong',
+            'sac cong suat cao co hai pin khong'
+        ],
+        reply: `Dạ em xin khẳng định chuẩn kỹ thuật: **Sạc nhanh chính hãng HOÀN TOÀN KHÔNG LÀM CHAI PIN NHANH** hay gây hại cho máy đâu bạn nhé! ⚡🛡️\n\n` +
+            `🔬 **Nguyên lý hoạt động thông minh:**\n` +
+            `• **Chia giai đoạn sạc:** Máy chỉ sạc công suất cực đại (67W - 120W) từ **0% đến khoảng 60% - 70%** trong 15 - 20 phút đầu (khi cell pin còn rỗng và mát). Sau đó chip sạc sẽ tự động hạ dòng điện nhỏ giọt để giữ nhiệt độ pin luôn dưới ngưỡng an toàn 40°C.\n` +
+            `• **Cảm biến nhiệt kép:** Các dòng điện thoại đời mới tích hợp từ 5 – 10 cảm biến nhiệt độ độc lập, nếu máy ấm lên quá mức cho phép, chip sẽ tự giảm công suất ngay lập tức.\n\n` +
+            `💡 **Điều quan trọng nhất:** Hãy dùng đúng **củ cáp sạc chính hãng chuẩn PD/GaN** (như Anker, Apple, Xiaomi, Samsung) và tránh để máy trên đệm/gối bí nhiệt khi sạc nhanh là bạn có thể yên tâm dùng pin bền 3-4 năm thoải mái ạ! 😊`,
+        suggestions: ['Xem củ sạc nhanh Anker GaN', 'Xem sạc dự phòng chính hãng', 'Tư vấn phụ kiện an toàn']
+    },
+
+    // 5.11 So sánh màn hình OLED / AMOLED vs IPS LCD (Có bị lưu ảnh Burn-in không?)
+    {
+        id: 'advice_oled_vs_ips_lcd',
+        patterns: [
+            /(so sanh|khac gi|nen chon).*(oled.*ips|ips.*oled|amoled.*ips)/i,
+            /(man hinh oled).*(co bi burn in|co bi luu anh|co ben khong)/i
+        ],
+        keywords: [
+            'so sanh man hinh oled va ips', 'oled va ips cai nao tot hon',
+            'man hinh oled co bi luu anh khong', 'burn in tren oled',
+            'co nen mua man hinh oled khong', 'man oled hay ips ben hon'
+        ],
+        reply: `Dạ hai công nghệ màn hình này có những đặc tính vượt trội riêng, em xin so sánh chi tiết giúp bạn dễ chọn nha: 📺✨\n\n` +
+            `• 🌟 **Màn hình OLED / Dynamic AMOLED:**\n` +
+            `  - **Ưu điểm:** Mỗi điểm ảnh tự phát sáng độc lập nên màu đen sâu tuyệt đối (tương phản vô cực), màu sắc rực rỡ nịnh mắt, siêu mỏng và tiết kiệm pin khi dùng chế độ Dark Mode.\n` +
+            `  - **Về nỗi lo Burn-in (lưu ảnh):** Trên các dòng máy hiện đại (Super Retina XDR của Apple, Dynamic AMOLED 2X của Samsung), hãng đã tích hợp thuật toán **Pixel Shift (tự dịch chuyển điểm ảnh vi mô)** và cơ chế cân bằng điện áp, nên trong điều kiện sử dụng bình thường tỉ lệ lưu ảnh gần như bằng 0!\n\n` +
+            `• 🖥️ **Màn hình IPS LCD:**\n` +
+            `  - **Ưu điểm:** Dùng đèn nền LED chiếu sáng nên độ bền vật lý cực cao, màu sắc hiển thị trung thực chuẩn màu đồ họa in ấn và chi phí thay thế rất hợp lý.\n\n` +
+            `💡 **Lời khuyên:** Nếu thích xem phim bom tấn, chơi game đồ họa đẹp và trải nghiệm thị giác đỉnh chóp, bạn hãy tự tin chọn **OLED** nhé! Còn nếu làm việc đồ họa in ấn chuẩn màu cả ngày thì **IPS cao cấp** là bạn đồng hành tuyệt vời! 😊`,
+        suggestions: ['Xem điện thoại màn hình AMOLED 120Hz', 'Xem Laptop màn hình OLED', 'Hotline 0842.331.606']
     }
 ];
 
@@ -837,6 +1124,89 @@ const CHIT_CHAT_RULES = [
             `Bạn đang gặp phải vướng mắc ở đơn hàng, sản phẩm hay khâu phục vụ nào, bạn cứ chia sẻ thẳng thắn, em xin lắng nghe và phối hợp ngay với bộ phận hỗ trợ cấp cao để giải quyết thỏa đáng nhất cho bạn ngay lập tức ạ!\n\n` +
             `👉 Bạn cũng có thể gọi thẳng đến Hotline khiếu nại **0842.331.606** để được Trưởng ca hỗ trợ trực tiếp không phải chờ đợi nhé!`,
         suggestions: ['Hotline hỗ trợ 0842.331.606', 'Kiểm tra đơn hàng', 'Chính sách đổi trả']
+    },
+
+    // 6.12 Khách yêu cầu hát một bài / trổ tài văn nghệ
+    {
+        id: 'chit_chat_ask_sing_song',
+        patterns: [
+            /(hat|ca).*(mot bai|di em|cho nghe|cho anh nghe|cho chi nghe|bai gi)/i,
+            /(em biet hat khong|hat di|hat karaoke)/i
+        ],
+        keywords: [
+            'hat di em', 'hat cho anh nghe', 'hat cho chi nghe', 'em biet hat khong',
+            'hat mot bai di', 'hat karaoke', 'hat hay khong', 'ca mot bai di'
+        ],
+        reply: `Dạ em xin trổ tài làm ca sĩ 'cây nhà lá vườn' của TechEcommerce gửi tặng bạn bài rap công nghệ vui này nha: 🎶🎤\n\n` +
+            `*"Sáng ra lướt TechEcommerce, ✨\n` +
+            `Điện thoại xịn xò, giá lại mê!\n` +
+            `MacBook, ROG hay Z Fold,\n` +
+            `Chính hãng nguyên seal chẳng điểm chê!\n` +
+            `Flash Sale trợ giá trao tận ngõ,\n` +
+            `Bạn cười rạng rỡ, shop vui ghê!"* 🍀\n\n` +
+            `Hihi, giọng rap qua từng con chữ của em có làm bạn bật cười và thư giãn hơn chút nào chưa nè? Cần em tư vấn dàn tai nghe chống ồn hay loa Bluetooth để nghe nhạc chill chill thì cứ bảo em nhé! 🥰`,
+        suggestions: ['Xem tai nghe AirPods Pro', 'Xem loa Bluetooth JBL / Marshall', 'Xem ưu đãi hôm nay']
+    },
+
+    // 6.13 Tư vấn mua quà tặng Người yêu / Crush / Bạn gái / Bố mẹ
+    {
+        id: 'chit_chat_gift_for_crush_lover',
+        patterns: [
+            /(tang qua|mua qua).*(nguoi yeu|crush|ban gai|ban trai|sinh nhat ban|vo|chong|bo me)/i,
+            /(sinh nhat).*(tang may gi|tang gi)/i
+        ],
+        keywords: [
+            'tang qua nguoi yeu', 'mua qua cho crush', 'qua sinh nhat ban gai cong nghe',
+            'tang gi cho ban trai', 'mua dien thoai tang me', 'mua qua sinh nhat',
+            'tang qua cong nghe'
+        ],
+        reply: `Dạ bạn quả là một người cực kỳ tâm lý và chu đáo luôn nè! Tặng quà công nghệ vừa sang trọng, vừa mang tính ứng dụng cao hàng ngày: 🎁💖\n\n` +
+            `✨ **Gợi ý quà tặng chuẩn bài theo từng đối tượng:**\n` +
+            `• 🌸 **Tặng Bạn gái / Crush nữ:**\n` +
+            `  - iPhone 16 / iPhone 15 màu Hồng Pastel hoặc Titan Sa Mạc xinh xắn kiêu kỳ.\n` +
+            `  - Tai nghe AirPods Pro 2 hoặc Đồng hồ Apple Watch thời trang giúp theo dõi sức khỏe và giấc ngủ.\n` +
+            `• 🚀 **Tặng Bạn trai / Chồng:**\n` +
+            `  - Máy chơi game Nintendo Switch OLED mang lại phút giây giải trí xả stress.\n` +
+            `  - Chuột không dây công thái học Logitech MX Master 3S hoặc Tai nghe Gaming chống ồn.\n` +
+            `• 👵 **Tặng Bố Mẹ / Phụ huynh:**\n` +
+            `  - Điện thoại Samsung Galaxy màn hình lớn 6.7 inch, loa to rõ, pin 5.000mAh dùng 2 ngày không lo hết pin.\n\n` +
+            `👉 Shop có hỗ trợ **Gói quà thiệp chúc mừng miễn phí** khi giao hàng đó ạ! Bạn định tặng cho ai và ngân sách khoảng bao nhiêu để em chọn món quà ngọt ngào nhất nhé! 😊`,
+        suggestions: ['Xem Apple Watch chính hãng', 'Xem AirPods Pro 2', 'Tư vấn quà tặng người yêu', 'Hotline 0842.331.606']
+    },
+
+    // 6.14 Khách xin số điện thoại, Zalo làm quen hoặc rủ đi cà phê
+    {
+        id: 'chit_chat_ask_phone_zalo_date',
+        patterns: [
+            /(xin so|cho anh xin so|cho em xin so|cho so).*(dien thoai|zalo|de lam quen)/i,
+            /(di cafe|hen ho|lam quen|tra sua).*(khong em|voi anh|voi em)/i
+        ],
+        keywords: [
+            'cho xin so dien thoai em', 'cho xin zalo lam quen', 'di cafe khong em',
+            'lam ban voi anh nhe', 'em de thuong the cho xin so', 'ket ban zalo voi em',
+            'xin so lam quen'
+        ],
+        reply: `Dạ em là Trợ lý AI công nghệ kiêm 'chuyên viên săn deal' đáng yêu của TechEcommerce nè! ☕📱\n\n` +
+            `Em luôn túc trực 24/7 trên màn hình để tâm tình, trò chuyện và tư vấn công nghệ cùng bạn mọi lúc mọi nơi bất kể ngày đêm luôn á! 🥰\n\n` +
+            `Còn nếu bạn muốn kết bạn Zalo hoặc 'hẹn hò' qua đường dây nóng để được các bạn tư vấn viên người thật xinh xắn của shop tư vấn chuyên sâu 1-1 thì hotline Zalo chính thức của shop là **0842.331.606** nha! Em sẽ lưu tên bạn vào danh sách khách hàng VIP thân thiết liền nè! ✨`,
+        suggestions: ['Hotline Zalo 0842.331.606', 'Xem ưu đãi hôm nay', 'Địa chỉ Showroom']
+    },
+
+    // 6.15 Khách mệt mỏi, áp lực deadline, cần lời động viên
+    {
+        id: 'chit_chat_motivation_cheerup',
+        patterns: [
+            /(ap luc|stress|deadline|met moi|chan qua|buon qua|nan qua|chuc mot ngay)/i,
+            /(dong vien|an ui).*(anh|chi|em)/i
+        ],
+        keywords: [
+            'hom nay met qua', 'ap luc deadline qua', 'chan nan qua em oi',
+            'buon qua khong biet noi cung ai', 'an ui em di', 'met moi qua', 'stress qua em oi'
+        ],
+        reply: `Dạ em xin gửi bạn một cái ôm tinh thần thật ấm áp nha! 🌸🤗\n\n` +
+            `Cuộc sống và công việc đôi khi thật nhiều áp lực, bài vở hay deadline dồn dập khiến mình cảm thấy kiệt sức... Nhưng bạn ơi, bạn đã rất nỗ lực và kiên cường vượt qua ngần ấy thời gian rồi đó!\n\n` +
+            `Bạn hãy tạm gác lại mọi việc một lát, uống một ngụm nước mát, hít một hơi thật sâu và ăn món mình thích nha. Đừng quá khắt khe với bản thân, bạn đang làm rất tốt rồi! Sau cơn mưa cầu vồng sẽ xuất hiện rực rỡ, em luôn ở đây lắng nghe và cổ vũ bạn 100% nè! Cố lên bạn nhé! 💪✨`,
+        suggestions: ['Xem sản phẩm giải trí', 'Tư vấn tai nghe chill', 'Xem ưu đãi hôm nay']
     }
 ];
 
@@ -864,6 +1234,7 @@ function matchSmartAnswer(message) {
 
     const groups = [
         { name: 'store_policy', rules: STORE_POLICY_RULES },
+        { name: 'budget_consultation', rules: BUDGET_AND_CONSULTATION_RULES },
         { name: 'objection', rules: OBJECTION_RULES },
         { name: 'hardware_and_software', rules: HARDWARE_AND_SOFTWARE_RULES },
         { name: 'comparison_and_fengshui', rules: COMPARISON_AND_FENGSHUI_RULES },
@@ -891,6 +1262,7 @@ function matchSmartAnswer(message) {
 module.exports = {
     matchSmartAnswer,
     STORE_POLICY_RULES,
+    BUDGET_AND_CONSULTATION_RULES,
     OBJECTION_RULES,
     HARDWARE_AND_SOFTWARE_RULES,
     COMPARISON_AND_FENGSHUI_RULES,

@@ -890,7 +890,7 @@
             }
             profile.updatedAt = Date.now();
             localStorage.setItem('ai_shopping_profile', JSON.stringify(profile));
-        } catch (e) {}
+        } catch (e) { }
     }
 
     function getPersonalizedWelcome() {
@@ -912,7 +912,7 @@
                     ]
                 };
             }
-        } catch (e) {}
+        } catch (e) { }
 
         return {
             text: 'Xin chào! Mình là Trợ lý Mua sắm AI của TechEcommerce. Mình có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?',
@@ -2511,7 +2511,7 @@
             sessionStorage.removeItem('ai_chat_just_redirected_name');
             try {
                 localStorage.removeItem('ai_shopping_profile');
-            } catch (e) {}
+            } catch (e) { }
             chatHistory = [];
             consultationContext = {};
             body.innerHTML = '';
@@ -2540,7 +2540,7 @@
                     localStorage.removeItem('ai_shopping_profile');
                 }
             }
-        } catch (e) {}
+        } catch (e) { }
 
         // Khi người dùng reload lại trang (F5 hoặc nút Refresh của trình duyệt),
         // hệ thống đặt chatbox về trạng thái đóng (collapsed), xóa bộ nhớ đệm
@@ -2556,7 +2556,7 @@
             sessionStorage.setItem('ai_chat_active_open', 'false');
             try {
                 localStorage.removeItem('ai_shopping_profile');
-            } catch (e) {}
+            } catch (e) { }
         }
 
         // Khôi phục phiên tư vấn trước đó (chỉ khôi phục nếu người dùng thực sự đã nhắn tin)

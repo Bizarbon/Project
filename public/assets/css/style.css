@@ -635,14 +635,14 @@ button[type="submit"]:hover {
 }
 
 .btn-secondary,
-button[type="button"] {
+button[type="button"]:not(.contact-main-btn):not(.buy-sticker-close):not(.ai-chat-toggle):not(.contact-popover-item) {
     background: var(--bg-card);
     color: var(--text-secondary);
     border: 1px solid var(--border);
 }
 
 .btn-secondary:hover,
-button[type="button"]:hover {
+button[type="button"]:not(.contact-main-btn):not(.buy-sticker-close):not(.ai-chat-toggle):not(.contact-popover-item):hover {
     background: var(--bg-card-hover);
     color: var(--text-primary);
     border-color: var(--border-light);
