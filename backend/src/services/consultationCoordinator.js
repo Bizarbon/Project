@@ -1034,9 +1034,9 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['surface laptop go 3', 'surface laptop'], match: /surface laptop go 3/i },
 
     // --- Tablets ---
-    { terms: ['ipad pro m4', 'ipad pro 11', 'ipad pro'], match: /ipad pro 11/i },
-    { terms: ['ipad air m2', 'ipad air 11', 'ipad air'], match: /ipad air/i },
-    { terms: ['ipad gen 10', 'ipad 10'], match: /ipad gen 10/i },
+    { terms: ['ipad pro m4', 'ipad pro 11', 'ipad pro 11inch', 'ipad pro 11 inch', 'ipad pro', 'pro m4', 'pro 11', 'pro 11inch'], match: /ipad pro 11/i },
+    { terms: ['ipad air m2', 'ipad air 11', 'ipad air 11inch', 'ipad air 11 inch', 'ipad air', 'air m2', 'air 11', 'air 11inch', 'air 11 inch'], match: /ipad air/i },
+    { terms: ['ipad gen 10', 'ipad 10', 'gen 10', 'gen10', 'ipad gen10', 'ipad 10.9', 'ipad 10th'], match: /ipad gen 10/i },
     { terms: ['tab s9 ultra', 'galaxy tab s9'], match: /tab s9 ultra/i },
     { terms: ['matepad 11.5', 'matepad'], match: /matepad/i },
     { terms: ['xiaomi pad 8', 'pad 8 pro', 'pad 8'], match: /xiaomi pad 8 pro/i },
@@ -1110,9 +1110,6 @@ async function findAllMatchingProductsInCatalog(message) {
     const directNameMatches = [...allActive]
         .filter(product => product.name && norm.includes(normalizeText(product.name)))
         .sort((a, b) => (b.name || '').length - (a.name || '').length);
-    // Keep every explicit full-name match so comparison requests such as
-    // "iPhone ... so với Galaxy ..." do not stop at the first product.
-    if (directNameMatches.length) return directNameMatches;
 
     // Kiểm tra bảng alias ánh xạ trực tiếp các model phổ biến
     const aliasMatches = [];
@@ -1128,7 +1125,20 @@ async function findAllMatchingProductsInCatalog(message) {
             }
         }
     }
+
+    if (directNameMatches.length >= 2) return directNameMatches;
+    if (aliasMatches.length >= 2) return aliasMatches;
+
+    // Kết hợp directNameMatches và aliasMatches nếu mỗi bên tìm được 1 sản phẩm
+    const combinedMatches = [...directNameMatches];
+    for (const p of aliasMatches) {
+        if (!combinedMatches.some(item => String(item._id) === String(p._id))) {
+            combinedMatches.push(p);
+        }
+    }
+    if (combinedMatches.length >= 2) return combinedMatches;
     if (aliasMatches.length) return aliasMatches;
+    if (directNameMatches.length) return directNameMatches;
 
     const matched = [];
 
@@ -4218,11 +4228,17 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         }
     }
 
-    // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix")
+    // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix", "iPad Air 11inch với Gen 10 có j khác nhau")
     // Explicit model names must be resolved before brand-level comparison.
     const earlyMatchedProducts = await findAllMatchingProductsInCatalog(message);
-    const earlyComparingIntent = ['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', 'hay nen mua', 'phan van', 'nen chon may nao', 'giua'].some(k => text.includes(k));
-    if (earlyComparingIntent && earlyMatchedProducts.length >= 2) {
+    const earlyComparingIntent = (
+        prev.stage === 'awaiting_comparison_products' ||
+        prev.currentIntent === 'compare_products' ||
+        ['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', 'khac j', 'co j khac', 'co gi khac', 'co gi khac nhau', 'co j khac nhau', 'hay nen mua', 'phan van', 'nen chon may nao', 'giua'].some(k => text.includes(k)) ||
+        /\b(?:va|voi|vs|hay|hoac)\b/i.test(text)
+    );
+
+    if (earlyComparingIntent && earlyMatchedProducts.length >= 2 && String(earlyMatchedProducts[0]._id) !== String(earlyMatchedProducts[1]._id)) {
         return await buildComparisonResponse(earlyMatchedProducts[0], earlyMatchedProducts[1], {
             ...prev,
             currentMessage: message,
@@ -4230,14 +4246,41 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         });
     }
 
+    // Contextual comparison: Khách chỉ nêu 1 sản phẩm mới ("với Gen 10 thì sao", "so với Gen 10 có j khác"),
+    // trong khi lượt trước đã có sản phẩm (ví dụ iPad Air)
+    if (earlyComparingIntent && earlyMatchedProducts.length === 1 && Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0) {
+        const p1Id = prev.lastProducts[0]?._id || prev.lastProducts[0];
+        if (p1Id && String(p1Id) !== String(earlyMatchedProducts[0]._id)) {
+            const p1 = await Product.findById(p1Id);
+            if (p1) {
+                return await buildComparisonResponse(p1, earlyMatchedProducts[0], {
+                    ...prev,
+                    currentMessage: message,
+                    category: authoritativeCategory || p1.category
+                });
+            }
+        }
+    }
+
     const brandComparison = await resolveBrandComparison(message, prev);
     if (brandComparison) return brandComparison;
 
     const matchedProducts = await findAllMatchingProductsInCatalog(message);
-    const isComparingIntent = ['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', 'hay nen mua', 'phan van', 'nen chon may nao', 'giua'].some(k => text.includes(k));
+    const isComparingIntent = earlyComparingIntent;
 
-    if (matchedProducts.length >= 2 && isComparingIntent) {
+    if (matchedProducts.length >= 2 && String(matchedProducts[0]._id) !== String(matchedProducts[1]._id) && isComparingIntent) {
         return await buildComparisonResponse(matchedProducts[0], matchedProducts[1], prev);
+    }
+
+    // Contextual comparison fallback
+    if (isComparingIntent && matchedProducts.length === 1 && Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0) {
+        const p1Id = prev.lastProducts[0]?._id || prev.lastProducts[0];
+        if (p1Id && String(p1Id) !== String(matchedProducts[0]._id)) {
+            const p1 = await Product.findById(p1Id);
+            if (p1) {
+                return await buildComparisonResponse(p1, matchedProducts[0], prev);
+            }
+        }
     }
 
     // Never downgrade an explicit comparison into a stale budget/recommendation
