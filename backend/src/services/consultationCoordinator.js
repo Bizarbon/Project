@@ -1005,8 +1005,8 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['honor x8b', 'x8b'], match: /honor x8b/i },
 
     // --- MacBooks & Laptops ---
-    { terms: ['macbook air m3', 'air m3', 'macbook m3'], match: /macbook air.*m3/i },
-    { terms: ['macbook air m2', 'air m2', 'macbook m2'], match: /macbook air.*m2/i },
+    { terms: ['macbook air m3', 'mac air m3', 'macbook m3'], match: /macbook air.*m3/i },
+    { terms: ['macbook air m2', 'mac air m2', 'macbook air', 'mac air', 'macbook m2'], match: /macbook air.*m2/i },
     { terms: ['rog strix g16', 'rog strix', 'strix g16'], match: /rog strix/i },
     { terms: ['tuf gaming a16', 'tuf gaming', 'asus tuf'], match: /tuf gaming/i },
     { terms: ['zenbook 14', 'zenbook oled', 'asus zenbook'], match: /zenbook/i },
@@ -4228,15 +4228,36 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         }
     }
 
-    // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix", "iPad Air 11inch với Gen 10 có j khác nhau")
-    // Explicit model names must be resolved before brand-level comparison.
-    const earlyMatchedProducts = await findAllMatchingProductsInCatalog(message);
+    // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix", "iPad Air 11inch với Gen 10 có j khác nhau", "so sánh gen 10 và air M2")
     const earlyComparingIntent = (
         prev.stage === 'awaiting_comparison_products' ||
         prev.currentIntent === 'compare_products' ||
         ['so sanh', 'so voi', 'khac nhau gi', 'khac nhau', 'khac gi', 'khac j', 'co j khac', 'co gi khac', 'co gi khac nhau', 'co j khac nhau', 'hay nen mua', 'phan van', 'nen chon may nao', 'giua'].some(k => text.includes(k)) ||
         /\b(?:va|voi|vs|hay|hoac)\b/i.test(text)
     );
+
+    if (earlyComparingIntent) {
+        // Phân tích câu so sánh có liên từ nối: "so sánh A và B", "A với B có j khác", "giữa A và B"
+        const cleanMsg = text
+            .replace(/^(?:so sanh|so voi|giua|phan van|nen mua|nen chon)\s+/i, '')
+            .replace(/\s+(?:co j khac|co gi khac|co j khac nhau|co gi khac nhau|khac nhau gi|khac gi|khac j|khac nhau|nen mua may nao|nen chon may nao|thi sao).*$/i, '')
+            .trim();
+        const parts = cleanMsg.split(/\s+(?:va|vs|hay|voi|hoac)\s+/i).map(s => s.trim()).filter(Boolean);
+        if (parts.length >= 2) {
+            const p1 = await findExactProductInCatalog(parts[0]);
+            const p2 = await findExactProductInCatalog(parts[1]);
+            if (p1 && p2 && String(p1._id) !== String(p2._id)) {
+                return await buildComparisonResponse(p1, p2, {
+                    ...prev,
+                    currentMessage: message,
+                    category: authoritativeCategory || p1.category || p2.category
+                });
+            }
+        }
+    }
+
+    // Explicit model names must be resolved before brand-level comparison.
+    const earlyMatchedProducts = await findAllMatchingProductsInCatalog(message);
 
     if (earlyComparingIntent && earlyMatchedProducts.length >= 2 && String(earlyMatchedProducts[0]._id) !== String(earlyMatchedProducts[1]._id)) {
         return await buildComparisonResponse(earlyMatchedProducts[0], earlyMatchedProducts[1], {
