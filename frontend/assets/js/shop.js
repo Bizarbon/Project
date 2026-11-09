@@ -4322,6 +4322,9 @@ function openQuickView(productId) {
     } else {
         dialog.setAttribute('open', '');
     }
+    const qvBody = dialog.querySelector('.quick-view-body');
+    if (qvBody) qvBody.scrollTop = 0;
+    dialog.scrollTop = 0;
 }
 window.openQuickView = openQuickView;
 

@@ -13135,25 +13135,28 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
     text-shadow: 0 1px 0 #8b0000, 0 2px 4px rgba(0, 0, 0, 0.65);
 }
 
-.buy-sticker-avatar {
-    width: 48px;
-    height: 48px;
+.buy-sticker-mascot {
+    width: 68px;
+    height: auto;
     margin-top: 2px;
     z-index: 1;
-    border-radius: 50%;
-    overflow: hidden;
-    background: #ffffff;
-    border: 1.5px solid rgba(255, 255, 255, 0.95);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
+    transition: transform 0.25s ease;
 }
 
-.buy-sticker-avatar img {
+.buy-sticker-mascot img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
     display: block;
-    transform: scale(1.05);
+}
+
+.buy-sticker-link:hover .buy-sticker-mascot {
+    transform: scale(1.08);
 }
 
 @keyframes buyStickerFloat {
@@ -13191,8 +13194,8 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
     }
 
     .buy-sticker-badge {
-        width: 74px !important;
-        height: 74px !important;
+        width: 76px !important;
+        height: 76px !important;
         padding-top: 5px !important;
     }
 
@@ -13204,9 +13207,8 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
         font-size: 10.2px !important;
     }
 
-    .buy-sticker-avatar {
-        width: 40px !important;
-        height: 40px !important;
+    .buy-sticker-mascot {
+        width: 58px !important;
         margin-top: 1px !important;
     }
 
@@ -13215,6 +13217,156 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
         height: 19px !important;
         top: -3px !important;
         right: -3px !important;
+    }
+}
+
+/* ==========================================================================
+   Quick View Modal Mobile Optimization (Chống đè hàng giá & phục hồi tiêu đề)
+   Khắc phục lỗi WebKit/Safari khi dùng aspect-ratio trong CSS Grid
+   ========================================================================== */
+@media (max-width: 768px) {
+    .quick-view-dialog {
+        width: min(calc(100% - 1.25rem), 480px) !important;
+        max-height: 88vh !important;
+        border-radius: 16px !important;
+        margin: auto !important;
+    }
+
+    .quick-view-header {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .quick-view-brand-pill {
+        font-size: 0.8rem !important;
+        padding: 0.25rem 0.65rem !important;
+    }
+
+    .quick-view-close-btn {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.1rem !important;
+    }
+
+    /* Chuyển grid sang flex để loại bỏ triệt để lỗi Safari tính sai row track */
+    .quick-view-body {
+        display: flex !important;
+        flex-direction: column !important;
+        padding: 0.85rem 1rem 1.25rem !important;
+        gap: 0.75rem !important;
+        max-height: calc(88vh - 56px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .quick-view-media {
+        width: 100% !important;
+        height: 190px !important;
+        max-height: 190px !important;
+        aspect-ratio: auto !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #f8fafc !important;
+        flex-shrink: 0 !important;
+        overflow: hidden !important;
+    }
+
+    html[data-theme='dark'] .quick-view-media {
+        background: #1f2937 !important;
+    }
+
+    .quick-view-media img {
+        max-height: 170px !important;
+        width: auto !important;
+        max-width: 90% !important;
+        object-fit: contain !important;
+    }
+
+    .quick-view-discount-ribbon {
+        top: 8px !important;
+        left: 8px !important;
+        font-size: 0.72rem !important;
+        padding: 0.2rem 0.45rem !important;
+    }
+
+    .quick-view-info {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+    }
+
+    .quick-view-cat-badge {
+        font-size: 0.72rem !important;
+        display: inline-block !important;
+        margin-bottom: -2px !important;
+    }
+
+    .quick-view-title {
+        font-size: 1.1rem !important;
+        line-height: 1.35 !important;
+        margin: 0.15rem 0 0 !important;
+        word-break: break-word !important;
+        display: block !important;
+    }
+
+    .quick-view-meta {
+        font-size: 0.8rem !important;
+        gap: 0.5rem !important;
+        margin-top: 0.1rem !important;
+    }
+
+    .quick-view-price-box {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: baseline !important;
+        gap: 0.5rem !important;
+        padding: 0.5rem 0 !important;
+        margin: 0.2rem 0 !important;
+        overflow: visible !important;
+        clear: both !important;
+    }
+
+    .quick-view-price {
+        font-size: 1.35rem !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    .quick-view-compare {
+        font-size: 0.88rem !important;
+    }
+
+    .quick-view-installment {
+        font-size: 0.78rem !important;
+        margin-top: 0.1rem !important;
+    }
+
+    .quick-view-spec-pills {
+        gap: 0.35rem !important;
+    }
+
+    .quick-view-spec-pills .spec-pill {
+        font-size: 0.75rem !important;
+        padding: 0.2rem 0.5rem !important;
+    }
+
+    .quick-view-desc {
+        font-size: 0.82rem !important;
+        line-height: 1.45 !important;
+    }
+
+    .quick-view-actions {
+        gap: 0.5rem !important;
+        margin-top: 0.35rem !important;
+    }
+
+    .quick-view-btn-add,
+    .quick-view-btn-buy {
+        padding: 0.65rem !important;
+        font-size: 0.9rem !important;
     }
 }
 
