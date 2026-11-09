@@ -189,8 +189,9 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // Floating Zalo button - only for storefront, never on admin pages!
-    if (window.location.pathname.includes('/admin/')) {
+    // Floating Zalo button: Da duoc tich hop truc tiep vao widget "Lien he" (Chuan anh 1)
+    // Khong tao nut Zalo roi rac nua de tranh bi chong cheo 2 nut
+    if (window.location.pathname.includes('/admin/') || document.getElementById('storeContactLauncher') || document.querySelector('.ai-chat')) {
         return;
     }
 

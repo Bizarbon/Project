@@ -2798,4 +2798,245 @@ html[data-theme='dark'] .ai-bundle-total-row {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ==========================================================================
+   Store Contact Launcher Widget (Chuẩn ảnh 1: Nút đỏ Liên hệ + Popover menu)
+   ========================================================================== */
+.store-contact-launcher {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1850;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Nút bấm chính "Liên hệ" màu đỏ bo cong chuẩn ảnh 1 */
+.contact-main-btn {
+    height: 46px;
+    min-width: 124px;
+    padding: 0 16px 0 18px;
+    border: none;
+    border-radius: 9999px;
+    background: #d70018;
+    background: linear-gradient(135deg, #e11b1e 0%, #d70018 60%, #b80012 100%);
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 20px rgba(215, 0, 24, 0.42), 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, background 0.2s;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.contact-main-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 26px rgba(215, 0, 24, 0.55), 0 3px 8px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #f02427 0%, #e11b1e 60%, #c40015 100%);
+}
+
+.contact-main-btn:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.contact-btn-text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.96rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+}
+
+.contact-btn-icon {
+    width: 20px;
+    height: 20px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+/* Popover Menu màu trắng mở lên phía trên (Ảnh 1) */
+.contact-popover {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    right: 0;
+    width: 230px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(12px) scale(0.94);
+    transform-origin: bottom right;
+    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10;
+}
+
+.store-contact-launcher.is-open .contact-popover {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+/* Các mục trong Popover */
+.contact-popover-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: background 0.18s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.contact-popover-item:hover {
+    background: #f8fafc;
+    transform: translateX(-2px);
+}
+
+.contact-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.ai-avatar-circle {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 1.5px solid #fca5a5;
+}
+
+.contact-ai-avatar {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+.zalo-avatar-circle {
+    background: #0068FF;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+}
+
+.contact-item-text-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.contact-item-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.25;
+}
+
+.contact-item-sub {
+    font-size: 0.72rem;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+/* Dark mode theme */
+html[data-theme='dark'] .contact-popover {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme='dark'] .contact-popover-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .contact-item-title {
+    color: #f1f5f9;
+}
+
+html[data-theme='dark'] .contact-item-sub {
+    color: #94a3b8;
+}
+
+/* Hiệu ứng rung nhẹ thu hút sự chú ý của nút Liên hệ */
+@keyframes contact-gentle-pulse {
+    0%, 100% {
+        box-shadow: 0 6px 20px rgba(215, 0, 24, 0.42), 0 0 0 0 rgba(215, 0, 24, 0.5);
+    }
+    50% {
+        box-shadow: 0 8px 24px rgba(215, 0, 24, 0.55), 0 0 0 10px rgba(215, 0, 24, 0);
+    }
+}
+
+.rhythmic-pulse-shake-contact {
+    animation: contact-gentle-pulse 3s infinite ease-in-out;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+    .store-contact-launcher {
+        right: 14px !important;
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    .contact-main-btn {
+        height: 42px !important;
+        min-width: 110px !important;
+        padding: 0 14px 0 16px !important;
+    }
+
+    .contact-btn-text {
+        font-size: 0.9rem !important;
+    }
+
+    .contact-btn-icon {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    .contact-popover {
+        width: 215px !important;
+        bottom: calc(100% + 10px) !important;
+    }
+}
+
+/* Ẩn launcher khi mở chat hoặc drawer */
+body.ai-chat-open .store-contact-launcher,
+body:has(.ai-chat.open) .store-contact-launcher,
+body.cart-open .store-contact-launcher,
+body:has(#cartDrawer:not([aria-hidden='true'])) .store-contact-launcher {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Ẩn vĩnh viễn nút Zalo cũ rời rạc để không bị 2 nút thừa như ảnh 2 */
+#zaloFloatingBtn,
+.zalo-floating-btn {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 

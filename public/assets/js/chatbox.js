@@ -365,14 +365,43 @@
                 <span>AI tư vấn</span>
                 <span class="ai-chat-min-arrow" aria-hidden="true">▲</span>
             </button>
-            <!-- Lucian UX/UI Prompt #215 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#215 -->
-            <button class="ai-chat-toggle rhythmic-pulse-shake-ai u215-launcher" type="button" aria-label="Mở trợ lý tư vấn" title="Tư vấn mua sắm cùng AI">
-                <figure class="ai-chat-toggle-icon" aria-hidden="true">
-                    <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="26" height="26" class="ai-toggle-avatar-img">
-                </figure>
-                <span class="ai-chat-toggle-label">Tư vấn AI</span>
-                <span class="ai-fab-status-dot" aria-hidden="true"></span>
-            </button>
+            <!-- Store Contact Launcher Widget (Chuẩn ảnh 1: Nút đỏ Liên hệ + Popover menu Zalo & Tư vấn AI) -->
+            <aside class="store-contact-launcher" id="storeContactLauncher" aria-label="Widget liên hệ hỗ trợ">
+                <!-- Popup menu sổ lên phía trên -->
+                <nav class="contact-popover" id="contactPopover" role="menu" aria-label="Menu liên hệ hỗ trợ" aria-hidden="true">
+                    <button type="button" class="contact-popover-item contact-item-ai ai-chat-toggle" id="contactItemAi" role="menuitem" title="Chat tư vấn cùng Trợ lý AI TechEcommerce">
+                        <figure class="contact-item-icon ai-avatar-circle" aria-hidden="true">
+                            <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="24" height="24" class="contact-ai-avatar">
+                        </figure>
+                        <div class="contact-item-text-group">
+                            <span class="contact-item-title">Tư vấn AI</span>
+                            <span class="contact-item-sub">Giải đáp mọi thắc mắc 24/7</span>
+                        </div>
+                    </button>
+                    <a href="https://zalo.me/0842331606" target="_blank" rel="noopener noreferrer" class="contact-popover-item contact-item-zalo" id="contactItemZalo" role="menuitem" title="Chat trực tiếp qua Zalo CSKH (0842.331.606)">
+                        <figure class="contact-item-icon zalo-avatar-circle" aria-hidden="true">
+                            <svg viewBox="0 0 100 100" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="50" r="48" fill="#0068FF"/>
+                                <path d="M50 20 C32 20 20 31.5 20 46 C20 53.5 24 60 30 64.5 C29.5 69 27 73.5 24 77 C30.5 75 36.5 72 40.5 69.5 C43.5 70.5 46.5 71 50 71 C68 71 80 59.5 80 46 C80 31.5 68 20 50 20 Z" fill="#FFFFFF"/>
+                                <text x="50" y="52" fill="#0068FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="24" text-anchor="middle" dominant-baseline="middle">Zalo</text>
+                            </svg>
+                        </figure>
+                        <div class="contact-item-text-group">
+                            <span class="contact-item-title">Liên hệ Zalo</span>
+                            <span class="contact-item-sub">Hotline: 0842.331.606</span>
+                        </div>
+                    </a>
+                </nav>
+
+                <!-- Nút Liên hệ chính màu đỏ chuẩn ảnh 1 -->
+                <button type="button" class="contact-main-btn rhythmic-pulse-shake-contact" id="contactMainBtn" aria-expanded="false" aria-haspopup="true" aria-label="Liên hệ hỗ trợ và tư vấn">
+                    <span class="contact-btn-text">Liên hệ</span>
+                    <svg class="contact-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+                        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+                    </svg>
+                </button>
+            </aside>
         `;
         document.body.appendChild(chat);
         return chat;
@@ -2278,7 +2307,20 @@
             }
         });
 
+        function toggleContactMenu(forceState) {
+            const contactBtn = chat.querySelector('#contactMainBtn');
+            const contactPopover = chat.querySelector('#contactPopover');
+            const contactLauncher = chat.querySelector('#storeContactLauncher');
+            if (!contactPopover || !contactBtn || !contactLauncher) return;
+            const isOpen = contactLauncher.classList.contains('is-open');
+            const targetState = typeof forceState === 'boolean' ? forceState : !isOpen;
+            contactLauncher.classList.toggle('is-open', targetState);
+            contactBtn.setAttribute('aria-expanded', String(targetState));
+            contactPopover.setAttribute('aria-hidden', String(!targetState));
+        }
+
         function openChat(focusInput = false) {
+            toggleContactMenu(false);
             chat.classList.add('open');
             chat.classList.remove('minimized');
             document.body.classList.add('ai-chat-open');
@@ -2366,8 +2408,51 @@
             });
         }
 
-        chat.querySelector('.ai-chat-toggle').addEventListener('click', () => {
-            openChat(true);
+        // Store Contact Widget Event Handlers (Ảnh 1)
+        const contactBtn = chat.querySelector('#contactMainBtn');
+        const contactLauncher = chat.querySelector('#storeContactLauncher');
+        if (contactBtn) {
+            contactBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleContactMenu();
+            });
+        }
+
+        const contactAiBtn = chat.querySelector('#contactItemAi');
+        if (contactAiBtn) {
+            contactAiBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleContactMenu(false);
+                openChat(true);
+            });
+        } else {
+            const legacyToggle = chat.querySelector('.ai-chat-toggle');
+            if (legacyToggle) {
+                legacyToggle.addEventListener('click', () => {
+                    openChat(true);
+                });
+            }
+        }
+
+        const contactZaloBtn = chat.querySelector('#contactItemZalo');
+        if (contactZaloBtn) {
+            contactZaloBtn.addEventListener('click', () => {
+                toggleContactMenu(false);
+            });
+        }
+
+        // Đóng menu popover khi click ra ngoài
+        document.addEventListener('click', (e) => {
+            if (contactLauncher && !contactLauncher.contains(e.target)) {
+                toggleContactMenu(false);
+            }
+        });
+
+        // Đóng menu popover khi nhấn ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                toggleContactMenu(false);
+            }
         });
 
         chat.querySelector('.ai-chat-close').addEventListener('click', () => {
