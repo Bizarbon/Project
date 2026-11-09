@@ -3956,6 +3956,18 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         return await handleOldDeviceDiagnosis(message, prev);
     }
 
+    // 1b. Kiểm tra tri thức chính sách cửa hàng, xử lý từ chối, mẹo công nghệ & đối đáp đời thường
+    const smartAnswer = matchSmartAnswer(message);
+    if (smartAnswer) {
+        return {
+            reply: smartAnswer.reply,
+            products: prev.lastProducts || [],
+            suggestions: smartAnswer.suggestions,
+            context: { ...prev, ...smartAnswer.context },
+            meta: { provider: 'store_knowledge_engine', isFallback: false, model: 'none' }
+        };
+    }
+
     // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix")
     // Explicit model names must be resolved before brand-level comparison.
     const earlyMatchedProducts = await findAllMatchingProductsInCatalog(message);

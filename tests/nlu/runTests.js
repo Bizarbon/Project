@@ -140,9 +140,38 @@ async function runAllTests() {
         console.log(`🔄 BẮT ĐẦU CHẠY KIỂM THỬ HỒI QUY HỘI THOẠI NHIỀU LƯỢT (${multiTotal} CA KIỂM CHỨNG)`);
         console.log(`================================================================\n`);
 
+        let baseUrl = 'http://localhost:5000';
+        let temporaryServer = null;
+
+        // Kiểm tra xem server port 5000 có đang chạy không
+        try {
+            const ping = await fetch('http://localhost:5000/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: 'ping' }),
+                signal: AbortSignal.timeout(1200)
+            });
+            baseUrl = 'http://localhost:5000';
+        } catch (e) {
+            // Server chính chưa bật -> Tự động khởi tạo server kiểm thử tạm thời trên cổng ngẫu nhiên
+            try {
+                require('dotenv').config({ path: path.join(__dirname, '../../backend/.env') });
+                const connectDB = require('../../backend/src/config/db');
+                const app = require('../../backend/src/app');
+                await connectDB();
+                temporaryServer = await new Promise((resolve) => {
+                    const s = app.listen(0, '127.0.0.1', () => resolve(s));
+                });
+                const testPort = temporaryServer.address().port;
+                baseUrl = `http://127.0.0.1:${testPort}`;
+            } catch (initErr) {
+                console.warn('Không thể khởi tạo server kiểm thử nội bộ:', initErr.message);
+            }
+        }
+
         for (const tc of multiCases) {
             try {
-                const res = await fetch('http://localhost:5000/api/chat', {
+                const res = await fetch(`${baseUrl}/api/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -245,6 +274,10 @@ async function runAllTests() {
 
         const multiRate = ((multiPassed / multiTotal) * 100).toFixed(1);
         console.log(`\n🏆 TỔNG KẾT PHẦN 2 (KIỂM THỬ HỒI QUY): ${multiPassed}/${multiTotal} CA ĐẠT (${multiRate}% THÀNH CÔNG)\n`);
+
+        if (temporaryServer) {
+            temporaryServer.close();
+        }
     }
 
     const allPassed = failures.length === 0 && multiFailures.length === 0;
