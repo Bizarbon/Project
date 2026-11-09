@@ -2130,9 +2130,11 @@ nav h1:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 4px;
     font-size: 0.72rem;
     font-weight: 600;
     line-height: 1.2;
+    width: 100%;
 }
 
 .fomo-stock-sold {
@@ -2140,10 +2142,14 @@ nav h1:hover {
     display: inline-flex;
     align-items: center;
     gap: 2px;
+    white-space: nowrap !important;
+    flex-shrink: 0;
 }
 
 .fomo-stock-remain {
     color: var(--text-muted, #94a3b8);
+    white-space: nowrap !important;
+    flex-shrink: 0;
 }
 
 .fomo-stock-remain.urgent {

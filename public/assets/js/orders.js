@@ -109,7 +109,7 @@ const actionLabels = {
 };
 
 function fmt(n) {
-    return (Number(n) || 0).toLocaleString('vi-VN') + ' đ';
+    return (Number(n) || 0).toLocaleString('vi-VN') + '\u00A0đ';
 }
 
 function formatDate(dateStr) {
