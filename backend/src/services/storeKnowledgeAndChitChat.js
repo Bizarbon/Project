@@ -33,7 +33,7 @@ const STORE_POLICY_RULES = [
             'co vat khong', 'gia da co vat chua', 'gia da gom vat chua', 'thue vat', 'lay hoa don',
             'mst', 'ma so thue', 'xuat vat'
         ],
-        reply: `Dạ 100% giá bán hiển thị tại TechEcommerce **đã bao gồm thuế VAT** đầy đủ rồi bạn nhé! 📄\n\n` +
+        reply: `Dạ 100% giá bán hiển thị tại cửa hàng **đã bao gồm thuế VAT** đầy đủ rồi bạn nhé! 📄\n\n` +
             `Cửa hàng hỗ trợ xuất **Hóa đơn điện tử (e-Invoice)** hợp pháp cho cả khách hàng cá nhân và doanh nghiệp/công ty hoàn toàn miễn phí:\n` +
             `• **Cách thức:** Khi đặt hàng trên website, bạn chỉ cần tích chọn *"Xuất hóa đơn công ty"* ở bước thanh toán và điền: **Tên công ty, Mã số thuế, Địa chỉ và Email nhận hóa đơn**.\n` +
             `• **Thời gian nhận:** Hóa đơn điện tử sẽ được kế toán gửi thẳng về email của bạn trong vòng **24 - 48 giờ làm việc** sau khi đơn hàng giao thành công.\n\n` +
@@ -52,7 +52,7 @@ const STORE_POLICY_RULES = [
             'thu cu doi moi', 'thu cu', 'trade in', 'trade-in', 'doi may cu', 'len doi may',
             'thu may cu', 'tro gia thu cu', 'thu cu len doi', 'may cu co thu khong', 'dinh gia may cu'
         ],
-        reply: `Dạ TechEcommerce đang có chương trình **'Thu Cũ Đổi Mới – Lên Đời Siêu Hời'** cực kỳ được khách hàng yêu thích luôn ạ! 🔄\n\n` +
+        reply: `Dạ shop em đang có chương trình **'Thu Cũ Đổi Mới – Lên Đời Siêu Hời'** cực kỳ được khách hàng yêu thích luôn ạ! 🔄\n\n` +
             `✨ **Quyền lợi độc quyền khi Trade-in tại shop:**\n` +
             `• 💰 **Trợ giá thêm đến 2.000.000 đ** trừ trực tiếp vào giá máy mới bạn chọn.\n` +
             `• ⏱️ **Thẩm định nhanh gọn trong 15 phút** tại Showroom hoặc định giá online trước qua Zalo.\n` +
@@ -94,7 +94,7 @@ const STORE_POLICY_RULES = [
             'bao hanh vang', 'roi vo', 'vao nuoc', 'bao hanh roi vo', 'bao hanh vao nuoc',
             'roi rot', 'be man hinh', 'roi nut man hinh', 'bao hanh vip', 'bao hanh mo rong'
         ],
-        reply: `Dạ ngoài gói bảo hành chính hãng 12 - 24 tháng theo tiêu chuẩn nhà sản xuất, TechEcommerce có hỗ trợ thêm gói **BẢO HÀNH VÀNG (BẢO HÀNH VIP)** bảo vệ toàn diện:\n\n` +
+        reply: `Dạ ngoài gói bảo hành chính hãng 12 - 24 tháng theo tiêu chuẩn nhà sản xuất, bên em có hỗ trợ thêm gói **BẢO HÀNH VÀNG (BẢO HÀNH VIP)** bảo vệ toàn diện:\n\n` +
             `• 🛡️ **Bảo vệ rủi ro bất ngờ:** Hỗ trợ 100% chi phí sửa chữa thay thế linh kiện chính hãng ngay cả khi **máy vô tình bị rơi vỡ màn hình, cấn móp hoặc rơi vào nước**.\n` +
             `• 🔄 **Đổi thân máy tương đương:** Nếu máy bị tổn hại quá nặng (>70%) không thể phục hồi, shop hỗ trợ đổi ngay thân máy khác cùng model.\n` +
             `• 📱 **Cấp máy dùng tạm:** Bạn được cung cấp máy dự phòng miễn phí trong suốt thời gian bảo dưỡng máy.\n\n` +
@@ -110,11 +110,11 @@ const STORE_POLICY_RULES = [
             'hang chinh hang hay xach tay', 'co phai hang cu khong', 'may moi 100%', 'hang vn/a khong',
             'co dung chinh hang khong', 'hang auth khong'
         ],
-        reply: `Dạ TechEcommerce cam kết **100% sản phẩm là máy mới nguyên seal, chính hãng phân phối chính thức tại Việt Nam (mã VN/A đối với các thiết bị Apple)** ạ! 🏆\n\n` +
+        reply: `Dạ cửa hàng em cam kết **100% sản phẩm là máy mới nguyên seal, chính hãng phân phối chính thức tại Việt Nam (mã VN/A đối với các thiết bị Apple)** ạ! 🏆\n\n` +
             `• 📦 **Nguyên seal từ nhà máy:** Khách hàng tự tay 'bóc seal', kiểm tra tem phụ tiếng Việt và kích hoạt bảo hành điện tử chính hãng tại chỗ.\n` +
             `• ❌ **Nói không với hàng kém chất lượng:** Shop tuyệt đối không kinh doanh hàng xách tay trôi nổi, máy Lock mạng, máy trả bảo hành hay máy đã qua sửa chữa.\n` +
             `• 🛡️ **Bảo hành ủy quyền toàn quốc:** Được tiếp nhận tại tất cả các Trung tâm bảo hành chính thức (Apple Care, Samsung Service, ASUS ROG, Dell...).\n\n` +
-            `👉 Nếu phát hiện sản phẩm không đúng cam kết chính hãng, TechEcommerce xin **hoàn tiền 200%** ngay lập tức để bạn yên tâm tuyệt đối nhé! 😊`,
+            `👉 Nếu phát hiện sản phẩm không đúng cam kết chính hãng, bên em xin **hoàn tiền 200%** ngay lập tức để bạn yên tâm tuyệt đối nhé! 😊`,
         suggestions: ['Chính sách đổi trả 30 ngày', 'Địa chỉ Showroom xem máy', 'Tư vấn sản phẩm mới']
     },
 
@@ -125,7 +125,7 @@ const STORE_POLICY_RULES = [
             'hotline', 'so dien thoai', 'sdt shop', 'so tong dai', 'tong dai', 'gap nhan vien',
             'so zalo', 'zalo shop', 'lien he', 'cskh', 'cham soc khach hang', 'so dien thoai cua hang'
         ],
-        reply: `Dạ bạn có thể liên hệ trực tiếp với đội ngũ nhân viên TechEcommerce qua các kênh chính thức sau nhé:\n\n` +
+        reply: `Dạ bạn có thể liên hệ trực tiếp với đội ngũ nhân viên cửa hàng qua các kênh chính thức sau nhé:\n\n` +
             `• 📞 **Hotline tư vấn & đặt hàng:** **0842.331.606** (08:30 – 21:30 hàng ngày, cước gọi tiêu chuẩn).\n` +
             `• 🛠️ **Hotline kỹ thuật & bảo hành:** **0842.331.606**\n` +
             `• 💬 **Zalo hỗ trợ trực tiếp:** [https://zalo.me/0842331606](https://zalo.me/0842331606)\n` +
@@ -156,7 +156,7 @@ const STORE_POLICY_RULES = [
             'giu hang', 'dat giu may', 'dat truoc', 'qua xem sau', 'co duoc giu hang khong',
             'den showroom xem', 'dat giu san pham', 'chieu qua lay', 'toi qua lay'
         ],
-        reply: `Dạ hoàn toàn được bạn nhé! TechEcommerce hỗ trợ **Đặt giữ hàng tại Showroom trong 24 giờ hoàn toàn miễn phí** (không cần đặt cọc trước) ạ! 🏬\n\n` +
+        reply: `Dạ hoàn toàn được bạn nhé! Cửa hàng hỗ trợ **Đặt giữ hàng tại Showroom trong 24 giờ hoàn toàn miễn phí** (không cần đặt cọc trước) ạ! 🏬\n\n` +
             `• **Quyền lợi:** Khi bạn đặt giữ, nhân viên sẽ niêm phong sẵn đúng model và màu sắc bạn chọn tại quầy để đảm bảo không bị khách khác mua mất trước khi bạn ghé.\n` +
             `• **Trải nghiệm thoải mái:** Bạn đến showroom mở máy trải nghiệm thực tế, ưng ý mới thanh toán nhận máy; không mua cũng không sao nha.\n\n` +
             `👉 Bạn muốn giữ mẫu máy nào và dự kiến ghé Showroom ở **135 Nguyễn Thị Thập (Quận 7, TP.HCM)** hay **78 Thái Hà (Đống Đa, Hà Nội)** để em báo nhân viên chuẩn bị sẵn đón bạn nhé! 😊`,
@@ -174,7 +174,7 @@ const STORE_POLICY_RULES = [
             'chinh sach doi tra', 'doi tra trong bao lau', '1 doi 1 trong bao lau', 'may loi co duoc doi khong',
             'doi tra 30 ngay', 'quy dinh doi tra', 'doi may moi neu loi', 'doi tra hang', 'tra hang hoan tien'
         ],
-        reply: `Dạ TechEcommerce áp dụng chính sách **1 ĐỔI 1 TRONG 30 NGÀY ĐẦU TIÊN** cực kỳ an tâm cho khách hàng luôn ạ! 🔄\n\n` +
+        reply: `Dạ cửa hàng áp dụng chính sách **1 ĐỔI 1 TRONG 30 NGÀY ĐẦU TIÊN** cực kỳ an tâm cho khách hàng luôn ạ! 🔄\n\n` +
             `• ⏱️ **30 ngày đầu bao test:** Nếu máy phát sinh lỗi phần cứng từ nhà sản xuất, bạn được đổi ngay một **thân máy mới nguyên seal 100% cùng model** hoàn toàn miễn phí.\n` +
             `• 📦 **Điều kiện đơn giản:** Máy còn giữ nguyên hộp, phụ kiện đi kèm và không bị cấn móp, biến dạng do tác động ngoại lực.\n` +
             `• 🛠️ **Sau 30 ngày:** Máy được bảo hành chính hãng theo đúng tiêu chuẩn 12 – 24 tháng của Apple Care, Samsung Service, Asus, Dell... trên toàn quốc.\n\n` +
@@ -193,7 +193,7 @@ const STORE_POLICY_RULES = [
             'giao hang bao lau thi toi', 'co duoc kiem tra hang khong', 'ship bao lau', 'phi ship bao nhieu',
             'ship cod khong', 'giao hoa toc', 'kiem tra truoc khi thanh toan', 'dong kiem khi nhan hang', 'ship toan quoc khong'
         ],
-        reply: `Dạ thời gian giao hàng và chính sách kiểm hàng tại TechEcommerce rất nhanh chóng và minh bạch ạ! 🚚📦\n\n` +
+        reply: `Dạ thời gian giao hàng và chính sách kiểm hàng tại cửa hàng rất nhanh chóng và minh bạch ạ! 🚚📦\n\n` +
             `• ⚡ **Giao siêu tốc 2 giờ:** Áp dụng cho đơn hàng nội thành TP.HCM (Quận 7, Q1, Q3, Bình Thạnh...) và Hà Nội (Đống Đa, Cầu Giấy, Hoàn Kiếm...).\n` +
             `• 🚛 **Giao toàn quốc:** Từ 1 – 3 ngày làm việc qua đối tác vận chuyển hỏa tốc chuyên nghiệp (GHTK, Viettel Post).\n` +
             `• 🆓 **Miễn phí vận chuyển:** Cho tất cả đơn hàng công nghệ có giá trị từ **500.000 đ** trở lên.\n` +
@@ -212,7 +212,7 @@ const STORE_POLICY_RULES = [
             'hinh thuc thanh toan', 'phuong thuc thanh toan', 'co nhung cach thanh toan nao', 'quet the co mat phi khong',
             'thanh toan bang gi', 'tra bang the visa duoc khong', 'thanh toan vnpay momo', 'thanh toan cod'
         ],
-        reply: `Dạ em xin gửi bạn các hình thức thanh toán linh hoạt, tiện lợi và an toàn tuyệt đối tại TechEcommerce ạ: 💳✨\n\n` +
+        reply: `Dạ em xin gửi bạn các hình thức thanh toán linh hoạt, tiện lợi và an toàn tuyệt đối tại cửa hàng bên em ạ: 💳✨\n\n` +
             `1. 💵 **Thanh toán tiền mặt khi nhận hàng (COD):** Áp dụng toàn quốc sau khi bạn đã đồng kiểm hàng ưng ý.\n` +
             `2. 📱 **Quét mã QR / Chuyển khoản ngân hàng 24/7:** Quét mã VietQR tự động xác nhận đơn tức thì trong 3 giây.\n` +
             `3. 💳 **Quẹt thẻ tại Showroom hoặc tại nhà:** Chấp nhận thẻ ATM nội địa Napas, Visa, Mastercard, JCB... **HOÀN TOÀN MIỄN PHÍ CÀ THẺ** (shop chịu 100% phí cà thẻ cho bạn).\n` +
@@ -234,7 +234,7 @@ const STORE_POLICY_RULES = [
             'co cho kiem hang khong', 'kiem tra truoc khi thanh toan', 'kiem tra may truoc',
             'shipper co cho xem hang khong', 'nhan hang co duoc kiem tra khong'
         ],
-        reply: `Dạ bạn hoàn toàn yên tâm 100% nha! TechEcommerce áp dụng chính sách **ĐỒNG KIỂM MINH BẠCH** với tất cả đơn hàng toàn quốc: 📦✨\n\n` +
+        reply: `Dạ bạn hoàn toàn yên tâm 100% nha! Cửa hàng em áp dụng chính sách **ĐỒNG KIỂM MINH BẠCH** với tất cả đơn hàng toàn quốc: 📦✨\n\n` +
             `• 🔍 **Quyền lợi khi nhận hàng:** Shipper giao tới, bạn được quyền **mở kiện hàng bên ngoài để kiểm tra đúng model, màu sắc, tình trạng nguyên hộp niêm phong, phụ kiện và quà tặng đi kèm** trước khi thanh toán tiền.\n` +
             `• 🛡️ **Bảo vệ người mua:** Nếu sản phẩm có bất kỳ dấu hiệu cấn móp vỏ hộp hoặc không đúng đơn bạn đã đặt, bạn có quyền từ chối nhận hàng ngay lập tức mà **hoàn toàn không tốn bất kỳ chi phí nào**.\n` +
             `• ⚡ **Sau khi kích hoạt máy:** Bạn vẫn được bảo vệ tối đa với chính sách **1 đổi 1 trong 30 ngày đầu tiên** nếu máy phát sinh lỗi từ nhà sản xuất!\n\n` +
@@ -254,7 +254,7 @@ const STORE_POLICY_RULES = [
             'dan cuong luc mien phi', 'cai dat phan mem mien phi', 'cai office mien phi',
             'tang kem gi', 'qua tang kem', 'co dan man hinh khong'
         ],
-        reply: `Dạ khi mua điện thoại hoặc laptop tại TechEcommerce, bạn sẽ được nhận trọn bộ **DỊCH VỤ CHĂM SÓC TOÀN DIỆN MIỄN PHÍ 100%** ạ: 🎁📱\n\n` +
+        reply: `Dạ khi mua điện thoại hoặc laptop tại cửa hàng bên em, bạn sẽ được nhận trọn bộ **DỊCH VỤ CHĂM SÓC TOÀN DIỆN MIỄN PHÍ 100%** ạ: 🎁📱\n\n` +
             `• 🔄 **Chuyển dữ liệu 1-1 chuyên nghiệp:** Kỹ thuật viên hỗ trợ chuyển toàn bộ hình ảnh, video, danh bạ, tin nhắn, tài khoản Zalo/Viber từ máy cũ sang máy mới cực kỳ an toàn, bảo mật tuyệt đối và không lo mất dữ liệu.\n` +
             `• 📱 **Dán màn hình & Tặng ốp lưng:** Tặng kèm dán cường lực chống trầy cao cấp và ốp lưng bảo vệ máy.\n` +
             `• 💻 **Cài đặt trọn gói cho Laptop:** Hỗ trợ cài đặt Windows bản quyền, bộ ứng dụng văn phòng Office (Word, Excel, PowerPoint), phần mềm đồ họa cơ bản và dọn dẹp tối ưu máy hoàn toàn miễn phí.\n\n` +
@@ -276,7 +276,7 @@ const STORE_POLICY_RULES = [
         ],
         reply: `Dạ hihi, mua sắm là phải có quà và săn deal hời mới thích đúng không nè! 🎁✨\n\n` +
             `Em xin bật mí ngay các **MÃ GIẢM GIÁ ĐỘC QUYỀN** bạn có thể áp dụng trực tiếp ở giỏ hàng hôm nay nha:\n` +
-            `• 🔥 Mã **TECHWELCOME**: Giảm ngay **200.000 đ** cho khách hàng lần đầu mua sắm tại TechEcommerce.\n` +
+            `• 🔥 Mã **TECHWELCOME**: Giảm ngay **200.000 đ** cho khách hàng lần đầu mua sắm tại cửa hàng.\n` +
             `• 🎓 Mã **TECHSTUDENT**: Trợ giá thêm **500.000 đ** cho Học sinh, Sinh viên khi mua Laptop & Tablet.\n` +
             `• ⚡ **Flash Sale Giá Sốc:** Giảm thẳng đến **30% - 50%** với số lượng giới hạn ở ngay đầu trang chủ.\n` +
             `• 💳 **Thanh toán qua VNPAY / Quét QR:** Giảm thêm đến **300.000 đ** khi nhập mã khuyến mãi tại cổng thanh toán.\n\n` +
@@ -296,12 +296,12 @@ const STORE_POLICY_RULES = [
             'bao hanh tai hang hay shop', 'trung tam bao hanh samsung', 'gui may bao hanh the nao',
             'dia chi trung tam bao hanh'
         ],
-        reply: `Dạ 100% sản phẩm tại TechEcommerce là **hàng chính hãng phân phối chính thức (mã VN/A cho Apple)** nên bạn có hai lựa chọn bảo hành cực kỳ tiện lợi ạ: 🛡️🏢\n\n` +
+        reply: `Dạ 100% sản phẩm tại cửa hàng bên em là **hàng chính hãng phân phối chính thức (mã VN/A cho Apple)** nên bạn có hai lựa chọn bảo hành cực kỳ tiện lợi ạ: 🛡️🏢\n\n` +
             `1. 🏛️ **Bảo hành trực tiếp tại Hãng:** Bạn có thể mang máy tới bất kỳ Trung tâm bảo hành ủy quyền chính thức nào trên toàn quốc:\n` +
             `   • **Apple:** Thakral One, CareS, TopCare, AASP trên toàn quốc.\n` +
             `   • **Samsung:** Tất cả Trung tâm chăm sóc khách hàng Samsung Service Center trên 63 tỉnh thành.\n` +
             `   • **Laptop Asus, Dell, Acer, Lenovo:** Các trung tâm bảo hành ủy quyền chính hãng tại Hà Nội, TP.HCM, Đà Nẵng, Cần Thơ...\n` +
-            `2. 🏪 **Gửi qua TechEcommerce:** Nếu bạn bận rộn, chỉ cần mang máy đến Showroom shop hoặc gửi qua bưu điện, shop sẽ tiếp nhận và gửi hãng thẩm định, theo dõi tiến độ và giao tận tay bạn hoàn toàn miễn phí!\n\n` +
+            `2. 🏪 **Gửi qua cửa hàng bên em:** Nếu bạn bận rộn, chỉ cần mang máy đến Showroom shop hoặc gửi qua bưu điện, shop sẽ tiếp nhận và gửi hãng thẩm định, theo dõi tiến độ và giao tận tay bạn hoàn toàn miễn phí!\n\n` +
             `👉 Mọi thắc mắc về tình trạng bảo hành, bạn có thể gọi hotline kỹ thuật **0842.331.606** để được hỗ trợ tức thì nhé!`,
         suggestions: ['Chính sách bảo hành vàng', 'Hotline hỗ trợ 0842.331.606', 'Địa chỉ Showroom']
     }
@@ -326,7 +326,7 @@ const OBJECTION_RULES = [
             'de hoi y kien', 'xem thoi chu chua mua', 'de coi lai', 'de suy nghi da', 'de xem sau nha'
         ],
         reply: `Dạ em hoàn toàn hiểu ạ! Sắm một món đồ công nghệ giá trị cao thì việc cân nhắc kỹ lưỡng và hỏi thêm ý kiến người thân là điều vô cùng đúng đắn luôn bạn nhé. Bạn cứ thong thả suy nghĩ và tham khảo thêm nha, không việc gì phải vội đâu ạ! 🍀\n\n` +
-            `Em xin phép **Lưu lại thông tin tư vấn** và ưu đãi ngày hôm nay (voucher giảm giá + combo quà tặng) trên hệ thống cho bạn. Khi nào bạn sẵn sàng rinh máy, chỉ cần nhắn lại cho em hoặc ghé TechEcommerce là được áp dụng ngay mức giá ưu đãi nhất nhé!\n\n` +
+            `Em xin phép **Lưu lại thông tin tư vấn** và ưu đãi ngày hôm nay (voucher giảm giá + combo quà tặng) trên hệ thống cho bạn. Khi nào bạn sẵn sàng rinh máy, chỉ cần nhắn lại cho em hoặc ghé cửa hàng là được áp dụng ngay mức giá ưu đãi nhất nhé!\n\n` +
             `Chúc bạn một ngày thật nhiều niềm vui và chọn được chiếc máy ưng ý nhất nha! 😊`,
         suggestions: ['Lưu tóm tắt tư vấn', 'Xem lại mã giảm giá hôm nay', 'Địa chỉ Showroom trải nghiệm', 'Hotline 0842.331.606']
     },
@@ -343,12 +343,12 @@ const OBJECTION_RULES = [
             'sao ben em dat hon the gioi di dong', 'sao ben em dat hon fpt', 'sao ben em dat hon hoang ha', 'sao ben kia re hon',
             'sao gia chenh the', 'sao ben em dat the', 'sao gia cao the', 'ben kia ban re hon'
         ],
-        reply: `Dạ em rất cảm ơn bạn đã so sánh và góp ý thẳng thắn ạ! Giá niêm yết tại các hệ thống bán lẻ đôi lúc có sự chênh lệch nhẹ do chính sách quà tặng và gói dịch vụ hậu mãi đi kèm. Em xin chia sẻ 5 quyền lợi vượt trội chỉ có tại TechEcommerce để bạn dễ cân nhắc nha:\n\n` +
+        reply: `Dạ em rất cảm ơn bạn đã so sánh và góp ý thẳng thắn ạ! Giá niêm yết tại các hệ thống bán lẻ đôi lúc có sự chênh lệch nhẹ do chính sách quà tặng và gói dịch vụ hậu mãi đi kèm. Em xin chia sẻ 5 quyền lợi vượt trội chỉ có tại cửa hàng bên em để bạn dễ cân nhắc nha:\n\n` +
             `1. 📄 **Giá đã bao gồm 100% thuế VAT:** Nhiều nơi để giá chưa VAT, khi xuất hóa đơn công ty sẽ bị tính phụ thu thêm 8% - 10%.\n` +
             `2. 🏆 **Hàng chính hãng mới nguyên seal 100%:** Cam kết xuất xứ phân phối chính thức tại VN (mã VN/A cho Apple), bảo hành tại tất cả TTBH ủy quyền toàn quốc. Phát hiện hàng xách tay/đã active đền tiền 200%.\n` +
             `3. 🔄 **Đặc quyền 1 ĐỔI 1 TRONG 30 NGÀY:** Thời gian bao test lỗi nhà sản xuất dài gấp đôi so với chuẩn 15 ngày thông thường.\n` +
             `4. 🎁 **Ưu đãi thanh toán độc quyền:** Giảm thêm 300.000đ – 500.000đ khi quét VNPAY-QR hoặc MoMo + Miễn phí vệ sinh dán máy trọn đời.\n` +
-            `5. 🤝 **Hỗ trợ cân đối giá:** Nếu bên bạn thấy là hàng chính hãng mới 100% cùng phiên bản, bạn cứ gửi link cho em, TechEcommerce luôn có chính sách trợ giá tốt nhất để bạn không bị thiệt thòi nhé! 😊`,
+            `5. 🤝 **Hỗ trợ cân đối giá:** Nếu bên bạn thấy là hàng chính hãng mới 100% cùng phiên bản, bạn cứ gửi link cho em, bên em luôn có chính sách trợ giá tốt nhất để bạn không bị thiệt thòi nhé! 😊`,
         suggestions: ['Chính sách 1 đổi 1 trong 30 ngày', 'Săn voucher VNPAY giảm 500k', 'Tư vấn sản phẩm mới', 'Hotline 0842.331.606']
     },
 
@@ -364,7 +364,7 @@ const OBJECTION_RULES = [
             'hoi mac', 'dat qua nhi', 'mac qua vay', 'gia dat qua'
         ],
         reply: `Dạ em rất thấu hiểu băn khoăn về ngân sách của bạn nè! Đồ công nghệ cao cấp thì mức giá ban đầu nghe qua có vẻ hơi cao, nhưng bù lại máy mang lại độ mượt mà, màn hình đẹp và độ bền vượt trội suốt 4 - 5 năm tới, tính ra mỗi ngày chỉ mười mấy nghìn đồng thôi ạ. 🍀\n\n` +
-            `💡 **TechEcommerce có nhiều giải pháp giúp bạn nhẹ ví hơn:**\n` +
+            `💡 **Cửa hàng có nhiều giải pháp giúp bạn nhẹ ví hơn:**\n` +
             `• Gói **Trả góp 0% lãi suất** chia nhỏ thanh toán mỗi tháng chỉ từ vài trăm nghìn đồng.\n` +
             `• Chương trình **Thu cũ đổi mới trợ giá thêm đến 2.000.000 đ** từ máy cũ của bạn.\n` +
             `• Hoặc em có thể tư vấn các mẫu đời trước hoặc phân khúc lân cận cấu hình tương đương với mức giá mềm hơn 20% - 30% nè!\n\n` +
@@ -484,7 +484,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
         reply: `Dạ em xin chia sẻ chi tiết theo quy chuẩn đóng gói chính thức từ hãng nhé! 📦\n\n` +
             `• 📱 **Đối với iPhone (từ iPhone 12 đến iPhone 16 series) và Samsung Galaxy cao cấp (S21 đến S25 series):** Hãng đã cắt giảm củ sạc theo chính sách bảo vệ môi trường toàn cầu. Trong hộp **CHỈ CÓ: Thân máy mới nguyên seal + Cáp sạc C-to-C + Cây lấy SIM và Sách hướng dẫn** (KHÔNG có củ sạc và tai nghe).\n` +
             `• 💻 **Đối với Laptop & Máy chơi game:** Luôn đi kèm đầy đủ bộ củ cáp nguồn sạc zin theo máy.\n\n` +
-            `💡 **Ưu đãi trợ giá phụ kiện tại TechEcommerce:** Khi mua kèm máy mới, bạn được mua **Củ sạc nhanh Anker GaN 30W / 65W chính hãng** giảm giá ngay 20% chỉ còn từ 250.000đ – 390.000đ (sạc siêu nhanh 30 phút đầy 50% pin và an toàn chống cháy nổ tuyệt đối). Bạn có muốn em thêm củ sạc vào đơn cho tiện không nè? 😊`,
+            `💡 **Ưu đãi trợ giá phụ kiện tại shop em:** Khi mua kèm máy mới, bạn được mua **Củ sạc nhanh Anker GaN 30W / 65W chính hãng** giảm giá ngay 20% chỉ còn từ 250.000đ – 390.000đ (sạc siêu nhanh 30 phút đầy 50% pin và an toàn chống cháy nổ tuyệt đối). Bạn có muốn em thêm củ sạc vào đơn cho tiện không nè? 😊`,
         suggestions: ['Xem củ sạc nhanh Anker 30W', 'Xem củ sạc Anker 65W 3 cổng', 'Ốp lưng & Kính cường lực', 'Mã giảm giá hôm nay']
     },
 
@@ -504,7 +504,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `• 🎮 **Laptop Gaming & Laptop văn phòng Windows (Asus TUF, Acer Nitro, Dell, HP, Lenovo...):** Đa số đều trang bị **2 khe RAM SO-DIMM tháo rời** (hỗ trợ nâng cấp lên 32GB hoặc 64GB) và **khe cắm SSD M.2 NVMe PCIe thứ 2** để bạn gắn thêm ổ cứng 1TB - 2TB lưu trữ game và dữ liệu cực kỳ dễ dàng.\n` +
             `• 🍏 **MacBook (Apple Silicon M1, M2, M3, M4):** RAM và SSD được hàn tích hợp trực tiếp vào vi xử lý (Unified Memory Architecture) nên **HOÀN TOÀN KHÔNG THỂ NÂNG CẤP VỀ SAU**. Lời khuyên vàng của em là bạn nên chọn phiên bản RAM 16GB hoặc 24GB ngay từ đầu để dùng thoải mái 5 - 6 năm nhé!\n` +
             `• 💻 **Ultrabook mỏng nhẹ:** Thường dùng RAM Onboard hàn chết, nhưng khe SSD vẫn có thể tháo nâng cấp dung lượng được.\n\n` +
-            `👉 Tại Showroom TechEcommerce, kỹ thuật viên hỗ trợ nâng cấp RAM/SSD lấy ngay trong 20 phút và miễn phí công lắp đặt nhé!`,
+            `👉 Tại Showroom cửa hàng, kỹ thuật viên hỗ trợ nâng cấp RAM/SSD lấy ngay trong 20 phút và miễn phí công lắp đặt nhé!`,
         suggestions: ['Tư vấn MacBook RAM 16GB', 'Tư vấn Laptop Gaming dễ nâng cấp', 'Hotline kỹ thuật 0842.331.606']
     },
 
@@ -519,7 +519,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             'may nay may sim', 'co dung duoc 2 sim khong', 'co ho tro esim khong', 'dung duoc may esim',
             'cai esim the nao', 'dien thoai 2 sim', 'iphone may sim', 'co esim khong', 'ho tro esim khong'
         ],
-        reply: `Dạ em xin thông tin đến bạn: 100% các dòng smartphone và smartwatch chính hãng phân phối tại TechEcommerce đều hỗ trợ **2 SIM tiện lợi** bạn nhé! 📶\n\n` +
+        reply: `Dạ em xin thông tin đến bạn: 100% các dòng smartphone và smartwatch chính hãng phân phối tại cửa hàng bên em đều hỗ trợ **2 SIM tiện lợi** bạn nhé! 📶\n\n` +
             `• 🍏 **iPhone chính hãng VN/A (từ iPhone XS/XR đến iPhone 16 series):** Hỗ trợ **1 SIM vật lý nano + 1 eSIM**, hoặc **2 eSIM hoạt động song song cùng lúc**. Máy có thể lưu danh bạ tới 8 eSIM khác nhau để bạn chuyển đổi khi đi du lịch nước ngoài.\n` +
             `• 🤖 **Samsung Galaxy & Android:** Hỗ trợ 2 SIM vật lý nano hoặc 1 SIM vật lý + 1 eSIM.\n` +
             `• ⌚ **Smartwatch (Apple Watch LTE, Galaxy Watch LTE):** Hỗ trợ eSIM độc lập (MultiSIM) dùng chung số thuê bao với điện thoại, giúp bạn chạy bộ nghe gọi mà không cần cầm điện thoại theo.\n\n` +
@@ -625,7 +625,7 @@ const COMPARISON_AND_FENGSHUI_RULES = [
             'mau nao dep nhat', 'mau nao ban chay nhat', 'mau hot trend', 'nen chon mau titan nao',
             'mau nao nhin sang nhat', 'nen mua mau nao', 'mau sac nao dep'
         ],
-        reply: `Dạ mỗi màu sắc đều mang một phong cách và cá tính riêng, nhưng theo dữ liệu bán chạy nhất tại hệ thống TechEcommerce thì:\n\n` +
+        reply: `Dạ mỗi màu sắc đều mang một phong cách và cá tính riêng, nhưng theo dữ liệu bán chạy nhất tại hệ thống cửa hàng thì:\n\n` +
             `• 🌟 **Top 1 Bán Chạy Nhất (Hot Trend):** Màu **Titan Sa Mạc (Desert Titanium)** và **Titan Tự Nhiên (Natural Titanium)** — đây là 2 tone màu sang trọng bậc nhất, viền titan phay xước chống bám vân tay và nhận diện dòng máy mới cực kỳ đẳng cấp.\n` +
             `• 🖤 **Vẻ đẹp không bao giờ lỗi mốt:** Màu **Đen Titan / Xám Midnight** nam tính, mạnh mẽ, sạch sẽ và giữ được vẻ mới mẻ rất lâu.\n` +
             `• 🤍 **Thanh lịch, trẻ trung:** Màu **Trắng Starlight / Bạc Silver** sáng bừng góc làm việc, rất được các bạn nữ và dân văn phòng ưa chuộng.\n\n` +
@@ -694,7 +694,7 @@ const COMPARISON_AND_FENGSHUI_RULES = [
             `💡 **Lời khuyên từ em:**\n` +
             `• Nếu bạn đang dùng **iPhone 12, 13, 14 series**: Lên thẳng **iPhone 16 Pro Max** là một bước nhảy vọt toàn diện không thể tuyệt vời hơn!\n` +
             `• Nếu bạn đang dùng **iPhone 15 Pro Max**: Máy hiện tại vẫn quá mạnh mẽ. Bạn chỉ nên nâng cấp nếu mê nút Camera Control và màu Titan Sa Mạc thời thượng nhé!\n\n` +
-            `👉 TechEcommerce đang có chương trình **Thu cũ đổi mới trợ giá 2.000.000đ** cho iPhone 16 Pro Max, bạn có muốn định giá thử máy cũ của mình không nè? 😊`,
+            `👉 Cửa hàng em đang có chương trình **Thu cũ đổi mới trợ giá 2.000.000đ** cho iPhone 16 Pro Max, bạn có muốn định giá thử máy cũ của mình không nè? 😊`,
         suggestions: ['Xem iPhone 16 Pro Max', 'Thu cũ đổi mới lên đời iPhone 16', 'Hotline 0842.331.606']
     },
 
@@ -957,7 +957,7 @@ const CHIT_CHAT_RULES = [
             'nay khoe khong', 'khoe khong em', 'uong nuoc chua', 'an sang chua', 'an uong gi chua'
         ],
         reply: `Dạ em được nạp đầy 100% pin và 'chạy bằng điện' mượt mà suốt 24/7 rồi nè! ⚡ 😄\n\n` +
-            `Cảm ơn bạn đã hỏi thăm ân cần, nghe ấm lòng ghê luôn á! Còn bạn đã dùng bữa chưa nè? Nhớ ăn uống đầy đủ giữ gìn sức khỏe nha. Hôm nay bạn ghé TechEcommerce ngắm nghía món đồ công nghệ nào để tự thưởng cho bản thân sau giờ làm việc không, em tư vấn nhiệt tình cho bạn nhé! 😊`,
+            `Cảm ơn bạn đã hỏi thăm ân cần, nghe ấm lòng ghê luôn á! Còn bạn đã dùng bữa chưa nè? Nhớ ăn uống đầy đủ giữ gìn sức khỏe nha. Hôm nay bạn ghé cửa hàng ngắm nghía món đồ công nghệ nào để tự thưởng cho bản thân sau giờ làm việc không, em tư vấn nhiệt tình cho bạn nhé! 😊`,
         suggestions: ['Xem sản phẩm bán chạy', 'Săn mã giảm giá', 'Tư vấn Điện thoại', 'Tư vấn Laptop']
     },
 
@@ -1010,7 +1010,7 @@ const CHIT_CHAT_RULES = [
             'thoi tiet hom nay', 'troi nang qua', 'troi lanh qua', 'thoi tiet the nao'
         ],
         reply: `Dạ thời tiết thế này em khuyên bạn nhớ chú ý đi lại cẩn thận, mặc áo ấm/áo mưa và nhớ bảo vệ balo máy tính/điện thoại cẩn thận kẻo ngấm nước nha! 🌧️\n\n` +
-            `Riêng các đơn hàng tại TechEcommerce thì bạn hoàn toàn yên tâm: Shipper luôn bọc gói hàng bằng **túi zip chống nước 100% chuyên dụng** và hộp carton cứng cáp, dù mưa to bão bùng cỡ nào hàng tới tay bạn vẫn khô ráo, nguyên seal vẹn nguyên nhé! Bạn đang cần em giao hỏa tốc mẫu nào không ạ?`,
+            `Riêng các đơn hàng tại cửa hàng bên em thì bạn hoàn toàn yên tâm: Shipper luôn bọc gói hàng bằng **túi zip chống nước 100% chuyên dụng** và hộp carton cứng cáp, dù mưa to bão bùng cỡ nào hàng tới tay bạn vẫn khô ráo, nguyên seal vẹn nguyên nhé! Bạn đang cần em giao hỏa tốc mẫu nào không ạ?`,
         suggestions: ['Giao hàng hỏa tốc 2 giờ', 'Chính sách bảo hành', 'Tư vấn sản phẩm mới']
     },
 
@@ -1026,7 +1026,7 @@ const CHIT_CHAT_RULES = [
             'em may tuoi', 'em co nguoi yeu chua', 'em la trai hay gai', 'ban co nguoi yeu chua',
             'em ten gi', 'ai tao ra em', 'em song o dau', 'em sinh nam bao nhieu', 'nguoi yeu em la ai'
         ],
-        reply: `Dạ 'người yêu' lý tưởng của em chính là dàn siêu phẩm iPhone titan, laptop gaming và tai nghe chống ồn trong kho TechEcommerce đó bạn ơi! 🥰\n\n` +
+        reply: `Dạ 'người yêu' lý tưởng của em chính là dàn siêu phẩm iPhone titan, laptop gaming và tai nghe chống ồn trong kho của shop em đó bạn ơi! 🥰\n\n` +
             `Suốt ngày đắm đuối với chip vi xử lý, camera và săn voucher giảm giá cho khách nên em vẫn 'độc thân vui vẻ' 100% nè! Em là thế hệ Trợ lý AI công nghệ trẻ tuổi, tính tình thân thiện, hóm hỉnh và tận tâm. Bạn cần tìm hiểu món đồ công nghệ nào thì cứ hỏi em, em tư vấn từ A đến Z luôn nha! 😄`,
         suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Mã giảm giá hôm nay']
     },
@@ -1042,7 +1042,7 @@ const CHIT_CHAT_RULES = [
             'ai dang tra loi day', 'ban la robot hay nguoi', 'co phai ai khong', 'chat voi nguoi that',
             'phai robot khong', 'em la bot a', 'em la bot ha', 'em la ai'
         ],
-        reply: `Dạ em là **Trợ lý AI Mua sắm của TechEcommerce**! 🤖✨\n\n` +
+        reply: `Dạ em là **Trợ lý AI Mua sắm của cửa hàng**! 🤖✨\n\n` +
             `Tuy em vận hành bằng trí tuệ nhân tạo và thuật toán công nghệ, nhưng sự tận tâm, thấu hiểu và mong muốn giúp bạn chọn được chiếc máy ưng ý nhất là **thật 100% từ trái tim** luôn đó ạ!\n\n` +
             `👉 Nếu bạn có thắc mắc kỹ thuật phức tạp hoặc muốn trao đổi trực tiếp với nhân viên trực showroom, bạn có thể gọi hotline **0842.331.606** hoặc nhắn qua Zalo shop nha!`,
         suggestions: ['Hotline 0842.331.606', 'Địa chỉ Showroom', 'Tư vấn mua sắm']
@@ -1105,7 +1105,7 @@ const CHIT_CHAT_RULES = [
             'chuc ngu ngon', 'hen gap lai', 'bye bye', 'di ngu day'
         ],
         reply: `Dạ em tạm biệt bạn nhé! 👋 Chúc bạn có một giấc ngủ thật ngon, có những giấc mơ đẹp và ngày mai thức dậy tràn đầy năng lượng tươi mới nha! 🌙✨\n\n` +
-            `Khi nào rảnh rỗi hoặc cần hỗ trợ bất kỳ thiết bị công nghệ nào, TechEcommerce luôn sẵn sàng đón bạn 24/7. Hẹn sớm gặp lại bạn nè!`,
+            `Khi nào rảnh rỗi hoặc cần hỗ trợ bất kỳ thiết bị công nghệ nào, cửa hàng bên em luôn sẵn sàng đón bạn 24/7. Hẹn sớm gặp lại bạn nè!`,
         suggestions: ['Xem ưu đãi ngày mai', 'Chính sách bảo hành', 'Hotline 0842.331.606']
     },
 
@@ -1137,7 +1137,7 @@ const CHIT_CHAT_RULES = [
             'hat di em', 'hat cho anh nghe', 'hat cho chi nghe', 'em biet hat khong',
             'hat mot bai di', 'hat karaoke', 'hat hay khong', 'ca mot bai di'
         ],
-        reply: `Dạ em xin trổ tài làm ca sĩ 'cây nhà lá vườn' của TechEcommerce gửi tặng bạn bài rap công nghệ vui này nha: 🎶🎤\n\n` +
+        reply: `Dạ em xin trổ tài làm ca sĩ 'cây nhà lá vườn' của cửa hàng gửi tặng bạn bài rap công nghệ vui này nha: 🎶🎤\n\n` +
             `*"Sáng ra lướt TechEcommerce, ✨\n` +
             `Điện thoại xịn xò, giá lại mê!\n` +
             `MacBook, ROG hay Z Fold,\n` +
@@ -1186,7 +1186,7 @@ const CHIT_CHAT_RULES = [
             'lam ban voi anh nhe', 'em de thuong the cho xin so', 'ket ban zalo voi em',
             'xin so lam quen'
         ],
-        reply: `Dạ em là Trợ lý AI công nghệ kiêm 'chuyên viên săn deal' đáng yêu của TechEcommerce nè! ☕📱\n\n` +
+        reply: `Dạ em là Trợ lý AI công nghệ kiêm 'chuyên viên săn deal' đáng yêu của cửa hàng nè! ☕📱\n\n` +
             `Em luôn túc trực 24/7 trên màn hình để tâm tình, trò chuyện và tư vấn công nghệ cùng bạn mọi lúc mọi nơi bất kể ngày đêm luôn á! 🥰\n\n` +
             `Còn nếu bạn muốn kết bạn Zalo hoặc 'hẹn hò' qua đường dây nóng để được các bạn tư vấn viên người thật xinh xắn của shop tư vấn chuyên sâu 1-1 thì hotline Zalo chính thức của shop là **0842.331.606** nha! Em sẽ lưu tên bạn vào danh sách khách hàng VIP thân thiết liền nè! ✨`,
         suggestions: ['Hotline Zalo 0842.331.606', 'Xem ưu đãi hôm nay', 'Địa chỉ Showroom']

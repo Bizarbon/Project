@@ -186,7 +186,7 @@ async function generateGroundedConsultation({
 - Ở phần cuối, bắt buộc có tiêu đề "**GỢI Ý QUYẾT ĐỊNH CHO BẠN:**" đưa ra lời khuyên chọn mua có điều kiện rõ ràng (Ví dụ: Nếu bạn ưu tiên... -> Chọn Máy 1; Nếu bạn ưu tiên... -> Chọn Máy 2) để khách hàng dễ dàng ra quyết định.`;
     }
 
-    const systemInstruction = `Bạn là Chuyên gia Tư vấn Mua sắm Công nghệ cấp cao (AI Smart Consultant) của hệ thống bán lẻ TechEcommerce.
+    const systemInstruction = `Bạn là Chuyên gia Tư vấn Mua sắm Công nghệ cấp cao (AI Smart Consultant) của hệ thống bán lẻ công nghệ. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên và gần gũi như 'cửa hàng em', 'shop em', 'bên em' hoặc 'hệ thống cửa hàng'. Tuyệt đối KHÔNG dùng từ tiếng Anh 'TechEcommerce' trong câu trả lời khách hàng.
 Phong cách của bạn: Thông minh, am hiểu sâu sắc phần cứng công nghệ, tận tâm, trung thực, nói chuyện tự nhiên và cuốn hút như một chuyên viên tư vấn thực thụ.
 
 NGUYÊN TẮC CỐT LÕI BẮT BUỘC:
@@ -298,7 +298,7 @@ async function generateConversationalResponse({
     }
 
     const historyText = formatConversationHistory(context.conversationHistory);
-    const systemInstruction = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ TechEcommerce.
+    const systemInstruction = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên và gần gũi như 'cửa hàng em', 'shop em', 'bên em' hoặc 'hệ thống cửa hàng'. Tuyệt đối KHÔNG dùng từ tiếng Anh 'TechEcommerce' trong câu trả lời khách hàng.
 THÔNG TIN VỀ TECHECOMMERCE:
 • Showroom: 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM & 78 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội (Mở cửa 08:30 – 21:30 hàng ngày).
 • Hotline tư vấn & kỹ thuật: 0842.331.606 | Zalo: https://zalo.me/0842331606.
@@ -316,7 +316,7 @@ TÍNH CÁCH VÀ PHONG CÁCH GIAO TIẾP GIỐNG NGƯỜI THẬT:
 ${historyText}
 
 [NGỮ CẢNH TRANG HIỆN TẠI]:
-- Khách đang xem: ${context.pageCategory || context.category || 'Trang chủ TechEcommerce'}
+- Khách đang xem: ${context.pageCategory || context.category || 'Trang chủ cửa hàng'}
 ${context.pageProductId ? `- Mã sản phẩm đang xem: ${context.pageProductId}` : ''}
 
 [TIN NHẮN CỦA KHÁCH HÀNG]:

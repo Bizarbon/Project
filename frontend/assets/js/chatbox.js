@@ -302,7 +302,7 @@
     function renderShell() {
         const chat = document.createElement('aside');
         chat.className = 'ai-chat';
-        chat.setAttribute('aria-label', 'Trợ lý tư vấn AI TechEcommerce');
+        chat.setAttribute('aria-label', 'Trợ lý tư vấn AI của cửa hàng');
         chat.innerHTML = `
             <section class="ai-chat-panel" role="dialog" aria-label="Trợ lý tư vấn mua hàng">
                 <header class="ai-chat-header">
@@ -369,7 +369,7 @@
             <aside class="store-contact-launcher" id="storeContactLauncher" aria-label="Widget liên hệ hỗ trợ">
                 <!-- Popup menu sổ lên phía trên -->
                 <nav class="contact-popover" id="contactPopover" role="menu" aria-label="Menu liên hệ hỗ trợ" aria-hidden="true">
-                    <button type="button" class="contact-popover-item contact-item-ai" id="contactItemAi" role="menuitem" title="Chat tư vấn cùng Trợ lý AI TechEcommerce">
+                    <button type="button" class="contact-popover-item contact-item-ai" id="contactItemAi" role="menuitem" title="Chat tư vấn cùng Trợ lý AI của cửa hàng">
                         <figure class="contact-item-icon ai-avatar-circle" aria-hidden="true">
                             <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="" width="38" height="38" class="contact-ai-avatar">
                         </figure>
@@ -911,7 +911,7 @@
         } catch (e) { }
 
         return {
-            text: 'Xin chào! Mình là Trợ lý Mua sắm AI của TechEcommerce. Mình có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?',
+            text: 'Xin chào! Em là Trợ lý Mua sắm AI của cửa hàng. Em có thể giúp bạn tìm sản phẩm theo ngân sách, so sánh thông số kỹ thuật, săn mã giảm giá và tính toán trả góp 0%. Bạn cần hỗ trợ gì hôm nay?',
             suggestions: starterSuggestions
         };
     }
@@ -1764,7 +1764,7 @@
                         }
 
                         const detected = visualResult.detectedItem || 'Thiết bị công nghệ';
-                        const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!\n${visualResult.description || ''}\nDưới đây là các sản phẩm tương thích chính hãng tốt nhất tại TechEcommerce:`;
+                        const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!\n${visualResult.description || ''}\nDưới đây là các sản phẩm tương thích chính hãng tốt nhất tại cửa hàng:`;
 
                         streamAIMessage(body, reply, () => {
                             if (visualResult.products?.length === 1) {
@@ -2194,7 +2194,7 @@
                 input.value = '';
                 appendMessage(body, 'user', message);
                 chatHistory.push({ role: 'user', text: message });
-                const reply = 'Đã mở Zalo để bạn trò chuyện trực tiếp cùng chuyên viên tư vấn TechEcommerce (Hotline/Zalo: 0842.331.606). Bạn cũng có thể hỏi tiếp em bất kỳ thông tin nào khác nhé!';
+                const reply = 'Đã mở Zalo để bạn trò chuyện trực tiếp cùng chuyên viên tư vấn của cửa hàng (Hotline/Zalo: 0842.331.606). Bạn cũng có thể hỏi tiếp em bất kỳ thông tin nào khác nhé!';
                 appendMessage(body, 'ai', reply);
                 chatHistory.push({ role: 'ai', text: reply });
                 saveSession();

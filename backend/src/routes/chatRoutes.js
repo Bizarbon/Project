@@ -123,7 +123,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (greetingPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Xin chào bạn! 👋 Em là Trợ lý Tư vấn Mua sắm AI của TechEcommerce. Bạn đang quan tâm đến sản phẩm công nghệ nào, hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?',
+            reply: 'Xin chào bạn! 👋 Em là Trợ lý Tư vấn Mua sắm AI của cửa hàng. Bạn đang quan tâm đến sản phẩm công nghệ nào, hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?',
             suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Đồng hồ thông minh', 'Mã giảm giá hôm nay'],
             context: { stage: 'asking_category' }
         };
@@ -152,8 +152,8 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (storeInquiryPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Dạ chào bạn! 👋 **TechEcommerce** là hệ sinh thái bán lẻ thiết bị công nghệ chính hãng 100%, bảo hành 1 đổi 1 trong 30 ngày và hỗ trợ trả góp 0% lãi suất.\n\n' +
-                'Hiện tại TechEcommerce phân phối đầy đủ 7 nhóm sản phẩm công nghệ hàng đầu:\n' +
+            reply: 'Dạ chào bạn! 👋 **Cửa hàng** là hệ sinh thái bán lẻ thiết bị công nghệ chính hãng 100%, bảo hành 1 đổi 1 trong 30 ngày và hỗ trợ trả góp 0% lãi suất.\n\n' +
+                'Hiện tại cửa hàng bên em phân phối đầy đủ 7 nhóm sản phẩm công nghệ hàng đầu:\n' +
                 '• 📱 **Điện thoại:** iPhone (Apple), Samsung Galaxy, Xiaomi, POCO, OPPO, HONOR.\n' +
                 '• 💻 **Laptop & MacBook:** MacBook Air/Pro, Asus ROG Strix, Acer Nitro, Lenovo, Dell, HP.\n' +
                 '• 📲 **Tablet (Máy tính bảng):** iPad Pro M4, iPad Air, iPad Gen 10, Samsung Galaxy Tab, Surface Pro.\n' +
@@ -175,7 +175,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (smallTalkPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Em là Trợ lý AI Mua sắm của **TechEcommerce** – cửa hàng chuyên phân phối chính hãng 100% các sản phẩm công nghệ: 📱 Điện thoại, 💻 Laptop, 📲 Tablet, ⌚ Đồng hồ thông minh, 🎮 Máy chơi game, 🎧 Tai nghe và Phụ kiện.\n\nEm có thể hỗ trợ bạn:\n• Tìm kiếm và tư vấn sản phẩm theo ngân sách\n• So sánh cấu hình chi tiết\n• Tra cứu mã giảm giá, tính trả góp 0%\n• Kiểm tra đơn hàng và chính sách bảo hành\n\nBạn cần hỗ trợ gì hôm nay?',
+            reply: 'Em là Trợ lý AI Mua sắm của **cửa hàng** – hệ thống chuyên phân phối chính hãng 100% các sản phẩm công nghệ: 📱 Điện thoại, 💻 Laptop, 📲 Tablet, ⌚ Đồng hồ thông minh, 🎮 Máy chơi game, 🎧 Tai nghe và Phụ kiện.\n\nEm có thể hỗ trợ bạn:\n• Tìm kiếm và tư vấn sản phẩm theo ngân sách\n• So sánh cấu hình chi tiết\n• Tra cứu mã giảm giá, tính trả góp 0%\n• Kiểm tra đơn hàng và chính sách bảo hành\n\nBạn cần hỗ trợ gì hôm nay?',
             suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Mã giảm giá hôm nay', 'Kiểm tra đơn hàng'],
             context: { stage: 'asking_category' }
         };
@@ -187,7 +187,7 @@ function detectGreetingOrSmallTalk(text) {
     ];
     if (byePatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Cảm ơn bạn đã ghé thăm TechEcommerce! 🙏 Chúc bạn một ngày tốt lành, hẹn gặp lại! Nếu cần tư vấn bất kỳ lúc nào, em luôn sẵn sàng hỗ trợ nhé! 😊',
+            reply: 'Cảm ơn bạn đã ghé thăm cửa hàng! 🙏 Chúc bạn một ngày tốt lành, hẹn gặp lại! Nếu cần tư vấn bất kỳ lúc nào, em luôn sẵn sàng hỗ trợ nhé! 😊',
             suggestions: ['Tư vấn sản phẩm', 'Mã giảm giá', 'Kiểm tra đơn hàng'],
             context: { stage: 'idle' }
         };
@@ -495,7 +495,7 @@ async function askGeminiOpenChat(message, context = {}) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return null;
 
-    const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ TechEcommerce.
+    const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ cửa hàng. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối không dùng từ TechEcommerce trong lời thoại.
 THÔNG TIN VỀ TECHECOMMERCE:
 • Showroom: 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM & 78 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội (Mở cửa 08:30 – 21:30 hàng ngày).
 • Hotline tư vấn & kỹ thuật: 0842.331.606 | Zalo: https://zalo.me/0842331606.
@@ -530,7 +530,7 @@ async function evaluateUpgradeVsNew(message, context = {}, user = null) {
     const suggested = [budgetOffice, midLaptop, premiumLaptop].filter(Boolean);
 
     const reply = `🔍 **TƯ VẤN KỸ THUẬT: ĐÁNH GIÁ NÂNG CẤP MÁY CŨ HAY ĐẦU TƯ MÁY MỚI?**\n\n` +
-        `Chào bạn! Để giúp bạn đưa ra quyết định đúng đắn, tiết kiệm và phù hợp nhất với nhu cầu, TechEcommerce xin phân tích chi tiết:\n\n` +
+        `Chào bạn! Để giúp bạn đưa ra quyết định đúng đắn, tiết kiệm và phù hợp nhất với nhu cầu, em xin phân tích chi tiết:\n\n` +
         `1. 📋 **CÁC THÔNG TIN CẦN XÁC ĐỊNH TRƯỚC KHI QUYẾT ĐỊNH:**\n` +
         `Để chẩn đoán chính xác nguyên nhân máy chậm, bạn có thể cho em biết thêm:\n` +
         `• **Model máy cụ thể:** Tên dòng laptop bạn đang dùng (Dell, HP, Lenovo, Asus...)?\n` +
@@ -1027,7 +1027,7 @@ async function performRagRecommendation({
     if (!products.length) {
         if (category) {
             return {
-                reply: `Dạ hiện tại TechEcommerce **chưa có sẵn mẫu sản phẩm phù hợp** với yêu cầu này trong danh mục **${category}** ạ! 🙏\n\nBạn có muốn tham khảo các mẫu ${category} khác đang có sẵn hoặc sản phẩm thuộc danh mục khác không ạ?`,
+                reply: `Dạ hiện tại cửa hàng **chưa có sẵn mẫu sản phẩm phù hợp** với yêu cầu này trong danh mục **${category}** ạ! 🙏\n\nBạn có muốn tham khảo các mẫu ${category} khác đang có sẵn hoặc sản phẩm thuộc danh mục khác không ạ?`,
                 products: [],
                 suggestions: [`Xem ${category} bán chạy`, 'Tư vấn sản phẩm khác', 'Chính sách bảo hành', 'Săn mã giảm giá'],
                 context: { stage: 'out_of_stock', notFound: true, category },
@@ -1050,7 +1050,7 @@ async function performRagRecommendation({
         `- ${p.name} (Giá: ${money(p.price)}, Còn: ${p.stock}, Hãng: ${p.brand}, CPU: ${p.specs?.cpu || 'Chưa có dữ liệu'}, RAM: ${p.specs?.ram || 'Chưa có dữ liệu'}, Ổ cứng: ${p.specs?.storage || 'Chưa có dữ liệu'}, Màn hình: ${p.specs?.screen || 'Chưa có dữ liệu'}, Pin: ${p.specs?.battery || 'Theo NSX'})`
     ).join('\n');
 
-    const systemPrompt = `Bạn là Trợ lý Tư vấn Mua sắm AI chuyên nghiệp, tận tâm của TechEcommerce.
+    const systemPrompt = `Bạn là Trợ lý Tư vấn Mua sắm AI chuyên nghiệp, tận tâm của cửa hàng.
 Khách hàng cần tư vấn ${category} với ngân sách: ${budget ? money(budget) : 'linh hoạt'}, mục đích: "${useCase || 'học tập, làm việc'}", ưu tiên: "${priority || 'cân bằng, bền bỉ'}", phong cách: ${isNonTech ? 'khách hàng không rành cấu hình' : 'khách hàng quan tâm hiệu năng'}.
 Danh sách sản phẩm THỰC TẾ trong kho:
 ${catalogContext}
@@ -1383,7 +1383,7 @@ async function answerProductQuestion(message, user, previousContext = {}) {
         const downPayment = Math.round((lowestLaptop?.price || 13990000) * 0.3);
         const monthlyInstallment = Math.round(((lowestLaptop?.price || 13990000) - downPayment) / 12);
 
-        const reply = `Dạ hiện tại TechEcommerce **chuyên phân phối 100% laptop mới chính hãng** với tiêu chuẩn bảo hành 12 - 24 tháng. Mẫu laptop chính hãng có giá tốt nhất tại cửa hàng hiện là **${lowestLaptop?.name || 'Lenovo IdeaPad Slim 3 14 inch'}** với mức giá **${money(lowestLaptop?.price || 13990000)}**.\n\n` +
+        const reply = `Dạ hiện tại cửa hàng **chuyên phân phối 100% laptop mới chính hãng** với tiêu chuẩn bảo hành 12 - 24 tháng. Mẫu laptop chính hãng có giá tốt nhất tại cửa hàng hiện là **${lowestLaptop?.name || 'Lenovo IdeaPad Slim 3 14 inch'}** với mức giá **${money(lowestLaptop?.price || 13990000)}**.\n\n` +
             `Với mức ngân sách **${money(budget)}**, em xin đề xuất 2 giải pháp tối ưu cho bạn:\n\n` +
             `1. 💳 **Mua trả góp 0% lãi suất:** Bạn chỉ cần trả trước khoảng 30% (tương đương **${money(downPayment)}**), số tiền còn lại chia nhỏ trả góp chỉ khoảng **${money(monthlyInstallment)}/tháng** với thủ tục duyệt CCCD chỉ 15 phút.\n` +
             `2. 📲 **Tham khảo Máy tính bảng chính hãng:** Nếu nhu cầu chủ yếu là học online, xem tài liệu PDF và lướt web, các dòng tablet trong kho như **${tablets[0]?.name || 'HONOR Pad 10'}** (${money(tablets[0]?.price)}) hoàn toàn đáp ứng tốt trong tầm ngân sách.\n\n` +
@@ -1625,7 +1625,7 @@ async function answerProductQuestion(message, user, previousContext = {}) {
 
     // Nếu không có danh mục cụ thể và câu hỏi rất chung (ví dụ "tư vấn mua hàng", "gợi ý sản phẩm")
     if (!category && !useCase && !budget) {
-        const reply = `Chào bạn! Em là Trợ lý Tư vấn Mua sắm AI của TechEcommerce. Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?`;
+        const reply = `Chào bạn! Em là Trợ lý Tư vấn Mua sắm AI của cửa hàng. Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?`;
         const suggestions = [
             'Tư vấn laptop 15 triệu',
             'Tư vấn điện thoại',
@@ -1997,7 +1997,7 @@ async function answerBundleBargainQuestion(message, context = {}) {
         const totalSavings = totalOriginalAddons - totalBundleAddons;
 
         const reply = `Dạ giá niêm yết **${money(targetProduct.price)}** của **${targetProduct.name}** hiện đã là giá kịch sàn cho hàng phân phối chính hãng kèm gói bảo hành 1 đổi 1 an tâm tuyệt đối ạ! 🛡️\n\n` +
-            `Tuy nhiên để hỗ trợ bạn tiết kiệm tối đa hôm nay, TechEcommerce kích hoạt chính sách **Combo Trợ Giá Phụ Kiện Chính Hãng Giảm Đến 30%** khi mua kèm máy!\n` +
+            `Tuy nhiên để hỗ trợ bạn tiết kiệm tối đa hôm nay, cửa hàng kích hoạt chính sách **Combo Trợ Giá Phụ Kiện Chính Hãng Giảm Đến 30%** khi mua kèm máy!\n` +
             `Bạn có thể tùy ý tích chọn các phụ kiện bên dưới để gộp đơn và tiết kiệm ngay **${money(totalSavings)}** nhé: 👇`;
 
         return {
@@ -2070,7 +2070,7 @@ async function handleBudgetAndSpecialAdvisorQueries(message, context = {}) {
 
             return {
                 reply: `✈️ **LỰA CHỌN TỐI ƯU NHẤT KHI ĐI MÁY BAY / DU LỊCH:**\n\n` +
-                    `Để triệt tiêu hoàn toàn tiếng ù và tiếng gầm động cơ phản lực trên các chuyến bay, **Tai nghe chống ồn chủ động (ANC)** là trang bị không thể thiếu. TechEcommerce đề xuất 2 mẫu tai nghe đỉnh nhất hiện nay:\n\n` +
+                    `Để triệt tiêu hoàn toàn tiếng ù và tiếng gầm động cơ phản lực trên các chuyến bay, **Tai nghe chống ồn chủ động (ANC)** là trang bị không thể thiếu. Cửa hàng đề xuất 2 mẫu tai nghe đỉnh nhất hiện nay:\n\n` +
                     `1. 🏆 **${topPick.name}** (${money(topPick.price)}):\n` +
                     `   • **Lý do tối ưu:** Sở hữu công nghệ chống ồn ANC hàng đầu thế giới với 2 chip xử lý và 8 micro triệt tiêu tạp âm tần số thấp cực sâu. Đệm tai siêu êm ái không gây đau tai suốt chuyến bay dài 8-12 tiếng. Pin 30 giờ và kèm sẵn cáp 3.5mm cắm trực tiếp vào hệ thống giải trí ghế máy bay.\n\n` +
                     (secondPick ? `2. 🌟 **${secondPick.name}** (${money(secondPick.price)}):\n   • **Lý do tối ưu:** Thiết kế True Wireless đút tai siêu gọn nhẹ bỏ túi áo. Chế độ xuyên âm thích ứng (Adaptive Audio) giúp nghe rõ thông báo từ cơ trưởng hoặc tiếp viên mà không cần tháo tai nghe.\n\n` : '') +
@@ -2293,7 +2293,7 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
             try {
                 const model = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                const prompt = `Bạn là hệ thống AI phân loại thiết bị công nghệ của TechEcommerce (chuyên: Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh, Phụ kiện, Máy chơi game).
+                const prompt = `Bạn là hệ thống AI phân loại thiết bị công nghệ của cửa hàng (chuyên: Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh, Phụ kiện, Máy chơi game).
 
 Nhiệm vụ: Phân tích KỸ CÀNG bức ảnh. Liệt kê TẤT CẢ thiết bị công nghệ bạn nhìn thấy.
 
@@ -2499,8 +2499,8 @@ Trả về JSON thuần:
                     ? 'Ảnh chụp chưa đủ rõ nét hoặc vật thể bị che khuất để nhận diện chính xác.'
                     : (classificationReason || 'Ảnh chưa cho thấy rõ thiết bị công nghệ trong hệ thống cửa hàng.'),
                 reply: detectionStatus === 'unclear'
-                    ? 'Ảnh chưa đủ rõ nét để nhận diện chính xác model. TechEcommerce gợi ý các sản phẩm công nghệ bán chạy hàng đầu dành cho bạn:'
-                    : 'Ảnh này chưa cho thấy thiết bị công nghệ của TechEcommerce. Bạn có thể tham khảo các sản phẩm thịnh hành tại cửa hàng:',
+                    ? 'Ảnh chưa đủ rõ nét để nhận diện chính xác model. Cửa hàng gợi ý các sản phẩm công nghệ bán chạy hàng đầu dành cho bạn:'
+                    : 'Ảnh này chưa cho thấy thiết bị công nghệ của cửa hàng. Bạn có thể tham khảo các sản phẩm thịnh hành tại cửa hàng:',
                 products: popularProducts,
                 suggestions: ['Điện thoại', 'Laptop & MacBook', 'Tai nghe & Âm thanh', 'Phụ kiện máy tính']
             });
@@ -2728,7 +2728,7 @@ async function ensureSeedConversations() {
                     },
                     {
                         sender: 'assistant',
-                        text: 'Dạ máy đang có sẵn hàng nguyên seal tại kho TechEcommerce TP.HCM. Bạn có thể đặt giao nhanh trong 2 giờ hoặc ghé trực tiếp chi nhánh để trải nghiệm máy nhé!',
+                        text: 'Dạ máy đang có sẵn hàng nguyên seal tại kho cửa hàng ở TP.HCM. Bạn có thể đặt giao nhanh trong 2 giờ hoặc ghé trực tiếp chi nhánh để trải nghiệm máy nhé!',
                         timestamp: new Date(now - 2 * hour + 60000)
                     }
                 ]
@@ -2774,7 +2774,7 @@ async function ensureSeedConversations() {
                     },
                     {
                         sender: 'assistant',
-                        text: '📋 **Chính sách Trả góp 0% tại TechEcommerce:**\n• Giá niêm yết: ~34.990.000 đ.\n• Trả trước đợt đầu 30%: khoảng 10.497.000 đ.\n• Số tiền còn lại chia đều trong 6 - 12 tháng không phát sinh lãi suất.\n• Hồ sơ: Chỉ cần CCCD gắn chip, duyệt online trong 15 phút.',
+                        text: '📋 **Chính sách Trả góp 0% tại cửa hàng:**\n• Giá niêm yết: ~34.990.000 đ.\n• Trả trước đợt đầu 30%: khoảng 10.497.000 đ.\n• Số tiền còn lại chia đều trong 6 - 12 tháng không phát sinh lãi suất.\n• Hồ sơ: Chỉ cần CCCD gắn chip, duyệt online trong 15 phút.',
                         timestamp: new Date(now - 12 * hour + 14000)
                     },
                     {
