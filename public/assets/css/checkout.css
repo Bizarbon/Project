@@ -365,3 +365,17 @@ body {
     transition-duration: 1ms !important;
   }
 }
+
+/* Triệt tiêu hoàn toàn các khối hình tròn/tam giác thừa SVG dưới nút Xác nhận Đặt hàng */
+.u081-ring,
+.u081-ck,
+.u081-ring-svg,
+#u081RingSvg,
+.u081-stage-box svg {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
