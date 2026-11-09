@@ -3531,7 +3531,7 @@ function productCard(p) {
                 <p class="product-desc">${escapeHTML(p.description || '')}</p>
                 ${p.recommendation?.reason ? `<p class="recommendation-reason">${escapeHTML(p.recommendation.reason)}</p>` : ''}
                 ${specLine ? `<p class="product-spec-line">${escapeHTML(specLine)}</p>` : ''}
-                ${p.rating ? `<p class="product-rating">★ ${Number(p.rating).toFixed(1)} <span>(${p.reviewCount || 0})</span>${p.soldCount ? ` <span>- đã bán ${p.soldCount}</span>` : ''}</p>` : ''}
+                ${p.rating ? `<p class="product-rating">★ ${Number(p.rating).toFixed(1)} <span class="rating-count">(${p.reviewCount || 0})</span>${p.soldCount ? ` <span class="rating-sold-text">- đã bán ${p.soldCount}</span>` : ''}</p>` : ''}
                 <div class="product-price-row">
                     <p class="price">${fmt(p.price)}</p>
                     ${p.compareAtPrice > p.price ? `<p class="compare-price">${fmt(p.compareAtPrice)}</p>` : ''}

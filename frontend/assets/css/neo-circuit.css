@@ -12709,34 +12709,132 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
 
 /* ============================================================================
    MOBILE RESPONSIVE PRODUCT CARD OPTIMIZATION (<= 768px & <= 360px)
-   Fix: Tràn giá, rớt ký hiệu tiền tệ 'đ', rớt chữ FOMO stock, co cụm nút bấm
+   Fix: Rút ngắn chiều cao card cân đối, chống tràn giá, chống rớt chữ, tối ưu UI
    ============================================================================ */
 @media (max-width: 768px) {
-    /* 1. Loại bỏ double padding giữa .product-card và .card-body */
+    /* 1. Kích thước & Padding card thon gọn, cân đối */
     .product-card {
-        padding: 0.5rem 0.5rem 0.65rem !important;
+        padding: 0.45rem 0.45rem 0.55rem !important;
         border-radius: 12px !important;
-    }
-
-    .product-card .card-body {
-        padding: 0.35rem 0 0 0 !important;
-        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
         box-sizing: border-box !important;
     }
 
-    /* 2. Hàng giá: Giữ nguyên vẹn số tiền + đ trên một dòng, flex-wrap cho giá so sánh */
+    /* 2. Thu gọn ảnh sản phẩm: Chiều cao gọn gàng, padding vừa vặn, không chiếm cả màn hình */
+    .product-card .product-media {
+        width: 100% !important;
+        height: 125px !important;
+        max-height: 125px !important;
+        aspect-ratio: auto !important;
+        padding: 8px 6px !important;
+        margin: 0 0 0.25rem 0 !important;
+        border-radius: 10px !important;
+        background: #ffffff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .product-card .product-media img {
+        max-height: 100% !important;
+        max-width: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+    }
+
+    .product-card .card-body {
+        padding: 0 !important;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 3. Hàng badge Danh mục & Thương hiệu: Gọn gàng 1 dòng duy nhất, ẩn SKU nội bộ */
+    .product-brand-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 4px !important;
+        margin: 0 0 0.2rem 0 !important;
+        overflow: hidden !important;
+    }
+
+    .category-badge,
+    .product-brand-badge {
+        font-size: 0.65rem !important;
+        padding: 1.5px 5px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+        border-radius: 4px !important;
+    }
+
+    .product-card .product-sku-badge {
+        display: none !important; /* SKU nội bộ chỉ hiển thị trên trang chi tiết/desktop */
+    }
+
+    /* 4. Tiêu đề sản phẩm: Rõ ràng, 2 dòng chuẩn mực, không nhảy dòng lung tung */
+    .product-card h3,
+    .product-card h3 a {
+        font-size: 0.84rem !important;
+        font-weight: 600 !important;
+        line-height: 1.25 !important;
+        margin: 0 0 0.2rem 0 !important;
+        min-height: 2.15rem !important;
+        max-height: 2.15rem !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-break: break-word !important;
+    }
+
+    /* 5. Ẩn mô tả dài lê thê trên mobile card để thẻ ngắn và thoáng mắt */
+    .product-card .product-desc,
+    .product-card .recommendation-reason {
+        display: none !important;
+    }
+
+    /* 6. Dòng thông số kỹ thuật: Gọn gàng 1 dòng tinh tế */
+    .product-card .product-spec-line {
+        font-size: 0.66rem !important;
+        line-height: 1.2 !important;
+        padding: 1.5px 5px !important;
+        margin: 0 0 0.2rem 0 !important;
+        border-radius: 4px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* 7. Hàng sao đánh giá: Gọn gàng, ẩn chữ đã bán trùng lặp với thanh FOMO */
+    .product-card .product-rating {
+        font-size: 0.68rem !important;
+        line-height: 1.2 !important;
+        margin: 0 0 0.2rem 0 !important;
+    }
+
+    .product-card .rating-sold-text {
+        display: none !important;
+    }
+
+    /* 8. Hàng giá: Giữ nguyên vẹn số tiền + đ trên một dòng, flex-wrap cho giá so sánh */
     .product-price-row {
         display: flex !important;
         flex-wrap: wrap !important;
         align-items: baseline !important;
-        gap: 2px 6px !important;
-        margin-bottom: 0.3rem !important;
+        gap: 2px 5px !important;
+        margin: 0 0 0.2rem 0 !important;
         width: 100% !important;
     }
 
     .product-price-row .price,
     .product-card .price {
-        font-size: 1.05rem !important;
+        font-size: 1.02rem !important;
         font-weight: 700 !important;
         line-height: 1.25 !important;
         white-space: nowrap !important;
@@ -12746,21 +12844,21 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
 
     .product-price-row .compare-price,
     .product-card .compare-price {
-        font-size: 0.75rem !important;
+        font-size: 0.72rem !important;
         line-height: 1.25 !important;
         white-space: nowrap !important;
         margin: 0 !important;
     }
 
-    /* 3. FOMO Stock: Badge không bao giờ rớt chữ xuống dòng 2 */
+    /* 9. FOMO Stock: Badge không bao giờ rớt chữ xuống dòng 2 */
     .product-fomo-stock {
-        margin: 0.25rem 0 0.45rem !important;
+        margin: 0.15rem 0 0.35rem !important;
         width: 100% !important;
     }
 
     .fomo-stock-bar {
-        height: 4px !important;
-        margin-bottom: 3px !important;
+        height: 3px !important;
+        margin-bottom: 2px !important;
     }
 
     .fomo-stock-meta {
@@ -12768,14 +12866,14 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
         align-items: center !important;
         justify-content: space-between !important;
         width: 100% !important;
-        gap: 4px !important;
-        font-size: 0.68rem !important;
+        gap: 3px !important;
+        font-size: 0.65rem !important;
         white-space: nowrap !important;
         overflow: hidden !important;
     }
 
     .fomo-stock-sold {
-        font-size: 0.68rem !important;
+        font-size: 0.65rem !important;
         white-space: nowrap !important;
         display: inline-flex !important;
         align-items: center !important;
@@ -12783,37 +12881,37 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
     }
 
     .fomo-stock-remain {
-        font-size: 0.65rem !important;
-        padding: 1.5px 5px !important;
+        font-size: 0.62rem !important;
+        padding: 1px 4px !important;
         white-space: nowrap !important;
         display: inline-flex !important;
         align-items: center !important;
         flex-shrink: 0 !important;
     }
 
-    /* 4. Hàng nút thao tác: Nút Thêm giỏ ưu tiên hiển thị đầy đủ 100% chữ, nút Xem/So sánh dạng icon button hiện đại */
+    /* 10. Hàng nút thao tác: Nút Thêm giỏ ưu tiên hiển thị đầy đủ 100% chữ, nút Xem/So sánh dạng icon button hiện đại */
     .product-card .product-actions {
         display: flex !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
         gap: 5px !important;
         margin-top: auto !important;
-        padding-top: 0.35rem !important;
+        padding-top: 0.25rem !important;
         width: 100% !important;
     }
 
     .product-card .product-actions .btn-add-cart {
         flex: 1 1 auto !important;
         min-width: 0 !important;
-        height: 36px !important;
-        min-height: 36px !important;
+        height: 34px !important;
+        min-height: 34px !important;
         padding: 0 8px !important;
-        font-size: 0.78rem !important;
+        font-size: 0.76rem !important;
         font-weight: 700 !important;
         display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 5px !important;
+        gap: 4px !important;
         white-space: nowrap !important;
         border-radius: 8px !important;
     }
@@ -12826,19 +12924,19 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
     }
 
     .product-card .product-actions .btn-add-cart svg {
-        width: 14px !important;
-        height: 14px !important;
+        width: 13px !important;
+        height: 13px !important;
         flex-shrink: 0 !important;
     }
 
     .product-card .product-actions .btn-quick-view,
     .product-card .product-actions .btn-compare {
-        flex: 0 0 36px !important;
-        width: 36px !important;
-        min-width: 36px !important;
-        max-width: 36px !important;
-        height: 36px !important;
-        min-height: 36px !important;
+        flex: 0 0 34px !important;
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
         padding: 0 !important;
         display: inline-flex !important;
         align-items: center !important;
@@ -12853,49 +12951,54 @@ html[data-theme='high-contrast'] .skeleton-shimmer {
 
     .product-card .product-actions .btn-quick-view svg,
     .product-card .product-actions .btn-compare svg {
-        width: 17px !important;
-        height: 17px !important;
+        width: 16px !important;
+        height: 16px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
     }
 }
 
 @media (max-width: 360px) {
+    .product-card .product-media {
+        height: 110px !important;
+        max-height: 110px !important;
+    }
+
     .product-price-row .price,
     .product-card .price {
-        font-size: 0.98rem !important;
+        font-size: 0.95rem !important;
     }
 
     .product-price-row .compare-price,
     .product-card .compare-price {
-        font-size: 0.72rem !important;
+        font-size: 0.7rem !important;
     }
 
     .product-card .product-actions {
-        gap: 4px !important;
+        gap: 3px !important;
     }
 
     .product-card .product-actions .btn-add-cart {
-        height: 34px !important;
-        min-height: 34px !important;
-        padding: 0 6px !important;
-        font-size: 0.74rem !important;
-        gap: 4px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 0 5px !important;
+        font-size: 0.72rem !important;
+        gap: 3px !important;
     }
 
     .product-card .product-actions .btn-quick-view,
     .product-card .product-actions .btn-compare {
-        flex: 0 0 32px !important;
-        width: 32px !important;
-        min-width: 32px !important;
-        max-width: 32px !important;
-        height: 34px !important;
-        min-height: 34px !important;
+        flex: 0 0 30px !important;
+        width: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+        height: 32px !important;
+        min-height: 32px !important;
     }
 
     .product-card .product-actions .btn-quick-view svg,
     .product-card .product-actions .btn-compare svg {
-        width: 15px !important;
-        height: 15px !important;
+        width: 14px !important;
+        height: 14px !important;
     }
 }
