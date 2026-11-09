@@ -3975,15 +3975,22 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     }
 
     // 1b. Kiểm tra tri thức chính sách cửa hàng, xử lý từ chối, mẹo công nghệ & đối đáp đời thường
-    const smartAnswer = matchSmartAnswer(message);
-    if (smartAnswer) {
-        return {
-            reply: smartAnswer.reply,
-            products: prev.lastProducts || [],
-            suggestions: smartAnswer.suggestions,
-            context: { ...prev, ...smartAnswer.context },
-            meta: { provider: 'store_knowledge_engine', isFallback: false, model: 'none' }
-        };
+    // Chỉ áp dụng smartAnswer khi câu hỏi KHÔNG hỏi tìm/tư vấn sản phẩm theo ngân sách hoặc danh mục cụ thể
+    const hasExplicitBudget = Boolean(extractBudget(message)) || Boolean(extractBudgetInfo(message)?.amount);
+    const hasExplicitProductQuery = Boolean(detectProductType(message)) || Boolean(inferCategory(message));
+    const isConsultationSearch = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim|mua|co ban)\b/i.test(text);
+
+    if (!hasExplicitBudget && !(hasExplicitProductQuery && isConsultationSearch)) {
+        const smartAnswer = matchSmartAnswer(message);
+        if (smartAnswer) {
+            return {
+                reply: smartAnswer.reply,
+                products: prev.lastProducts || [],
+                suggestions: smartAnswer.suggestions,
+                context: { ...prev, ...smartAnswer.context },
+                meta: { provider: 'store_knowledge_engine', isFallback: false, model: 'none' }
+            };
+        }
     }
 
     // 2a. Kiểm tra nếu câu hỏi nhắc đến 2 sản phẩm cụ thể để so sánh ("So sánh MacBook Air M2 và Asus ROG Strix")

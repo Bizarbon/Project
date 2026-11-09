@@ -1153,6 +1153,10 @@ function setShopPrice(maxPrice, options = {}) {
     const maxEl = document.getElementById('maxPrice');
     if (minEl && !options.preserveMinPrice) minEl.value = '';
     if (maxEl) maxEl.value = maxPrice || '';
+    const url = new URL(window.location.href);
+    if (maxPrice) url.searchParams.set('maxPrice', maxPrice);
+    else url.searchParams.delete('maxPrice');
+    window.history.replaceState({}, '', url);
     renderProducts();
     if (options.scroll !== false) {
         document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

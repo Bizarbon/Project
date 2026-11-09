@@ -1234,7 +1234,6 @@ function matchSmartAnswer(message) {
 
     const groups = [
         { name: 'store_policy', rules: STORE_POLICY_RULES },
-        { name: 'budget_consultation', rules: BUDGET_AND_CONSULTATION_RULES },
         { name: 'objection', rules: OBJECTION_RULES },
         { name: 'hardware_and_software', rules: HARDWARE_AND_SOFTWARE_RULES },
         { name: 'comparison_and_fengshui', rules: COMPARISON_AND_FENGSHUI_RULES },

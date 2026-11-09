@@ -1712,6 +1712,13 @@ async function answerVoucherQuestion() {
 async function answerPolicyQuestion(message) {
     const text = normalizeText(message);
 
+    // Không xử lý chính sách cửa hàng nếu câu hỏi đang tìm/tư vấn sản phẩm hoặc có mức ngân sách
+    const hasExplicitBudget = Boolean(extractBudget(message));
+    const hasProductConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim may|mua may|laptop|dien thoai|tai nghe|dong ho|may choi game|ban phim|chuot|sac)\b/i.test(text);
+    if (hasExplicitBudget || (hasProductConsultation && /\b(tu van|tim|mua|gia|duoi|tam|tren)\b/i.test(text))) {
+        return null;
+    }
+
     // Ưu tiên tri thức chính sách nâng cao, mẹo công nghệ & đối đáp đời thường
     const smart = matchSmartAnswer(message);
     if (smart) return smart;

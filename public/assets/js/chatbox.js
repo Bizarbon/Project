@@ -1786,6 +1786,29 @@
             });
         }
 
+        function extractBudgetFromText(text) {
+            if (!text) return 0;
+            const str = String(text).toLowerCase();
+            const mMillion = str.match(/(\d+(?:[.,]\d+)?)\s*(?:tr|trieu|triệu|m\b)/i);
+            if (mMillion) {
+                const val = parseFloat(mMillion[1].replace(',', '.'));
+                if (!isNaN(val) && val > 0 && val < 500) {
+                    return Math.round(val * 1000000);
+                }
+            }
+            const mRaw = str.match(/(\d{1,3}(?:\.\d{3}){2,3})\s*(?:d|đ|vnd)?/i);
+            if (mRaw) {
+                const val = parseInt(mRaw[1].replace(/\./g, ''), 10);
+                if (!isNaN(val) && val > 0) return val;
+            }
+            const mK = str.match(/(\d+)\s*(?:k|nghin|nghìn|ngan|ngàn)\b/i);
+            if (mK) {
+                const val = parseInt(mK[1], 10);
+                if (!isNaN(val) && val > 0) return val * 1000;
+            }
+            return 0;
+        }
+
         function handleAutoNavigation(userMessage, data) {
             if (data.notFound) {
                 return;
@@ -1975,12 +1998,13 @@
             // D1. Khách hàng hỏi ngân sách ngoài phạm vi hoặc sản phẩm có giá gần nhất (Nearest Price Match)
             // TUYỆT ĐỐI không gán maxPrice thấp vào bộ lọc cửa hàng vì sẽ làm trắng màn hình ("Không tìm thấy sản phẩm phù hợp").
             // Thay vào đó: xóa bộ lọc khoảng giá, chọn đúng danh mục, xóa lọc hãng và hiển thị ngay sản phẩm gần nhất lên storefront!
+            const effectiveBudget = Number(data.context?.budget || extractBudgetFromText(userMessage) || 0);
             const isNearestPriceMatch = Boolean(
                 data.context?.isNearestMatch ||
                 data.context?.currentIntent === 'nearest_price_match' ||
                 data.context?.currentIntent === 'out_of_budget_scope' ||
                 data.context?.currentIntent === 'product_type_no_match' ||
-                (topProduct && data.context?.budget > 0 && Number(topProduct.price) > Number(data.context.budget))
+                (topProduct && effectiveBudget > 0 && Number(topProduct.price) > Number(effectiveBudget))
             );
 
             if (isNearestPriceMatch) {
@@ -2049,22 +2073,22 @@
             }
 
             // D3. Khách hàng hỏi ngân sách trong tầm giá hợp lệ ("còn khi khách hàng muốn ngân sách trong tầm giá thì mới nhảy ra để tư vấn khách hàng")
-            if (data.context?.budget > 0) {
+            if (effectiveBudget > 0) {
                 if (isMainShop) {
-                    if (targetCategory && typeof window.setCategory === 'function') {
-                        window.setCategory(targetCategory, { scroll: false });
-                    }
                     if (typeof window.setShopSearch === 'function') {
                         window.setShopSearch('', { scroll: false });
                     }
                     if (typeof window.setBrandFilter === 'function') {
                         window.setBrandFilter(data.context?.brand || 'all', { scroll: false });
                     }
+                    if (targetCategory && typeof window.setCategory === 'function') {
+                        window.setCategory(targetCategory, { preserveFilters: true, scroll: false });
+                    }
                     if (typeof window.setShopPrice === 'function') {
-                        window.setShopPrice(data.context.budget);
+                        window.setShopPrice(effectiveBudget);
                     }
                 } else if (targetCategory) {
-                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}#catalogStart`;
+                    window.location.href = `${root}index.html?category=${encodeURIComponent(targetCategory)}&maxPrice=${encodeURIComponent(effectiveBudget)}#catalogStart`;
                 }
                 return;
             }
