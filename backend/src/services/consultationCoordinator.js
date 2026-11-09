@@ -7,6 +7,7 @@
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
 const aiModelService = require('./aiModelService');
+const { matchSmartAnswer } = require('./storeKnowledgeAndChitChat');
 const nlu = require('./nlu');
 const config = nlu.config || require('./nlu/config');
 
@@ -4246,6 +4247,16 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
 
     // 2. Phân loại câu hỏi đùa / hỏi vui / tâm sự đời thường / câu hỏi khó
     let fallbackText = deterministicMathReply;
+    let customSuggestions = null;
+
+    if (!fallbackText) {
+        const smart = matchSmartAnswer(message);
+        if (smart) {
+            fallbackText = smart.reply;
+            customSuggestions = smart.suggestions;
+        }
+    }
+
     if (!fallbackText) {
         const isHumorOrChitChat = /\b(vui khong|buon|chan|met|khoe khong|an com chua|ngu chua|hat|ke chuyen|nguoi yeu|may tuoi|ten gi|ai tao ra|troi dep|troi mua|xinh khong|yeu khong|co nguoi yeu)\b/i.test(norm);
         if (isHumorOrChitChat) {
@@ -4266,7 +4277,7 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
     return {
         reply: aiResult.reply || fallbackText,
         products: [],
-        suggestions: [
+        suggestions: customSuggestions || [
             'Tư vấn Laptop sinh viên',
             'Tư vấn Điện thoại chụp ảnh',
             'Xem máy tính bảng học tập',

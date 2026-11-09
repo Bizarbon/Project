@@ -8,6 +8,7 @@ const Coupon = require('../models/Coupon');
 const ChatSession = require('../models/ChatSession');
 const KnowledgeArticle = require('../models/KnowledgeArticle');
 const { findKnowledgeArticle } = require('../services/knowledgeService');
+const { matchSmartAnswer } = require('../services/storeKnowledgeAndChitChat');
 const { optionalAuth, protect, admin } = require('../middleware/auth');
 const { recommendProducts } = require('../utils/recommendations');
 const { coordinateConsultation, checkUnsupportedProduct, buildOutOfCatalogResponse, extractBudget } = require('../services/consultationCoordinator');
@@ -494,15 +495,19 @@ async function askGeminiOpenChat(message, context = {}) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) return null;
 
-    const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và am hiểu công nghệ của cửa hàng TechEcommerce.
-TechEcommerce chuyên bán chính hãng 100%: Điện thoại (iPhone, Samsung, Xiaomi...), Laptop (MacBook, ROG, Dell...), Tablet (iPad, Galaxy Tab...), Máy chơi game (PS5, Nintendo Switch, ROG Ally...), Smartwatch (Apple Watch, Garmin...), Tai nghe và Phụ kiện cao cấp.
-Chính sách: Bảo hành 12-24 tháng, lỗi 1 đổi 1 trong 30 ngày, trả góp 0% lãi suất.
+    const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ TechEcommerce.
+THÔNG TIN VỀ TECHECOMMERCE:
+• Showroom: 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM & 78 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội (Mở cửa 08:30 – 21:30 hàng ngày).
+• Hotline tư vấn & kỹ thuật: 0842.331.606 | Zalo: https://zalo.me/0842331606.
+• Cam kết: 100% hàng mới chính hãng nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12 - 24 tháng.
+• Dịch vụ: Xuất hóa đơn VAT điện tử công ty, Thu cũ đổi mới trợ giá đến 2.000.000 đ, Trả góp 0% qua thẻ tín dụng và qua CCCD gắn chip (không cần thẻ). Đồng kiểm mở hộp khi nhận hàng. Giao hỏa tốc 2 giờ nội thành.
 
-NGUYÊN TẮC TRẢ LỜI:
-1. Giao tiếp tự nhiên, tận tâm và chuyên nghiệp. Luôn xưng là "em" và gọi khách là "bạn". Tuyệt đối KHÔNG tự xưng "mình", "tụi mình", "chúng mình".
-2. Nếu khách hỏi vui, chào hỏi, đố vui, toán học (ví dụ: "1+1", "bạn có người yêu chưa", "kể chuyện cười"), hãy trả lời dí dỏm, khéo léo và tự nhiên. Tuyệt đối không spam kịch bản bán hàng máy móc!
-3. Nếu khách hỏi câu hỏi khó hoặc nằm ngoài khả năng, hãy nhẹ nhàng thông báo: "Dạ câu này em chưa hiểu rõ ý bạn lắm nè 😅" và gợi ý khách diễn đạt lại nhu cầu công nghệ để hỗ trợ tốt nhất.
-4. Giữ câu trả lời ngắn gọn, súc tích (khoảng 2 - 4 câu), có thể kèm emoji phù hợp.`;
+NGUYÊN TẮC TRẢ LỜI GIỐNG NGƯỜI THẬT:
+1. Giao tiếp cực kỳ tự nhiên, hóm hỉnh, ấm áp và gần gũi như một người bạn hoặc chuyên viên tư vấn công nghệ trẻ trung, am hiểu tâm lý. Tuyệt đối KHÔNG trả lời máy móc, lặp lại hay spam bán hàng gượng gạo.
+2. Khi khách hỏi vui, đố mẹo, hỏi toán, hỏi thăm đời thường (ăn cơm chưa, mệt mỏi, thời tiết, người yêu, cà phê hay trà sữa...): Hãy đối đáp thông minh, dí dỏm, thấu hiểu cảm xúc của khách, sau đó có thể khéo léo dẫn dắt hoặc mở lời sẵn sàng hỗ trợ nếu khách có nhu cầu.
+3. Khi khách hỏi mẹo công nghệ (sạc qua đêm, dán cường lực, laptop nóng, chụp màn hình...): Giải thích ngắn gọn, dễ hiểu, thực tế, kèm mẹo hữu ích.
+4. Quy tắc xưng hô nhất quán: Luôn xưng là "em" và gọi khách là "bạn". Tuyệt đối KHÔNG tự xưng "mình", "tụi mình", "chúng mình".
+5. Giữ câu trả lời ngắn gọn, súc tích (khoảng 2 - 4 câu), có thể kèm emoji phù hợp.`;
 
     return await askGeminiIfConfigured(systemPrompt, message);
 }
@@ -1707,6 +1712,10 @@ async function answerVoucherQuestion() {
 async function answerPolicyQuestion(message) {
     const text = normalizeText(message);
 
+    // Ưu tiên tri thức chính sách nâng cao, mẹo công nghệ & đối đáp đời thường
+    const smart = matchSmartAnswer(message);
+    if (smart) return smart;
+
     try {
         const article = await findKnowledgeArticle(message, { type: 'policy' });
         if (article?.answer) return article.answer;
@@ -2195,8 +2204,9 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             response = await answerOrderQuestion(req, message);
         } else if (policyAnswer) {
             response = {
-                reply: policyAnswer,
-                suggestions: ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay']
+                reply: typeof policyAnswer === 'string' ? policyAnswer : policyAnswer.reply,
+                suggestions: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.suggestions)) ? policyAnswer.suggestions : ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay'],
+                context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...(req.body.context || {}), ...policyAnswer.context } : { ...(req.body.context || {}), stage: 'policy' }
             };
         } else {
             response = await coordinateConsultation({ message, user: req.user, context: req.body.context });
