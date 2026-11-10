@@ -53,7 +53,7 @@ const SCENARIOS = [
         title: 'Đặt giữ hàng 24h tại Showroom',
         input: 'Có được đặt giữ hàng trước không em?',
         expectedIntent: 'reserve_product',
-        mustInclude: ['Đặt giữ hàng tại Showroom trong 24 giờ', '135 Nguyễn Thị Thập', '78 Thái Hà']
+        mustInclude: ['Đặt giữ hàng tại Showroom trong 24 giờ', '78 Nguyễn Văn Khối', 'Gò Vấp']
     },
     {
         title: 'Chính sách đổi trả 1 đổi 1 trong 30 ngày',

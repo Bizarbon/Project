@@ -501,7 +501,7 @@ async function askGeminiOpenChat(message, context = {}) {
 
     const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ cửa hàng. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối không dùng từ TechEcommerce trong lời thoại.
 THÔNG TIN VỀ CỬA HÀNG:
-• Showroom: 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM & 78 Thái Hà, P. Trung Liệt, Đống Đa, Hà Nội (Mở cửa 08:30 – 21:30 hàng ngày).
+• Showroom: 78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh (Mở cửa 08:30 – 21:30 hàng ngày).
 • Hotline tư vấn & kỹ thuật: 0842.331.606 | Zalo: https://zalo.me/0842331606.
 • Cam kết: 100% hàng mới chính hãng nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12 - 24 tháng.
 • Dịch vụ: Xuất hóa đơn VAT điện tử công ty, Thu cũ đổi mới trợ giá đến 2.000.000 đ, Trả góp 0% qua thẻ tín dụng và qua CCCD gắn chip (không cần thẻ). Đồng kiểm mở hộp khi nhận hàng. Giao hỏa tốc 2 giờ nội thành.
@@ -1816,15 +1816,13 @@ async function answerPolicyQuestion(message) {
     // 1. Địa chỉ showroom / Cửa hàng xem máy trực tiếp
     if (['shop o dau', 'cua hang o dau', 'o dau vay', 'dia chi cua hang', 'dia chi shop', 'dia chi o dau', 'o dau', 'showroom', 'chi nhanh', 'den xem truc tiep', 'xem may o dau', 'co showroom khong', 'dia chi', 'tim showroom'].some(k => text.includes(k))) {
         return {
-            reply: '📍 **HỆ THỐNG SHOWROOM & ĐỊA CHỈ TRẢI NGHIỆM CỬA HÀNG:**\n\n' +
+            reply: '📍 **ĐỊA CHỈ SHOWROOM & TRẢI NGHIỆM CỬA HÀNG:**\n\n' +
                 'Cửa hàng mở cửa từ **08:30 – 21:30** tất cả các ngày trong tuần (kể cả Thứ 7, Chủ Nhật & ngày lễ):\n\n' +
-                '• **🏢 Showroom 1 (TP.HCM):** 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM\n' +
-                '  *(Có bãi đỗ ô tô rộng rãi, quầy trải nghiệm thực tế 100% iPhone, MacBook, iPad, Laptop Gaming, kỹ thuật viên chuyển dữ liệu miễn phí)*\n\n' +
-                '• **🏢 Showroom 2 (Hà Nội):** 78 Thái Hà, P. Trung Liệt, Q. Đống Đa, Hà Nội\n' +
-                '  *(Trung tâm phố công nghệ, sẵn máy mới nguyên seal VN/A, quẹt thẻ mPOS hoàn toàn miễn phí)*\n\n' +
+                '• **🏢 Địa chỉ Showroom duy nhất:** 78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh\n' +
+                '  *(Có chỗ đỗ ô tô và xe máy rộng rãi, quầy trải nghiệm thực tế 100% iPhone, MacBook, iPad, Laptop Gaming, kỹ thuật viên hỗ trợ dán màn hình, cài đặt & chuyển dữ liệu miễn phí)*\n\n' +
                 '📞 **Hotline tư vấn & đặt giữ máy trước:** **0842.331.606** (Miễn phí cuộc gọi)\n\n' +
-                '👉 Bạn dự kiến ghé showroom nào để em chuẩn bị sẵn máy đón tiếp bạn chu đáo nhất nhé! 😊',
-            suggestions: ['Showroom 135 Nguyễn Thị Thập Q7', 'Showroom 78 Thái Hà Đống Đa', 'Đặt giữ hàng 24h tại Showroom', 'Hotline 0842.331.606']
+                '👉 Bạn có thể ghé trực tiếp Showroom tại **78 Nguyễn Văn Khối, Quận Gò Vấp** để trải nghiệm máy thực tế hoặc nhắn em hỗ trợ đặt giữ hàng trước trong 24h nhé! 😊',
+            suggestions: ['Showroom 78 Nguyễn Văn Khối Gò Vấp', 'Đặt giữ hàng 24h tại Showroom', 'Hotline 0842.331.606', 'Tư vấn trả góp 0%']
         };
     }
 

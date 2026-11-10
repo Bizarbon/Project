@@ -554,7 +554,7 @@ function printCustomerInvoice() {
                 <div class="inv-header">
                     <div class="inv-company">
                         <h2>HỆ THỐNG BÁN LẺ CÔNG NGHỆ TECHECOMMERCE</h2>
-                        <p>Trụ sở chính: Showroom TechEcommerce, TP. Hồ Chí Minh</p>
+                        <p>Trụ sở chính & Showroom: 78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh</p>
                         <p>Hotline: 0842.331.606 | Email: support@techecommerce.vn</p>
                     </div>
                     <div class="inv-meta">

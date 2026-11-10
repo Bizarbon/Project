@@ -7,7 +7,7 @@
     const starterSuggestions = [
         '📦 Tra cứu đơn hàng',
         '💳 Tính trả góp 0%',
-        '📍 Tìm showroom gần nhất',
+        '📍 Địa chỉ showroom',
         'Tư vấn laptop dưới 15 triệu',
         'Mã giảm giá hôm nay',
         'Tìm máy chơi mượt Genshin'

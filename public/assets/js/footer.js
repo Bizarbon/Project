@@ -105,7 +105,7 @@
                         <li>Khiếu nại: <a href="tel:0842331606"><strong>0842.331.606</strong></a> <span class="cps-time-badge">(8h00 - 21h30)</span></li>
                     </ul>
                     <address class="cps-address-list">
-                        <p>📍 <a href="${root}index.html?openAddress=1">64 Nguyễn Văn Bảo, Gò Vấp, TP.HCM</a> <a class="cps-map-link" href="https://www.google.com/maps/search/?api=1&query=64+Nguyen+Van+Bao+Go+Vap+Ho+Chi+Minh" target="_blank" rel="noopener">(xem bản đồ)</a></p>
+                        <p>📍 <a href="${root}index.html?openAddress=1">78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh</a> <a class="cps-map-link" href="https://www.google.com/maps/search/?api=1&query=78+Nguyen+Van+Khoi+Go+Vap+Ho+Chi+Minh" target="_blank" rel="noopener">(xem bản đồ)</a></p>
                         <p>✉️ <a href="mailto:vuphilong@techecommerce.vn">vuphilong@techecommerce.vn</a></p>
                     </address>
 

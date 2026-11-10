@@ -160,8 +160,8 @@ const STORE_POLICY_RULES = [
         reply: `Dạ hoàn toàn được bạn nhé! Cửa hàng hỗ trợ **Đặt giữ hàng tại Showroom trong 24 giờ hoàn toàn miễn phí** (không cần đặt cọc trước) ạ! 🏬\n\n` +
             `• **Quyền lợi:** Khi bạn đặt giữ, nhân viên sẽ niêm phong sẵn đúng model và màu sắc bạn chọn tại quầy để đảm bảo không bị khách khác mua mất trước khi bạn ghé.\n` +
             `• **Trải nghiệm thoải mái:** Bạn đến showroom mở máy trải nghiệm thực tế, ưng ý mới thanh toán nhận máy; không mua cũng không sao nha.\n\n` +
-            `👉 Bạn muốn giữ mẫu máy nào và dự kiến ghé Showroom ở **135 Nguyễn Thị Thập (Quận 7, TP.HCM)** hay **78 Thái Hà (Đống Đa, Hà Nội)** để em báo nhân viên chuẩn bị sẵn đón bạn nhé! 😊`,
-        suggestions: ['Showroom 135 Nguyễn Thị Thập Q7', 'Showroom 78 Thái Hà Đống Đa', 'Hotline 0842.331.606']
+            `👉 Địa chỉ Showroom duy nhất của cửa hàng tại: **78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh**. Bạn muốn đặt giữ mẫu máy nào để em báo nhân viên chuẩn bị sẵn đón tiếp bạn chu đáo nhé! 😊`,
+        suggestions: ['Showroom 78 Nguyễn Văn Khối Gò Vấp', 'Đặt giữ hàng 24h tại Showroom', 'Hotline 0842.331.606']
     },
 
     // 1.9 Chính sách Đổi trả 1 đổi 1 trong 30 ngày

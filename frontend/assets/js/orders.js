@@ -1530,7 +1530,7 @@ async function printOrderInvoice(id) {
                     <div class="inv-company">
                         <h2>CÔNG TY CỔ PHẦN CÔNG NGHỆ TECHECOMMERCE VIỆT NAM</h2>
                         <p><strong>Mã số thuế:</strong> 0318992388</p>
-                        <p><strong>Địa chỉ:</strong> Tầng 5, Tòa nhà Innovation, TP. Hồ Chí Minh</p>
+                        <p><strong>Địa chỉ:</strong> 78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh</p>
                         <p><strong>Hotline:</strong> 0842.331.606 | <strong>Website:</strong> techshopvn.vercel.app</p>
                     </div>
                     <div class="inv-meta">
