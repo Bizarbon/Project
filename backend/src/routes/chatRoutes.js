@@ -59,12 +59,16 @@ router.patch('/knowledge/:id', protect, admin, async (req, res) => {
 
 const STATUS_LABELS = {
     pending: 'chờ xác nhận',
-    processing: 'đang xử lý',
+    confirmed: 'đã xác nhận',
+    processing: 'đang đóng gói & kiểm hàng',
+    ready_to_ship: 'sẵn sàng giao cho shipper',
     shipping: 'đang giao hàng',
-    completed: 'đã hoàn tất',
+    completed: 'giao hàng thành công',
     cancelled: 'đã hủy',
-    returned: 'đã trả hàng',
-    boom: 'giao hàng không thành công'
+    delivery_failed: 'giao hàng không thành công',
+    returned: 'đã chuyển hoàn',
+    boom: 'giao hàng không thành công',
+    return_requested: 'yêu cầu đổi/trả'
 };
 
 function escapeRegex(value) {
@@ -699,19 +703,18 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
     if (Array.isArray(previousProducts) && previousProducts.length > 0) {
         product = previousProducts[0];
     } else {
-        const words = text.replace(/tra gop|tinh gop|lai suat|moi thang|bao nhieu|thu tuc|co khong|the nao|huong dan|dieu kien|giay to/g, '').trim();
-        if (words && words.length >= 3) {
+        let words = text.replace(/tinh\s*tra\s*gop|tra\s*gop|tinh\s*gop|lai\s*suat|moi\s*thang|bao\s*nhieu|thu\s*tuc|co\s*khong|the\s*nao|huong\s*dan|dieu\s*kien|giay\s*to/g, ' ').trim();
+        words = words.replace(/^(?:tinh|cho|mua|xem|hoi|gia)\s+/i, '').trim();
+        if (words && words.length >= 2) {
+            const pattern = words.split(/\s+/).filter(Boolean).map(escapeRegex).join('.*');
             product = await Product.findOne({
                 active: { $ne: false },
-                name: { $regex: escapeRegex(words), $options: 'i' }
+                name: { $regex: pattern, $options: 'i' }
             });
         }
     }
 
-    // Nếu khách hỏi thủ tục trả góp chung mà chưa chọn máy cụ thể
-    const isGeneralInquiry = !product || /thu tuc|the nao|can gi|co the tin dung|khong co the|cccd|cmnd|bao nhieu tuoi|co tra gop|lai suat|dieu kien/i.test(text);
-
-    if (!product || (isGeneralInquiry && (!previousProducts || previousProducts.length === 0))) {
+    if (!product) {
         const reply = `💳 **CHÍNH SÁCH & THỦ TỤC TRẢ GÓP TẠI CỬA HÀNG:**\n\n` +
             `Cửa hàng hỗ trợ **2 hình thức trả góp linh hoạt**, cực kỳ nhanh chóng và an tâm:\n\n` +
             `1. 🪪 **Trả góp qua CCCD gắn chip (Không cần thẻ tín dụng):**\n` +
@@ -731,24 +734,32 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
     }
 
     const price = product.price;
-    const downPayment = Math.round(price * 0.3); // 30%
-    const remaining = price - downPayment;
-    const monthly6 = Math.round(remaining / 6);
-    const monthly12 = Math.round(remaining / 12);
+    const downPayment30 = Math.round(price * 0.3); // 30%
+    const remaining30 = price - downPayment30;
+    const monthly6_cccd = Math.round(remaining30 / 6);
+    const monthly12_cccd = Math.round(remaining30 / 12);
 
-    const reply = `💳 **BẢNG DỰ TÍNH TRẢ GÓP 0% LÃI SUẤT CHO ${product.name}:**\n\n` +
-        `• **Giá niêm yết sản phẩm:** **${money(price)}**\n` +
-        `• **Số tiền trả trước tối thiểu (30%):** **${money(downPayment)}** *(Lưu ý: Đây chỉ là khoản thanh toán đợt đầu, không phải là giá bán trọn gói của sản phẩm)*\n` +
-        `• **Khoản còn lại được chia đều:** ${money(remaining)}\n\n` +
-        `📅 **Dự tính số tiền thanh toán hàng tháng (0% lãi suất):**\n` +
-        `• Kỳ hạn **6 tháng**: khoảng **${money(monthly6)}/tháng**\n` +
-        `• Kỳ hạn **12 tháng**: khoảng **${money(monthly12)}/tháng**\n\n` +
-        `✨ **Điều kiện & Thủ tục:** Áp dụng qua thẻ tín dụng liên kết (0% lãi suất) hoặc đối tác tài chính (xét duyệt CCCD gắn chip từ 18 tuổi trong 15 phút). Bạn có thể bấm "+ Giỏ" và chọn hình thức Trả góp khi thanh toán nhé!`;
+    const monthly6_card = Math.round(price / 6);
+    const monthly12_card = Math.round(price / 12);
+
+    const reply = `💳 **BẢNG DỰ TÍNH TRẢ GÓP CHI TIẾT CHO ${product.name}:**\n\n` +
+        `• **Giá niêm yết chính hãng:** **${money(price)}**\n\n` +
+        `1. 💳 **Phương án 1: Trả góp 0% qua Thẻ tín dụng (Không cần trả trước):**\n` +
+        `   • Số tiền trả trước: **0 ₫ (Trả trước 0 đồng)**\n` +
+        `   • Kỳ hạn 6 tháng: khoảng **${money(monthly6_card)}/tháng** (0% lãi suất)\n` +
+        `   • Kỳ hạn 12 tháng: khoảng **${money(monthly12_card)}/tháng** (0% lãi suất)\n` +
+        `   • Ưu điểm: Áp dụng hơn 25 ngân hàng, chuyển đổi online ngay khi đặt hàng.\n\n` +
+        `2. 🪪 **Phương án 2: Trả góp qua CCCD gắn chip (Xét duyệt online 15 phút):**\n` +
+        `   • Trả trước tối thiểu (30%): khoảng **${money(downPayment30)}**\n` +
+        `   • Kỳ hạn 6 tháng: khoảng **${money(monthly6_cccd)}/tháng**\n` +
+        `   • Kỳ hạn 12 tháng: khoảng **${money(monthly12_cccd)}/tháng**\n` +
+        `   • Điều kiện: Chỉ cần CCCD gắn chip từ 18 tuổi, không giữ giấy tờ gốc, không cần chứng minh thu nhập.\n\n` +
+        `✨ **Đặc quyền kèm theo:** Miễn phí dán màn hình & cài đặt trọn gói, lỗi 1 đổi 1 trong 30 ngày đầu!`;
 
     return {
         reply,
         products: [product],
-        suggestions: ['Thêm sản phẩm này vào giỏ', 'Chính sách bảo hành', 'So sánh sản phẩm khác']
+        suggestions: ['Thêm sản phẩm này vào giỏ', 'Chính sách bảo hành', 'Địa chỉ Showroom xem máy', 'So sánh sản phẩm khác']
     };
 }
 
@@ -862,41 +873,113 @@ async function evaluateGameOrTaskCapability(message, context = {}) {
 
 async function answerOrderQuestion(req, message) {
     const user = req.user;
-    const orderId = (message.match(/#?\b(\d{1,8})\b/) || [])[1];
+    const cleanMsg = String(message || '');
 
-    if (!user) {
-        return {
-            reply: 'Để em kiểm tra đơn hàng chính xác, bạn hãy đăng nhập tài khoản đã đặt hàng rồi hỏi lại theo mẫu: "Kiểm tra đơn #123". Bạn cũng có thể vào mục "Đơn hàng của tôi" ở góc trang web.',
-            suggestions: ['Đăng nhập tài khoản', 'Chính sách vận chuyển', 'Chính sách đổi trả']
-        };
+    // Extract phone number (e.g. 0987654321 or +84987654321)
+    const phoneMatch = cleanMsg.match(/(?:(?:\+84|0)[3|5|7|8|9][0-9]{8})\b/) || cleanMsg.match(/\b(0[0-9]{9,10})\b/);
+    const phone = phoneMatch ? phoneMatch[0] : null;
+
+    // Extract Order ID (#31, đơn 31, mã 31, order 31, or standalone number if accompanied by order intent)
+    const orderIdMatch = cleanMsg.match(/(?:#|đơn\s*(?:hàng\s*)?|mã\s*(?:đơn\s*)?|order\s*)#?(\d{1,8})\b/i) || cleanMsg.match(/#(\d{1,8})\b/);
+    let orderId = orderIdMatch ? orderIdMatch[1] : null;
+    if (!orderId && !phone) {
+        const standaloneNum = cleanMsg.match(/\b(\d{1,8})\b/);
+        if (standaloneNum && /don|order|ma|kiem tra|tra cuu/i.test(cleanMsg)) {
+            orderId = standaloneNum[1];
+        }
     }
 
-    const filter = { customer: user._id };
-    if (orderId) filter._id = Number(orderId);
+    let orders = [];
+    const isGuestLookup = !user;
 
-    const orders = await Order.find(filter).sort({ orderDate: -1, createdAt: -1 }).limit(orderId ? 1 : 3);
+    if (user) {
+        const filter = { customer: user._id };
+        if (orderId) filter._id = Number(orderId);
+        orders = await Order.find(filter).sort({ createdAt: -1, orderDate: -1 }).limit(orderId ? 1 : 3);
+    } else {
+        if (phone) {
+            orders = await Order.find({
+                $or: [{ customerPhone: phone }, { recipientPhone: phone }]
+            }).sort({ createdAt: -1, orderDate: -1 }).limit(3);
+        } else if (orderId) {
+            const singleOrder = await Order.findById(Number(orderId));
+            if (singleOrder) orders = [singleOrder];
+        } else {
+            // Neither user, nor phone, nor orderId provided
+            return {
+                reply: `📦 **TRA CỨU TRẠNG THÁI & HÀNH TRÌNH ĐƠN HÀNG:**\n\n` +
+                    `Dạ để em kiểm tra tiến độ giao hàng ngay cho bạn, bạn vui lòng nhắn giúp em một trong các thông tin sau nhé:\n\n` +
+                    `• **Mã đơn hàng** (Ví dụ: \`#31\` hoặc \`Đơn 31\`)\n` +
+                    `• Hoặc **Số điện thoại** bạn đã dùng đặt hàng (Ví dụ: \`0987654321\`)\n` +
+                    `• Hoặc [Đăng nhập tài khoản](/pages/auth/login.html) để xem toàn bộ lịch sử tại mục **Đơn hàng của tôi**.\n\n` +
+                    `Em sẽ tra cứu tình trạng đóng gói, bưu tá vận chuyển (GHTK / Viettel Post / Hỏa tốc 2H) và thời gian giao hàng dự kiến ngay cho bạn ạ! 😊`,
+                suggestions: ['Đăng nhập tài khoản', 'Chính sách vận chuyển', 'Chính sách đồng kiểm COD', 'Hotline hỗ trợ 0842.331.606']
+            };
+        }
+    }
 
     if (!orders.length) {
+        let notFoundText = 'Tài khoản của bạn hiện chưa có đơn hàng nào.';
+        if (orderId) {
+            notFoundText = `Em chưa tìm thấy đơn hàng **#${orderId}** trong hệ thống. Bạn vui lòng kiểm tra lại mã đơn hoặc nhắn số điện thoại đặt hàng để em tra cứu nhé.`;
+        } else if (phone) {
+            notFoundText = `Em chưa tìm thấy đơn hàng nào liên kết với số điện thoại **${phone}**. Bạn kiểm tra lại số điện thoại hoặc cung cấp mã đơn hàng (VD: \`#31\`) giúp em nhé.`;
+        }
         return {
-            reply: orderId
-                ? `Em chưa tìm thấy đơn #${orderId} trong tài khoản của bạn. Bạn kiểm tra lại mã đơn hoặc vào mục Đơn hàng của tôi để xem danh sách đầy đủ nhé.`
-                : 'Tài khoản của bạn hiện chưa có đơn hàng nào. Bạn có thể nói nhu cầu mua sắm, em sẽ gợi ý sản phẩm phù hợp.',
-            suggestions: ['Tư vấn laptop học tập', 'Gợi ý điện thoại chụp ảnh', 'Sản phẩm đang còn hàng']
+            reply: `🔍 ${notFoundText}\n\n👉 Nếu cần hỗ trợ khẩn cấp, bạn có thể gọi hotline **0842.331.606** (miễn phí) để nhân viên trực kho tra cứu trực tiếp trên hệ thống nhé!`,
+            suggestions: ['Kiểm tra bằng số điện thoại khác', 'Chính sách vận chuyển & COD', 'Tư vấn sản phẩm mới', 'Hotline 0842.331.606']
         };
     }
 
     const lines = orders.map(order => {
-        const status = STATUS_LABELS[order.status] || order.status;
-        const payment = order.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán';
-        return `📦 **Đơn #${order._id}** (${money(order.totalAmount)})\n` +
-            `   • Trạng thái: **${status.toUpperCase()}**\n` +
-            `   • Thanh toán: ${payment}\n` +
-            `   • Mã vận đơn: ${order.trackingNumber ? `\`${order.trackingNumber}\`` : 'Đang cập nhật'}`;
+        const statusText = (STATUS_LABELS[order.status] || order.status || 'đang xử lý').toUpperCase();
+        let statusIcon = '📦';
+        if (order.status === 'shipping') statusIcon = '🚀';
+        else if (order.status === 'completed') statusIcon = '🎉';
+        else if (order.status === 'confirmed') statusIcon = '✅';
+        else if (order.status === 'cancelled') statusIcon = '❌';
+        else if (order.status === 'processing') statusIcon = '⚙️';
+
+        const payment = order.paymentStatus === 'paid' ? 'Đã thanh toán online' : (['ShipCOD', 'cod'].includes(order.paymentMethod) ? 'Thanh toán COD khi nhận hàng' : 'Chưa thanh toán');
+        const carrier = order.shippingUnit || (order.shippingStatus === 'delivering' ? 'Hỏa tốc nội thành 2H' : 'Đơn vị vận chuyển tiêu chuẩn (GHTK / Viettel Post)');
+        const tracking = order.trackingNumber ? `\`${order.trackingNumber}\`` : 'Đang cập nhật mã bưu phẩm';
+
+        // Recipient (masked if guest)
+        let recipientLine = '';
+        const rawPhone = order.recipientPhone || order.customerPhone || '';
+        const rawName = order.recipientName || order.customerName || 'Quý khách';
+        if (rawPhone || rawName) {
+            const phoneShow = isGuestLookup && rawPhone.length >= 7 
+                ? rawPhone.slice(0, 3) + '****' + rawPhone.slice(-3) 
+                : rawPhone;
+            recipientLine = `\n   • Người nhận: **${rawName}** (${phoneShow})`;
+        }
+
+        // Product items
+        let itemsList = '';
+        if (Array.isArray(order.products) && order.products.length > 0) {
+            const pLines = order.products.map(p => {
+                const variant = [p.color, p.storage].filter(Boolean).join(' - ');
+                return `     - ${p.quantity}x **${p.productName || 'Sản phẩm'}** ${variant ? `*(${variant})*` : ''} — ${money(p.price)}`;
+            }).join('\n');
+            itemsList = `\n   • Sản phẩm trong đơn:\n${pLines}`;
+        }
+
+        return `📦 **ĐƠN HÀNG #${order._id}** — Tổng tiền: **${money(order.totalAmount)}**\n` +
+            `   • Trạng thái: ${statusIcon} **${statusText}**\n` +
+            `   • Thanh toán: ${payment} (${order.paymentMethod || 'COD'})\n` +
+            `   • Đơn vị vận chuyển: ${carrier}\n` +
+            `   • Mã vận đơn: ${tracking}` +
+            recipientLine +
+            itemsList;
     });
 
     return {
-        reply: `🚚 **Thông tin đơn hàng của bạn:**\n\n${lines.join('\n\n')}\n\n👉 Bạn có thể vào mục **Đơn hàng của tôi** để xem chi tiết từng món và theo dõi lộ trình giao hàng thời gian thực.`,
-        suggestions: ['Xem đơn hàng của tôi', 'Chính sách vận chuyển', 'Tư vấn mua thêm phụ kiện']
+        reply: `🚚 **THÔNG TIN TIẾN ĐỘ ĐƠN HÀNG CỦA BẠN:**\n\n` +
+            `${lines.join('\n\n---\n\n')}\n\n` +
+            `✨ **Chính sách an tâm:** Toàn bộ đơn hàng đều được **mở hộp đồng kiểm** trước khi thanh toán COD và hỗ trợ **1 đổi 1 trong 30 ngày đầu** nếu có lỗi nhà sản xuất.\n` +
+            `👉 Bạn có thể vào mục **[Đơn hàng của tôi](/pages/profile/orders.html)** để xem biên nhận chi tiết hoặc gọi hotline **0842.331.606** khi cần giao gấp nhé!`,
+        suggestions: ['Xem đơn hàng của tôi', 'Chính sách đồng kiểm COD', 'Chính sách đổi trả 30 ngày', 'Hotline 0842.331.606']
     };
 }
 
@@ -1731,15 +1814,18 @@ async function answerPolicyQuestion(message) {
     }
 
     // 1. Địa chỉ showroom / Cửa hàng xem máy trực tiếp
-    if (['shop o dau', 'cua hang o dau', 'o dau vay', 'dia chi cua hang', 'dia chi shop', 'dia chi o dau', 'o dau', 'showroom', 'chi nhanh', 'den xem truc tiep', 'xem may o dau', 'co showroom khong', 'dia chi'].some(k => text.includes(k))) {
-        return '📍 **HỆ THỐNG SHOWROOM & ĐỊA CHỈ TRẢI NGHIỆM CỬA HÀNG:**\n\n' +
-            'Cửa hàng mở cửa từ **08:30 – 21:30** tất cả các ngày trong tuần (kể cả Thứ 7, Chủ Nhật & ngày lễ):\n\n' +
-            '• **Showroom 1 (TP.HCM):** 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM\n' +
-            '• **Showroom 2 (Hà Nội):** 78 Thái Hà, P. Trung Liệt, Q. Đống Đa, Hà Nội\n\n' +
-            '✨ **Đặc quyền khi ghé Showroom:**\n' +
-            '- Trải nghiệm thực tế 100% các dòng máy demo (test camera, gõ thử phím cơ, thử màn hình 144Hz...). \n' +
-            '- Kỹ thuật viên hỗ trợ cài đặt phần mềm, chuyển dữ liệu và dán màn hình miễn phí tại chỗ.\n' +
-            '- Bãi đỗ xe ô tô và xe máy rộng rãi, an toàn, có nhân viên hướng dẫn nhiệt tình.';
+    if (['shop o dau', 'cua hang o dau', 'o dau vay', 'dia chi cua hang', 'dia chi shop', 'dia chi o dau', 'o dau', 'showroom', 'chi nhanh', 'den xem truc tiep', 'xem may o dau', 'co showroom khong', 'dia chi', 'tim showroom'].some(k => text.includes(k))) {
+        return {
+            reply: '📍 **HỆ THỐNG SHOWROOM & ĐỊA CHỈ TRẢI NGHIỆM CỬA HÀNG:**\n\n' +
+                'Cửa hàng mở cửa từ **08:30 – 21:30** tất cả các ngày trong tuần (kể cả Thứ 7, Chủ Nhật & ngày lễ):\n\n' +
+                '• **🏢 Showroom 1 (TP.HCM):** 135 Nguyễn Thị Thập, P. Tân Hưng, Quận 7, TP.HCM\n' +
+                '  *(Có bãi đỗ ô tô rộng rãi, quầy trải nghiệm thực tế 100% iPhone, MacBook, iPad, Laptop Gaming, kỹ thuật viên chuyển dữ liệu miễn phí)*\n\n' +
+                '• **🏢 Showroom 2 (Hà Nội):** 78 Thái Hà, P. Trung Liệt, Q. Đống Đa, Hà Nội\n' +
+                '  *(Trung tâm phố công nghệ, sẵn máy mới nguyên seal VN/A, quẹt thẻ mPOS hoàn toàn miễn phí)*\n\n' +
+                '📞 **Hotline tư vấn & đặt giữ máy trước:** **0842.331.606** (Miễn phí cuộc gọi)\n\n' +
+                '👉 Bạn dự kiến ghé showroom nào để em chuẩn bị sẵn máy đón tiếp bạn chu đáo nhất nhé! 😊',
+            suggestions: ['Showroom 135 Nguyễn Thị Thập Q7', 'Showroom 78 Thái Hà Đống Đa', 'Đặt giữ hàng 24h tại Showroom', 'Hotline 0842.331.606']
+        };
     }
 
     // 2. Chính sách đồng kiểm khi nhận hàng (BẮT BUỘC ĐẶT TRƯỚC "doi tra" / "tra hang")
@@ -2207,7 +2293,12 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             response = await answerVoucherQuestion();
         } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => hasWordOrPhrase(text, k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => hasWordOrPhrase(text, k))) {
             response = await answerInstallmentQuestion(message, req.body.context?.lastProducts);
-        } else if (['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi'].some(k => hasWordOrPhrase(text, k))) {
+        } else if (
+            ['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi', 'don cua em', 'kiem tra don', 'tra cuu don', 'kiem tra hang da den dau', 'khi nao giao'].some(k => hasWordOrPhrase(text, k)) ||
+            /(?:tra cuu|kiem tra|check|trang thai|tinh trang)?\s*(?:don|order|ma don|van don)\s*#?\d{1,8}\b/i.test(text) ||
+            /(?:kiem tra|tra cuu)\s+don\b/i.test(text) ||
+            /(?:don hang|don cua toi|don cua em)\s+(?:sdt\s*)?(?:0|\+84)\d{9,10}\b/i.test(text)
+        ) {
             response = await answerOrderQuestion(req, message);
         } else if (policyAnswer) {
             response = {

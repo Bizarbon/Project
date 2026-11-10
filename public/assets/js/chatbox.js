@@ -5,11 +5,12 @@
     const root = typeof window.getAppBasePath === 'function' ? window.getAppBasePath() : getBasePath();
     const apiUrl = window.API_URL || 'http://localhost:5000/api';
     const starterSuggestions = [
-        'Tìm máy dưới 15 triệu chơi mượt Genshin Impact',
-        'Tìm tai nghe chống ồn tốt nhất để đi máy bay',
+        '📦 Tra cứu đơn hàng',
+        '💳 Tính trả góp 0%',
+        '📍 Tìm showroom gần nhất',
         'Tư vấn laptop dưới 15 triệu',
         'Mã giảm giá hôm nay',
-        'Tính trả góp 0%'
+        'Tìm máy chơi mượt Genshin'
     ];
 
     function getBasePath() {
