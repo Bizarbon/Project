@@ -28,7 +28,7 @@ function applyPreGuardrails({ nluResult, rawMessage, context = {} }) {
             intercepted: true,
             action: 'block_prompt_injection',
             response: {
-                reply: 'Dạ em là Trợ lý AI Mua sắm của TechEcommerce ạ! Em luôn sẵn sàng hỗ trợ bạn tìm kiếm và tư vấn các thiết bị công nghệ chính hãng tốt nhất. Bạn đang cần tìm sản phẩm nào để em giúp nhé! 😊',
+                reply: 'Dạ em là Trợ lý AI Mua sắm của cửa hàng ạ! Em luôn sẵn sàng hỗ trợ bạn tìm kiếm và tư vấn các thiết bị công nghệ chính hãng tốt nhất. Bạn đang cần tìm sản phẩm nào để em giúp nhé! 😊',
                 suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Mã giảm giá hôm nay'],
                 context: { ...(context || {}), stage: 'safe_redirection' }
             }
@@ -42,7 +42,7 @@ function applyPreGuardrails({ nluResult, rawMessage, context = {} }) {
             intercepted: true,
             action: 'route_to_support',
             response: {
-                reply: `Dạ TechEcommerce thành thật xin lỗi vì trải nghiệm chưa trọn vẹn của bạn ạ! 🙏 Để hỗ trợ xử lý vấn đề của bạn nhanh nhất, bạn vui lòng liên hệ trực tiếp hotline CSKH: ${HOTLINE_SUPPORT} (miễn phí) hoặc Zalo hỗ trợ kỹ thuật (${ZALO_SUPPORT}) để chuyên viên xử lý ngay cho bạn nhé!`,
+                reply: `Dạ bên em thành thật xin lỗi vì trải nghiệm chưa trọn vẹn của bạn ạ! 🙏 Để hỗ trợ xử lý vấn đề của bạn nhanh nhất, bạn vui lòng liên hệ trực tiếp hotline CSKH: ${HOTLINE_SUPPORT} (miễn phí) hoặc Zalo hỗ trợ kỹ thuật (${ZALO_SUPPORT}) để chuyên viên xử lý ngay cho bạn nhé!`,
                 suggestions: ['Kiểm tra đơn hàng', 'Chính sách bảo hành', 'Gặp tư vấn viên'],
                 context: { ...(context || {}), stage: 'support_escalation' }
             }
@@ -50,12 +50,14 @@ function applyPreGuardrails({ nluResult, rawMessage, context = {} }) {
     }
 
     // 3. Xử lý MẶT HÀNG NGOÀI DANH MỤC (Out of catalog: Thú cưng / Hamster / Gia dụng / Xe cộ...)
+    // Để consultationCoordinator.js điều phối với câu trả lời chi tiết theo từng loại mặt hàng cụ thể (lót chuột, pin đồng hồ, máy ảnh...)
+    // Nếu là thú cưng / hamster trực tiếp
     if (nluResult.entities?.isPetHamster) {
         return {
             intercepted: true,
             action: 'out_of_catalog_pet_hamster',
             response: {
-                reply: 'Dạ TechEcommerce là cửa hàng chuyên về thiết bị công nghệ chính hãng nên em chưa có chuột hamster hay thú cưng đâu ạ! 🐹\n\nTuy nhiên, nếu bạn đang cần tìm **chuột máy tính** (chuột văn phòng không dây, chuột gaming) để phục vụ học tập và làm việc thì em luôn có sẵn những mẫu rất xịn nhé!',
+                reply: 'Dạ bên em là cửa hàng chuyên về thiết bị công nghệ chính hãng nên em chưa có chuột hamster hay thú cưng đâu ạ! 🐹\n\nTuy nhiên, nếu bạn đang cần tìm **chuột máy tính** (chuột văn phòng không dây, chuột gaming) để phục vụ học tập và làm việc thì em luôn có sẵn những mẫu rất xịn nhé!',
                 products: [],
                 suggestions: ['Chuột gaming Logitech', 'Chuột văn phòng không dây', 'Xem tất cả phụ kiện', 'Mã giảm giá hôm nay'],
                 context: {
@@ -64,23 +66,6 @@ function applyPreGuardrails({ nluResult, rawMessage, context = {} }) {
                     category: 'Phụ kiện',
                     productType: 'mouse',
                     lastQuestionKey: 'pet_hamster_redirect'
-                }
-            }
-        };
-    }
-
-    if (nluResult.intents.includes('out_of_catalog')) {
-        return {
-            intercepted: true,
-            action: 'out_of_catalog_general',
-            response: {
-                reply: 'Dạ TechEcommerce chỉ chuyên kinh doanh các thiết bị công nghệ chính hãng (Điện thoại, Laptop, Tablet, Phụ kiện, Máy chơi game...) nên em chưa có mặt hàng này đâu ạ! 🙏 Nếu bạn cần tìm thiết bị công nghệ nào thì cứ bảo em nhé.',
-                products: [],
-                suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Xem Phụ kiện công nghệ', 'Mã giảm giá hôm nay'],
-                context: {
-                    ...(context || {}),
-                    stage: 'out_of_catalog_redirect',
-                    lastQuestionKey: 'out_of_catalog_general'
                 }
             }
         };
@@ -145,7 +130,7 @@ function applyPostGuardrails({ response, nluResult, context = {} }) {
         if (pattern.test(reply)) {
             console.warn(`[Guardrails Warning] Phát hiện câu hứa hẹn không hợp lệ trong phản hồi AI: ${pattern}`);
             // Làm mềm câu hứa hẹn thành câu thông tin chính sách chuẩn
-            reply = reply.replace(pattern, 'Mức giá niêm yết tại TechEcommerce đã là giá ưu đãi tốt nhất thị trường');
+            reply = reply.replace(pattern, 'Mức giá niêm yết tại cửa hàng đã là giá ưu đãi tốt nhất thị trường');
             modified = true;
         }
     }

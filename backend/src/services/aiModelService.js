@@ -17,10 +17,11 @@ const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
 const CANDIDATE_MODELS = Array.from(new Set([
     DEFAULT_MODEL,
     'gemini-flash-lite-latest',
-    'gemini-3.8-flash',
-    'gemini-flash-latest'
+    'gemini-2.5-flash-lite',
+    'gemini-flash-latest',
+    'gemini-3.8-flash'
 ]));
-const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 15000);
+const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 10000);
 
 // Bộ nhớ tạm đánh dấu các model đang bị giới hạn quota (429) hoặc không tồn tại (404)
 // để các lượt chat tiếp theo chuyển nhánh tức thì (0ms) mà không phải chờ timeout.

@@ -388,6 +388,92 @@ const KNOWN_UNSUPPORTED_ITEMS = [
         customReply: `Dạ bên em chỉ chuyên kinh doanh các thiết bị công nghệ chính hãng (Điện thoại, Laptop, Tablet, Phụ kiện, Máy chơi game...) nên em chưa có mặt hàng này đâu ạ! 🙏 Nếu bạn cần tìm thiết bị công nghệ nào thì cứ bảo em nhé.`,
         suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Xem Phụ kiện công nghệ', 'Mã giảm giá hôm nay']
     },
+    // 0b. Lót chuột / Bàn di chuột (Phân biệt với chuột máy tính)
+    {
+        id: 'mousepad_deskmat',
+        keywords: [
+            'lot chuot', 'lót chuột', 'pad chuot', 'pad chuột', 'ban di chuot', 'bàn di chuột',
+            'mouse pad', 'mousepad', 'deskmat', 'mieng lot chuot', 'miếng lót chuột',
+            'tam lot chuot', 'tấm lót chuột', 'tham lot chuot', 'thảm lót chuột'
+        ],
+        name: 'lót chuột / bàn di chuột (mousepad / deskmat)',
+        customReply: `Dạ chào bạn! Hiện tại cửa hàng **chưa kinh doanh mặt hàng lót chuột / bàn di chuột (mousepad / deskmat)** ạ. 🙏\n\n` +
+            `Cửa hàng chuyên phân phối chính hãng 100% các dòng **chuột máy tính** và **bàn phím cơ / không dây** cao cấp hỗ trợ làm việc và chơi game đỉnh cao:\n` +
+            `• 🖱️ **Chuột máy tính không dây & Gaming:** **Logitech MX Master 3S** (Cuộn siêu tốc vô cực, công thái học, giảm 90% tiếng ồn, pin 70 ngày), **Logitech G502 Hero**, **Logitech G304 Lightspeed**, **Microsoft Arc Mouse** (Gập phẳng di động).\n` +
+            `• ⌨️ **Bàn phím cơ & không dây:** **Logitech MX Keys S**, **Logitech POP Keys**, **Logitech G413 SE Mechanical**.\n\n` +
+            `👉 Nếu bạn đang cần tìm chuột máy tính hay bàn phím chất lượng cho góc làm việc/học tập, bạn nhắn em mức ngân sách để em tư vấn mẫu phù hợp nhất nhé! 😊`,
+        suggestions: ['Chuột Logitech MX Master 3S', 'Chuột gaming Logitech G502', 'Bàn phím Logitech MX Keys S', 'Xem phụ kiện công nghệ']
+    },
+    // 0c. Pin cúc áo rời / Thay pin đồng hồ kim / đồng hồ cơ
+    {
+        id: 'watch_batteries',
+        keywords: [
+            'pin dong ho', 'pin đồng hồ', 'thay pin dong ho', 'thay pin đồng hồ',
+            'pin cuc ao', 'pin cúc áo', 'pin cr2032', 'pin cr2025', 'pin cr2016',
+            'thay pin smartwatch', 'sua pin dong ho', 'thay pin dong ho co', 'thay pin dong ho kim'
+        ],
+        name: 'pin cúc áo / thay pin đồng hồ truyền thống',
+        customReply: `Dạ chào bạn! Hiện tại cửa hàng **chưa bán các loại pin cúc áo rời (CR2032, CR2025...) cũng như chưa có dịch vụ thay pin cho đồng hồ cơ / đồng hồ kim truyền thống** ạ. 🙏\n\n` +
+            `Tất cả các dòng **Đồng hồ thông minh (Smartwatch)** tại cửa hàng đều sử dụng pin sạc tích hợp kèm đế sạc nam châm / sạc nhanh chính hãng:\n` +
+            `• ⌚ **Apple Watch Series 10 / SE 2024:** Sạc nhanh tiện lợi, pin dùng cả ngày, theo dõi sức khỏe và đồng bộ trọn vẹn với iPhone.\n` +
+            `• ⌚ **Samsung Galaxy Watch:** Đo chỉ số cơ thể BIA, điện tâm đồ ECG, pin bền bỉ đồng bộ mượt mà với điện thoại Android.\n` +
+            `• ⌚ **Garmin Forerunner / Venu:** Pin siêu trâu từ 7 đến 14 ngày, GPS độc lập chuẩn xác cho dân thể thao chuyên nghiệp.\n\n` +
+            `👉 Bạn có muốn tham khảo các mẫu Smartwatch chính hãng này không, bạn nhắn em mức ngân sách để em tư vấn chi tiết cho bạn nhé! 😊`,
+        suggestions: ['Apple Watch Series 10', 'Đồng hồ Garmin pin 14 ngày', 'Samsung Galaxy Watch', 'Smartwatch dưới 5 triệu']
+    },
+    // 0d. Ốp lưng / Kính cường lực / Dán màn hình bán lẻ
+    {
+        id: 'cases_and_screen_protectors',
+        keywords: [
+            'op lung', 'ốp lưng', 'kinh cuong luc', 'kính cường lực', 'dan man hinh', 'dán màn hình',
+            'dan cuong luc', 'dán cường lực', 'bao da', 'mieng dan man hinh', 'miếng dán màn hình',
+            'dan ppf', 'dán ppf', 'skin dien thoai', 'dán skin'
+        ],
+        name: 'ốp lưng / kính cường lực / dán màn hình',
+        excludeIf: (normText) => /nen dan|so sanh|hay dan|tot hon|hay ppf|hay cuong luc|co chong vo|tang kem gi|co ho tro chuyen du lieu/.test(normText),
+        customReply: `Dạ chào bạn! Hiện tại cửa hàng **chưa kinh doanh ốp lưng, bao da và dịch vụ dán kính cường lực / dán màn hình bán lẻ** ạ. 🙏\n\n` +
+            `*(Lưu ý: Khi mua điện thoại hoặc máy tính bảng tại cửa hàng, quý khách luôn được hỗ trợ dán màn hình và quà tặng kèm bảo vệ máy chu đáo).* 🎁\n\n` +
+            `Cửa hàng tập trung phân phối chính hãng 100% các dòng thiết bị công nghệ cao cấp cùng phụ kiện điện tử chính hãng:\n` +
+            `• 📱 **Điện thoại:** iPhone 16 / 15 Series, Samsung Galaxy S25 / S24 Ultra, Xiaomi, OPPO chính hãng.\n` +
+            `• 🔋 **Phụ kiện điện tử:** Củ sạc nhanh GaN Anker 100W/65W, sạc Baseus, cáp Type-C Ugreen, pin sạc dự phòng 20.000mAh, tai nghe chống ồn AirPods Pro 2, Sony WH-1000XM5.\n\n` +
+            `👉 Nếu bạn quan tâm đến dòng điện thoại mới hoặc phụ kiện sạc / tai nghe chính hãng, bạn chia sẻ nhu cầu để em hỗ trợ nhé! 😊`,
+        suggestions: ['Củ sạc nhanh Anker', 'Pin sạc dự phòng', 'Tai nghe AirPods Pro 2', 'Điện thoại iPhone chính hãng']
+    },
+    // 0e. Dịch vụ sửa chữa / Thay màn hình / Thay pin lẻ ngoài
+    {
+        id: 'repair_services',
+        keywords: [
+            'sua chua', 'sửa chữa', 'ep kinh', 'ép kính', 'thay man hinh', 'thay màn hình',
+            'sua dien thoai', 'sửa điện thoại', 'sua laptop', 'sửa laptop',
+            'thay pin dien thoai', 'thay pin điện thoại', 'thay pin iphone', 'thay pin laptop',
+            'sua may tinh', 'sửa máy tính', 'sua ipad', 'sửa ipad'
+        ],
+        name: 'dịch vụ sửa chữa / thay màn hình / thay pin ngoài',
+        excludeIf: (normText) => /bao hanh|chinh sach|1 doi 1|doi tra/.test(normText),
+        customReply: `Dạ chào bạn! Hiện tại cửa hàng bên em chuyên phân phối **100% thiết bị công nghệ mới nguyên seal chính hãng**, nên bên em **chưa nhận dịch vụ sửa chữa dịch vụ bên ngoài, thay màn hình / ép kính hay thay pin lẻ** ạ. 🙏\n\n` +
+            `Tất cả sản phẩm mua tại hệ thống cửa hàng đều được áp dụng chính sách bảo hành chính hãng uy tín:\n` +
+            `• 🛡️ Bảo hành chính hãng 12 - 24 tháng tại các trung tâm bảo hành ủy quyền của Apple, Samsung, ASUS, Acer, Dell, HP...\n` +
+            `• 🔄 Chính sách lỗi 1 đổi 1 trong 30 ngày đầu tiên nếu phát sinh lỗi từ nhà sản xuất.\n\n` +
+            `👉 Nếu bạn đang có sản phẩm mua tại cửa hàng cần hỗ trợ bảo hành hoặc muốn lên đời máy mới, bạn nhắn em để em hỗ trợ ngay nhé! 😊`,
+        suggestions: ['Chính sách bảo hành', 'Thu cũ đổi mới', 'Tư vấn Laptop mới', 'Tư vấn Điện thoại mới']
+    },
+    // 0f. Linh kiện máy tính để bàn rời / Ráp PC
+    {
+        id: 'pc_components',
+        keywords: [
+            'card man hinh', 'card màn hình', 'vga', 'card roi', 'card rời',
+            'mainboard', 'bo mach chu', 'bo mạch chủ', 'cpu roi', 'cpu rời',
+            'nguon pc', 'nguồn pc', 'case may tinh', 'case máy tính', 'vo case', 'vỏ case',
+            'build pc', 'rap pc', 'ráp pc', 'rap may tinh', 'ráp máy tính', 'tan nhiet nuoc', 'tản nhiệt nước'
+        ],
+        name: 'linh kiện PC rời / dịch vụ ráp máy tính bàn',
+        customReply: `Dạ chào bạn! Hiện tại cửa hàng **chưa kinh doanh linh kiện máy tính để bàn rời (như Card màn hình rời VGA, Mainboard bo mạch chủ, Nguồn PC, Vỏ case) hay dịch vụ ráp PC theo yêu cầu** ạ. 🙏\n\n` +
+            `Cửa hàng tập trung phân phối các giải pháp máy tính xách tay (Laptop) đồng bộ hiệu năng cực cao và các hệ máy chơi game thế hệ mới:\n` +
+            `• 💻 **Laptop Gaming đỉnh cao:** ASUS ROG Strix, Acer Nitro / Predator, Lenovo Legion, MSI Cyborg trang bị GPU RTX 40 Series mạnh mẽ, tản nhiệt buồng hơi tối ưu, cơ động di chuyển mọi nơi.\n` +
+            `• 🎮 **Cỗ máy chơi game console & PC cầm tay:** PlayStation 5 Slim 4K, Steam Deck OLED (chơi mượt kho game Steam đồ họa đỉnh cao).\n\n` +
+            `👉 Bạn có muốn tham khảo các mẫu Laptop Gaming cấu hình khủng tương đương PC để tiện vừa làm việc vừa chiến game không ạ? 😊`,
+        suggestions: ['Laptop Gaming ASUS ROG', 'Laptop Acer Nitro / Predator', 'PlayStation 5 Slim', 'Steam Deck OLED']
+    },
     // 1. Đồng hồ kim / đồng hồ cơ / thương hiệu đồng hồ thời trang truyền thống
     {
         id: 'traditional_watches',
@@ -785,6 +871,18 @@ function isHardBudgetLimit(text) {
 
 function inferCategory(text) {
     const norm = normalizeText(text);
+
+    // Bỏ qua các phụ kiện / linh kiện / dịch vụ không kinh doanh để không gán sai danh mục
+    const uncarriedAccessoriesOrServices = [
+        'lot chuot', 'pad chuot', 'ban di chuot', 'mouse pad', 'mousepad', 'deskmat',
+        'pin dong ho', 'thay pin dong ho', 'pin cuc ao', 'pin cr2032', 'pin cr2025',
+        'op lung', 'kinh cuong luc', 'dan man hinh', 'dan cuong luc', 'bao da',
+        'sua chua', 'ep kinh', 'thay man hinh', 'thay pin',
+        'card man hinh', 'vga', 'mainboard', 'bo mach chu', 'nguon pc', 'build pc', 'rap pc'
+    ];
+    if (uncarriedAccessoriesOrServices.some(k => hasWordOrPhrase(norm, k) || norm.includes(k))) {
+        return '';
+    }
 
     // Bỏ qua đồng hồ truyền thống / đồng hồ kim / đồng hồ cơ / thương hiệu đồng hồ thời trang
     const traditionalWatchKeywords = [
@@ -1497,8 +1595,17 @@ async function handleDeepProductConsultation(product, context = {}, userMessage 
 function detectProductType(text) {
     const norm = normalizeText(text);
     const isPetMouse = /hamster|bach|lang|thu cung|nuoi|long|chuong|bo u/i.test(norm);
+    const isMousePad = /lot chuot|lót chuột|pad chuot|pad chuột|ban di chuot|bàn di chuột|mouse ?pad|deskmat|mieng lot chuot|tam lot chuot|tham lot chuot/i.test(norm);
+    const isWatchBattery = /pin dong ho|pin đồng hồ|thay pin dong ho|thay pin đồng hồ|pin cuc ao|pin cúc áo|cr2032|cr2025/i.test(norm);
+    const isCaseOrScreen = /op lung|ốp lưng|kinh cuong luc|kính cường lực|dan man hinh|dán màn hình|bao da|dan cuong luc/i.test(norm);
+    const isRepair = /sua chua|sửa chữa|ep kinh|ép kính|thay man hinh|thay màn hình|thay pin/i.test(norm);
+    const isPcPart = /card man hinh|card màn hình|vga|mainboard|bo mach chu|bo mạch chủ|nguon pc|build pc|rap pc/i.test(norm);
+
     return PRODUCT_TYPE_INTENTS.find(type => {
-        if (type.key === 'mouse' && isPetMouse) return false;
+        if (type.key === 'mouse' && (isPetMouse || isMousePad)) return false;
+        if ((type.key === 'smartwatch' || type.key === 'apple_watch') && isWatchBattery) return false;
+        if ((type.key === 'phone' || type.key === 'iphone' || type.key === 'galaxy') && (isCaseOrScreen || isRepair)) return false;
+        if ((type.key === 'laptop' || type.key === 'macbook' || type.key === 'rog') && (isRepair || isPcPart)) return false;
         return type.aliases.some(alias => hasWordOrPhrase(text, alias));
     }) || null;
 }
@@ -4294,6 +4401,10 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     const unsupportedItem = checkUnsupportedProduct(message);
     if (unsupportedItem) {
         return buildOutOfCatalogResponse(unsupportedItem, message);
+    }
+
+    if (prev.nluIntents?.includes('out_of_catalog')) {
+        return buildOutOfCatalogResponse(prev.nlu?.entities?.outOfCatalogType || null, message);
     }
 
     if (authoritativeCategory === 'Máy trợ thính' && isHearingAidMedicalQuestion(message)) {

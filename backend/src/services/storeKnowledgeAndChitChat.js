@@ -1073,7 +1073,7 @@ const CHIT_CHAT_RULES = [
             'dat the ai mua noi', 'khong co tien dau'
         ],
         reply: `Dạ em thấu hiểu lắm nè! Tài chính là chuyện quan trọng mà, bạn cứ từ từ tích lũy nha, không việc gì phải vội đâu ạ. 🍀\n\n` +
-            `Khi nào bạn có nhu cầu sắm máy, TechEcommerce luôn có sẵn:\n` +
+            `Khi nào bạn có nhu cầu sắm máy, cửa hàng bên em luôn có sẵn:\n` +
             `• Các dòng máy phân khúc **'học sinh sinh viên' ngon - bổ - rẻ** chỉ từ vài triệu đồng nhưng cấu hình rất bền bỉ.\n` +
             `• Chương trình **Trả góp 0% trả trước 0 đồng** chia nhỏ mỗi tháng chỉ vài trăm nghìn cực kỳ nhẹ ví.\n\n` +
             `Cứ ghé em tham khảo cấu hình và ngắm nghía trước cho vui nha, khi nào sẵn sàng thì rinh máy sau cũng được nè! 😊`,
@@ -1141,7 +1141,7 @@ const CHIT_CHAT_RULES = [
             'hat mot bai di', 'hat karaoke', 'hat hay khong', 'ca mot bai di'
         ],
         reply: `Dạ em xin trổ tài làm ca sĩ 'cây nhà lá vườn' của cửa hàng gửi tặng bạn bài rap công nghệ vui này nha: 🎶🎤\n\n` +
-            `*"Sáng ra lướt TechEcommerce, ✨\n` +
+            `*"Sáng ra lướt xem đồ công nghệ, ✨\n` +
             `Điện thoại xịn xò, giá lại mê!\n` +
             `MacBook, ROG hay Z Fold,\n` +
             `Chính hãng nguyên seal chẳng điểm chê!\n` +

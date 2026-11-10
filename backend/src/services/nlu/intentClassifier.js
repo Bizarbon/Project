@@ -72,6 +72,16 @@ function extractBrand(text) {
  */
 function extractCategory(text) {
     const s = text.toLowerCase();
+
+    // Loại trừ các mặt hàng / linh kiện / dịch vụ ngoài danh mục
+    const isMousePad = /lót chuột|lot chuot|pad chuột|pad chuot|bàn di chuột|ban di chuot|mouse ?pad|deskmat/i.test(s);
+    const isWatchBattery = /pin đồng hồ|pin dong ho|thay pin|pin cúc áo|pin cuc ao|cr2032|cr2025/i.test(s);
+    const isCaseOrScreen = /ốp lưng|op lung|kính cường lực|kinh cuong luc|dán màn hình|dan man hinh|bao da/i.test(s);
+    const isRepair = /sửa chữa|sua chua|ép kính|ep kinh|thay màn hình|thay man hinh/i.test(s);
+    const isPcPart = /card màn hình|card man hinh|vga|mainboard|bo mạch chủ|bo mach chu|nguồn pc|nguon pc|build pc|ráp pc|rap pc/i.test(s);
+
+    if (isCaseOrScreen || isRepair || isPcPart) return null;
+
     if (/iphone|điện thoại|dien thoai|smartphone|galaxy s|galaxy z|s\d{2}|redmi|xiaomi 1|oppo find|reno/i.test(s)) {
         return 'Điện thoại';
     }
@@ -84,15 +94,15 @@ function extractCategory(text) {
     if (/tai nghe|earphone|headphone|airpods|buds|freebuds|loa|audio|earbuds/i.test(s)) {
         return 'Tai nghe';
     }
-    if (/đồng hồ|dong ho|smartwatch|apple watch|galaxy watch|forerunner|watch fit|vòng đeo tay|band 9/i.test(s)) {
+    if (!isWatchBattery && /đồng hồ|dong ho|smartwatch|apple watch|galaxy watch|forerunner|watch fit|vòng đeo tay|band 9/i.test(s)) {
         return 'Đồng hồ thông minh';
     }
     if (/máy chơi game|may choi game|console|playstation|ps5|switch|nintendo switch|rog ally|legion go|claw/i.test(s)) {
         return 'Máy chơi game';
     }
-    // Kiểm tra loại trừ nếu là chuột thú cưng / hamster
+    // Kiểm tra loại trừ nếu là chuột thú cưng / hamster hoặc lót chuột
     const isPetMouse = /hamster|thú cưng|thu cung|nuôi|nuoi|lồng|long|chuồng|chuong|chuột bạch|chuot bach|chuột lang|chuot lang|bọ ú|bo u/i.test(s);
-    if (!isPetMouse && /chuột|chuot|bàn phím|ban phim|củ sạc|cu sac|dây sạc|day sac|cáp|hub usb|gimbal|osmo pocket|phụ kiện|phu kien/i.test(s)) {
+    if (!isPetMouse && !isMousePad && /chuột|chuot|bàn phím|ban phim|củ sạc|cu sac|dây sạc|day sac|cáp|hub usb|gimbal|osmo pocket|phụ kiện|phu kien/i.test(s)) {
         return 'Phụ kiện';
     }
     return null;
@@ -285,6 +295,13 @@ function classifyIntent(normalizedText, unaccentedText) {
             }
             if (isOutOfCatalog) break;
         }
+    }
+
+    // Ngoại trừ các câu hỏi mẹo công nghệ / tư vấn so sánh (VD: "Nên dán cường lực hay dán PPF")
+    const isTechAdviceQuestion = /nên dán|nen dan|so sánh|so sanh|hay dán|hay dan|tốt hơn|tot hon|hay ppf|hay cường lực|hay cuong luc|có chống vỡ|co chong vo|có chai pin|co chai pin/i.test(text + ' ' + noAcc);
+    if (isTechAdviceQuestion) {
+        isOutOfCatalog = false;
+        outOfCatalogType = null;
     }
 
     if (!isOutOfCatalog) {
