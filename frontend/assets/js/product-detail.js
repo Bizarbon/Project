@@ -1331,7 +1331,7 @@ function renderProduct() {
     const relatedContainer = document.getElementById('relatedProducts');
     if (relatedContainer) {
         relatedContainer.innerHTML = relatedProducts.length > 0 ? relatedProducts.map(p => `
-            <a class="related-product-card" href="product.html?id=${p._id}">
+            <a class="related-product-card" href="product.html?id=${p._id}" draggable="true" data-product-card-id="${p._id}" data-product-name="${escapeHTML(p.name)}" data-product-price="${fmt(p.price)}" data-product-img="${escapeHTML(resolveProductImage(p.image, '../../'))}" data-product-category="${escapeHTML(p.category || 'Công nghệ')}" title="Kéo thả vào khung chat AI để tư vấn">
                 <div class="related-thumb-wrapper">
                     <img src="${escapeHTML(resolveProductImage(p.image, '../../'))}" alt="${escapeHTML(p.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';" loading="lazy">
                 </div>

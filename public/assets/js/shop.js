@@ -3502,7 +3502,7 @@ function productCard(p) {
     const isNewRelease = Array.isArray(p.tags) && p.tags.includes('Mới ra mắt');
 
     return `
-        <article class="product-card fade-in" data-product-card-id="${p._id}" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết ${escapeHTML(p.name)}">
+        <article class="product-card fade-in" data-product-card-id="${p._id}" data-product-name="${escapeHTML(p.name)}" data-product-price="${fmt(p.price)}" data-product-img="${escapeHTML(imgSrc)}" data-product-category="${escapeHTML(p.category)}" data-product-brand="${escapeHTML(p.brand || '')}" draggable="true" onclick="window.location.href='pages/catalog/product.html?id=${p._id}'" title="Xem chi tiết hoặc kéo thả vào khung chat AI để tư vấn ${escapeHTML(p.name)}">
             <button class="wishlist-btn ${liked ? 'active' : ''}" data-wishlist-id="${p._id}" type="button" aria-pressed="${liked ? 'true' : 'false'}" title="Yêu thích" onclick="event.stopPropagation(); toggleWishlist('${p._id}').catch(err => showToast(err.message, 'error'))">
                 <span class="u022-ring" aria-hidden="true"></span>
                 <span class="u022-burst" aria-hidden="true">

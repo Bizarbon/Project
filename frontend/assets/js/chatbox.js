@@ -354,6 +354,19 @@
                         </svg>
                     </button>
                 </form>
+                <aside class="ai-chat-dropzone" id="aiChatDropzone" aria-hidden="true" role="region" aria-label="Khu vực thả sản phẩm hỏi AI">
+                    <div class="ai-dropzone-inner">
+                        <div class="ai-dropzone-icon" aria-hidden="true">
+                            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                        </div>
+                        <strong>Thả sản phẩm vào đây</strong>
+                        <p>Hỏi thông số, giá bán &amp; ưu đãi ngay lập tức</p>
+                    </div>
+                </aside>
             </section>
             <aside class="ai-fab-greeting" id="aiFabGreeting" role="tooltip" aria-hidden="true">
                 <span class="ai-fab-greeting-text">👋 Cần AI tư vấn chọn máy?</span>
@@ -415,13 +428,28 @@
     }
 
     /* Lucian UX/UI Prompt #086 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#086 */
-    function appendMessage(body, role, text) {
+    function appendMessage(body, role, text, meta = null) {
         const message = document.createElement('article');
         message.className = `ai-message ${role} u215-msg-pop`;
         const bubble = document.createElement('section');
         bubble.className = 'ai-bubble';
         if (String(role).includes('ai-typing')) {
             bubble.innerHTML = `<div class="u086-thinking-row"><span class="u086-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>${escapeHTML(text)}</span></div>`;
+        } else if (role === 'user' && meta?.droppedProduct) {
+            const p = meta.droppedProduct;
+            const thumbHtml = p.img ? `<img src="${escapeHTML(p.img)}" alt="${escapeHTML(p.name)}" class="ai-dropped-thumb">` : '';
+            const priceHtml = p.price ? `<span class="ai-dropped-price">${escapeHTML(p.price)}</span>` : '';
+            bubble.innerHTML = `
+                <div class="ai-dropped-product-msg">
+                    ${thumbHtml}
+                    <div class="ai-dropped-info">
+                        <span class="ai-dropped-tag">📦 Sản phẩm đã chọn</span>
+                        <strong class="ai-dropped-name">${escapeHTML(p.name)}</strong>
+                        ${priceHtml}
+                    </div>
+                </div>
+                <p>${escapeHTML(text)}</p>
+            `;
         } else {
             bubble.innerHTML = role === 'user' ? `<p>${escapeHTML(text)}</p>` : formatAIMessage(text);
         }
@@ -2208,12 +2236,20 @@
 
             input.value = '';
             input.removeAttribute('aria-invalid');
-            appendMessage(body, 'user', message);
-            chatHistory.push({ role: 'user', text: message });
+            const userMsgMeta = options.droppedProduct ? { droppedProduct: options.droppedProduct } : null;
+            appendMessage(body, 'user', message, userMsgMeta);
+            chatHistory.push({
+                role: 'user',
+                text: message,
+                ...(options.droppedProduct ? { droppedProduct: options.droppedProduct } : {})
+            });
             renderSuggestions(suggestionsBar, [], send);
             saveSession();
 
-            const typing = appendMessage(body, 'ai ai-typing', 'Đang tìm kiếm thông tin tối ưu...');
+            const typingText = options.droppedProduct
+                ? `Đang phân tích thông số và ưu đãi cho ${options.droppedProduct.name}...`
+                : 'Đang tìm kiếm thông tin tối ưu...';
+            const typing = appendMessage(body, 'ai ai-typing', typingText);
             sendButton.disabled = true;
             panel.dataset.state = 'loading';
             window.TechMascot?.setState('thinking');
@@ -2504,6 +2540,181 @@
             }
         };
 
+        // ============================================================
+        // DRAG & DROP PRODUCT INTO CHATBOX
+        // Cho phép khách hàng kéo bất kỳ sản phẩm nào trên trang vào khung chat
+        // để AI tự động phân tích và tư vấn chuyên sâu về sản phẩm đó.
+        // ============================================================
+        function setupProductDragAndDrop() {
+            const dropzone = chat.querySelector('#aiChatDropzone');
+
+            // 1. Delegated dragstart on document to capture any product card or image dragged
+            document.addEventListener('dragstart', (e) => {
+                const card = e.target.closest('.product-card, [data-product-card-id], .related-product-card, .ai-interactive-card, .ai-chat-product-card');
+                let productData = null;
+
+                if (card) {
+                    const id = card.dataset.productCardId || (card.getAttribute('onclick')?.match(/id=(\d+)/) || [])[1] || (card.querySelector('a')?.href?.match(/id=(\d+)/) || [])[1];
+                    const name = card.dataset.productName || card.querySelector('h3 a, h3, .interactive-card-name, .related-card-title')?.textContent?.trim() || '';
+                    const price = card.dataset.productPrice || card.querySelector('.price, .interactive-card-price strong, .related-card-price')?.textContent?.trim() || '';
+                    const img = card.dataset.productImg || card.querySelector('.product-media img, img')?.src || '';
+                    const category = card.dataset.productCategory || card.querySelector('.category-badge, .related-card-category')?.textContent?.trim() || '';
+                    const brand = card.dataset.productBrand || card.querySelector('.product-brand-badge')?.textContent?.trim() || '';
+
+                    if (name) {
+                        productData = { id, name, price, img, category, brand };
+                    }
+                } else if (e.target.id === 'mainProductImage' || e.target.closest('#mainProductImage, .product-media-column')) {
+                    const name = document.querySelector('.product-hero-header h1, h1')?.textContent?.trim() || '';
+                    const price = document.querySelector('.hero-current-price, .price')?.textContent?.trim() || '';
+                    const img = document.getElementById('mainProductImage')?.src || '';
+                    if (name) {
+                        productData = { name, price, img };
+                    }
+                }
+
+                if (productData && productData.name) {
+                    window.__draggedProduct = productData;
+                    document.body.classList.add('is-dragging-product');
+                    try {
+                        e.dataTransfer.setData('application/json', JSON.stringify(productData));
+                        e.dataTransfer.setData('text/plain', `Tư vấn chi tiết cho tôi về ${productData.name}`);
+                        e.dataTransfer.effectAllowed = 'copy';
+                    } catch (err) {}
+
+                    if (chat.classList.contains('open')) {
+                        dropzone?.classList.add('is-active');
+                    }
+                }
+            }, true);
+
+            document.addEventListener('dragend', () => {
+                document.body.classList.remove('is-dragging-product');
+                dropzone?.classList.remove('is-active', 'drag-over');
+                setTimeout(() => { window.__draggedProduct = null; }, 300);
+            }, true);
+
+            // 2. Drag over chat launchers (if minimized, open chat)
+            const openChatIfDragging = () => {
+                if (window.__draggedProduct && !chat.classList.contains('open')) {
+                    openChat(false);
+                    dropzone?.classList.add('is-active');
+                }
+            };
+
+            const minPill = chat.querySelector('.ai-chat-min-pill');
+            const contactLauncher = chat.querySelector('.store-contact-launcher');
+            const fabGreeting = chat.querySelector('#aiFabGreeting');
+
+            [minPill, contactLauncher, fabGreeting].forEach(el => {
+                if (!el) return;
+                el.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    openChatIfDragging();
+                });
+                el.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    openChatIfDragging();
+                });
+            });
+
+            // 3. Dropzone & panel drag events
+            let dragCounter = 0;
+
+            panel.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                dragCounter++;
+                if (dropzone) dropzone.classList.add('is-active', 'drag-over');
+            });
+
+            panel.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                if (dropzone && !dropzone.classList.contains('is-active')) {
+                    dropzone.classList.add('is-active', 'drag-over');
+                }
+            });
+
+            panel.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    dragCounter = 0;
+                    if (dropzone) dropzone.classList.remove('drag-over');
+                }
+            });
+
+            panel.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dragCounter = 0;
+                document.body.classList.remove('is-dragging-product');
+                if (dropzone) dropzone.classList.remove('is-active', 'drag-over');
+
+                let productData = null;
+                try {
+                    const raw = e.dataTransfer.getData('application/json');
+                    if (raw) productData = JSON.parse(raw);
+                } catch (err) {}
+
+                if (!productData && window.__draggedProduct) {
+                    productData = window.__draggedProduct;
+                }
+
+                // If user dropped an image file from desktop
+                if (!productData && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = async () => {
+                            const base64Data = reader.result;
+                            const imgMsg = document.createElement('article');
+                            imgMsg.className = 'ai-message user';
+                            imgMsg.innerHTML = `<section class="ai-bubble"><div style="max-width:180px; border-radius:8px; overflow:hidden;"><img src="${base64Data}" alt="Ảnh tải lên" style="width:100%; display:block;"></div><p style="margin-top:4px; font-size:0.8rem;">[Tìm sản phẩm từ hình ảnh]</p></section>`;
+                            body.appendChild(imgMsg);
+                            scrollToBottom(body);
+
+                            const typing = appendMessage(body, 'ai ai-typing', 'AI đang phân tích nhận diện thiết bị công nghệ...');
+                            try {
+                                const res = await fetch(`${apiUrl}/chat/visual-search`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ image: base64Data, filename: file.name, hint: '' })
+                                });
+                                const visualResult = await res.json();
+                                typing.remove();
+                                if (!res.ok) throw new Error(visualResult.message || 'Không thể nhận diện hình ảnh');
+                                const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn!`;
+                                streamAIMessage(body, reply, () => {
+                                    if (visualResult.products && visualResult.products.length) {
+                                        renderChatProducts(body, visualResult.products);
+                                    }
+                                });
+                            } catch (err) {
+                                typing.remove();
+                                appendMessage(body, 'ai', err.message || 'Không thể nhận diện ảnh lúc này.');
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                        return;
+                    }
+                }
+
+                if (productData && productData.name) {
+                    openChat(false);
+                    window.TechMascot?.setState('happy');
+                    consultationContext.lastProduct = productData.name;
+                    consultationContext.targetProduct = productData.name;
+                    if (productData.id) consultationContext.targetProductId = productData.id;
+
+                    const prompt = `Tư vấn chi tiết cho tôi về sản phẩm ${productData.name}`;
+                    send(prompt, { droppedProduct: productData });
+                }
+            });
+        }
+
+        setupProductDragAndDrop();
+
         function resetChatbox(showNotice = false) {
             cancelReengagement();
             if (voiceSessionActive) {
@@ -2593,7 +2804,7 @@
             chatHistory = savedHistory;
             savedHistory.forEach(item => {
                 if (item.role === 'user') {
-                    appendMessage(body, 'user', item.text);
+                    appendMessage(body, 'user', item.text, { droppedProduct: item.droppedProduct });
                 } else if (item.role === 'ai') {
                     appendMessage(body, 'ai', item.text);
                     if (item.vouchers && item.vouchers.length) {

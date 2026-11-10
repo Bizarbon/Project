@@ -3137,4 +3137,210 @@ body:has(#cartDrawer:not([aria-hidden='true'])) .store-contact-launcher {
     pointer-events: none !important;
 }
 
+/* ============================================================
+   DRAG & DROP PRODUCT INTO CHATBOX
+   ============================================================ */
+
+/* Con trỏ kéo thả cho các thẻ sản phẩm */
+.product-card,
+.product-card .product-media,
+.product-card .product-media img,
+.related-product-card,
+#mainProductImage {
+    cursor: grab;
+}
+
+.product-card:active,
+.related-product-card:active,
+#mainProductImage:active {
+    cursor: grabbing;
+}
+
+/* Khi người dùng đang kéo sản phẩm trên toàn trang */
+body.is-dragging-product .ai-chat-min-pill,
+body.is-dragging-product .contact-main-btn {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4), 0 12px 32px rgba(37, 99, 235, 0.5) !important;
+    animation: pulse-drag-target 1.2s infinite ease-in-out !important;
+}
+
+@keyframes pulse-drag-target {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+/* Lớp phủ Dropzone bên trong chat panel */
+.ai-chat-dropzone {
+    position: absolute;
+    inset: 0;
+    z-index: 99;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    border-radius: 20px;
+}
+
+html[data-theme='dark'] .ai-chat-dropzone {
+    background: rgba(15, 23, 42, 0.95);
+}
+
+.ai-chat-dropzone.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.ai-dropzone-inner {
+    width: 100%;
+    height: 100%;
+    border: 2.5px dashed #2563eb;
+    border-radius: 16px;
+    background: rgba(37, 99, 235, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 24px rgba(37, 99, 235, 0.08);
+}
+
+.ai-chat-dropzone.drag-over .ai-dropzone-inner {
+    border-color: #059669;
+    background: rgba(16, 185, 129, 0.08);
+    box-shadow: inset 0 0 32px rgba(16, 185, 129, 0.16);
+    transform: scale(0.98);
+}
+
+.ai-dropzone-icon {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+    animation: bounce-dropzone-icon 1.6s infinite ease-in-out;
+}
+
+html[data-theme='dark'] .ai-dropzone-icon {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: #60a5fa;
+}
+
+.ai-chat-dropzone.drag-over .ai-dropzone-icon {
+    color: #059669;
+    background: #d1fae5;
+}
+
+@keyframes bounce-dropzone-icon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.ai-dropzone-inner strong {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+html[data-theme='dark'] .ai-dropzone-inner strong {
+    color: #f8fafc;
+}
+
+.ai-dropzone-inner p {
+    font-size: 0.86rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.45;
+}
+
+html[data-theme='dark'] .ai-dropzone-inner p {
+    color: #94a3b8;
+}
+
+/* Thẻ tin nhắn sản phẩm được kéo thả vào khung chat */
+.ai-dropped-product-msg {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme='dark'] .ai-dropped-product-msg {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.ai-dropped-thumb {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f8fafc;
+    flex-shrink: 0;
+    border: 1px solid #e2e8f0;
+}
+
+html[data-theme='dark'] .ai-dropped-thumb {
+    background: #0f172a;
+    border-color: #334155;
+}
+
+.ai-dropped-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-align: left;
+}
+
+.ai-dropped-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.ai-dropped-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+}
+
+html[data-theme='dark'] .ai-dropped-name {
+    color: #f8fafc;
+}
+
+.ai-dropped-price {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+
 
