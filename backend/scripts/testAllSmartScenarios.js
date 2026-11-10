@@ -274,6 +274,127 @@ const SCENARIOS = [
         input: 'Bực mình quá sao phục vụ kiểu gì vậy',
         expectedIntent: 'handle_angry_frustrated',
         mustInclude: ['thật sự xin lỗi', 'phiền lòng và bực bội', '0842.331.606']
+    },
+    // --- 7. KỊCH BẢN MỚI NÂNG CẤP (TƯ VẤN B2B, NÂNG CẤP ĐỜI MÁY, CỨU HỘ & TÂM LÝ) ---
+    {
+        title: 'Chiết khấu mua số lượng lớn cho công ty B2B',
+        input: 'Công ty mình muốn mua số lượng lớn có chiết khấu không shop?',
+        expectedIntent: 'policy_b2b_corporate_bulk',
+        mustInclude: ['Doanh nghiệp, Công ty', '3% đến 8%', '0842.331.606']
+    },
+    {
+        title: 'Thanh toán quẹt thẻ mPOS tại nhà',
+        input: 'Giao hàng có mang máy pos đến quẹt thẻ tại nhà không?',
+        expectedIntent: 'policy_pos_payment_at_home',
+        mustInclude: ['mPOS TẬN NƠI TẠI NHÀ', 'mọi loại thẻ', 'đồng kiểm']
+    },
+    {
+        title: 'Khách ngại: Sợ vợ mắng / Vợ không cho mua',
+        input: 'Thích chiếc máy này quá mà sợ vợ mắng không cho mua',
+        expectedIntent: 'objection_wife_afraid',
+        mustInclude: ['yêu vợ', 'Trả góp 0%', 'màu sắc chị thích']
+    },
+    {
+        title: 'Khách hẹn: Chờ lương về đầu tháng sau mới mua',
+        input: 'Đầu tháng sau có lương anh mới ghé mua được',
+        expectedIntent: 'objection_wait_for_salary',
+        mustInclude: ['lãnh lương', 'GIỮ MÃ GIẢM GIÁ', 'HOÀN TOÀN MIỄN PHÍ']
+    },
+    {
+        title: 'Đang dùng iPhone 11 có nên lên iPhone 16 không',
+        input: 'Đang dùng iPhone 11 có nên lên đời iPhone 16 không em?',
+        expectedIntent: 'advice_iphone_upgrade_decision',
+        mustInclude: ['Type-C', 'Dynamic Island', 'Camera 48MP', 'Thu cũ đổi mới']
+    },
+    {
+        title: 'Đang dùng MacBook chip Intel có nên đổi sang chip M',
+        input: 'Macbook cũ chạy chip Intel chậm quá có nên đổi sang chip M không?',
+        expectedIntent: 'advice_macbook_intel_to_m_series',
+        mustInclude: ['NÊN ĐỔI NGAY', 'mát rượi', '15 – 18 tiếng', 'Instant On']
+    },
+    {
+        title: 'Màn hình 60Hz và 120Hz khác biệt thực tế',
+        input: 'Màn hình 60Hz và 120Hz khác gì nhau có đáng tiền không em?',
+        expectedIntent: 'advice_screen_60hz_vs_120hz',
+        mustInclude: ['120 lần mỗi giây', 'như bôi bơ', 'LTPO thông minh']
+    },
+    {
+        title: 'Nên mua iPad bản Wi-Fi hay Cellular 4G',
+        input: 'Nên mua iPad wifi hay 4g cellular hả em?',
+        expectedIntent: 'advice_ipad_wifi_vs_cellular',
+        mustInclude: ['3.000.000 đ', 'Instant Hotspot', 'bản Wi-Fi', 'Bút Apple Pencil']
+    },
+    {
+        title: 'Nên chọn bộ nhớ 128GB hay 256GB',
+        input: 'Điện thoại 128gb có đủ dùng không hay nên lấy 256gb?',
+        expectedIntent: 'advice_storage_128gb_vs_256gb',
+        mustInclude: ['128GB', '256GB', 'LỰA CHỌN VÀNG']
+    },
+    {
+        title: 'Củ sạc nhanh 100W GaN sạc cho iPhone an toàn không',
+        input: 'Củ sạc nhanh 100W GaN sạc cho iPhone có sợ nổ chai pin không em?',
+        expectedIntent: 'advice_gan_charger_safety',
+        mustInclude: ['CỰC KỲ AN TOÀN', 'Power Delivery', 'GaN']
+    },
+    {
+        title: 'Chuẩn chống nước IP68 có mang đi bơi được không',
+        input: 'Điện thoại chống nước IP68 có mang đi bơi chụp ảnh dưới nước được không?',
+        expectedIntent: 'advice_waterproof_ip68_swimming',
+        mustInclude: ['nước ngọt tĩnh', 'muối ăn mòn', 'TUYỆT ĐỐI KHÔNG NÊN']
+    },
+    {
+        title: 'Combo thiết bị cho dân làm TikToker / Vlogger',
+        input: 'Muốn làm tiktoker vlogger chuyên nghiệp nên mua thiết bị gì em?',
+        expectedIntent: 'advice_creator_vlogger_setup',
+        mustInclude: ['DJI Osmo Pocket 3', 'iPhone 16 Pro Max', 'DJI Mic 2']
+    },
+    {
+        title: 'So sánh máy chơi game PS5 Slim vs Nintendo Switch OLED',
+        input: 'Nên mua PS5 hay Nintendo Switch để chơi game em?',
+        expectedIntent: 'compare_ps5_vs_switch_vs_steamdeck',
+        mustInclude: ['PlayStation 5 Slim', 'Nintendo Switch OLED', 'DualSense']
+    },
+    {
+        title: 'Mua máy chơi game có kèm sẵn game không',
+        input: 'Mua PS5 có sẵn game chơi luôn không hay phải mua thêm đĩa game?',
+        expectedIntent: 'console_games_included_or_not',
+        mustInclude: ['Astro\'s Playroom', 'Free-to-play', 'Đĩa game', 'PlayStation Plus']
+    },
+    {
+        title: 'Cấp cứu khẩn cấp điện thoại rơi vào nước',
+        input: 'Điện thoại bị rơi vào nước phải làm sao cấp cứu khẩn cấp em ơi?',
+        expectedIntent: 'tip_water_damage_emergency',
+        mustInclude: ['CẤM cắm sạc', 'CẤM dùng máy sấy', 'CẤM vùi máy vào thùng gạo', 'Tắt nguồn']
+    },
+    {
+        title: 'Cách vệ sinh màn hình laptop bàn phím đúng chuẩn',
+        input: 'Vệ sinh màn hình MacBook bằng cồn được không shop?',
+        expectedIntent: 'tip_screen_keyboard_cleaning',
+        mustInclude: ['TUYỆT ĐỐI KHÔNG dùng cồn', 'Microfiber', 'nước cất', 'miễn phí 100%']
+    },
+    {
+        title: 'Khắc phục tai nghe 1 bên bị nhỏ tiếng hoặc mất kết nối',
+        input: 'Tai nghe AirPods một bên không nghe được hoặc bị nhỏ tiếng xử lý thế nào?',
+        expectedIntent: 'tip_earphone_one_side_issue',
+        mustInclude: ['Vệ sinh màng lưới', 'chân tiếp xúc', 'Reset lại tai nghe']
+    },
+    {
+        title: 'Hỏi về chú Mèo Đại diện của cửa hàng',
+        input: 'Con mèo trên màn hình là con mèo gì mặc vest dễ thương thế?',
+        expectedIntent: 'chit_chat_cat_mascot',
+        mustInclude: ['Mèo Quản gia Công nghệ', 'siêu năng lực', 'canh giữ kho hàng']
+    },
+    {
+        title: 'Tư vấn mua điện thoại tặng bố mẹ người lớn tuổi',
+        input: 'Tư vấn điện thoại cho bố mẹ người già đọc báo dễ dùng em ơi',
+        expectedIntent: 'chit_chat_gift_parents_seniors',
+        mustInclude: ['Samsung Galaxy A-Series', 'Easy Mode', 'iPad Gen 10', 'sức khỏe']
+    },
+    {
+        title: 'Tư vấn máy tính bảng cho con em học tiếng Anh',
+        input: 'Mua máy tính bảng cho con học tiếng Anh và học online nên chọn máy nào?',
+        expectedIntent: 'chit_chat_gift_kids_students',
+        mustInclude: ['Bảo vệ thị lực', 'Parental Controls', 'iPad Gen 10', 'Samsung Kids']
     }
 ];
 

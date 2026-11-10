@@ -45,8 +45,9 @@ const STORE_POLICY_RULES = [
     {
         id: 'trade_in',
         patterns: [
-            /(thu cu|trade[\s-]?in|doi may cu|len doi).*(moi|cu|khong|gia|the nao)/i,
-            /(co|nhan|ho tro).*(thu cu|trade[\s-]?in|thu lai)/i
+            /(thu cu|trade[\s-]?in|doi may cu).*(moi|cu|khong|gia|the nao)/i,
+            /(co|nhan|ho tro).*(thu cu|trade[\s-]?in|thu lai)/i,
+            /(chuong trinh|chinh sach).*(thu cu|len doi)/i
         ],
         keywords: [
             'thu cu doi moi', 'thu cu', 'trade in', 'trade-in', 'doi may cu', 'len doi may',
@@ -87,12 +88,12 @@ const STORE_POLICY_RULES = [
     {
         id: 'golden_warranty',
         patterns: [
-            /(bao hanh|co bao hanh).*(roi vo|vao nuoc|be man hinh|roi rot)/i,
+            /(bao hanh|chinh sach bao hanh).*(roi vo|vao nuoc|be man hinh|roi rot)/i,
             /bao hanh vang/i
         ],
         keywords: [
-            'bao hanh vang', 'roi vo', 'vao nuoc', 'bao hanh roi vo', 'bao hanh vao nuoc',
-            'roi rot', 'be man hinh', 'roi nut man hinh', 'bao hanh vip', 'bao hanh mo rong'
+            'bao hanh vang', 'bao hanh vao nuoc', 'bao hanh roi vo', 'co bao hanh vao nuoc khong',
+            'co bao hanh roi vo khong', 'bao hanh roi rot', 'bao hanh be man hinh', 'bao hanh vip', 'bao hanh mo rong'
         ],
         reply: `Dạ ngoài gói bảo hành chính hãng 12 - 24 tháng theo tiêu chuẩn nhà sản xuất, bên em có hỗ trợ thêm gói **BẢO HÀNH VÀNG (BẢO HÀNH VIP)** bảo vệ toàn diện:\n\n` +
             `• 🛡️ **Bảo vệ rủi ro bất ngờ:** Hỗ trợ 100% chi phí sửa chữa thay thế linh kiện chính hãng ngay cả khi **máy vô tình bị rơi vỡ màn hình, cấn móp hoặc rơi vào nước**.\n` +
@@ -304,6 +305,45 @@ const STORE_POLICY_RULES = [
             `2. 🏪 **Gửi qua cửa hàng bên em:** Nếu bạn bận rộn, chỉ cần mang máy đến Showroom shop hoặc gửi qua bưu điện, shop sẽ tiếp nhận và gửi hãng thẩm định, theo dõi tiến độ và giao tận tay bạn hoàn toàn miễn phí!\n\n` +
             `👉 Mọi thắc mắc về tình trạng bảo hành, bạn có thể gọi hotline kỹ thuật **0842.331.606** để được hỗ trợ tức thì nhé!`,
         suggestions: ['Chính sách bảo hành vàng', 'Hotline hỗ trợ 0842.331.606', 'Địa chỉ Showroom']
+    },
+
+    // 1.16 Mua số lượng lớn cho công ty / doanh nghiệp (B2B)
+    {
+        id: 'policy_b2b_corporate_bulk',
+        patterns: [
+            /(mua|lay|dat).*(so luong lon|cho cong ty|cho doanh nghiep|b2b|du an|van phong)/i,
+            /(chiet khau|bao gia).*(cong ty|doanh nghiep|so luong lon)/i
+        ],
+        keywords: [
+            'mua so luong lon', 'mua cho cong ty', 'chiet khau doanh nghiep', 'chiet khau b2b',
+            'mua may cho van phong', 'bao gia cong ty', 'mua laptop cho cong ty', 'hop dong cong ty'
+        ],
+        reply: `Dạ cửa hàng bên em có **chính sách ưu đãi và chiết khấu B2B đặc quyền dành riêng cho khách hàng Doanh nghiệp, Công ty & Trường học** ạ! 🏢💼\n\n` +
+            `• 💰 **Mức chiết khấu hấp dẫn:** Giảm thêm trực tiếp từ **3% đến 8%** trên tổng giá trị đơn hàng tùy theo số lượng máy.\n` +
+            `• 📄 **Hóa đơn & Hợp đồng đầy đủ:** Xuất hóa đơn VAT điện tử hợp pháp ngay trong ngày, ký kết hợp đồng kinh tế và cung cấp chứng nhận xuất xứ (CO/CQ) theo yêu cầu.\n` +
+            `• 🚚 **Giao hàng & Lắp đặt tận nơi:** Miễn phí giao hàng hỏa tốc tận văn phòng, kỹ thuật viên hỗ trợ bóc seal, cài đặt phần mềm và chuyển dữ liệu trọn gói.\n` +
+            `• 💳 **Chính sách công nợ linh hoạt:** Hỗ trợ thanh toán chuyển khoản doanh nghiệp hoặc bảo lãnh ngân hàng tiện lợi.\n\n` +
+            `👉 Quý công ty cần nhận bảng báo giá chi tiết, xin vui lòng gọi ngay chuyên viên B2B qua hotline: **0842.331.606** hoặc gửi danh sách qua email: **support@techecommerce.vn** để được phục vụ chu đáo nhất nhé! 😊`,
+        suggestions: ['Hotline B2B 0842.331.606', 'Tư vấn Laptop công ty', 'Chính sách xuất hóa đơn VAT']
+    },
+
+    // 1.17 Quẹt thẻ mPOS tại nhà khi nhận hàng
+    {
+        id: 'policy_pos_payment_at_home',
+        patterns: [
+            /(quet the|mpos|pos|ca the).*(tai nha|khi nhan hang|tan noi)/i,
+            /(nhan hang|giao hang).*(quet the|ca the|mpos)/i
+        ],
+        keywords: [
+            'quet the tai nha', 'co quet the tan noi khong', 'thanh toan quet the khi nhan hang',
+            'mang may pos den nha', 'ca the tai nha', 'co mang may quet the khong'
+        ],
+        reply: `Dạ có ạ! Cửa hàng bên em hỗ trợ **QUẸT THẺ mPOS TẬN NƠI TẠI NHÀ** khi giao hàng cực kỳ tiện lợi và an toàn nhé! 💳🏠\n\n` +
+            `• 🚚 **Nhân viên mang máy POS đến tận nơi:** Khi shipper giao máy, bạn được quyền kiểm tra máy nguyên seal, mở hộp đồng kiểm, sau đó nhân viên sẽ quẹt thẻ thanh toán tại chỗ.\n` +
+            `• 💳 **Hỗ trợ mọi loại thẻ:** Chấp nhận tất cả thẻ ATM nội địa (NAPAS), thẻ tín dụng/ghi nợ quốc tế (Visa, MasterCard, JCB) và thanh toán chạm Apple Pay / Google Pay.\n` +
+            `• ⚡ **Cách đặt dịch vụ:** Khi đặt hàng trên website hoặc nhắn tư vấn viên, bạn chỉ cần chọn hoặc ghi chú *"Thanh toán quẹt thẻ mPOS tại nhà"* là shipper sẽ chuẩn bị sẵn máy quẹt thẻ mang theo nhé!\n\n` +
+            `👉 Bạn đang quan tâm đến sản phẩm nào để em hỗ trợ lên đơn giữ hàng cho bạn nha! 😊`,
+        suggestions: ['Kiểm tra hàng trước thanh toán', 'Tư vấn trả góp 0%', 'Hotline 0842.331.606']
     }
 ];
 
@@ -370,6 +410,45 @@ const OBJECTION_RULES = [
             `• Hoặc em có thể tư vấn các mẫu đời trước hoặc phân khúc lân cận cấu hình tương đương với mức giá mềm hơn 20% - 30% nè!\n\n` +
             `👉 Bạn có muốn em tìm mẫu máy cấu hình ngon mà giá mềm hơn trong tầm này cho bạn không ạ? 😊`,
         suggestions: ['Xem dòng máy giá mềm hơn', 'Tư vấn Trả góp 0%', 'Thu cũ đổi mới trợ giá 2tr', 'Mã giảm giá hôm nay']
+    },
+
+    // 2.4 Khách bảo: "Sợ vợ mắng", "Vợ không cho mua", "Về xin phép vợ"
+    {
+        id: 'objection_wife_afraid',
+        patterns: [
+            /(vo|ba xa|noc nha).*(khong cho|chui|mang|so vo|hoi vo|xin phep)/i,
+            /(so|hoi y kien).*(vo|ba xa|noc nha)/i
+        ],
+        keywords: [
+            'vo khong cho mua', 'so vo mang', 'de hoi vo da', 'so noc nha',
+            've xin phep vo', 'vo khong dong y', 'so vo biet', 'so ba xa mang'
+        ],
+        reply: `Dạ em thấu hiểu tâm lý của các anh 'yêu vợ, thương gia đình' lắm luôn ạ! 🤭 Người đàn ông có trách nhiệm lúc nào cũng nghĩ đến gia đình đầu tiên nè!\n\n` +
+            `Tuy nhiên, em xin mách nhỏ anh mấy 'chiêu' cực kỳ tâm lý đảm bảo chị nhà duyệt ngay trong 1 nốt nhạc nha: ✨\n\n` +
+            `1. 💼 **'Đầu tư phục vụ công việc & học tập':** Anh có thể chia sẻ máy mới này giúp anh làm việc nhanh gấp đôi, kiếm thêm thu nhập cho gia đình và để các con học tiếng Anh/học online cực kỳ hiệu quả.\n` +
+            `2. 💳 **Chọn gói Trả góp 0% chia nhỏ chi phí:** Mỗi tháng chỉ trích ra vài trăm nghìn đồng tiền cà phê là đã có máy xịn dùng ngay, quỹ sinh hoạt gia đình hoàn toàn không bị ảnh hưởng.\n` +
+            `3. 🎁 **Chọn màu sắc chị thích:** Chọn máy màu Hồng hoặc Titan Sa Mạc sang trọng, thỉnh thoảng đưa máy cho chị chụp ảnh selfie/sống ảo siêu đẹp là chị khen anh tâm lý hết lời luôn đó ạ!\n\n` +
+            `👉 Anh đang ngắm chiếc máy nào, em tư vấn thêm ưu đãi và phương án thanh toán êm đẹp nhất cho anh nhé! 😊`,
+        suggestions: ['Tư vấn Trả góp 0%', 'Thu cũ đổi mới trợ giá 2tr', 'Xem sản phẩm hot trend', 'Hotline 0842.331.606']
+    },
+
+    // 2.5 Khách bảo: "Chờ lương về", "Đầu tháng sau mới mua"
+    {
+        id: 'objection_wait_for_salary',
+        patterns: [
+            /(cho|doi|bao gio).*(co luong|luong ve|dau thang|linh luong).*(mua|moi mua)/i,
+            /(dau thang sau|cuoi thang).*(co luong|linh luong)/i
+        ],
+        keywords: [
+            'cho luong ve', 'dau thang co luong mua', 'doi linh luong da',
+            'cho lanh luong', 'dau thang sau mua', 'khi nao co luong thi mua', 'cho co tien moi mua'
+        ],
+        reply: `Dạ em chúc anh/chị tháng này lãnh lương thưởng thật rực rỡ và trọn vẹn niềm vui nha! 🍀💵\n\n` +
+            `Để tránh việc sang đầu tháng sau các chương trình khuyến mãi, voucher trợ giá hay quà tặng kèm bị hết số lượng:\n` +
+            `• 🔒 **Shop hỗ trợ GIỮ MÃ GIẢM GIÁ & GIÁ ƯU ĐÃI TRƯỚC HOÀN TOÀN MIỄN PHÍ:** Bạn không cần phải đặt cọc trước bất kỳ đồng nào đâu ạ!\n` +
+            `• ⚡ **Lương về là máy tới ngay:** Bạn chỉ cần để lại thông tin và mẫu máy ưng ý, khi nào tiền ting ting về tài khoản, bạn chỉ cần bấm xác nhận là máy được giao hỏa tốc đến tận tay bạn trong ngày luôn nhé!\n\n` +
+            `👉 Bạn đang ưng ý mẫu máy hoặc cấu hình nào nhất để em giữ deal hời này cho bạn trước nha! 😊`,
+        suggestions: ['Đặt giữ hàng 24h miễn phí', 'Săn voucher giảm giá', 'Tư vấn sản phẩm hot', 'Hotline 0842.331.606']
     }
 ];
 
@@ -585,6 +664,169 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `• 🐒 **Siêu phẩm AAA (Black Myth: Wukong, Cyberpunk 2077):** Khuyên dùng cấu hình có **RTX 4060 trở lên kết hợp công nghệ DLSS 3 Frame Generation** để trải nghiệm đồ họa Ray Tracing đỉnh chóp.\n\n` +
             `👉 Bạn dự kiến ngân sách bao nhiêu để em chọn chiếc laptop gaming tản nhiệt mát nhất trong tầm giá cho bạn nhé! 😊`,
         suggestions: ['Xem Laptop Acer Nitro V RTX 4050', 'Xem Laptop ASUS ROG Strix', 'Tư vấn Laptop dưới 20 triệu']
+    },
+
+    // 3.7 Đang dùng iPhone cũ (11, 12, 13, 14) có nên lên đời iPhone 16 không?
+    {
+        id: 'advice_iphone_upgrade_decision',
+        patterns: [
+            /(iphone 11|iphone 12|iphone 13|iphone 14).*(co nen len|co nen doi|len doi|khac gi).*(iphone 16|16 pro|16 pro max)/i,
+            /(dang dung|dang sai).*(iphone 11|iphone 12|iphone 13).*(co nen mua|co nen len)/i
+        ],
+        keywords: [
+            'iphone 11 co nen len 16', 'iphone 12 len 16 khac gi', 'iphone 13 co nen len iphone 16 khong',
+            'tu 11 len 16 co nen khong', 'dang dung 12 co nen len 16', 'co nen doi tu iphone 13 len 16'
+        ],
+        reply: `Dạ nếu bạn đang dùng các đời iPhone 11, 12 hoặc 13 thì việc nâng cấp lên **iPhone 16 Series** sẽ là một bước nhảy vọt toàn diện 'đáng đồng tiền bát gạo' nhất đấy ạ! 🍏🚀\n\n` +
+            `✨ **Những bước chuyển mình khác biệt một trời một vực:**\n` +
+            `• 🔌 **Cổng sạc Type-C đa năng:** Thay thế hoàn toàn cổng Lightning cũ, giờ đây bạn dùng chung 1 sợi cáp sạc cho cả iPhone, MacBook, iPad và tai nghe.\n` +
+            `• 🏝️ **Màn hình Dynamic Island:** Loại bỏ tai thỏ thô kệch, hiển thị thông báo cuộc gọi, Grab, đồng hồ đếm giờ cực kỳ thông minh.\n` +
+            `• 📸 **Camera 48MP siêu nét & Nút Camera Control:** Bắt nét tức thì, chụp đêm sáng rõ không nhiễu hạt, zoom quang học sắc nét vượt trội.\n` +
+            `• 🔋 **Pin trâu hơn từ 4 - 6 tiếng:** Nếu máy cũ của bạn pin đã chai dưới 80% hoặc hay nóng ran khi dùng, iPhone 16 với chip A18 3nm sẽ mát rượi và onscreen cả ngày dài.\n\n` +
+            `💡 **Chính sách Thu cũ đổi mới:** Cửa hàng bên em hỗ trợ định giá máy cũ lên đến 85% và **trợ giá thêm 2.000.000đ** khi lên đời iPhone 16. Bạn có muốn em hỗ trợ định giá máy cũ của mình không nè? 😊`,
+        suggestions: ['Thu cũ đổi mới trợ giá 2tr', 'Xem iPhone 16 chính hãng', 'Xem iPhone 16 Pro Max', 'Hotline 0842.331.606']
+    },
+
+    // 3.8 Đang dùng MacBook chip Intel có nên đổi sang chip M (M2 / M3 / M4) không?
+    {
+        id: 'advice_macbook_intel_to_m_series',
+        patterns: [
+            /(macbook|mac).*(intel).*(m1|m2|m3|m4|apple silicon|co nen doi|co nen len)/i,
+            /(tu chip intel|macbook intel).*(sang chip m|sang macbook m)/i
+        ],
+        keywords: [
+            'macbook intel co nen len chip m', 'mac intel co nen doi macbook m2 khong',
+            'tu macbook intel sang m3', 'macbook intel cham qua co nen doi'
+        ],
+        reply: `Dạ em khuyên bạn chân thành: **NÊN ĐỔI NGAY VÀ LUÔN, KHÔNG CẦN PHẢI ĐẮN ĐO MỘT GIÂY NÀO NỮA Ạ!** 🍏⚡\n\n` +
+            `Sự khác biệt giữa MacBook chip Intel và MacBook chip Apple Silicon (M2 / M3 / M4) được xem là cuộc cách mạng lớn nhất lịch sử máy tính cá nhân:\n` +
+            `• ❄️ **Nhiệt độ mát rượi:** MacBook Intel đời cũ nổi tiếng là chiếc 'lò sưởi' nóng rát tay và quạt hú ầm ĩ. Sang dòng chip M, máy vận hành êm ru tuyệt đối và luôn mát lạnh dù mở hàng chục ứng dụng.\n` +
+            `• 🔋 **Thời lượng pin gấp 3 lần:** Từ 4 - 5 tiếng trên máy Intel tăng vọt lên **15 – 18 tiếng liên tục** trên chip M. Bạn có thể mang máy đi làm cả ngày mà không cần đem theo củ sạc.\n` +
+            `• 🚀 **Khởi động tức thì (Instant On):** Mở nắp máy là màn hình sáng lên làm việc ngay trong 0.5 giây như iPhone, không còn hiện tượng con trỏ cầu vồng xoay vòng vòng ức chế.\n\n` +
+            `👉 Cửa hàng em có sẵn **MacBook Air M2 và MacBook Air M3** chính hãng với mức giá cực tốt, bạn cần bản 13 inch nhỏ gọn hay 15 inch màn hình lớn để em tư vấn nhé! 😊`,
+        suggestions: ['Xem MacBook Air M2 chính hãng', 'Xem MacBook Air M3', 'Thu cũ đổi mới máy tính', 'Hotline 0842.331.606']
+    },
+
+    // 3.9 Màn hình 60Hz và 120Hz (ProMotion / 144Hz) khác biệt gì, có đáng tiền không?
+    {
+        id: 'advice_screen_60hz_vs_120hz',
+        patterns: [
+            /(60hz|120hz|144hz).*(khac gi|so sanh|co khac|co dang tien|nen mua)/i,
+            /(man hinh 120hz|promotion).*(co khac 60hz|co ngon khong)/i
+        ],
+        keywords: [
+            'man hinh 60hz va 120hz khac gi', 'co nen mua man hinh 120hz',
+            'man 120hz co ton pin khong', 'so sanh 60hz va 120hz', 'promotion 120hz co ngon khong'
+        ],
+        reply: `Dạ sự khác biệt giữa 60Hz và 120Hz (ProMotion / 144Hz) là một trải nghiệm **'đã mắt' đến mức một khi bạn đã dùng quen thì sẽ không bao giờ muốn quay lại 60Hz nữa đâu ạ!** ✨📱\n\n` +
+            `• 🧈 **Độ mượt mà 'như bôi bơ':** Màn hình 120Hz quét hình ảnh 120 lần mỗi giây (gấp đôi 60Hz). Mọi thao tác cuộn trang Facebook, lướt web, mở đóng ứng dụng hay vuốt ảnh đều mượt mà trơn tru, không hề có vệt bóng mờ.\n` +
+            `• 🎯 **Lợi thế lớn khi chơi game:** Trong các tựa game bắn súng FPS (Valorant, CS2, PUBG) hay MOBA, 120Hz/144Hz giúp bạn nhìn thấy đối phương sớm hơn vài mili-giây, phản xạ nhanh và chuẩn xác hơn rõ rệt.\n` +
+            `• 🔋 **Có tốn pin hơn không?** Các dòng máy cao cấp (iPhone Pro, iPad Pro, Galaxy S25 Ultra) đều dùng công nghệ **LTPO thông minh**, tự động hạ tần số quét xuống 1Hz - 10Hz khi xem ảnh tĩnh và chỉ tăng vọt lên 120Hz khi ngón tay bạn vuốt chạm, nên cực kỳ tiết kiệm pin!\n\n` +
+            `👉 Bạn đang quan tâm đến điện thoại hay laptop màn hình 120Hz để em gợi ý model phù hợp ngân sách nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem iPhone màn hình 120Hz', 'Xem Laptop Gaming 144Hz', 'Tư vấn Samsung Galaxy S25']
+    },
+
+    // 3.10 Nên mua iPad bản Wi-Fi hay 4G/5G Cellular?
+    {
+        id: 'advice_ipad_wifi_vs_cellular',
+        patterns: [
+            /(ipad).*(wifi hay 4g|wifi hay cellular|4g hay wifi|cellular hay wifi|co nen mua ban 4g)/i,
+            /(nen mua ipad).*(wifi hay 4g|wifi hay cellular)/i
+        ],
+        keywords: [
+            'nen mua ipad wifi hay 4g', 'ipad wifi hay cellular tot hon',
+            'ipad cellular co can thiet khong', 'ipad wifi dung o ngoai the nao', 'so sanh ipad wifi va 4g'
+        ],
+        reply: `Dạ đây là câu hỏi mà 90% khách hàng mua iPad đều băn khoăn nè! Em xin phân tích kinh tế và thực tế sử dụng để bạn tiết kiệm chi phí nha: 📲💡\n\n` +
+            `• 💰 **Chênh lệch chi phí lớn:** Bản Cellular (4G/5G) thường đắt hơn bản Wi-Fi từ **3.000.000 đ – 4.500.000 đ**, chưa kể bạn phải tốn thêm tiền nạp gói data 4G/5G hàng tháng.\n` +
+            `• ☕ **Thực tế sử dụng:** Hầu hết mọi người dùng iPad ở nhà, công ty, trường học hay quán cà phê — những nơi này đều có sẵn Wi-Fi tốc độ cao miễn phí.\n` +
+            `• ⚡ **Tính năng chia sẻ mạng 1 chạm (Instant Hotspot):** Khi đi ra ngoài công viên hay trên xe, nếu bạn dùng iPhone hoặc điện thoại Android, bạn chỉ cần bấm mở phát Wi-Fi là iPad tự động kết nối trong 1 giây mà không cần bấm mật khẩu, tiện lợi hệt như máy 4G!\n\n` +
+            `💡 **Lời khuyên chân thành từ em:** Bạn nên chọn **bản Wi-Fi**! Khoản tiền 3 - 4 triệu tiết kiệm được, bạn có thể sắm ngay một chiếc **Bút Apple Pencil** để ghi chép vẽ vời hoặc bao da bàn phím cao cấp nhé! 😊`,
+        suggestions: ['Xem iPad Gen 10 Wi-Fi', 'Xem iPad Air M2 Wi-Fi', 'Xem bút Apple Pencil', 'Hotline 0842.331.606']
+    },
+
+    // 3.11 Nên chọn bộ nhớ dung lượng 128GB, 256GB hay 512GB?
+    {
+        id: 'advice_storage_128gb_vs_256gb',
+        patterns: [
+            /(nen mua|chon|so sanh).*(128gb hay 256gb|256gb hay 128gb|128 hay 256|256 hay 512)/i,
+            /(128gb).*(co du dung|du dung khong|co it qua khong)/i
+        ],
+        keywords: [
+            'nen mua 128gb hay 256gb', '128gb co du dung khong', 'dien thoai 128gb co it khong',
+            'nen chon bo nho bao nhieu gb', 'dung luong 128 hay 256'
+        ],
+        reply: `Dạ em xin tư vấn theo đúng thói quen dùng máy hàng ngày để bạn chọn dung lượng chuẩn xác, không bị lãng phí nha: 💾📱\n\n` +
+            `• 📦 **Bản 128GB (Vừa vặn cho nhu cầu cơ bản):**\n` +
+            `  - Phù hợp với: Dân văn phòng, phụ huynh, người chỉ dùng các ứng dụng mạng xã hội (Facebook, Zalo, TikTok), xem phim YouTube/Netflix và chụp ảnh gia đình thường nhật.\n` +
+            `  - Lưu ý: Sau 2 - 3 năm, bạn nên dọn dẹp bộ nhớ đệm app Zalo/Telegram định kỳ để máy không bị đầy.\n\n` +
+            `• 🚀 **Bản 256GB (LỰA CHỌN VÀNG KHUYÊN DÙNG NHẤT):**\n` +
+            `  - Phù hợp với: Hầu hết mọi người! Bạn có thể thoải mái quay video 4K khi đi du lịch, cài đặt nhiều tựa game nặng (Genshin Impact, Liên Quân, PUBG) và dùng bền bỉ 4 – 5 năm mà không bao giờ phải bận tâm đến thông báo 'Bộ nhớ đầy'.\n\n` +
+            `• 🎬 **Bản 512GB – 1TB:** Dành riêng cho dân làm nội dung, TikToker, Vlogger thường xuyên quay video 4K 60fps/120fps định dạng ProRes chuyên nghiệp.\n\n` +
+            `👉 Bạn thường chụp ảnh quay phim nhiều hay chơi game nặng không để em chọn phiên bản hợp lý nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem điện thoại 256GB bán chạy', 'Xem iPhone 16 128GB', 'Tư vấn trả góp 0%']
+    },
+
+    // 3.12 Củ sạc nhanh 65W/100W GaN có an toàn khi sạc cho iPhone, điện thoại nhỏ không?
+    {
+        id: 'advice_gan_charger_safety',
+        patterns: [
+            /(cu sac|sac).*(65w|100w|140w|gan|cong suat lon).*(sac duoc|sac cho|an toan|co no|so no|hai pin|chai pin)/i,
+            /(dung sac laptop|sac macbook).*(sac dien thoai|sac tai nghe).*(duoc khong|co sao khong)/i
+        ],
+        keywords: [
+            'cu sac 100w sac cho iphone duoc khong', 'cu sac 65w co sac duoc dien thoai khong',
+            'dung sac macbook sac cho iphone co sao khong', 'cu sac cong suat lon co hai pin khong',
+            'sac gan 100w an toan khong', 'cu sac 100w gan sac cho iphone'
+        ],
+        reply: `Dạ bạn hoàn toàn có thể an tâm 100%: **CỰC KỲ AN TOÀN VÀ HOÀN TOÀN KHÔNG LO NỔ HAY HẠI PIN ĐÂU Ạ!** 🔌🛡️\n\n` +
+            `Lý do đến từ công nghệ sạc thông minh hiện đại ngày nay:\n` +
+            `• 🤝 **Giao thức bắt tay Power Delivery (PD):** Củ sạc và thiết bị (iPhone, tai nghe, iPad) có chip vi xử lý giao tiếp với nhau. Thiết bị cần nhận tối đa bao nhiêu Watt thì củ sạc chỉ cấp chính xác bấy nhiêu (Ví dụ: cắm tai nghe củ sạc chỉ cấp 2.5W - 5W, cắm iPhone cấp 20W - 27W, cắm MacBook mới cấp đủ 65W - 100W).\n` +
+            `• ⚡ **Công nghệ GaN (Gallium Nitride):** Giúp củ sạc nhỏ gọn chỉ bằng nắm tay, tỏa nhiệt cực thấp và tích hợp cảm biến kiểm soát nhiệt độ chống quá dòng, quá áp 24/7.\n` +
+            `• 🎒 **Tiện lợi tối đa khi đi du lịch:** Bạn chỉ cần mang **DUY NHẤT 1 củ sạc Anker / Baseus 65W hoặc 100W có 3 cổng** là sạc cùng lúc được cho cả Laptop, Điện thoại và Tai nghe!\n\n` +
+            `👉 Cửa hàng em có sẵn củ sạc nhanh Anker GaN chính hãng bảo hành 18 tháng lỗi 1 đổi 1, bạn có muốn xem thử các mẫu sạc này không nè? 😊`,
+        suggestions: ['Xem củ sạc Anker GaN 65W', 'Xem củ sạc Anker 100W 3 cổng', 'Xem cáp sạc nhanh Type-C']
+    },
+
+    // 3.13 Chuẩn chống nước IP68 / 5ATM có mang đi bơi, tắm biển, xông hơi được không?
+    {
+        id: 'advice_waterproof_ip68_swimming',
+        patterns: [
+            /(ip68|chong nuoc|5atm).*(di boi|tam bien|tam ho|xong hoi|ngam nuoc)/i,
+            /(co dem|co mang).*(dien thoai|dong ho).*(di boi|tam bien|xong hoi)/i
+        ],
+        keywords: [
+            'dien thoai ip68 co di boi duoc khong', 'dong ho 5atm co tam bien duoc khong',
+            'mang dien thoai vao phong xong hoi duoc khong', 'chong nuoc ip68 mang di boi', 'dien thoai chong nuoc co vao nuoc khong'
+        ],
+        reply: `Dạ đây là lưu ý sống còn mà rất nhiều người dùng hiểu lầm nè! Em xin giải thích thực tế để bảo vệ chiếc máy yêu quý của bạn nha: 🌊⚠️\n\n` +
+            `• 🏊 **Chuẩn IP68 trên điện thoại:** Được thử nghiệm trong điều kiện **nước ngọt tĩnh** ở phòng lab. Trong thực tế, nước hồ bơi có hóa chất clo và nước biển có muối ăn mòn cực mạnh màng loa và cổng sạc kim loại. Đặc biệt, **nước nóng và phòng xông hơi** có hơi nước siêu mịn làm nở gioăng cao su ngấm thẳng vào bo mạch.\n` +
+            `• ⌚ **Đối với Smartwatch chuẩn 5ATM / 50 mét:** Được thiết kế để bơi lội trong hồ bơi nước ngọt. Sau khi bơi, bạn nên dùng tính năng *Đẩy nước khỏi màng loa (Water Eject)* và tráng lại bằng nước sạch.\n\n` +
+            `💡 **Lời khuyên chuẩn mực từ em:** Khả năng kháng nước sinh ra là để **'cứu sinh mạng' cho chiếc máy** khi vô tình gặp mưa to, đổ ly nước hay rơi vào bồn nước. Bạn **TUYỆT ĐỐI KHÔNG NÊN cố ý mang điện thoại đi lặn biển hay chụp ảnh dưới đáy hồ bơi** vì nếu vào nước, tất cả các hãng đều từ chối bảo hành theo quy định toàn cầu nhé!`,
+        suggestions: ['Xem đồng hồ thể thao bơi lội', 'Chính sách bảo hành vàng rơi vỡ vào nước', 'Hotline 0842.331.606']
+    },
+
+    // 3.14 Tư vấn Combo thiết bị cho dân làm TikToker, YouTuber, Vlogger, Livestream bán hàng
+    {
+        id: 'advice_creator_vlogger_setup',
+        patterns: [
+            /(tiktoker|vlogger|youtuber|quay vlog|livestream|sang tao noi dung|quay video).*(nen mua may gi|combo gi|thiet bi gi|can nhung gi)/i,
+            /(muon lam|hoc lam).*(tiktok|youtube|vlog).*(mua may gi|tu van thiet bi)/i
+        ],
+        keywords: [
+            'muon lam tiktoker nen mua may gi', 'thiet bi quay vlog youtube', 'combo quay video livestream',
+            'tu van thiet bi quay tiktok', 'may quay cho content creator', 'combo quay phim di dong'
+        ],
+        reply: `Dạ chào bạn, thế giới Sáng tạo nội dung (Content Creator, TikTok, YouTube, Reels) đang cực kỳ bùng nổ luôn nè! 🎬✨ Để có những thước phim triệu view triệu tim chuyên nghiệp, em xin gợi ý **Combo thiết bị chuẩn phòng thu di động** đang được các Top Creator tin dùng nhất hiện nay:\n\n` +
+            `1. 📹 **Camera Gimbal bỏ túi số 1: DJI Osmo Pocket 3 Creator Combo**\n` +
+            `   • Cảm biến 1 inch đỉnh chóp, quay 4K/120fps siêu nét, chống rung 3 trục cơ học đi bộ chạy nhảy thước phim vẫn êm ru như phim điện ảnh.\n` +
+            `   • Màn hình xoay ngang dọc 2 inch trực quan, tự động bám nét khuôn mặt thông minh.\n\n` +
+            `2. 📱 **Smartphone quay chụp Flagship: iPhone 16 Pro Max**\n` +
+            `   • Quay phim chuẩn điện ảnh 4K 120fps Dolby Vision, nút Camera Control chụp quay tức thì và 4 mic thu âm chuẩn studio lọc tiếng gió chuyên sâu.\n\n` +
+            `3. 🎙️ **Micro thu âm không dây: DJI Mic 2 (2 TX + 1 RX)**\n` +
+            `   • Thu âm trong vắt, tích hợp tính năng lọc ồn AI cực đỉnh dù bạn đứng quay giữa phố đông đúc hay quán cafe ồn ào.\n\n` +
+            `👉 Bạn đang dự định làm kênh về chủ đề gì (du lịch, ẩm thực, làm đẹp hay bán hàng livestream) và tầm ngân sách bao nhiêu để em chọn combo tối ưu nhất nhé! 😊`,
+        suggestions: ['Xem DJI Osmo Pocket 3', 'Xem Micro DJI Mic 2', 'Xem iPhone 16 Pro Max', 'Tư vấn Gimbal chống rung']
     }
 ];
 
@@ -723,6 +965,54 @@ const COMPARISON_AND_FENGSHUI_RULES = [
             `  - **Chống ồn ANC đỉnh chóp:** Đệm mút bọt biển cách âm độc quyền kết hợp chip xử lý kép V2 & QN2e triệt tiêu tiếng ồn môi trường gần như tuyệt đối.\n\n` +
             `👉 Bạn đang dùng điện thoại iPhone hay Android để em chọn chiếc tai nghe đồng bộ hoàn hảo nhất cho bạn nhé! 😊`,
         suggestions: ['Xem AirPods Pro 2 USB-C', 'Xem tai nghe Sony chính hãng', 'Tư vấn phụ kiện âm thanh']
+    },
+
+    // 4.7 So sánh Máy chơi game: PS5 Slim vs Nintendo Switch OLED vs Steam Deck OLED
+    {
+        id: 'compare_ps5_vs_switch_vs_steamdeck',
+        patterns: [
+            /(so sanh|nen mua).*(ps5.*switch|switch.*ps5|ps5.*steam deck|steam deck.*switch|may choi game nao)/i,
+            /(nen mua may choi game).*(ps5 hay nintendo|nintendo hay steam deck)/i
+        ],
+        keywords: [
+            'nen mua ps5 hay nintendo switch', 'so sanh ps5 va nintendo switch',
+            'nen mua switch hay steam deck', 'may choi game nao dang mua nhat', 'ps5 va steam deck nen mua con nao'
+        ],
+        reply: `Dạ đây là 3 'ông vua' của 3 thế giới chơi game hoàn toàn khác nhau nè! Em xin so sánh thực tế để bạn chọn đúng phong cách giải trí của mình nha: 🎮✨\n\n` +
+            `• 🏰 **Sony PlayStation 5 Slim (PS5) — Đồ họa 4K đỉnh nóc tại phòng khách:**\n` +
+            `  - Dành cho bạn thích cắm TV màn hình lớn 55 - 75 inch trong phòng khách.\n` +
+            `  - Chiến các siêu phẩm đồ họa bom tấn mãn nhãn: Black Myth: Wukong, God of War, Spider-Man 2, GTA V, đá FIFA/FC 25 cùng bạn bè.\n` +
+            `  - Tay cầm DualSense rung phản hồi xúc giác chân thực từng bước chân.\n\n` +
+            `• 🍄 **Nintendo Switch OLED — Niềm vui gia đình & Tiệc tùng di động:**\n` +
+            `  - Dành cho gia đình, cặp đôi hoặc bạn bè thích chơi chung với các tựa game độc quyền siêu vui: Mario Kart, Zelda, Pokemon, Overcooked.\n` +
+            `  - Tháo 2 tay cầm Joy-Con chia cho 2 người chơi mọi lúc mọi nơi, mang đi du lịch máy bay cực kỳ nhỏ gọn.\n\n` +
+            `• 💻 **Steam Deck OLED — Cỗ máy PC cầm tay cho game thủ:**\n` +
+            `  - Dành cho bạn đã có sẵn thư viện game bản quyền trên Steam (PC), muốn nằm trên giường hoặc ra quán cà phê cày game PC mượt mà.\n\n` +
+            `👉 Bạn thích chơi game bom tấn cắm TV lớn hay thích máy cầm tay mang đi lại tiện lợi để em tư vấn chi tiết nhé! 😊`,
+        suggestions: ['Xem PlayStation 5 Slim', 'Xem Nintendo Switch OLED', 'Xem Steam Deck OLED', 'Hotline 0842.331.606']
+    },
+
+    // 4.8 Mua máy chơi game có kèm sẵn game chơi luôn không?
+    {
+        id: 'console_games_included_or_not',
+        patterns: [
+            /(may choi game|ps5|nintendo switch|steam deck).*(co san game|kem game|co dia game|cai san game|tang game)/i,
+            /(mua ps5|mua switch).*(co game choi luon khong|phai mua dia khong)/i
+        ],
+        keywords: [
+            'mua ps5 co san game khong', 'nintendo switch co cai san game khong',
+            'mua may choi game co can mua dia khong', 'may choi game co tang game khong', 'mua dia game o dau'
+        ],
+        reply: `Dạ về game đi kèm máy, em xin thông tin chi tiết và minh bạch để bạn chuẩn bị sẵn sàng giải trí ngay khi nhận máy nhé! 🎮📦\n\n` +
+            `• 📦 **Trọn bộ máy mới 100% nguyên seal:** Bao gồm thân máy, tay cầm điều khiển zin, dây nguồn, dây HDMI tốc độ cao và sách hướng dẫn.\n` +
+            `• 🎮 **Có game chơi được ngay không?**\n` +
+            `  - Trên **PS5:** Có cài sẵn tựa game độc quyền *Astro's Playroom* cực hay để bạn trải nghiệm tay cầm DualSense, cùng hàng chục tựa game online miễn phí đỉnh cao tải về chơi ngay như *Fortnite, eFootball, Rocket League, Genshin Impact*.\n` +
+            `  - Trên **Nintendo Switch & Steam Deck:** Bạn có thể tải các tựa game Free-to-play trực tiếp trên cửa hàng số eShop / Steam.\n\n` +
+            `💡 **Cách chơi các game bom tấn có phí:**\n` +
+            `1. Mua **Đĩa game / Thẻ game vật lý** (ưu điểm: chơi xong có thể bán lại hoặc trao đổi cùng bạn bè).\n` +
+            `2. Hoặc đăng ký gói **PlayStation Plus / Nintendo Switch Online** chia nhỏ chỉ từ vài chục nghìn/tháng để truy cập kho hàng trăm game bản quyền đỉnh cao!\n\n` +
+            `👉 Bạn đang tính tậu cỗ máy nào để em tư vấn các tựa game hot nhất cho bạn cùng trải nghiệm nha! 😊`,
+        suggestions: ['Xem PlayStation 5 Slim', 'Xem Nintendo Switch OLED', 'Tư vấn gói PlayStation Plus']
     }
 ];
 
@@ -944,6 +1234,75 @@ const TECH_TIP_RULES = [
             `  - **Ưu điểm:** Dùng đèn nền LED chiếu sáng nên độ bền vật lý cực cao, màu sắc hiển thị trung thực chuẩn màu đồ họa in ấn và chi phí thay thế rất hợp lý.\n\n` +
             `💡 **Lời khuyên:** Nếu thích xem phim bom tấn, chơi game đồ họa đẹp và trải nghiệm thị giác đỉnh chóp, bạn hãy tự tin chọn **OLED** nhé! Còn nếu làm việc đồ họa in ấn chuẩn màu cả ngày thì **IPS cao cấp** là bạn đồng hành tuyệt vời! 😊`,
         suggestions: ['Xem điện thoại màn hình AMOLED 120Hz', 'Xem Laptop màn hình OLED', 'Hotline 0842.331.606']
+    },
+
+    // 5.12 Hướng dẫn cấp cứu khi điện thoại, laptop bị rơi vào nước
+    {
+        id: 'tip_water_damage_emergency',
+        patterns: [
+            /(roi vao nuoc|vao nuoc|dinh nuoc|do nuoc|roi xuong nuoc|ngam nuoc).*(phai lam sao|cap cuu|xu ly the nao|bi tat nguon)/i,
+            /(laptop|dien thoai|may).*(bi uot|bi do nuoc|bi ngap)/i
+        ],
+        keywords: [
+            'dien thoai roi vao nuoc phai lam sao', 'laptop bi do nuoc len ban phim', 'cap cuu dien thoai vao nuoc',
+            'may roi xuong nuoc co bo thung gao khong', 'dien thoai bi vao nuoc'
+        ],
+        reply: `Dạ em xin gửi bạn **HƯỚNG DẪN CẤP CỨU KHẨN CẤP KHI THIẾT BỊ RƠI VÀO NƯỚC!** 🚨\n\n` +
+            `Bạn hãy bình tĩnh và làm ngay theo các bước chuẩn kỹ thuật dưới đây cùng em để cứu sống máy của bạn nha: ⚡📱\n\n` +
+            `❌ **3 ĐIỀU TUYỆT ĐỐI CẤM LÀM:**\n` +
+            `1. **CẤM cắm sạc pin ngay lập tức** (chập cháy nổ IC nguồn và hỏng bo mạch vĩnh viễn).\n` +
+            `2. **CẤM dùng máy sấy tóc thổi nóng** (nhiệt độ cao làm chảy keo chống nước và đẩy giọt nước đi sâu hơn vào bên trong linh kiện).\n` +
+            `3. **CẤM vùi máy vào thùng gạo** (bụi cám gạo gặp nước sẽ biến thành keo bết dính làm tắc nghẽn cổng sạc và màng loa).\n\n` +
+            `✅ **4 BƯỚC CỨU MÁY CHUẨN KỸ THUẬT:**\n` +
+            `• **Bước 1:** Tắt nguồn máy ngay lập tức (nếu máy còn đang sáng màn hình).\n` +
+            `• **Bước 2:** Tháo ốp lưng, tháo khay SIM và lau thật khô toàn bộ bề mặt bên ngoài bằng khăn vải mềm.\n` +
+            `• **Bước 3:** Dựng đứng máy thẳng đứng, hướng cổng sạc xuống dưới trước luồng gió quạt máy mát để nước tự thoát ra ngoài.\n` +
+            `• **Bước 4:** Mang máy ngay tới cửa hàng hoặc trung tâm bảo hành gần nhất để kỹ thuật viên mở máy vệ sinh và sấy hút ẩm chuyên dụng.\n\n` +
+            `👉 Cần kỹ thuật viên hỗ trợ hướng dẫn từ xa, bạn gọi ngay hotline kỹ thuật: **0842.331.606** nhé!`,
+        suggestions: ['Hotline kỹ thuật 0842.331.606', 'Địa chỉ Showroom gần nhất', 'Chính sách bảo hành']
+    },
+
+    // 5.13 Cách vệ sinh màn hình điện thoại, laptop, bàn phím đúng chuẩn
+    {
+        id: 'tip_screen_keyboard_cleaning',
+        patterns: [
+            /(ve sinh|lau|chui).*(man hinh|ban phim|macbook|laptop|dien thoai).*(bang con|bang gi|the nao|dung cach)/i,
+            /(co duoc dung con|dung nuoc xit kinh).*(lau man hinh)/i
+        ],
+        keywords: [
+            'cach ve sinh man hinh laptop', 've sinh man hinh macbook bang gi',
+            'co duoc dung con lau man hinh khong', 'dung nuoc xit kinh lau man hinh duoc khong', 'cach lau ban phim laptop'
+        ],
+        reply: `Dạ đây là kiến thức bảo quản cực kỳ quan trọng giúp bảo vệ lớp màn hình đắt tiền của bạn nè! 🧼💻\n\n` +
+            `⚠️ **CẢNH BÁO NGUY HIỂM:**\n` +
+            `• **TUYỆT ĐỐI KHÔNG dùng cồn y tế (cồn 70° - 90°) hay nước xịt kính thông thường** để lau màn hình MacBook, iPad hay màn hình điện thoại. Cồn và hóa chất tẩy rửa mạnh sẽ **phá hủy lớp phủ chống lóa (Anti-Reflective Coating)** và làm bong tróc lớp nano chống bám vân tay, để lại những vệt ố loang lổ vĩnh viễn không thể khắc phục!\n\n` +
+            `✨ **CÁCH VỆ SINH ĐÚNG CHUẨN CHUYÊN GIA:**\n` +
+            `1. **Chuẩn bị:** Dùng khăn vải vi sợi (Microfiber) loại mềm mịn chuyên dụng lau kính hoặc ống kính máy ảnh.\n` +
+            `2. **Lau màn hình:** Làm ẩm nhẹ một góc khăn bằng **nước cất hoặc dung dịch vệ sinh màn hình chuyên dụng không chứa cồn**. Lau xoay tròn nhẹ nhàng, sau đó dùng góc khăn khô lau lại một lần nữa.\n` +
+            `3. **Vệ sinh bàn phím:** Dùng bóng thổi bụi hoặc cọ quét lông mềm để quét sạch bụi cát dăm dưới khe phím trước khi lau bề mặt phím.\n\n` +
+            `💡 Khách hàng ghé Showroom cửa hàng em luôn được các bạn kỹ thuật viên **vệ sinh máy và thổi bụi miễn phí 100%** trọn đời đó ạ! 😊`,
+        suggestions: ['Địa chỉ Showroom miễn phí vệ sinh', 'Xem phụ kiện công nghệ', 'Hotline 0842.331.606']
+    },
+
+    // 5.14 Tai nghe không dây một bên bị nhỏ tiếng hoặc không kết nối được
+    {
+        id: 'tip_earphone_one_side_issue',
+        patterns: [
+            /(tai nghe).*(mot ben|1 ben|ben to ben nho|mat tieng|khong nghe duoc|khong ket noi duoc|khong len)/i,
+            /(airpods|tai nghe bluetooth).*(bi nho tieng|bi tit)/i
+        ],
+        keywords: [
+            'tai nghe airpods 1 ben khong nghe duoc', 'tai nghe mot ben to mot ben nho',
+            'tai nghe bluetooth mat ket noi 1 ben', 'tai nghe bi tit mot ben', 'cach reset tai nghe airpods'
+        ],
+        reply: `Dạ hiện tượng tai nghe không dây bị nhỏ tiếng hoặc một bên không kết nối rất hay gặp và có thể xử lý tại nhà trong 2 phút với 3 bước sau nè: 🎧🔧\n\n` +
+            `1. 🧹 **Vệ sinh màng lưới tai nghe (90% do nguyên nhân này):** Bụi bẩn và ráy tai bám chặt lâu ngày vào màng lưới kim loại làm âm thanh bị nghẹt. Bạn lấy tăm bông khô hoặc bàn chải lông mềm khô chà nhẹ nhàng lên màng loa và các lỗ thoát khí phụ xung quanh.\n` +
+            `2. 🔋 **Lau sạch chân tiếp xúc sạc kim loại:** Ở dưới đáy chuôi tai nghe và sâu trong đáy hộp sạc có 2 chân kim loại dẫn điện. Nếu bị bám bụi, tai nghe bên đó sẽ không sạc được pin dẫn đến mất kết nối.\n` +
+            `3. 🔄 **Reset lại tai nghe về trạng thái xuất xưởng:**\n` +
+            `   • Với **AirPods:** Đặt cả 2 tai vào hộp sạc, mở nắp hộp $\rightarrow$ Nhấn giữ nút tròn phía sau hộp 15 giây cho đến khi đèn chuyển từ màu cam nhấp nháy sang màu trắng $\rightarrow$ Đưa lại gần iPhone kết nối lại từ đầu.\n` +
+            `   • Với các dòng tai nghe khác: Nhấn giữ cảm ứng cả 2 bên tai trong 10 - 15 giây.\n\n` +
+            `👉 Nếu sau khi thử mà tai nghe vẫn không lên tiếng, bạn mang qua cửa hàng bên em để kỹ thuật viên kiểm tra bảo hành đổi mới cho bạn nhé! 😊`,
+        suggestions: ['Xem tai nghe AirPods Pro 2', 'Chính sách bảo hành đổi mới', 'Hotline 0842.331.606']
     }
 ];
 
@@ -1210,6 +1569,69 @@ const CHIT_CHAT_RULES = [
             `Cuộc sống và công việc đôi khi thật nhiều áp lực, bài vở hay deadline dồn dập khiến mình cảm thấy kiệt sức... Nhưng bạn ơi, bạn đã rất nỗ lực và kiên cường vượt qua ngần ấy thời gian rồi đó!\n\n` +
             `Bạn hãy tạm gác lại mọi việc một lát, uống một ngụm nước mát, hít một hơi thật sâu và ăn món mình thích nha. Đừng quá khắt khe với bản thân, bạn đang làm rất tốt rồi! Sau cơn mưa cầu vồng sẽ xuất hiện rực rỡ, em luôn ở đây lắng nghe và cổ vũ bạn 100% nè! Cố lên bạn nhé! 💪✨`,
         suggestions: ['Xem sản phẩm giải trí', 'Tư vấn tai nghe chill', 'Xem ưu đãi hôm nay']
+    },
+
+    // 6.16 Khách hỏi hoặc trêu chú Mèo Đại diện của cửa hàng (Mèo Tom Quản gia)
+    {
+        id: 'chit_chat_cat_mascot',
+        patterns: [
+            /(con meo|chu meo|meo gi|meo tom|avatar con meo|hinh con meo).*(la ai|la gi|the|de thuong|dang yeu|mac vest)/i,
+            /(sao lai co|logo).*(con meo)/i
+        ],
+        keywords: [
+            'con meo nay la gi', 'meo tom cua shop', 'avatar con meo de thuong the',
+            'sao shop dung con meo', 'meo mac vest', 'chu meo de thuong qua'
+        ],
+        reply: `Meo meo! Em xin tự giới thiệu, em là **chú Mèo Quản gia Công nghệ** kiêm Trợ lý Mua sắm thông minh siêu tận tâm của cửa hàng đây ạ! 🐱🎩✨\n\n` +
+            `Bộ vest lịch lãm em mặc là để thể hiện tinh thần phục vụ chuyên nghiệp, chu đáo và minh bạch 100% dành cho bạn đó nè! Tuy là mèo nhưng em có 'siêu năng lực' cực đỉnh:\n` +
+            `• 🔍 So sánh cấu hình, giải thích đánh đổi chi tiết từng mili-mét.\n` +
+            `• 🎁 Săn lùng mã giảm giá hời nhất và canh giữ kho hàng 24/7.\n` +
+            `• 🍀 Luôn sẵn sàng tâm sự, đối đáp vui vẻ và mang lại nụ cười thoải mái cho bạn mỗi khi ghé thăm shop!\n\n` +
+            `Hôm nay bạn cần chú mèo quản gia này tư vấn thiết bị công nghệ nào hay săn deal giảm giá gì, cứ bảo em một tiếng nha! 🥰`,
+        suggestions: ['Săn mã giảm giá hôm nay', 'Tư vấn Laptop mỏng nhẹ', 'Tư vấn Điện thoại mới', 'Kể chuyện cười đi em']
+    },
+
+    // 6.17 Tư vấn mua điện thoại / máy tính bảng tặng Bố Mẹ, Ông Bà, Người lớn tuổi
+    {
+        id: 'chit_chat_gift_parents_seniors',
+        patterns: [
+            /(mua|tang).*(bo me|ba me|ong ba|phu huynh|nguoi lon tuoi|nguoi gia).*(may gi|dien thoai gi|tablet nao)/i,
+            /(dien thoai|may tinh bang).*(cho nguoi gia|cho bo me|cho nguoi lon)/i
+        ],
+        keywords: [
+            'mua dien thoai cho bo me', 'tang may gi cho bo me', 'dien thoai cho nguoi gia',
+            'may tinh bang cho nguoi lon tuoi doc bao', 'mua qua cong nghe cho bo me'
+        ],
+        reply: `Dạ bạn là một người con/cháu vô cùng hiếu thảo và tâm lý luôn nè! 💖 Chọn đồ công nghệ tặng bố mẹ hay ông bà thì tiêu chí cốt lõi phải là: **Màn hình to sắc nét, Loa ngoài to rõ, Pin trâu và Giao diện cực kỳ dễ dùng** ạ:\n\n` +
+            `✨ **Top gợi ý yêu thương nhất dành cho phụ huynh:**\n` +
+            `1. 📱 **Điện thoại Samsung Galaxy A-Series (Màn hình 6.7 inch to rõ):** Có chế độ *Giao diện dễ dàng (Easy Mode)* phóng to chữ và biểu tượng cực kỳ rõ nét, pin 5.000mAh dùng 2 ngày, loa đàm thoại to rõ không sợ bố mẹ nghe không rõ.\n` +
+            `2. 📲 **Máy tính bảng iPad Gen 10 10.9 inch:** 'Món quà vàng' cho bố mẹ đọc báo buổi sáng, xem YouTube nấu ăn/thời sự và gọi video call cho con cháu màn hình rộng thênh thang cực nét.\n` +
+            `3. ⌚ **Vòng đeo tay / Đồng hồ sức khỏe:** Theo dõi nhịp tim 24/7, đo nồng độ oxy trong máu SpO2, đếm bước chân và theo dõi giấc ngủ để con cháu an tâm từ xa.\n\n` +
+            `💡 Cửa hàng bên em hỗ trợ **Cài đặt sẵn cỡ chữ to, tài khoản và ứng dụng xem phim/đọc báo hoàn toàn miễn phí** trước khi giao hàng tận nhà nha! Bạn dự kiến tầm ngân sách bao nhiêu để em chọn mẫu phù hợp nhất ạ? 😊`,
+        suggestions: ['Xem Samsung Galaxy màn to', 'Xem iPad Gen 10 màn lớn', 'Xem vòng đeo tay sức khỏe', 'Hotline 0842.331.606']
+    },
+
+    // 6.18 Tư vấn máy tính bảng cho con em học tiếng Anh, học sinh tiểu học học online
+    {
+        id: 'chit_chat_gift_kids_students',
+        patterns: [
+            /(mua|tang).*(cho con|cho be|tre em|hoc sinh tieu hoc|lop 1|lop 2|lop 3|lop 4|lop 5).*(hoc tieng anh|hoc online|may gi)/i,
+            /(may tinh bang|tablet|ipad).*(cho be|cho tre em|hoc tieng anh)/i
+        ],
+        keywords: [
+            'mua may tinh bang cho con hoc tieng anh', 'tablet cho be', 'may cho tre em hoc online',
+            'ipad cho con hoc', 'mua may cho hoc sinh tieu hoc'
+        ],
+        reply: `Dạ đầu tư cho việc học tập và phát triển tư duy của các bé là quyết định tuyệt vời nhất của các bậc phụ huynh luôn ạ! 📚✨\n\n` +
+            `✨ **Tiêu chí vàng khi chọn máy cho bé học:**\n` +
+            `• 🛡️ **Bảo vệ thị lực của bé:** Màn hình phải có chứng nhận bảo vệ mắt (Eye Comfort / Lọc ánh sáng xanh) để bé không bị mỏi mắt hay cận thị khi học lâu.\n` +
+            `• 🔒 **Chế độ kiểm soát phụ huynh (Parental Controls):** Giúp ba mẹ dễ dàng giới hạn thời gian sử dụng mỗi ngày và chặn hoàn toàn các nội dung không lành mạnh trên mạng.\n` +
+            `• ✏️ **Hỗ trợ bút vẽ cảm ứng:** Bé thỏa sức tập viết chữ, học toán và tô màu sáng tạo.\n\n` +
+            `🏆 **Top máy tính bảng học tập được phụ huynh chọn nhiều nhất:**\n` +
+            `• **iPad Gen 10 10.9 inch:** Kho ứng dụng giáo dục học tiếng Anh (Duolingo, Monkey Junior, Khan Academy) phong phú và tối ưu mượt mà nhất.\n` +
+            `• **Samsung Galaxy Tab / Xiaomi Pad:** Mức giá cực mềm chỉ từ 4 - 7 triệu, có sẵn không gian an toàn cho trẻ em *Samsung Kids*.\n\n` +
+            `👉 Bé nhà mình đang học lớp mấy và bạn cần máy trong tầm giá nào để em tư vấn mẫu bền bỉ kèm bao da chống va đập cho bé nhé! 😊`,
+        suggestions: ['Xem iPad Gen 10 học tập', 'Xem Galaxy Tab giá tốt', 'Tư vấn bút cảm ứng cho bé']
     }
 ];
 
