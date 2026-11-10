@@ -11,7 +11,16 @@ const { findKnowledgeArticle } = require('../services/knowledgeService');
 const { matchSmartAnswer } = require('../services/storeKnowledgeAndChitChat');
 const { optionalAuth, protect, admin } = require('../middleware/auth');
 const { recommendProducts } = require('../utils/recommendations');
-const { coordinateConsultation, checkUnsupportedProduct, buildOutOfCatalogResponse, extractBudget } = require('../services/consultationCoordinator');
+const {
+    coordinateConsultation,
+    checkUnsupportedProduct,
+    buildOutOfCatalogResponse,
+    extractBudget,
+    isPresenceCheckOrGreeting,
+    buildPresenceCheckResponse,
+    isTabletStylusQuery,
+    handleTabletStylusExplanation
+} = require('../services/consultationCoordinator');
 const nlu = require('../services/nlu');
 
 const chatLimiter = rateLimit({
@@ -118,18 +127,22 @@ function money(value) {
 function detectGreetingOrSmallTalk(text) {
     const norm = normalizeText(text);
 
-    // 1. Lời chào thông dụng
+    // 1. Lời chào & kiểm tra hiện diện thông dụng ("alo", "alo alo", "alo shop", "ê shop", "shop ơi"...)
     const greetingPatterns = [
-        /^(xin\s+)?chao(\s+(ban|shop|cua\s+hang|ad|admin|anh|chi|em|nha|nhe|a|ạ))*[!.?\s]*$/,
-        /^(hello|hi|hey|alo|helu|helo|xin chao)[!.?\s]*$/,
-        /^chao\s+buoi\s+(sang|trua|chieu|toi)[!.?\s]*$/,
-        /^(good\s+)?(morning|afternoon|evening)[!.?\s]*$/
+        /^(xin\s+)?chao(\s+(ban|shop|cua\s+hang|ad|admin|anh|chi|em|nha|nhe|a|ạ))*[!.?\s]*$/i,
+        /^(hello|hi|hey|alo|helu|helo|xin chao)[!.?\s]*$/i,
+        /^alo(\s+alo)*(\s+(em|shop|ad|admin|ban|ban\s+oi|shop\s+oi|em\s+oi|oi))?[!.?\s]*$/i,
+        /^(e\s+shop|shop\s+oi|em\s+oi|ad\s+oi|admin\s+oi|bot\s+oi|ai\s+oi|ban\s+oi|bac\s+oi)[!.?\s]*$/i,
+        /^(co\s+ai\s+(khong|o\s+day\s+khong|truc\s+khong|online\s+khong|rep\s+khong|khong\s+a))[!.?\s]*$/i,
+        /^(test|alo\s+test|test\s+bot|test\s+mic|123|test\s+123)[!.?\s]*$/i,
+        /^chao\s+buoi\s+(sang|trua|chieu|toi)[!.?\s]*$/i,
+        /^(good\s+)?(morning|afternoon|evening)[!.?\s]*$/i
     ];
     if (greetingPatterns.some(p => p.test(norm))) {
         return {
-            reply: 'Xin chào bạn! 👋 Em là Trợ lý Tư vấn Mua sắm AI của cửa hàng. Bạn đang quan tâm đến sản phẩm công nghệ nào, hoặc có mức ngân sách khoảng bao nhiêu để em tư vấn chi tiết nhất nhé?',
-            suggestions: ['Tư vấn Laptop', 'Tư vấn Điện thoại', 'Đồng hồ thông minh', 'Mã giảm giá hôm nay'],
-            context: { stage: 'asking_category' }
+            reply: 'Dạ em nghe ạ! Em là Trợ lý AI của TechEcommerce, luôn túc trực 24/7 để hỗ trợ bạn đây ạ 😊\n\nBạn đang quan tâm đến sản phẩm nào, cần tư vấn cấu hình, so sánh máy, săn mã giảm giá hay kiểm tra đơn hàng cứ nhắn em hỗ trợ ngay nhé! 🚀',
+            suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Tư vấn Máy tính bảng', 'Săn mã giảm giá', 'Tra cứu đơn hàng'],
+            context: { stage: 'greeting', currentIntent: 'presence_check' }
         };
     }
 
@@ -1802,6 +1815,11 @@ async function answerPolicyQuestion(message) {
         return null;
     }
 
+    // Nếu là câu hỏi về máy tính bảng kèm bút, nhường cho handleTabletStylusExplanation để kèm danh thiếp sản phẩm thực tế
+    if (isTabletStylusQuery(message)) {
+        return null;
+    }
+
     // Ưu tiên tri thức chính sách nâng cao, mẹo công nghệ & đối đáp đời thường
     const smart = matchSmartAnswer(message);
     if (smart) return smart;
@@ -2274,7 +2292,11 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const isBargainOrBundle = ['bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem', 'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot', 'co giam them', 'combo phu kien', 'co khuyen mai kem'].some(k => hasWordOrPhrase(text, k));
 
         const smallTalk = detectGreetingOrSmallTalk(text);
-        if (smallTalk) {
+        if (isPresenceCheckOrGreeting(message)) {
+            response = buildPresenceCheckResponse(message, req.body.context);
+        } else if (isTabletStylusQuery(message, req.body.context)) {
+            response = await handleTabletStylusExplanation(message, req.body.context);
+        } else if (smallTalk) {
             response = smallTalk;
         } else if (specialAdvisor) {
             response = specialAdvisor;

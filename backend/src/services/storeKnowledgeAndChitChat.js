@@ -567,6 +567,34 @@ const HARDWARE_AND_SOFTWARE_RULES = [
         suggestions: ['Xem củ sạc nhanh Anker 30W', 'Xem củ sạc Anker 65W 3 cổng', 'Ốp lưng & Kính cường lực', 'Mã giảm giá hôm nay']
     },
 
+    // 3.1b Máy tính bảng tặng kèm bút là sao / Bút cảm ứng trong hộp
+    {
+        id: 'tablet_bundled_stylus_pen',
+        patterns: [
+            /(tang kem but|kem but|tang but|kem theo but|co but khong|co kem but|co but cam ung).*(la sao|la gi|the nao|nhu the nao|nghia la|ra sao)/i,
+            /(may tinh bang|tablet).*(tang kem but|kem but|tang but|co kem but|co but)/i,
+            /^(tang kem but la sao|kem but la sao|tang but la sao|may tinh bang tang kem but la sao|tablet tang kem but la sao)$/i
+        ],
+        keywords: [
+            'tang kem but la sao', 'kem but la sao', 'tang but la sao', 'may tinh bang tang kem but la sao',
+            'tablet tang kem but', 'but cam ung kem theo la gi', 'but trong hop la sao', 'tablet nao kem but',
+            'may tinh bang co kem but khong', 'lenovo tab m11 kem but la sao', 'tang kem but la nhu the nao'
+        ],
+        reply: `Dạ "Tặng kèm bút" (hoặc Kèm bút) đối với máy tính bảng nghĩa là bên trong hộp máy nguyên seal khi xuất xưởng **ĐÃ CÓ SẴN CÂY BÚT CẢM ỨNG CHÍNH HÃNG** đi kèm theo máy, bạn mở hộp ra là dùng được ngay mà **KHÔNG CẦN CHI THÊM TIỀN** mua riêng bút ngoài ạ! ✍️📦\n\n` +
+            `✨ **LỢI ÍCH VƯỢT TRỘI KHI CHỌN TABLET TẶNG KÈM BÚT:**\n` +
+            `• 💰 **Tiết kiệm từ 1.500.000 ₫ – 3.500.000 ₫:** Khác với dòng máy không kèm bút (như Apple iPad), bạn tiết kiệm được khoản chi phí phụ kiện rất lớn.\n` +
+            `• 📝 **Học tập & Ghi chép tức thì:** Hỗ trợ chống tì đè lòng bàn tay (Palm Rejection) giúp tì tay lên màn hình viết vẽ tự nhiên như trên giấy thật, ghi chú trực tiếp vào tài liệu PDF / Word.\n` +
+            `• 🎨 **Phác thảo & Vẽ đồ họa:** Cảm ứng lực nhạy bén, nét vẽ đậm nhạt chuẩn xác theo lực tay.\n\n` +
+            `🏆 **CÁC DÒNG TABLET TẠI TECHECOMMERCE:**\n` +
+            `1. 🌟 **Dòng ĐÃ KÈM SẴN BÚT trong hộp (Mở hộp dùng ngay, siêu tiết kiệm):**\n` +
+            `   • 📝 **Lenovo Tab M11 Kèm Bút (4.290.000 ₫):** Tặng sẵn bút Lenovo Tab Pen, màn hình 11 inch 90Hz, 4 loa Dolby Atmos to rõ, kinh tế nhất cho học sinh - sinh viên.\n` +
+            `   • 💎 **Samsung Galaxy Tab S9 Ultra (25.990.000 ₫):** Tặng sẵn bút S-Pen cao cấp trong hộp, kháng nước IP68, độ trễ 2.8ms siêu nhạy, không cần sạc pin cho bút.\n` +
+            `2. ⚠️ **Dòng KHÔNG KÈM BÚT trong hộp (Dòng Apple iPad):**\n` +
+            `   • 🍎 **iPad Gen 10 (8.990.000 ₫), iPad Air M2, iPad Pro M4:** Trong hộp chỉ có máy và củ/cáp sạc. Nếu muốn viết vẽ, bạn cần mua riêng bút **Apple Pencil chính hãng** (từ 1.890.000 ₫ – 3.490.000 ₫).\n\n` +
+            `👉 Bạn dự kiến dùng máy chủ yếu để học tập hay vẽ đồ họa, và ngân sách khoảng bao nhiêu triệu để em tư vấn mẫu phù hợp nhất nhé! 😊`,
+        suggestions: ['Xem Lenovo Tab M11 Kèm Bút', 'Xem Galaxy Tab S9 Ultra', 'So sánh iPad vs Samsung Tab', 'Tư vấn Tablet học tập']
+    },
+
     // 3.2 Khả năng nâng cấp RAM và SSD trên Laptop
     {
         id: 'hardware_laptop_upgrade',
@@ -1311,6 +1339,26 @@ const TECH_TIP_RULES = [
 // -------------------------------------------------------------
 
 const CHIT_CHAT_RULES = [
+    // 6.0 Khách gọi thử / Chào hỏi / Kiểm tra hiện diện ("alo", "alo alo", "alo shop", "ê shop", "shop ơi", "có ai không"...)
+    {
+        id: 'chit_chat_greeting_presence',
+        patterns: [
+            /^alo(\s+alo)*(\s+(em|shop|ad|admin|ban|ban\s+oi|shop\s+oi|em\s+oi|oi))?[!.?\s]*$/i,
+            /^(e\s+shop|shop\s+oi|em\s+oi|ad\s+oi|admin\s+oi|bot\s+oi|ai\s+oi|ban\s+oi|bac\s+oi)[!.?\s]*$/i,
+            /^(co\s+ai\s+(khong|o\s+day\s+khong|truc\s+khong|online\s+khong|rep\s+khong|khong\s+a))[!.?\s]*$/i,
+            /^(test|alo\s+test|test\s+bot|test\s+mic|123|test\s+123)[!.?\s]*$/i,
+            /^(hi|hello|hey|chao|chao\s+ban|chao\s+shop|chao\s+em|xin\s+chao|hi\s+shop|hello\s+shop)[!.?\s]*$/i
+        ],
+        keywords: [
+            'alo', 'alo alo', 'alo shop', 'alo em', 'alo ban oi', 'alo shop oi', 'alo em oi',
+            'e shop', 'shop oi', 'em oi', 'ad oi', 'admin oi', 'co ai khong', 'co ai o day khong',
+            'co ai truc khong', 'test', 'alo test', 'chao shop', 'chao ban', 'hello shop', 'hi shop'
+        ],
+        reply: `Dạ em nghe ạ! Em là Trợ lý AI của TechEcommerce, luôn túc trực 24/7 để hỗ trợ bạn đây ạ 😊\n\n` +
+            `Bạn đang quan tâm đến sản phẩm nào, cần tư vấn cấu hình, so sánh máy, săn mã giảm giá hay kiểm tra đơn hàng cứ nhắn em hỗ trợ ngay nhé! 🚀`,
+        suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Tư vấn Máy tính bảng', 'Săn mã giảm giá', 'Tra cứu đơn hàng']
+    },
+
     // 6.1 Khách hỏi thăm ăn uống / sức khỏe
     {
         id: 'eating_and_health',

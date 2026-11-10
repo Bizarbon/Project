@@ -683,6 +683,129 @@ function checkUnsupportedProduct(text) {
     return null;
 }
 
+function isPresenceCheckOrGreeting(message) {
+    if (!message || typeof message !== 'string') return false;
+    const clean = message.trim().toLowerCase();
+    const unacc = normalizeText(clean);
+
+    if (clean.length > 45) return false;
+
+    // Bỏ qua nếu có từ khóa hỏi sâu về giá, danh mục cụ thể hoặc giao dịch
+    if (/\b(tu van|gia bao nhieu|bao nhieu|so sanh|muon mua|can mua|tim mua|bao hanh|khuyen mai|tra gop|dia chi|don hang|ship)\b/i.test(unacc)) {
+        return false;
+    }
+
+    const presencePatterns = [
+        /^alo(\s+alo)*(\s+(em|shop|ad|admin|ban|ban\s+oi|shop\s+oi|em\s+oi|oi))?[\s!?.~]*$/i,
+        /^(e\s+shop|shop\s+oi|em\s+oi|ad\s+oi|admin\s+oi|bot\s+oi|ai\s+oi|ban\s+oi|bac\s+oi)[\s!?.~]*$/i,
+        /^(co\s+ai\s+(khong|o\s+day\s+khong|truc\s+khong|online\s+khong|rep\s+khong|khong\s+a))[\s!?.~]*$/i,
+        /^(test|alo\s+test|test\s+bot|test\s+mic|123|test\s+123)[\s!?.~]*$/i,
+        /^(hi|hello|hey|chao|chao\s+ban|chao\s+shop|chao\s+em|xin\s+chao|hi\s+shop|hello\s+shop)[\s!?.~]*$/i
+    ];
+
+    return presencePatterns.some(p => p.test(clean) || p.test(unacc));
+}
+
+function buildPresenceCheckResponse(message, prev = {}) {
+    return {
+        reply: `Dạ em nghe ạ! Em là Trợ lý AI của TechEcommerce, luôn túc trực 24/7 để hỗ trợ bạn đây ạ 😊\n\n` +
+            `Bạn đang quan tâm đến sản phẩm nào, cần tư vấn cấu hình, so sánh máy, săn mã giảm giá hay kiểm tra đơn hàng cứ nhắn em hỗ trợ ngay nhé! 🚀`,
+        products: [],
+        suggestions: [
+            'Tư vấn Điện thoại',
+            'Tư vấn Laptop',
+            'Tư vấn Máy tính bảng',
+            'Săn mã giảm giá',
+            'Tra cứu đơn hàng'
+        ],
+        context: {
+            ...prev,
+            stage: 'greeting',
+            currentIntent: 'presence_check'
+        },
+        meta: { provider: 'presence_check_engine', isFallback: false, model: 'none' }
+    };
+}
+
+function isTabletStylusQuery(message, prev = {}) {
+    if (!message || typeof message !== 'string') return false;
+    const unacc = normalizeText(message);
+
+    const hasStylusSignal = /\b(tang kem but|kem but|tang but|kem theo but|co but khong|co kem but|co but cam ung|but cam ung|but spen|but s-pen|but lenovo|but apple pencil|but cam ung di kem|but trong hop|but di kem)\b/i.test(unacc);
+    const hasMeaningQuestion = /\b(la sao|la gi|la nhu the nao|the nao|nghia la sao|nghia la gi|nhu the nao|dung the nao|dung ra sao|co phai|co duoc|khong can mua|duoc tang|co san|mua rieng|co phai mua)\b/i.test(unacc);
+
+    const prevHasTablet = prev?.category === 'Tablet' ||
+        (Array.isArray(prev?.lastProducts) && prev.lastProducts.some(p => /tab|ipad|tablet|but/i.test(p?.name || '')));
+
+    if (prevHasTablet && /\b(but|cay but|but cam ung|kem but|tang but)\b/i.test(unacc) && (hasMeaningQuestion || unacc.split(/\s+/).length <= 4)) {
+        return true;
+    }
+
+    return (hasStylusSignal && hasMeaningQuestion) ||
+        /\b(tang kem but la sao|kem but la sao|tang but la sao|may tinh bang tang kem but|tablet tang kem but|tablet kem but|may tinh bang kem but|tai sao kem but|kem but la gi|sao lai kem but|but trong hop la sao|but cam ung kem theo la gi|co kem but khong|co tang but khong|co but di kem khong|tang kem but|kem but)\b/i.test(unacc);
+}
+
+async function handleTabletStylusExplanation(message, prev = {}) {
+    const text = normalizeText(message);
+    const prevProd = Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 ? prev.lastProducts[0] : null;
+    const isLenovoContext = (prevProd && /lenovo tab m11/i.test(prevProd.name || '')) || /lenovo|tab m11/i.test(text);
+
+    let lenovoProd = null;
+    let samsungProd = null;
+    let ipadProd = null;
+    try {
+        lenovoProd = await Product.findOne({ name: /Lenovo Tab M11/i, active: { $ne: false } });
+        samsungProd = await Product.findOne({ name: /Galaxy Tab S9/i, active: { $ne: false } });
+        ipadProd = await Product.findOne({ name: /iPad Gen 10/i, active: { $ne: false } });
+    } catch (_) {}
+
+    const lenovoPrice = lenovoProd ? money(lenovoProd.price) : '4.290.000 ₫';
+    const samsungPrice = samsungProd ? money(samsungProd.price) : '25.990.000 ₫';
+    const ipadPrice = ipadProd ? money(ipadProd.price) : '8.990.000 ₫';
+
+    let intro = '';
+    if (isLenovoContext) {
+        intro = `Dạ đối với mẫu **Máy tính bảng Lenovo Tab M11 Kèm Bút** (giá niêm yết **${lenovoPrice}**) mà bạn đang quan tâm, **"Tặng kèm bút"** nghĩa là ngay bên trong hộp máy nguyên seal khi xuất xưởng **ĐÃ CÓ SẴN CÂY BÚT CẢM ỨNG CHÍNH HÃNG Lenovo Tab Pen**, bạn mở hộp ra là dùng được ngay mà **KHÔNG CẦN TỐN THÊM TIỀN** mua riêng ạ! ✍️📦\n\n`;
+    } else {
+        intro = `Dạ **"Tặng kèm bút"** (hoặc Kèm bút) đối với máy tính bảng nghĩa là ngay bên trong hộp máy nguyên seal khi xuất xưởng **ĐÃ CÓ SẴN CÂY BÚT CẢM ỨNG CHÍNH HÃNG** đi kèm theo máy, bạn mở hộp ra là dùng được ngay mà **KHÔNG CẦN CHI THÊM TIỀN** mua riêng bút ngoài ạ! ✍️📦\n\n`;
+    }
+
+    const reply = intro +
+        `✨ **NHỮNG LỢI ÍCH VƯỢT TRỘI KHI MUA TABLET KÈM SẴN BÚT:**\n` +
+        `• 💰 **Tiết kiệm từ 1.500.000 ₫ – 3.500.000 ₫:** Khác với các dòng máy tính bảng thông thường (như iPad không có bút), bạn tiết kiệm được khoản chi phí rất lớn vì không phải mua thêm bút rời.\n` +
+        `• 📝 **Học tập & Ghi chép tức thì:** Viết bài giảng, ghi chú tài liệu PDF, làm bài tập trực tiếp trên màn hình. Bút có công nghệ **chống tì đè lòng bàn tay (Palm Rejection)**, cho phép bạn tì hẳn cổ tay lên màn hình để viết êm ái như trên tập vở thật.\n` +
+        `• 🎨 **Vẽ đồ họa & Phác thảo:** Cảm ứng nhận diện lực nhấn nhạy bén, nét vẽ đậm nhạt tự nhiên theo lực đè của tay.\n` +
+        `• 📑 **Ký duyệt văn bản:** Ký hợp đồng, phê duyệt tài liệu điện tử cực nhanh gọn mà không cần in giấy.\n\n` +
+        `🏆 **CÁC DÒNG MÁY TÍNH BẢNG TẠI CỬA HÀNG ĐỂ BẠN THAM KHẢO:**\n` +
+        `1. 🌟 **Dòng ĐÃ KÈM SẴN BÚT trong hộp (Mở hộp là dùng ngay, siêu tiết kiệm):**\n` +
+        `   • 📝 **Lenovo Tab M11 Kèm Bút (${lenovoPrice} — Sẵn ${lenovoProd?.stock || 35} máy):** Mẫu tablet kinh tế nhất cho học sinh, sinh viên; tặng sẵn bút Lenovo Tab Pen, màn hình 11 inch 90Hz mượt mà, 4 loa Dolby Atmos to rõ.\n` +
+        `   • 💎 **Samsung Galaxy Tab S9 Ultra (${samsungPrice} — Sẵn ${samsungProd?.stock || 16} máy):** Flagship đỉnh cao tặng kèm sẵn bút **S-Pen cao cấp** trong hộp, chuẩn kháng nước IP68, độ trễ 2.8ms siêu nhạy, viết không cần sạc pin cho bút.\n` +
+        `2. ⚠️ **Dòng KHÔNG KÈM BÚT trong hộp (Điển hình là Apple iPad):**\n` +
+        `   • 🍎 **iPad Gen 10 (${ipadPrice} — Sẵn ${ipadProd?.stock || 45} máy) / iPad Air M2 / iPad Pro M4:** Trong hộp chỉ gồm thân máy và củ/cáp sạc. Khách mua iPad nếu muốn viết vẽ phải mua riêng bút **Apple Pencil chính hãng** (giá từ 1.890.000 ₫ – 3.490.000 ₫).\n\n` +
+        `👉 Bạn đang cần tìm máy tính bảng chủ yếu để học tập ghi chép hay vẽ đồ họa, và ngân sách dự kiến của bạn khoảng bao nhiêu để em chọn cấu hình tối ưu nhất cho bạn nhé! 😊`;
+
+    const candidates = [lenovoProd, samsungProd, ipadProd].filter(Boolean);
+
+    return {
+        reply,
+        products: candidates,
+        suggestions: [
+            'Xem Lenovo Tab M11 Kèm Bút',
+            'Xem Samsung Galaxy Tab S9 Ultra',
+            'So sánh iPad vs Samsung Tab',
+            'Tư vấn Tablet học tập'
+        ],
+        context: {
+            ...prev,
+            category: 'Tablet',
+            currentIntent: 'tablet_stylus_explanation',
+            stage: 'tablet_stylus_explanation',
+            lastProducts: candidates
+        },
+        meta: { provider: 'stylus_knowledge_engine', isFallback: false, model: 'none' }
+    };
+}
+
 function buildOutOfCatalogResponse(unsupportedInfo, rawText = '') {
     const isObject = typeof unsupportedInfo === 'object' && unsupportedInfo !== null;
     const productName = isObject ? unsupportedInfo.name : unsupportedInfo;
@@ -4397,6 +4520,16 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         delete prev.uncarriedBrand;
     }
 
+    // 0a-pre. Kiểm tra câu chào hỏi / gọi thử / kiểm tra hiện diện ("alo alo", "alo", "alo shop", "ê shop", "shop ơi", "test"...)
+    if (isPresenceCheckOrGreeting(message)) {
+        return buildPresenceCheckResponse(message, prev);
+    }
+
+    // 0a-stylus. Kiểm tra câu hỏi về "tặng kèm bút là sao", "máy tính bảng tặng kèm bút là sao", bút cảm ứng trong hộp
+    if (isTabletStylusQuery(message, prev)) {
+        return await handleTabletStylusExplanation(message, prev);
+    }
+
     // 0. Kiểm tra mặt hàng ngoài phạm vi kinh doanh (máy đọc sách, tivi, máy ảnh độc lập...)
     const unsupportedItem = checkUnsupportedProduct(message);
     if (unsupportedItem) {
@@ -4644,7 +4777,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
 
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở
     // trên, nhánh exact lookup đã ưu tiên trả sản phẩm ngay lập tức.
-    const hasDeepQuestionSignal = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|thiet bi nay|em nay|chu nay|tai sao|vi sao|ly do|co nen|co dang|co gi tot|co gi hay|co gi noi bat|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|dung duoc gi|choi game|pin|camera|man hinh|cau hinh|tac dung|cong dung|chuc nang|lam duoc gi|dung de lam gi|co tac dung gi|tinh nang|tinh nang gi)\b/i.test(text);
+    const hasDeepQuestionSignal = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|thiet bi nay|em nay|chu nay|tai sao|vi sao|ly do|co nen|co dang|co gi tot|co gi hay|co gi noi bat|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|dung duoc gi|choi game|pin|camera|man hinh|cau hinh|tac dung|cong dung|chuc nang|lam duoc gi|dung de lam gi|co tac dung gi|tinh nang|tinh nang gi|tang kem|kem but|kem ban phim|kem theo|la sao|nghia la sao|la gi|la nhu the nao|the nao)\b/i.test(text);
     const isBudgetCorrection = /\b(tren\s+\d+|tren\s+\d+tr|tren\s+\d+\s+trieu|tim\s+tren|bao\s+la\s+tren|noi\s+la\s+tren|goi\s+y\s+duoi|cai\s+nay\s+la\s+duoi)\b/i.test(text) || (text.includes('tren') && text.includes('20') && (text.includes('ma') || text.includes('sao') || text.includes('duoi')));
     if (Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
         (/may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text) || isCheaperRequest(text) || isBudgetCorrection || extractOrdinalReference(message) || extractEliminatedBrand(message) || hasDeepQuestionSignal)) {
@@ -4893,4 +5026,8 @@ module.exports = {
     normalizeText
     , isHearingAidMedicalQuestion
     , buildHearingAidSafetyResponse
+    , isPresenceCheckOrGreeting
+    , buildPresenceCheckResponse
+    , isTabletStylusQuery
+    , handleTabletStylusExplanation
 };
