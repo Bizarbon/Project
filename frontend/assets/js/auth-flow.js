@@ -313,8 +313,11 @@
                     handleLoginSuccessRedirect(data.user);
                 }, 600);
             } catch (error) {
-                setFieldError(pwInput, error.message);
-                setStatus(error.message, 'error');
+                const userMsg = (error.message && !error.message.includes('secret') && !error.message.includes('Key'))
+                    ? error.message
+                    : 'Không thể đăng nhập lúc này. Vui lòng thử lại sau.';
+                setFieldError(pwInput, userMsg);
+                setStatus(userMsg, 'error');
                 setButtonLoading(button, false, 'Đăng nhập', 'Đang xác thực…');
             }
         });

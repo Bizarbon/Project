@@ -200,7 +200,12 @@ router.post('/login', [
             user: publicUser(customer)
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Login error:', error);
+        res.status(500).json({
+            message: error.message && !error.message.includes('secret') && !error.message.includes('jwt')
+                ? error.message
+                : 'Không thể đăng nhập lúc này. Vui lòng thử lại sau.'
+        });
     }
 });
 
