@@ -459,31 +459,44 @@
   <script src="assets/js/auth.js?v=20261103-lucian-p1"></script>
 
   <main class="container fade-in">
-    <!-- Category Navigation: Green Box on Desktop / Swipeable on Mobile -->
+    <!-- Category Navigation & Standout Setup Builder Tool -->
     <nav class="header-categories" id="storefrontCategories" aria-label="Danh mục sản phẩm">
-      <button type="button" class="category-scroll-arrow category-scroll-prev" aria-label="Cuộn danh mục sang trái"
-        hidden>‹</button>
-      <ul class="header-shell header-category-list">
-        <li><button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản
-            phẩm</button></li>
-        <li><button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện
-            thoại</button></li>
-        <li><button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg"
-              alt="" />Laptop</button></li>
-        <li><button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg"
-              alt="" />Tablet</button></li>
-        <li><button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai
-            nghe</button></li>
-        <li><button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg"
-              alt="" />Đồng hồ thông minh</button></li>
-        <li><button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ
-            kiện</button></li>
-        <li><button type="button" data-header-category="Máy chơi game"><img src="assets/icons/gaming.svg" alt="" />Máy
-            chơi game</button></li>
-        <li><a href="pages/tools/setup-builder.html" class="category-builder-btn" style="display:inline-flex;align-items:center;gap:0.4rem;text-decoration:none;font-weight:700;color:var(--neo-primary);padding:0.45rem 0.85rem;border-radius:9999px;background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.35);font-size:0.85rem;"><span style="color:#ef4444;font-size:0.75rem;">🔥</span> Setup Builder</a></li>
-      </ul>
-      <button type="button" class="category-scroll-arrow category-scroll-next" aria-label="Cuộn danh mục sang phải"
-        hidden>›</button>
+      <div class="header-categories-container">
+        <div class="category-scroll-wrapper">
+          <button type="button" class="category-scroll-arrow category-scroll-prev" aria-label="Cuộn danh mục sang trái"
+            hidden>‹</button>
+          <ul class="header-category-list" role="tablist">
+            <li><button type="button" data-header-category="all"><img src="assets/icons/grid-3x3.svg" alt="" />Tất cả sản
+                phẩm</button></li>
+            <li><button type="button" data-header-category="Điện thoại"><img src="assets/icons/smartphone.svg" alt="" />Điện
+                thoại</button></li>
+            <li><button type="button" data-header-category="Laptop"><img src="assets/icons/laptop.svg"
+                  alt="" />Laptop</button></li>
+            <li><button type="button" data-header-category="Tablet"><img src="assets/icons/tablet.svg"
+                  alt="" />Tablet</button></li>
+            <li><button type="button" data-header-category="Tai nghe"><img src="assets/icons/headphones.svg" alt="" />Tai
+                nghe</button></li>
+            <li><button type="button" data-header-category="Đồng hồ thông minh"><img src="assets/icons/watch.svg"
+                  alt="" />Đồng hồ thông minh</button></li>
+            <li><button type="button" data-header-category="Phụ kiện"><img src="assets/icons/cable.svg" alt="" />Phụ
+                kiện</button></li>
+            <li><button type="button" data-header-category="Máy chơi game"><img src="assets/icons/gaming.svg" alt="" />Máy
+                chơi game</button></li>
+          </ul>
+          <button type="button" class="category-scroll-arrow category-scroll-next" aria-label="Cuộn danh mục sang phải"
+            hidden>›</button>
+        </div>
+        <aside class="header-builder-slot">
+          <a href="pages/tools/setup-builder.html" class="btn-setup-builder-highlight" title="Công cụ phối cấu hình PC, bàn ghế & phụ kiện chuẩn công thái học">
+            <span class="builder-flame-icon" aria-hidden="true">🔥</span>
+            <span class="builder-text-group">
+              <strong class="builder-title">Setup Builder</strong>
+              <small class="builder-sub">Tự phối góc làm việc</small>
+            </span>
+            <span class="builder-arrow-pill" aria-hidden="true">→</span>
+          </a>
+        </aside>
+      </div>
     </nav>
 
     <section class="hero-carousel reveal" id="promoCarousel" aria-label="Ưu đãi nổi bật"
@@ -676,6 +689,19 @@
             </div>
           </header>
           <div class="flash-sale-deals-container" id="flashSaleDealsContainer"></div>
+        </section>
+
+        <!-- Storefront Active Filter Status & Breadcrumbs -->
+        <section class="storefront-filter-status-bar" id="storefrontFilterStatusBar" aria-label="Trạng thái lọc và đường dẫn phân cấp" hidden>
+          <nav class="storefront-breadcrumb-nav" id="storefrontBreadcrumbNav" aria-label="Đường dẫn phân cấp">
+            <ol class="storefront-breadcrumbs" id="storefrontBreadcrumbs"></ol>
+          </nav>
+          <div class="storefront-active-chips-wrap">
+            <span class="active-chips-title">🏷️ Đang lọc theo:</span>
+            <div class="storefront-active-chips" id="storefrontActiveChips"></div>
+            <span class="active-filter-count" id="activeFilterCountBadge"></span>
+            <button type="button" class="btn-clear-all-chips" id="btnClearAllChips" onclick="resetAllFilters()">Xóa tất cả bộ lọc ×</button>
+          </div>
         </section>
 
         <!-- Quick Price Preset Filter Chips -->

@@ -1223,7 +1223,8 @@ html[data-theme='high-contrast'] .storefront-header {
 }
 
 .header-shell {
-    width: min(100% - 40px, 1500px);
+    width: min(100% - 48px, 1320px);
+    max-width: 1320px;
     margin-inline: auto;
 }
 
@@ -3466,7 +3467,7 @@ html[data-theme='dark'] .dropdown-item:hover {
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
     margin: 0 auto !important;
-    padding: 4px 38px !important;
+    padding: 4px 8px !important;
     list-style: none !important;
     width: max-content !important;
     max-width: 100% !important;
@@ -8595,19 +8596,19 @@ body:not(.admin-page) #productSections .product-grid {
     --ai-chat-dock-width: 320px;
 }
 
-/* Homepage main container ALWAYS remains centered in the middle of the screen */
-body:not(.admin-page) main.container {
-    width: min(100% - 32px, 1220px) !important;
-    max-width: 1220px !important;
-    margin-inline: auto !important;
-    padding-bottom: 120px !important;
-}
-
+/* Unified storefront container width across Header, Main Content, and Footer (1320px standard) */
+.header-shell,
+body:not(.admin-page) main.container,
 body:not(.admin-page) .site-footer .footer-top,
 body:not(.admin-page) .site-footer .footer-bottom {
-    width: min(100% - 32px, 1220px) !important;
-    max-width: 1220px !important;
+    width: min(100% - 48px, 1320px) !important;
+    max-width: 1320px !important;
     margin-inline: auto !important;
+    box-sizing: border-box !important;
+}
+
+body:not(.admin-page) main.container {
+    padding-bottom: 120px !important;
 }
 
 /* Product grid is 4 columns on desktop, 2 on tablet, 1 on mobile */
@@ -13528,4 +13529,454 @@ a.contact-popover-item:hover {
 .contact-item-sub {
     font-size: 0.74rem !important;
     color: #64748b !important;
+}
+
+/* ==========================================================================
+   Storefront Navigation, Filter Feedback & Hero Polish Refinements
+   ========================================================================== */
+
+/* 1. Category Bar & Standout Setup Builder Highlight */
+.header-categories {
+    position: relative !important;
+    z-index: 10 !important;
+    width: 100% !important;
+    padding: 6px 0 !important;
+    border-radius: 14px !important;
+    background: var(--bg-card, #ffffff) !important;
+    border: 1px solid var(--border, #e2e8f0) !important;
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05) !important;
+    margin-bottom: 1.25rem !important;
+}
+
+html[data-theme='dark'] .header-categories {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.header-categories-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    width: 100% !important;
+    padding: 2px 8px !important;
+    box-sizing: border-box !important;
+}
+
+.category-scroll-wrapper {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.category-scroll-wrapper .header-category-list {
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    margin: 0 !important;
+    padding: 3px 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.category-scroll-wrapper .header-category-list::-webkit-scrollbar {
+    display: none !important;
+}
+
+.category-scroll-wrapper .header-category-list button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+    padding: 5px 9px !important;
+    border-radius: 9999px !important;
+    font-size: 0.81rem !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary, #64748b) !important;
+    background: var(--bg-card-hover, rgba(241, 245, 249, 0.7)) !important;
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme='dark'] .category-scroll-wrapper .header-category-list button {
+    color: #94a3b8 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.category-scroll-wrapper .header-category-list button:hover {
+    color: var(--neo-primary, #2563eb) !important;
+    background: rgba(37, 99, 235, 0.1) !important;
+    border-color: rgba(37, 99, 235, 0.25) !important;
+    transform: translateY(-1px) !important;
+}
+
+.category-scroll-wrapper .header-category-list button.active {
+    background: var(--neo-primary, #2563eb) !important;
+    color: #ffffff !important;
+    border-color: var(--neo-primary, #2563eb) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+}
+
+.category-scroll-wrapper .header-category-list button.active img {
+    filter: brightness(0) invert(1) !important;
+}
+
+/* Standout Setup Builder Highlight Button */
+.header-builder-slot {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.btn-setup-builder-highlight {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 6px 14px 6px 12px !important;
+    border-radius: 9999px !important;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.12) 0%, rgba(255, 142, 83, 0.16) 100%) !important;
+    border: 1.5px solid rgba(255, 107, 107, 0.45) !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 3px 12px rgba(239, 68, 68, 0.15) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    white-space: nowrap !important;
+}
+
+.btn-setup-builder-highlight:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    background: linear-gradient(135deg, #ef4444 0%, #f97316 100%) !important;
+    border-color: #f97316 !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-setup-builder-highlight:hover .builder-title {
+    color: #ffffff !important;
+}
+
+.btn-setup-builder-highlight:hover .builder-sub {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.btn-setup-builder-highlight:hover .builder-arrow-pill {
+    background: #ffffff !important;
+    color: #ef4444 !important;
+    transform: translateX(2px) !important;
+}
+
+.builder-flame-icon {
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    animation: flamePulse 2s infinite ease-in-out !important;
+}
+
+@keyframes flamePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(-5deg); }
+}
+
+.builder-text-group {
+    display: flex !important;
+    flex-direction: column !important;
+    line-height: 1.15 !important;
+    text-align: left !important;
+}
+
+.builder-title {
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    color: #ef4444 !important;
+    letter-spacing: -0.2px !important;
+    transition: color 0.2s ease !important;
+}
+
+html[data-theme='dark'] .builder-title {
+    color: #f87171 !important;
+}
+
+.builder-sub {
+    font-size: 0.68rem !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary, #64748b) !important;
+    transition: color 0.2s ease !important;
+}
+
+html[data-theme='dark'] .builder-sub {
+    color: #cbd5e1 !important;
+}
+
+.builder-arrow-pill {
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 50% !important;
+    background: rgba(239, 68, 68, 0.18) !important;
+    color: #ef4444 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.75rem !important;
+    font-weight: 800 !important;
+    transition: all 0.2s ease !important;
+}
+
+/* 2. Storefront Filter Status Bar & Semantic Breadcrumbs */
+.storefront-filter-status-bar {
+    margin: 0.5rem 0 1.25rem 0;
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border, #e2e8f0);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.storefront-filter-status-bar[hidden] {
+    display: none !important;
+}
+
+html[data-theme='dark'] .storefront-filter-status-bar {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.storefront-breadcrumb-nav {
+    display: flex;
+    align-items: center;
+}
+
+.storefront-breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #64748b);
+}
+
+.storefront-breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.storefront-breadcrumbs a {
+    color: var(--neo-primary, #2563eb);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.storefront-breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+.storefront-breadcrumbs .breadcrumb-sep {
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.75rem;
+}
+
+.storefront-breadcrumbs .breadcrumb-current {
+    font-weight: 600;
+    color: var(--text-primary, #0f172a);
+}
+
+html[data-theme='dark'] .storefront-breadcrumbs .breadcrumb-current {
+    color: #f1f5f9;
+}
+
+.storefront-active-chips-wrap {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.active-chips-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-primary, #0f172a);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+html[data-theme='dark'] .active-chips-title {
+    color: #e2e8f0;
+}
+
+.storefront-active-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.storefront-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--neo-primary, #2563eb);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.storefront-chip:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.35);
+}
+
+.storefront-chip .chip-remove-icon {
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.active-filter-count {
+    margin-left: auto;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+}
+
+.btn-clear-all-chips {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    text-decoration: underline;
+    transition: opacity 0.15s ease;
+}
+
+.btn-clear-all-chips:hover {
+    opacity: 0.8;
+}
+
+/* 3. Compact Hero Banner when storefront filters are active */
+.hero-carousel.hero-compact {
+    min-height: unset !important;
+    max-height: 110px !important;
+    margin-bottom: 1.25rem !important;
+    padding: 0.4rem 1.25rem !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.hero-carousel.hero-compact .hero-slide {
+    padding: 0.35rem 0.85rem !important;
+    min-height: unset !important;
+}
+
+.hero-carousel.hero-compact .hero-slide-grid {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1.5rem !important;
+    min-height: unset !important;
+}
+
+.hero-carousel.hero-compact .hero-slide-content {
+    padding: 0 !important;
+    max-width: 75% !important;
+}
+
+.hero-carousel.hero-compact .hero-slide-content h2 {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.2rem !important;
+    line-height: 1.2 !important;
+}
+
+.hero-carousel.hero-compact .hero-slide-content p,
+.hero-carousel.hero-compact .hero-feature-tags,
+.hero-carousel.hero-compact .hero-cta {
+    display: none !important;
+}
+
+.hero-carousel.hero-compact .hero-slide-visual {
+    max-height: 75px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.hero-carousel.hero-compact .hero-slide-visual img {
+    max-height: 70px !important;
+    width: auto !important;
+    object-fit: contain !important;
+}
+
+.hero-carousel.hero-compact .hero-nav,
+.hero-carousel.hero-compact .hero-indicators {
+    display: none !important;
+}
+
+/* 4. Hero Primary CTA: High-impact vibrant blue solid/gradient button */
+button.hero-cta,
+.hero-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    min-height: 48px !important;
+    padding: 0.75rem 1.6rem !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0068FF 0%, #0052cc 100%) !important;
+    box-shadow: 0 10px 24px -4px rgba(0, 104, 255, 0.45) !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+button.hero-cta:hover,
+.hero-cta:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 14px 28px -4px rgba(0, 104, 255, 0.65) !important;
+    background: linear-gradient(135deg, #0056d6 0%, #003fa6 100%) !important;
+    color: #ffffff !important;
+}
+
+button.hero-cta svg,
+.hero-cta svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+    transition: transform 200ms ease !important;
+}
+
+button.hero-cta:hover svg,
+.hero-cta:hover svg {
+    transform: translateX(4px) !important;
 }

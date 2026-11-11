@@ -3268,7 +3268,12 @@ function toggleAdvancedFilters() {
 window.toggleAdvancedFilters = toggleAdvancedFilters;
 
 function resetAllFilters() {
+    activeCategory = 'all';
+    activeSpecFacets.clear();
+    expandedHomeCategories.clear();
+
     const searchInput = document.getElementById('searchInput');
+    const headerSearchInput = document.getElementById('headerSearchInput');
     const minPrice = document.getElementById('minPrice');
     const maxPrice = document.getElementById('maxPrice');
     const brandFilter = document.getElementById('brandFilter');
@@ -3276,16 +3281,184 @@ function resetAllFilters() {
     const sort = document.getElementById('sortProducts');
 
     if (searchInput) searchInput.value = '';
+    if (headerSearchInput) headerSearchInput.value = '';
     if (minPrice) minPrice.value = '';
     if (maxPrice) maxPrice.value = '';
     if (brandFilter) brandFilter.value = 'all';
     if (inStock) inStock.checked = false;
     if (sort) sort.value = '';
 
+    document.querySelectorAll('.price-chip-btn').forEach(b => {
+        b.classList.toggle('active', !b.dataset.priceMin && !b.dataset.priceMax);
+    });
+
+    const url = new URL(window.location.href);
+    url.search = '';
+    window.history.replaceState({}, '', url.toString());
+
+    updateHeaderCategoryState();
     syncBrandChipsState('all');
     renderProducts();
 }
 window.resetAllFilters = resetAllFilters;
+
+window.clearPriceFilter = function() {
+    const minEl = document.getElementById('minPrice');
+    const maxEl = document.getElementById('maxPrice');
+    if (minEl) minEl.value = '';
+    if (maxEl) maxEl.value = '';
+    document.querySelectorAll('.price-chip-btn').forEach(b => {
+        b.classList.toggle('active', !b.dataset.priceMin && !b.dataset.priceMax);
+    });
+    const url = new URL(window.location.href);
+    url.searchParams.delete('minPrice');
+    url.searchParams.delete('maxPrice');
+    window.history.replaceState({}, '', url.toString());
+    renderProducts();
+};
+
+window.clearStockFilter = function() {
+    const stockEl = document.getElementById('inStockOnly');
+    if (stockEl) stockEl.checked = false;
+    renderProducts();
+};
+
+window.clearSearchFilter = function() {
+    const catSearch = document.getElementById('searchInput');
+    const headSearch = document.getElementById('headerSearchInput');
+    if (catSearch) catSearch.value = '';
+    if (headSearch) headSearch.value = '';
+    const url = new URL(window.location.href);
+    url.searchParams.delete('search');
+    window.history.replaceState({}, '', url.toString());
+    renderProducts();
+};
+
+window.clearNonCategoryFilters = function() {
+    window.clearPriceFilter();
+    syncBrandChipsState('all');
+    const brandSelect = document.getElementById('brandFilter');
+    if (brandSelect) brandSelect.value = 'all';
+    window.clearStockFilter();
+    window.clearSearchFilter();
+};
+
+function syncActiveFilterChipsAndBreadcrumbs(count = null) {
+    const bar = document.getElementById('storefrontFilterStatusBar');
+    const breadcrumbs = document.getElementById('storefrontBreadcrumbs');
+    const chipsContainer = document.getElementById('storefrontActiveChips');
+    const countBadge = document.getElementById('activeFilterCountBadge');
+    const hero = document.getElementById('promoCarousel');
+    if (!bar || !breadcrumbs || !chipsContainer) return;
+
+    const filters = currentFilters();
+    const isCategoryFiltered = activeCategory && activeCategory !== 'all';
+    const isPriceFiltered = Boolean(filters.minPrice > 0 || filters.maxPrice > 0);
+    const isBrandFiltered = filters.brand && filters.brand !== 'all';
+    const isStockFiltered = Boolean(filters.inStock);
+    const isSearchFiltered = Boolean(filters.search);
+    const isFacetsFiltered = activeSpecFacets.size > 0;
+
+    const hasActiveFilters = isCategoryFiltered || isPriceFiltered || isBrandFiltered || isStockFiltered || isSearchFiltered || isFacetsFiltered;
+
+    // 1. Thu nhỏ Hero thành banner mỏng khi có bộ lọc hoạt động
+    if (hero) {
+        hero.classList.toggle('hero-compact', hasActiveFilters);
+    }
+
+    if (!hasActiveFilters) {
+        bar.hidden = true;
+        return;
+    }
+
+    bar.hidden = false;
+
+    // 2. Xây dựng Breadcrumbs ngữ nghĩa
+    const crumbs = [
+        `<li><a href="index.html" onclick="setCategory('all'); return false;">Trang chủ</a></li>`
+    ];
+    if (isCategoryFiltered) {
+        const catLabel = categoryLabels[activeCategory] || activeCategory;
+        if (isPriceFiltered || isBrandFiltered || isSearchFiltered) {
+            crumbs.push(`<li><span class="crumb-separator" aria-hidden="true">/</span><a href="#" onclick="window.clearNonCategoryFilters(); return false;">${escapeHTML(catLabel)}</a></li>`);
+        } else {
+            crumbs.push(`<li><span class="crumb-separator" aria-hidden="true">/</span><span class="crumb-current" aria-current="page">${escapeHTML(catLabel)}</span></li>`);
+        }
+    }
+    if (isBrandFiltered) {
+        crumbs.push(`<li><span class="crumb-separator" aria-hidden="true">/</span><span class="crumb-current">${escapeHTML(filters.brand)}</span></li>`);
+    }
+    if (isPriceFiltered) {
+        let priceText = '';
+        if (filters.minPrice && filters.maxPrice) {
+            priceText = `${fmt(filters.minPrice)} – ${fmt(filters.maxPrice)}`;
+        } else if (filters.maxPrice) {
+            priceText = `Dưới ${Math.round(filters.maxPrice / 1000000)} triệu`;
+        } else {
+            priceText = `Trên ${Math.round(filters.minPrice / 1000000)} triệu`;
+        }
+        crumbs.push(`<li><span class="crumb-separator" aria-hidden="true">/</span><span class="crumb-current" aria-current="page">${escapeHTML(priceText)}</span></li>`);
+    }
+    breadcrumbs.innerHTML = crumbs.join('');
+
+    // 3. Xây dựng các chip lọc đang kích hoạt
+    const chips = [];
+    if (isCategoryFiltered) {
+        const catLabel = categoryLabels[activeCategory] || activeCategory;
+        chips.push(`
+            <span class="storefront-chip">
+                <span class="chip-label">${escapeHTML(catLabel)}</span>
+                <button type="button" class="chip-remove" onclick="setCategory('all')" aria-label="Bỏ lọc danh mục ${escapeHTML(catLabel)}" title="Bỏ lọc danh mục">×</button>
+            </span>
+        `);
+    }
+    if (isPriceFiltered) {
+        let priceChipLabel = '';
+        if (filters.minPrice && filters.maxPrice) {
+            priceChipLabel = `${fmt(filters.minPrice)} – ${fmt(filters.maxPrice)}`;
+        } else if (filters.maxPrice) {
+            priceChipLabel = `Dưới ${Math.round(filters.maxPrice / 1000000)} triệu`;
+        } else {
+            priceChipLabel = `Trên ${Math.round(filters.minPrice / 1000000)} triệu`;
+        }
+        chips.push(`
+            <span class="storefront-chip">
+                <span class="chip-label">${escapeHTML(priceChipLabel)}</span>
+                <button type="button" class="chip-remove" onclick="window.clearPriceFilter()" aria-label="Bỏ lọc khoảng giá" title="Bỏ lọc khoảng giá">×</button>
+            </span>
+        `);
+    }
+    if (isBrandFiltered) {
+        chips.push(`
+            <span class="storefront-chip">
+                <span class="chip-label">${escapeHTML(filters.brand)}</span>
+                <button type="button" class="chip-remove" onclick="selectBrandFilter('all')" aria-label="Bỏ lọc hãng ${escapeHTML(filters.brand)}" title="Bỏ lọc hãng">×</button>
+            </span>
+        `);
+    }
+    if (isStockFiltered) {
+        chips.push(`
+            <span class="storefront-chip">
+                <span class="chip-label">Chỉ còn hàng</span>
+                <button type="button" class="chip-remove" onclick="window.clearStockFilter()" aria-label="Bỏ lọc tình trạng hàng" title="Bỏ lọc tình trạng">×</button>
+            </span>
+        `);
+    }
+    if (isSearchFiltered) {
+        chips.push(`
+            <span class="storefront-chip">
+                <span class="chip-label">"${escapeHTML(filters.search)}"</span>
+                <button type="button" class="chip-remove" onclick="window.clearSearchFilter()" aria-label="Bỏ lọc từ khóa" title="Bỏ lọc từ khóa">×</button>
+            </span>
+        `);
+    }
+    chipsContainer.innerHTML = chips.join('');
+
+    const matchCount = typeof count === 'number' ? count : filteredProducts().length;
+    if (countBadge) {
+        countBadge.textContent = `${matchCount} sản phẩm`;
+    }
+}
 
 function scrollFlashSale(direction) {
     const track = document.getElementById('flashSaleTrack');
@@ -3299,9 +3472,34 @@ function renderFlashSaleDeals() {
     const container = document.getElementById('flashSaleDealsContainer');
     if (!container) return;
 
-    // Top 10 discount deals from active catalog
-    const deals = allProducts
-        .filter(p => p.stock > 0 && p.compareAtPrice > p.price)
+    let pool = allProducts.filter(p => p.stock > 0 && p.compareAtPrice > p.price);
+
+    // Lọc Flash Sale theo danh mục đang chọn (nếu khác 'all')
+    const badgeEl = document.querySelector('.flash-sale-badge');
+    const hasCategoryFilter = activeCategory && activeCategory !== 'all';
+    if (hasCategoryFilter) {
+        const catNorm = activeCategory.normalize('NFC').trim().toLowerCase();
+        const catDeals = pool.filter(p => (p.category || '').normalize('NFC').trim().toLowerCase() === catNorm);
+        if (catDeals.length > 0) {
+            pool = catDeals;
+        }
+        if (badgeEl) {
+            badgeEl.textContent = `⚡ FLASH SALE ${activeCategory.toUpperCase()}`;
+        }
+    } else {
+        if (badgeEl) {
+            badgeEl.textContent = '⚡ FLASH SALE GIÁ SỐC';
+        }
+    }
+
+    // Nếu có lọc giá tối đa, ưu tiên các deal nằm trong tầm ngân sách
+    const maxP = Number(document.getElementById('maxPrice')?.value || 0);
+    if (maxP > 0) {
+        const budgetDeals = pool.filter(p => p.price <= maxP);
+        if (budgetDeals.length > 0) pool = budgetDeals;
+    }
+
+    const deals = pool
         .map(p => {
             const discount = Math.round((1 - p.price / p.compareAtPrice) * 100);
             return { ...p, discountPercent: discount };
@@ -3311,7 +3509,11 @@ function renderFlashSaleDeals() {
         .slice(0, 10);
 
     if (!deals.length) {
-        container.innerHTML = '';
+        container.innerHTML = `
+            <div class="flash-sale-empty" style="padding: 1.5rem; text-align: center; color: var(--neo-text-muted);">
+                <span>Hiện chưa có deal Flash Sale giá sốc riêng cho bộ lọc này. Xem ngay danh sách sản phẩm bên dưới!</span>
+            </div>
+        `;
         return;
     }
 
@@ -3360,6 +3562,7 @@ function renderProducts() {
     if (!sections) return;
     const products = filteredProducts();
     syncPriceHistogramUI(products.length);
+    syncActiveFilterChipsAndBreadcrumbs(products.length);
     const resultCount = document.getElementById('resultCount');
     if (resultCount) resultCount.textContent = `${products.length} sản phẩm`;
     const catalogTitle = document.getElementById('catalogTitle');
@@ -3369,7 +3572,7 @@ function renderProducts() {
             : categoryLabels[activeCategory] || activeCategory;
     }
 
-    // Render Flash Sale top deals
+    // Render Flash Sale top deals (đã lọc theo danh mục & giá)
     renderFlashSaleDeals();
 
     if (!products.length) {
@@ -4762,6 +4965,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const maxEl = document.getElementById('maxPrice');
         if (maxEl) maxEl.value = initialMaxPrice;
     }
+    const initialMinPrice = pageParams.get('minPrice') || '';
+    if (initialMinPrice) {
+        const minEl = document.getElementById('minPrice');
+        if (minEl) minEl.value = initialMinPrice;
+    }
+    const initialBrand = pageParams.get('brand') || '';
+    if (initialBrand) {
+        const brandEl = document.getElementById('brandFilter');
+        if (brandEl) brandEl.value = initialBrand;
+    }
+
+    const hasInitialFilters = pageParams.has('category') || pageParams.has('maxPrice') || pageParams.has('minPrice') || pageParams.has('brand') || pageParams.has('search');
+    if (hasInitialFilters) {
+        window.setTimeout(() => {
+            const target = document.getElementById('storefrontFilterStatusBar') || document.getElementById('storefrontCategories') || document.getElementById('u024HistogramPanel');
+            if (target) {
+                const y = target.getBoundingClientRect().top + window.pageYOffset - 90;
+                window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+            }
+        }, 350);
+    }
+
     setupStorefrontHeader();
     if (pageParams.get('openAddress') === '1') {
         document.getElementById('headerLocationToggle')?.click();

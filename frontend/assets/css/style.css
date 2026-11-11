@@ -635,14 +635,14 @@ button[type="submit"]:hover {
 }
 
 .btn-secondary,
-button[type="button"]:not(.contact-main-btn):not(.buy-sticker-close):not(.ai-chat-toggle):not(.contact-popover-item) {
+button[type="button"]:not(.contact-main-btn):not(.buy-sticker-close):not(.ai-chat-toggle):not(.contact-popover-item):not(.hero-cta) {
     background: var(--bg-card);
     color: var(--text-secondary);
     border: 1px solid var(--border);
 }
 
 .btn-secondary:hover,
-button[type="button"]:not(.contact-main-btn):not(.buy-sticker-close):not(.ai-chat-toggle):not(.contact-popover-item):hover {
+button[type="button"]:not(.contact-main-btn):not(.buy-sticker-close):not(.ai-chat-toggle):not(.contact-popover-item):not(.hero-cta):hover {
     background: var(--bg-card-hover);
     color: var(--text-primary);
     border-color: var(--border-light);
@@ -3899,6 +3899,8 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
 .flash-sale-carousel-wrapper {
     position: relative;
     width: 100%;
+    padding: 0 46px;
+    box-sizing: border-box;
 }
 
 .flash-sale-track {
@@ -3908,7 +3910,7 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
-    padding: 6px 4px 10px;
+    padding: 8px 4px 12px;
     scrollbar-width: thin;
     scrollbar-color: rgba(239, 68, 68, 0.3) transparent;
 }
@@ -4070,18 +4072,18 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid rgba(255, 59, 48, 0.4);
+    border: 1.5px solid rgba(255, 59, 48, 0.5);
     background: #0f172a;
     color: #ffffff;
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 5;
+    z-index: 10;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .flash-nav-btn:hover {
@@ -4092,11 +4094,11 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
 }
 
 .flash-nav-prev {
-    left: -12px;
+    left: 4px;
 }
 
 .flash-nav-next {
-    right: -12px;
+    right: 4px;
 }
 
 /* --- Storefront Filter & Sort Toolbar (Box 2) --- */
