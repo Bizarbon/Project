@@ -2050,8 +2050,18 @@ async function answerBundleBargainQuestion(message, context = {}) {
         // 1. Tìm sản phẩm mục tiêu (từ context trước đó hoặc từ tên model nhắc tới)
         let targetProduct = null;
         if (Array.isArray(context.lastProducts) && context.lastProducts.length > 0) {
-            const firstId = context.lastProducts[0]._id || context.lastProducts[0];
-            targetProduct = allActive.find(p => String(p._id) === String(firstId)) || null;
+            const firstItem = context.lastProducts[0];
+            const firstId = firstItem?._id || (typeof firstItem === 'string' ? firstItem : null);
+            if (firstId) {
+                targetProduct = allActive.find(p => String(p._id) === String(firstId)) || null;
+            }
+            if (!targetProduct && firstItem?.name) {
+                const normName = normalizeText(firstItem.name);
+                targetProduct = allActive.find(p => {
+                    const pNorm = normalizeText(p.name);
+                    return pNorm.includes(normName) || normName.includes(pNorm);
+                }) || null;
+            }
         }
 
         if (!targetProduct) {
@@ -2098,12 +2108,18 @@ async function answerBundleBargainQuestion(message, context = {}) {
         const totalBundleAddons = selectedAccessories.filter(a => a.selected).reduce((s, a) => s + a.bundlePrice, 0);
         const totalSavings = totalOriginalAddons - totalBundleAddons;
 
-        const reply = `Dạ giá niêm yết **${money(targetProduct.price)}** của **${targetProduct.name}** hiện đã là giá kịch sàn cho hàng phân phối chính hãng kèm gói bảo hành 1 đổi 1 an tâm tuyệt đối ạ! 🛡️\n\n` +
-            `Tuy nhiên để hỗ trợ bạn tiết kiệm tối đa hôm nay, cửa hàng kích hoạt chính sách **Combo Trợ Giá Phụ Kiện Chính Hãng Giảm Đến 30%** khi mua kèm máy!\n` +
-            `Bạn có thể tùy ý tích chọn các phụ kiện bên dưới để gộp đơn và tiết kiệm ngay **${money(totalSavings)}** nhé: 👇`;
+        const voucherCode = targetProduct.price >= 20000000 ? 'DEALHOT500' : (targetProduct.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME');
+        const voucherDiscount = targetProduct.price >= 20000000 ? '500.000 ₫' : (targetProduct.price >= 3000000 ? '200.000 ₫' : '100.000 ₫');
+
+        const reply = `Dạ giá niêm yết **${money(targetProduct.price)}** của **${targetProduct.name}** hiện đã là mức giá kịch sàn cho hàng mới nguyên seal 100% chính hãng phân phối tại Việt Nam (kèm bảo hành lỗi 1 đổi 1 trong 30 ngày) ạ! 🛡️\n\n` +
+            `🎁 **ĐẶC QUYỀN TRỢ GIÁ RIÊNG CHO BẠN HÔM NAY:**\n` +
+            `Thấu hiểu bạn rất thiện chí chốt máy, em xin phép quản lý kích hoạt riêng cho bạn **Mã Trợ Giá Độc Quyền: \`${voucherCode}\` (Giảm ngay ${voucherDiscount})**, có hiệu lực giữ ưu đãi trong 15 phút!\n\n` +
+            `🛍️ **ƯU ĐÃI COMBO PHỤ KIỆN TƯƠNG THÍCH (Giảm đến 30%):**\n` +
+            `Khi mua kèm máy, bạn được giảm thêm **${money(totalSavings)}** cho combo phụ kiện chính hãng (củ sạc, ốp lưng, tai nghe) bên dưới. Bạn chốt đơn luôn để em áp mã giảm trừ trực tiếp nhé! 👇`;
 
         return {
             reply,
+            products: [targetProduct],
             bundle: {
                 mainProduct: {
                     _id: targetProduct._id,
@@ -2116,14 +2132,16 @@ async function answerBundleBargainQuestion(message, context = {}) {
                 totalSavings
             },
             suggestions: [
+                `Áp mã ${voucherCode} giảm ${voucherDiscount}`,
                 `Mua cả combo ${targetProduct.name}`,
                 'Tư vấn trả góp 0%',
-                'Xem bảng so sánh máy khác'
+                'Đặt giữ hàng tại Showroom'
             ],
             context: {
                 ...context,
                 lastProducts: [targetProduct],
-                stage: 'bundle_bargain'
+                stage: 'bundle_bargain',
+                activeVoucher: voucherCode
             }
         };
     } catch (e) {
@@ -2289,7 +2307,13 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const specialAdvisor = await handleBudgetAndSpecialAdvisorQueries(message, req.body.context);
         const policyAnswer = await answerPolicyQuestion(message);
         const gameCapability = await evaluateGameOrTaskCapability(message, req.body.context);
-        const isBargainOrBundle = ['bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem', 'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot', 'co giam them', 'combo phu kien', 'co khuyen mai kem'].some(k => hasWordOrPhrase(text, k));
+        const isBargainOrBundle = [
+            'bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem',
+            'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot',
+            'co giam them', 'combo phu kien', 'co khuyen mai kem', 'bot khong shop', 'co bot khong', 'bot gia khong',
+            'fix gia khong', 'fix gia', 'bot 200k', 'bot 500k', 'giam 200k', 'giam 500k', 'bot chut di', 'giam chut di',
+            'co chiet khau khong', 'mua 2 cai co giam khong', 'mua nhieu co giam khong', 'co gia si khong', 'bot duoc khong'
+        ].some(k => hasWordOrPhrase(text, k)) || /\b(bot|giam|fix|chiet khau)\s+(\d+\s*(k|tr|trieu)|chut|it|ti)\b/i.test(text);
 
         const smallTalk = detectGreetingOrSmallTalk(text);
         if (isPresenceCheckOrGreeting(message)) {
@@ -2323,6 +2347,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         } else if (policyAnswer) {
             response = {
                 reply: typeof policyAnswer === 'string' ? policyAnswer : policyAnswer.reply,
+                products: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.products)) ? policyAnswer.products : [],
                 suggestions: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.suggestions)) ? policyAnswer.suggestions : ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay'],
                 context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...(req.body.context || {}), ...policyAnswer.context } : { ...(req.body.context || {}), stage: 'policy' }
             };

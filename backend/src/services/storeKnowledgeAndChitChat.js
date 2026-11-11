@@ -195,7 +195,7 @@ const STORE_POLICY_RULES = [
             'ship cod khong', 'giao hoa toc', 'kiem tra truoc khi thanh toan', 'dong kiem khi nhan hang', 'ship toan quoc khong'
         ],
         reply: `Dạ thời gian giao hàng và chính sách kiểm hàng tại cửa hàng rất nhanh chóng và minh bạch ạ! 🚚📦\n\n` +
-            `• ⚡ **Giao siêu tốc 2 giờ:** Áp dụng cho đơn hàng nội thành TP.HCM (Quận 7, Q1, Q3, Bình Thạnh...) và Hà Nội (Đống Đa, Cầu Giấy, Hoàn Kiếm...).\n` +
+            `• ⚡ **Giao siêu tốc 2 giờ:** Áp dụng cho đơn hàng nội thành TP.HCM (Gò Vấp, Bình Thạnh, Q1, Q3, Tân Bình, Phú Nhuận, Thủ Đức...).\n` +
             `• 🚛 **Giao toàn quốc:** Từ 1 – 3 ngày làm việc qua đối tác vận chuyển hỏa tốc chuyên nghiệp (GHTK, Viettel Post).\n` +
             `• 🆓 **Miễn phí vận chuyển:** Cho tất cả đơn hàng công nghệ có giá trị từ **500.000 đ** trở lên.\n` +
             `• 🔍 **ĐẶC QUYỀN ĐỒNG KIỂM 100%:** Bạn được quyền **Mở hộp kiểm tra ngoại quan máy, phụ kiện, tem niêm phong và cắm sạc lên nguồn** trước khi thanh toán tiền cho shipper. Nếu hàng không đúng mô tả, bạn có quyền từ chối nhận mà không mất bất kỳ chi phí nào!`,
@@ -855,6 +855,185 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `   • Thu âm trong vắt, tích hợp tính năng lọc ồn AI cực đỉnh dù bạn đứng quay giữa phố đông đúc hay quán cafe ồn ào.\n\n` +
             `👉 Bạn đang dự định làm kênh về chủ đề gì (du lịch, ẩm thực, làm đẹp hay bán hàng livestream) và tầm ngân sách bao nhiêu để em chọn combo tối ưu nhất nhé! 😊`,
         suggestions: ['Xem DJI Osmo Pocket 3', 'Xem Micro DJI Mic 2', 'Xem iPhone 16 Pro Max', 'Tư vấn Gimbal chống rung']
+    },
+
+    // 3.15 Hàng chính hãng VN/A là gì? Khác gì hàng xách tay (LL/A, ZA/A)?
+    {
+        id: 'advice_vna_vs_imported_phone',
+        patterns: [
+            /(hang|may).*(vn\/a|vna).*(la gi|la sao|khac gi|xach tay|ll\/a|lla|za\/a|zaa)/i,
+            /(hang xach tay|may xach tay).*(co tot khong|co nen mua|co duoc bao hanh|khac gi)/i,
+            /(tai sao|ly do).*(nen mua hang vna|mua may vna|mua chinh hang)/i,
+            /(co phai|dung phai).*(hang vn\/a|may vn\/a)/i
+        ],
+        keywords: [
+            'hang vna la gi', 'hang vna khac gi xach tay', 'tai sao nen mua hang vna', 'may vna va lla',
+            'hang xach tay co bao hanh khong', 'phan biet vna va xach tay', 'nguon goc may techecommerce', 'co phai may lock khong',
+            'may vn/a la sao', 'tai sao nen mua vna'
+        ],
+        reply: `Dạ em xin giải thích chi tiết và minh bạch về sự khác biệt giữa hàng chính hãng VN/A và hàng xách tay để bạn hoàn toàn an tâm chọn lựa nhé! 🇻🇳🛡️\n\n` +
+            `1. 🏆 **HÀNG CHÍNH HÃNG VN/A (100% CÓ SẴN TẠI TECHECOMMERCE):**\n` +
+            `   • **Nguồn gốc chuẩn mực:** Là sản phẩm được Apple/Samsung/ASUS phân phối chính thức cho thị trường Việt Nam, có hóa đơn VAT điện tử hợp pháp và tem kiểm định chất lượng ICT.\n` +
+            `   • **Bảo hành ủy quyền toàn quốc:** Được tiếp nhận tại 100% Trung tâm Bảo hành Ủy quyền (Apple AASP, CareS, Samsung Service...) trên toàn quốc mà không cần xuất trình hóa đơn phức tạp.\n` +
+            `   • **Phần cứng tối ưu:** Bản iPhone VN/A có 1 khe SIM vật lý + eSIM tiện lợi, sóng mạng 5G Viettel/VinaPhone/MobiFone ổn định tối đa.\n\n` +
+            `2. ⚠️ **RỦI RO KHI MUA HÀNG XÁCH TAY (LL/A - Mỹ, ZA/A - Singapore/Hongkong):**\n` +
+            `   • Bản Mỹ (LL/A từ iPhone 14 trở đi) **bị bỏ hoàn toàn khe SIM vật lý**, chỉ dùng eSIM gây bất tiện khi đổi máy hoặc đi nước ngoài.\n` +
+            `   • Từ năm 2023, các TTBH ủy quyền tại Việt Nam **từ chối bảo hành máy xách tay** nếu không có hóa đơn mua hàng gốc từ Apple Store nước sở tại kèm giấy tờ hải quan.\n` +
+            `   • Rủi ro cao dính máy Lock cấy sim ghép, máy MDM quản lý từ xa, hoặc máy đã bị luộc linh kiện đóng lại seal giả.\n\n` +
+            `👉 Tại TechEcommerce, 100% máy là **mới nguyên seal chính hãng VN/A**, cam kết bảo hành **1 đổi 1 trong 30 ngày** nếu phát sinh lỗi phần cứng. Bạn ghé Showroom **78 Nguyễn Văn Khối, Q. Gò Vấp** tự tay bóc seal và kiểm tra bảo hành điện tử nhé! 😊`,
+        suggestions: ['Chính sách bảo hành 1 đổi 1', 'Địa chỉ Showroom 78 Nguyễn Văn Khối', 'Tư vấn iPhone chính hãng', 'Hotline 0842.331.606']
+    },
+
+    // 3.16 Điện thoại màn hình gập (Galaxy Z Fold / Z Flip) vs Điện thoại dạng thanh (iPhone Pro Max / Galaxy Ultra)
+    {
+        id: 'advice_foldable_vs_bar_phone',
+        patterns: [
+            /(co nen mua|nen mua).*(dien thoai gap|man hinh gap|z fold|z flip|galaxy fold)/i,
+            /(so sanh|chon).*(z fold|galaxy fold|dien thoai gap).*(iphone|pro max|s24 ultra|s25 ultra|dien thoai thuong)/i,
+            /(man hinh gap|z fold).*(co ben khong|de hong khong|nep gap)/i
+        ],
+        keywords: [
+            'co nen mua dien thoai gap khong', 'z fold co ben khong', 'nen mua z fold hay iphone pro max',
+            'nep gap man hinh z fold', 'man hinh gap dung co so hong khong', 'so sanh z fold va s24 ultra', 'co nen mua z fold 7'
+        ],
+        reply: `Dạ đây là câu hỏi được rất nhiều khách hàng quan tâm khi phân vân giữa điện thoại màn hình gập thời thượng và flagship dạng thanh truyền thống nè! Em xin phân tích đánh đổi thực tế để bạn chọn đúng nhu cầu nhé: 📱⚖️\n\n` +
+            `1. 💼 **ĐIỆN THOẠI MÀN HÌNH GẬP (Điển hình: Samsung Galaxy Z Fold7 5G):**\n` +
+            `   • ✨ **Ưu điểm vượt trội:** Mở ra thành máy tính bảng mini 7.6 - 8 inch, đa nhiệm cùng lúc 3 cửa sổ (vừa xem biểu đồ tài chính, vừa họp online, vừa ghi chú S-Pen). Gập lại mỏng gọn chỉ bằng chiếc điện thoại thông thường.\n` +
+            `   • 🛡️ **Độ bền thực tế:** Bản lề Armor Aluminum thế hệ mới chịu được hơn 400.000 lần gập mở (tương đương 10 năm sử dụng), nếp gấp đã được tối ưu phẳng lì và có kháng nước IP48/IPX8.\n` +
+            `   • ⚠️ **Lưu ý:** Cần tránh va chạm cát bụi sắc nhọn vào màn hình trong, chi phí thay màn hình dẻo cao hơn màn hình thường.\n\n` +
+            `2. 👑 **ĐIỆN THOẠI DẠNG THANH TRUYỀN THỐNG (iPhone 16 Pro Max / Galaxy S24 Ultra):**\n` +
+            `   • ✨ **Ưu điểm:** Khung Titan siêu bền, kính Ceramic Shield chịu va đập tốt hơn, thời lượng pin trâu hơn 20-30%, phụ kiện ốp lưng kính cường lực phong phú và giữ giá tốt hơn khi bán lại.\n\n` +
+            `🎯 **LỜI KHUYÊN TỪ CHUYÊN GIA TECHECOMMERCE:**\n` +
+            `• 👉 Chọn **Galaxy Z Fold:** Nếu bạn là doanh nhân, nhà đầu tư, quản lý cần làm việc đa nhiệm và thích trải nghiệm công nghệ tương lai.\n` +
+            `• 👉 Chọn **iPhone Pro Max / Galaxy Ultra:** Nếu bạn cần chiếc máy thực dụng, bền bỉ tuyệt đối, pin dùng cả ngày dài và camera chụp ảnh/quay video tốt nhất.\n\n` +
+            `Bạn ghé Showroom **78 Nguyễn Văn Khối, Gò Vấp** cầm thử trực tiếp cả 2 dòng máy để cảm nhận độ đầm tay nhé! 😊`,
+        suggestions: ['Xem Galaxy Z Fold7 5G', 'Xem iPhone 16 Pro Max', 'Xem Galaxy S24 Ultra', 'Tư vấn trả góp 0%']
+    },
+
+    // 3.17 Chuyển đổi dữ liệu giữa iPhone và Android (sao lưu Zalo, danh bạ, hình ảnh)
+    {
+        id: 'advice_os_migration_ios_android',
+        patterns: [
+            /(chuyen|doi|sang).*(tu iphone sang|tu android sang|tu samsung sang|ios sang android|android sang ios|iphone sang|android sang|samsung sang)/i,
+            /(iphone|android|samsung|ios).*(doi sang|chuyen sang|chuyen qua|sang).*(iphone|android|samsung|may moi)/i,
+            /(doi may|sang may moi|doi dien thoai).*(mat|zalo|tin nhan|danh ba|du lieu)/i,
+            /(co mat|so mat|mat).*(tin nhan|zalo|danh ba|anh|hinh anh|du lieu).*(khong|khi doi|khi chuyen)?/i,
+            /(chuyen du lieu|chuyen danh ba|chuyen tin nhan|chuyen zalo).*(sang may moi|sang iphone|sang samsung|co mat khong|the nao|nhu the nao)/i
+        ],
+        keywords: [
+            'chuyen tu android sang iphone co kho khong', 'doi may co mat tin nhan zalo khong', 'chuyen danh ba sang iphone',
+            'chuyen du lieu samsung sang iphone', 'sao luu zalo sang may moi', 'doi tu iphone sang samsung', 'chuyen zalo qua may moi',
+            'doi iphone sang samsung co mat zalo khong', 'co mat tin nhan zalo khong'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm nhé! Việc đổi hệ điều hành giữa iPhone và Android hiện nay đã cực kỳ nhanh chóng và **100% KHÔNG BỊ MẤT DỮ LIỆU** ạ! 📲🔄\n\n` +
+            `✨ **3 BƯỚC CHUYỂN DỮ LIỆU TRỌN VẸN TRONG 10 PHÚT:**\n` +
+            `1. 📇 **Danh bạ, Hình ảnh, Video & Ghi chú:**\n` +
+            `   • Từ Android sang iPhone: Dùng ứng dụng chính thức **'Move to iOS'** (tải trên CH Play). Đặt 2 máy cạnh nhau, quét mã là chuyển toàn bộ ảnh, danh bạ, tin nhắn SMS tự động qua Wi-Fi.\n` +
+            `   • Từ iPhone sang Samsung: Dùng cáp C-to-C cắm trực tiếp 2 máy qua ứng dụng **'Smart Switch'**, tốc độ chuyển cực nhanh 50GB chỉ mất ~8 phút.\n\n` +
+            `2. 💬 **Tin nhắn Zalo (Cực kỳ quan trọng):**\n` +
+            `   • Trên máy cũ: Vào Zalo > Cài đặt (icon bánh răng) > **Sao lưu và khôi phục** > Bấm **'Sao lưu ngay'** (nhớ đặt mật khẩu sao lưu để bảo vệ tin nhắn).\n` +
+            `   • Trên máy mới: Đăng nhập Zalo và nhập mật khẩu sao lưu là toàn bộ tin nhắn và ảnh cũ sẽ được khôi phục nguyên vẹn 100%.\n\n` +
+            `3. 🛠️ **ĐẶC QUYỀN MIỄN PHÍ TẠI TECHECOMMERCE:**\n` +
+            `Khi mua máy tại Showroom **78 Nguyễn Văn Khối, Quận Gò Vấp**, chuyên viên kỹ thuật sẽ hỗ trợ chuyển toàn bộ dữ liệu, dán màn hình và cài đặt phần mềm miễn phí từ A đến Z cho bạn nhé! 😊`,
+        suggestions: ['Showroom 78 Nguyễn Văn Khối Gò Vấp', 'Tư vấn iPhone mới', 'Tư vấn Samsung mới', 'Hotline 0842.331.606']
+    },
+
+    // 3.18 So sánh vi xử lý Apple Silicon M-Series (M2 vs M3/M4) & Intel Core Ultra vs AMD Ryzen
+    {
+        id: 'advice_chipset_m_series_intel',
+        patterns: [
+            /(chip|vi xu ly).*(m1|m2|m3|m4|intel|core ultra|ryzen).*(khac gi|manh hon|nen mua)/i,
+            /(so sanh chip|nen chon chip|m2 hay m3|m3 hay m4)/i
+        ],
+        keywords: [
+            'chip m2 va m3 khac gi', 'chip m2 con dang mua khong', 'nen mua macbook chip m nao',
+            'chip m4 manh hon m3 bao nhieu', 'so sanh chip intel va apple silicon', 'core ultra co gi moi', 'm2 voi m3'
+        ],
+        reply: `Dạ em xin tóm lược định lượng hiệu năng thực tế giữa các thế hệ vi xử lý để bạn chọn cấu hình tối ưu chi phí nhất nè: ⚡💻\n\n` +
+            `🍎 **DÒNG CHIP APPLE SILICON (M-SERIES):**\n` +
+            `• 💡 **Apple M2 (Best P/P - Đáng tiền nhất):** Cân mượt mà 100% tác vụ văn phòng, học tập, Photoshop, Illustrator, Premiere dựng video 4K CapCut mát rượi và pin trâu 18 tiếng. Giá máy đang cực tốt (MacBook Air M2 13 inch chỉ 23.490.000 ₫).\n` +
+            `• 🚀 **Apple M3 / M4 (Đỉnh cao đồ họa & AI):** Nâng cấp công nghệ dò tia Ray Tracing bằng phần cứng, render 3D Blender và biên dịch code Xcode/Docker nhanh hơn 25-35%, hỗ trợ xuất 2 màn hình ngoài khi gập máy.\n\n` +
+            `⚡ **DÒNG CHIP WINDOWS (INTEL CORE ULTRA & AMD RYZEN 8000):**\n` +
+            `• Tích hợp nhân NPU chuyên biệt xử lý các tác vụ trí tuệ nhân tạo (Copilot+ PC, khử ồn webcam, nhận diện cử chỉ).\n` +
+            `• Tương thích tuyệt đối với các phần mềm kỹ thuật đặc thù (AutoCAD, SolidWorks, 3Ds Max) và kho game đồ họa PC khổng lồ.\n\n` +
+            `👉 Nếu nhu cầu của bạn là làm việc di động, cần máy pin trâu cả ngày và màn hình chuẩn màu ➔ **MacBook chip M2/M3** là số 1.\n` +
+            `👉 Nếu cần chơi game nặng hoặc phần mềm kỹ thuật ➔ **Laptop Windows Intel Core Ultra / RTX Gaming** là chuẩn nhất nhé! 😊`,
+        suggestions: ['Xem MacBook Air M2 256GB', 'Xem Laptop Gaming ASUS', 'Tư vấn Laptop Lập trình', 'Hotline 0842.331.606']
+    },
+
+    // 3.19 Tư vấn mua quà tặng công nghệ theo dịp & đối tượng (Tặng sếp, người yêu/vợ, bố mẹ, con cái)
+    {
+        id: 'advice_gifting_persona_selection',
+        patterns: [
+            /(mua qua|tang qua|chon qua).*(cho sep|cho ban gai|cho vo|cho chong|cho bo me|cho con|sinh nhat|tot nghiep|8\/3|20\/10|tet)/i,
+            /(tu van qua tang|qua sinh nhat|qua tang cong nghe)/i
+        ],
+        keywords: [
+            'mua qua tang sep', 'qua tang sinh nhat ban gai', 'tang qua 8/3 cho vo', 'mua qua tang bo me',
+            'tang qua cong nghe', 'qua sinh nhat cho nguoi yeu', 'tang qua tot nghiep', 'qua tang cong nghe y nghia'
+        ],
+        reply: `Dạ quà tặng công nghệ luôn là món quà vừa sang trọng, tinh tế vừa có giá trị sử dụng thiết thực hàng ngày nè! Em xin gợi ý các combo 'chuẩn không cần chỉnh' theo từng đối tượng nhé: 🎁✨\n\n` +
+            `1. 👔 **TẶNG SẾP / ĐỐI TÁC DOANH NGHIỆP:**\n` +
+            `   • 🌟 **Gợi ý:** iPad Pro M4, MacBook Air M2/M3 hoặc Đồng hồ thông minh cao cấp Apple Watch Ultra 2 / Garmin Forerunner.\n` +
+            `   • Điểm nhấn: Thiết kế kim loại nguyên khối sang trọng, phục vụ công việc và khẳng định vị thế.\n\n` +
+            `2. 💖 **TẶNG VỢ / BẠN GÁI (Sinh nhật, 8/3, 20/10, Kỷ niệm):**\n` +
+            `   • 🌟 **Gợi ý:** iPhone màu Hồng (Pink) / Titan Sa Mạc, Apple Watch Series 10 (viền mỏng nữ tính, theo dõi chu kỳ sức khỏe) hoặc Tai nghe AirPods 4 nhỏ nhắn đeo êm tai.\n` +
+            `   • Đảm bảo chị em mở hộp ra là mê mẩn và khen bạn tâm lý số 1 luôn ạ!\n\n` +
+            `3. 👨‍👩‍👧 **TẶNG BỐ MẸ / NGƯỜI LỚN TUỔI:**\n` +
+            `   • 🌟 **Gợi ý:** iPad Gen 10 10.9 inch (gọi video call sắc nét, màn to đọc báo không mỏi mắt) hoặc Samsung Galaxy A-series (pin 2 ngày, loa to rõ, font chữ lớn).\n\n` +
+            `4. 🎓 **TẶNG CON / EM HỌC SINH - SINH VIÊN:**\n` +
+            `   • 🌟 **Gợi ý:** Lenovo Tab M11 (tặng sẵn bút cảm ứng vẽ ghi chú chỉ hơn 4 triệu) hoặc Laptop học tập mỏng nhẹ ASUS Vivobook.\n\n` +
+            `🎀 **ĐẶC QUYỀN QUÀ TẶNG TẠI TECHECOMMERCE:**\n` +
+            `Shop hỗ trợ **Miễn phí gói quà cao cấp kèm thiệp viết tay theo lời chúc của bạn** và giao hỏa tốc tận tay người nhận nhé! Bạn đang muốn tặng dịp nào để em chuẩn bị chu đáo nha? 😊`,
+        suggestions: ['Xem iPhone chính hãng', 'Xem Apple Watch Series 10', 'Xem Lenovo Tab M11 Kèm Bút', 'Hotline 0842.331.606']
+    },
+
+    // 3.20 Tư vấn mua trả góp qua CCCD khi không có thẻ tín dụng & thắc mắc nợ xấu
+    {
+        id: 'advice_installment_bad_debt_no_card',
+        patterns: [
+            /(khong co the tin dung|chi co cccd|khong co the).*(co tra gop duoc khong|mua gop duoc khong)/i,
+            /(no xau|bi no xau).*(co tra gop duoc khong|mua gop)/i,
+            /(tra truoc 0 dong|khong can tra truoc).*(duoc khong)/i
+        ],
+        keywords: [
+            'khong co the tin dung tra gop duoc khong', 'chi co cccd mua gop duoc khong', 'bi no xau co tra gop duoc khong',
+            'tra truoc 0 dong', 'thu tuc tra gop cccd', 'tra gop sinh vien', 'khong co the tin dung'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm nhé! Tại TechEcommerce, **KHÔNG CẦN THẺ TÍN DỤNG VẪN TRẢ GÓP 100% ĐƯỢC** ạ! 💳📝\n\n` +
+            `✨ **HÌNH THỨC TRẢ GÓP QUA CCCD GẮN CHIP (Duyệt online 3 - 5 phút):**\n` +
+            `• 📋 **Thủ tục siêu đơn giản:** Chỉ cần ảnh chụp 2 mặt CCCD gắn chip chính chủ (độ tuổi từ 18 – 60 tuổi).\n` +
+            `• ❌ **Không cần chứng minh thu nhập:** Không cần sao kê bảng lương, không giữ giấy tờ gốc, không gọi điện làm phiền người thân.\n` +
+            `• 💵 **Trả trước linh hoạt:** Có thể trả trước từ **0 đồng** (hoặc 10% - 30% tùy dòng máy để tăng tỷ lệ duyệt 100%). Kỳ hạn thanh toán linh hoạt 6 – 12 tháng.\n\n` +
+            `⚠️ **VỀ TRƯỜNG HỢP NỢ XẤU (CIC):**\n` +
+            `• Các công ty tài chính đối tác (Home Credit, HD Saison, FE Credit) sẽ quét lịch sử tín dụng trên hệ thống CIC quốc gia.\n` +
+            `• Nếu bạn từng có nợ xấu nhóm 3 trở lên, hồ sơ tự động có thể bị từ chối. Trong trường hợp này, **shop khuyên chân thành bạn có thể nhờ người thân trong gia đình (bố, mẹ, anh chị em) đứng tên hồ sơ trả góp hộ** để được duyệt ngay trong 5 phút nhé!\n\n` +
+            `👉 Bạn đang quan tâm mẫu máy nào để em tính thử số tiền trả trước và tiền góp mỗi tháng cho bạn xem trước nha! 😊`,
+        suggestions: ['Tính thử trả góp 0%', 'Tư vấn thủ tục CCCD', 'Xem sản phẩm hot', 'Hotline 0842.331.606']
+    },
+
+    // 3.21 Hẹn giờ trải nghiệm máy & giữ hàng 24h tại Showroom 78 Nguyễn Văn Khối Gò Vấp
+    {
+        id: 'advice_showroom_experience_appointment',
+        patterns: [
+            /(den xem may|ghe showroom|trai nghiem may|co san may khong|mo cua den may gio|cho dau xe|giu may giup toi)/i,
+            /(dia chi showroom o dau|o go vap khong|78 nguyen van khoi)/i
+        ],
+        keywords: [
+            'den xem may truc tiep duoc khong', 'showroom co san may trai nghiem khong', 'mo cua den may gio',
+            'co cho dau o to khong', 'giu may giup toi', 'dia chi showroom go vap', 'showroom go vap mo cua may gio'
+        ],
+        reply: `Dạ cửa hàng nhiệt liệt chào đón bạn ghé trải nghiệm thực tế bất kỳ lúc nào ạ! 🏬✨\n\n` +
+            `📍 **ĐỊA CHỈ SHOWROOM DUY NHẤT:**\n` +
+            `• **🏢 78 Nguyễn Văn Khối, Phường 11, Quận Gò Vấp, Thành phố Hồ Chí Minh**\n` +
+            `• ⏰ **Giờ mở cửa:** **08:30 – 21:30** tất cả các ngày trong tuần (kể cả Thứ 7, Chủ Nhật và ngày Lễ, Tết).\n` +
+            `• 🚗 **Tiện ích:** Có bãi đỗ xe ô tô và xe máy rộng rãi ngay trước cửa, bảo vệ trông xe miễn phí.\n\n` +
+            `🌟 **ĐẶC QUYỀN KHI ĐẾN TRẢI NGHIỆM TRỰC TIẾP:**\n` +
+            `1. Quầy trải nghiệm thực tế 100% sản phẩm bật nguồn sẵn: lướt web, thử camera, test loa, trải nghiệm bút cảm ứng trên màn hình 120Hz mượt mà.\n` +
+            `2. Kỹ thuật viên dán cường lực miễn phí, hỗ trợ chuyển dữ liệu và cài đặt phần mềm trọn gói.\n` +
+            `3. **Dịch vụ Giữ máy 24 giờ:** Nếu bạn ưng ý mẫu nào, shop hỗ trợ niêm phong giữ máy tại quầy trong 24h **hoàn toàn miễn phí** (không cần cọc tiền trước).\n\n` +
+            `👉 Bạn dự kiến ghé showroom vào khung giờ nào để em dặn các bạn chuyên viên chuẩn bị máy sẵn đón tiếp bạn chu đáo nhất nhé! 😊`,
+        suggestions: ['Đặt giữ máy 24h tại Showroom', 'Hotline 0842.331.606', 'Tư vấn sản phẩm mới']
     }
 ];
 
