@@ -107,6 +107,7 @@ const STORE_POLICY_RULES = [
     // 1.5 Cam kết chất lượng máy mới nguyên seal 100%
     {
         id: 'genuine_seal_commitment',
+        excludeIf: (norm) => /\b(like new|99%|99|cu|nen mua.*(moi hay|like new)|so sanh.*(moi|99)|phan van.*(moi|99))\b/i.test(norm),
         keywords: [
             'nguyen seal', 'co nguyen seal khong', 'hang quoc te hay lock', 'may lock hay quoc te',
             'hang chinh hang hay xach tay', 'co phai hang cu khong', 'may moi 100%', 'hang vn/a khong',
@@ -359,9 +360,10 @@ const OBJECTION_RULES = [
     // 2.0 Khách cần hỏi ý kiến vợ/chồng/người yêu ("Về hỏi vợ đã", "Hỏi ý kiến vợ")
     {
         id: 'objection_ask_partner_spouse',
+        excludeIf: (norm) => /\b(chong on|chong nuoc|chong soc|chong rung|chong bui|tai nghe)\b/i.test(norm),
         patterns: [
             /(ve|de|cho).*(hoi vo|hoi chong|hoi ban gai|hoi nguoi yeu|ban lai voi vo|ban voi chong|hoi y kien vo|hoi y kien chong|hoi y kien ba xa|hoi y kien ong xa)/i,
-            /(vo|chong|nguoi yeu|ba xa|ong xa|noc nha).*(chua cho|chua dong y|la|mang|khong cho mua|kho tinh)/i,
+            /\b(vo|chong|nguoi yeu|ba xa|ong xa|noc nha)\b.*?\b(chua cho|chua dong y|la mang|bi la|bi mang|mang mo|khong cho mua|kho tinh)\b/i,
             /(hoi y kien|hoi).*(vo|chong|ba xa|ong xa|nguoi yeu|ban gai|ban trai|noc nha)/i
         ],
         keywords: [
@@ -527,6 +529,7 @@ const BUDGET_AND_CONSULTATION_RULES = [
     // 3.1 Điện thoại dưới 5 triệu (Phổ thông, Pin trâu, Học sinh & Người lớn tuổi)
     {
         id: 'budget_phone_under_5m',
+        excludeIf: (norm) => /\b(cho bo me|cho me|cho ba|cho ong ba|nguoi lon tuoi|nguoi gia)\b/i.test(norm),
         patterns: [
             /(dien thoai|may).*(duoi 5 trieu|duoi 5tr|tam 3|tam 4|tam 5 trieu|gia re|hoc sinh)/i,
             /(3 trieu|4 trieu|5 trieu).*(mua dien thoai gi|nen mua may nao)/i
@@ -1227,6 +1230,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.19 Tư vấn laptop chuyên dụng cho Đồ họa 2D / 3D / Kiến trúc / Render video 4K
     {
         id: 'advice_graphic_design_architect_render',
+        excludeIf: (norm) => /\b(mac.*(hay|vs|hoac).*(win|windows)|(win|windows).*(hay|vs|hoac).*mac)\b/i.test(norm),
         patterns: [
             /(do hoa 2d|do hoa 3d|photoshop|illustrator|autocad|revit|3ds max|blender|sketchup)/i,
             /(premiere|after effects|dung phim|render 4k|capcut pc|da vinci)/i,
@@ -1300,6 +1304,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.22 Hỏi về khả năng đi mưa, mồ hôi tập gym, chuẩn kháng nước IP68 thực tế
     {
         id: 'advice_water_resistant_rain_sweat',
+        excludeIf: (norm) => /\b(dong ho|smartwatch|apple watch|galaxy watch|garmin|chay bo|marathon)\b/i.test(norm),
         patterns: [
             /(di mua co sao khong|mo hoi|tap gym|chong nuoc the nao|chuan ip68|roi xuong nuoc)/i,
             /(co duoc rua may khong|mang vao phong tam|chong nuoc that khong)/i,
@@ -1736,6 +1741,288 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `💡 **LƯU Ý SỐNG CÒN:** Dù chọn Mac hay Windows, hãy chọn **RAM tối thiểu 16GB trở lên** (tuyệt đối không mua 8GB) để chạy mượt nhiều máy ảo Docker và trình giả lập điện thoại nhé!\n\n` +
             `👉 Bạn dự định chuyên sâu mảng Web, Mobile, AI hay Game để em lọc mẫu máy tối ưu nhất cho bạn nhé! 😊`,
         suggestions: ['Xem MacBook Pro RAM 16GB/24GB', 'Xem Laptop Gaming RTX cho IT', 'Ưu đãi Sinh viên giảm 500k']
+    },
+
+    // 3.49 Tư vấn Phụ kiện & Combo Mua Kèm Tiết Kiệm (Cross-sell / Bundle Strategy)
+    {
+        id: 'advice_cross_sell_accessories_bundle',
+        patterns: [
+            /(mua kem|phu kien|combo).*(giam gia|tiet kiem|co gi|can mua gi|tang kem|uu dai)/i,
+            /(mua|sam).*(ipad|iphone|laptop).*(co kem|co can mua|nen mua kem|co phu kien gi)/i,
+            /(co nen mua them|can mua them).*(but|cu sac|op lung|cuong luc|chuot|ban phim)/i
+        ],
+        keywords: [
+            'combo phu kien tiet kiem', 'mua kem phu kien co giam gia khong', 'mua ipad co nen mua but khong',
+            'mua iphone co kem cu sac khong', 'mua laptop can mua them phu kien gi', 'combo phu kien giam 30',
+            'nen mua them gi khi mua may moi', 'phu kien nen mua kem'
+        ],
+        reply: `Dạ khi mua máy mới tại cửa hàng, bạn sẽ nhận được **Đặc quyền Giảm ngay 30% cho Combo Phụ kiện mua kèm**, tiết kiệm trực tiếp từ 250.000 ₫ đến 500.000 ₫ nè! 🎁⚡\n\n` +
+            `Em xin gợi ý những món phụ kiện thiết thực nhất theo từng dòng máy để bạn tham khảo nha:\n` +
+            `• 📱 **Khi mua iPhone mới (từ iPhone 12 trở lên):** Trong hộp chỉ có máy và dây sạc Type-C, không kèm củ sạc. Combo tối ưu nhất là: **Củ sạc nhanh GaN 30W chuẩn PD (sạc 50% trong 25 phút) + Kính cường lực KingKong chống va đập + Ốp lưng từ tính MagSafe**.\n` +
+            `• 🖊️ **Khi mua iPad / Tablet:** Nếu bạn dùng để **ghi chú học tập hoặc vẽ**, bút cảm ứng (Apple Pencil / Bút Stylus) là vật bất ly thân; nếu cần soạn thảo văn bản nhiều thì nên sắm kèm **Bao da bàn phím Bluetooth**.\n` +
+            `• 💻 **Khi mua Laptop:** Combo không thể thiếu gồm: **Chuột không dây tĩnh âm (Silent Click) + Balo chống sốc chống thấm nước + Hub chuyển đổi Type-C đa năng** để cắm máy chiếu/USB tiện lợi.\n\n` +
+            `👉 Bạn đang tính rinh mẫu máy nào để em lên sẵn set combo phụ kiện vừa khít và áp voucher giảm giá tối đa cho bạn nhé! 😊`,
+        suggestions: ['Xem Củ sạc nhanh GaN 30W', 'Xem Bút cảm ứng iPad', 'Xem Chuột & Balo Laptop', 'Săn mã giảm giá combo']
+    },
+
+    // 3.50 Lo Ngại Bị Tráo Linh Kiện / Luộc Đồ Khi Đi Bảo Hành Sửa Chữa
+    {
+        id: 'advice_hardware_tampering_warranty_safety',
+        patterns: [
+            /(bao hanh|sua chua).*(so bi trao|luoc do|luoc linh kien|trao do|thay linh kien)/i,
+            /(co so bi luoc|co bi trao linh kien|co bi luoc do khong)/i,
+            /(co duoc ky ten|quy trinh tiep nhan bao hanh|kiem dinh linh kien)/i
+        ],
+        keywords: [
+            'bao hanh co bi luoc do khong', 'gui may bao hanh so bi trao do', 'so bi luoc linh kien',
+            'quy trinh bao hanh co minh bach khong', 'co duoc ky ten len linh kien khong',
+            'so bi thay do khi bao hanh', 'bao hanh co an tam khong'
+        ],
+        reply: `Dạ em rất thấu hiểu băn khoăn của bạn! Nỗi lo bị tráo đồ hay luộc linh kiện là hoàn toàn có cơ sở khi gửi máy ở các tiệm nhỏ lẻ bên ngoài. Tuy nhiên tại TechEcommerce, quy trình dịch vụ được chuẩn hóa với **4 LỚP MINH BẠCH TUYỆT ĐỐI** bạn hoàn toàn an tâm nhé: 🛡️🔒\n\n` +
+            `1. ✍️ **Ký tên trực tiếp lên linh kiện:** Trước khi nhận máy, kỹ thuật viên sẽ mời bạn dùng bút chuyên dụng **ký tên trực tiếp lên Màn hình, Cụm Camera, Pin và Mainboard**.\n` +
+            `2. 📄 **Biên bản kiểm định niêm phong:** Ghi nhận rõ số Serial/IMEI của từng linh kiện, chụp ảnh lưu trữ trên hệ thống điện tử của cửa hàng.\n` +
+            `3. 📹 **Camera 4K giám sát 24/7:** Toàn bộ khu vực kỹ thuật bóc tách và sửa chữa máy đều nằm trong tầm quét camera lưu trữ 90 ngày. Khách hàng có thể yêu cầu trích xuất bất kỳ lúc nào.\n` +
+            `4. 📲 **Theo dõi tiến độ bằng mã QR:** Khách có thể quét mã theo dõi từng bước kỹ thuật viên xử lý máy theo thời gian thực.\n\n` +
+            `🤝 **CAM KẾT THÉP:** Nếu phát hiện bất kỳ linh kiện nào bị thay thế không đúng thỏa thuận, cửa hàng **ĐỀN NGAY 01 MÁY MỚI 100% NGUYÊN SEAL** và hoàn trả toàn bộ chi phí! Bạn cứ yên tâm tuyệt đối nha! 😊`,
+        suggestions: ['Chính sách 1 đổi 1 trong 30 ngày', 'Gói Bảo Hành Vàng', 'Địa chỉ Showroom hỗ trợ']
+    },
+
+    // 3.51 Khách Phân Vân: Mua Máy Mới 100% Đập Hộp hay Máy Like New 99%
+    {
+        id: 'advice_brand_new_vs_like_new_99',
+        patterns: [
+            /(nen mua|so sanh|phan van).*(may moi|brand new|dap hop|nguyen seal).*(may cu|like new|99|cu)/i,
+            /(may 99|like new 99).*(co ngon khong|co dam bao khong|co zin khong|co nen mua)/i
+        ],
+        keywords: [
+            'nen mua may moi hay may 99', 'nen mua like new hay dap hop', 'may like new 99 co zin khong',
+            'co nen mua may like new de tiet kiem khong', 'so sanh may moi va may 99', 'may 99 dung co ben khong'
+        ],
+        reply: `Dạ đây là phân vân của rất nhiều khách hàng thông thái luôn nè! Em xin so sánh thực tế giữa 2 lựa chọn để bạn dễ dàng quyết định theo ngân sách nha: 📱⚖️\n\n` +
+            `✨ **1. MÁY MỚI 100% NGUYÊN SEAL (ĐẬP HỘP):**\n` +
+            `• **Ưu điểm:** Cảm giác tự tay bóc seal cực kỳ thích thú; pin nguyên vẹn 100%; bảo hành chính hãng trọn vẹn 12 - 24 tháng tại TTBH ủy quyền của Apple/Samsung trên toàn quốc; dùng bền bỉ 4 - 5 năm không cần bận tâm.\n` +
+            `• **Phù hợp:** Người mua dùng lâu dài, người không rành kiểm tra máy, hoặc mua làm quà tặng.\n\n` +
+            `✨ **2. MÁY LIKE NEW 99% (ĐÃ QUA SỬ DỤNG LƯỚT):**\n` +
+            `• **Ưu điểm:** **Tiết kiệm từ 3.000.000 ₫ đến 7.000.000 ₫** so với máy mới, giúp bạn dễ dàng chạm tay vào các dòng máy Flagship cao cấp với ngân sách mềm hơn.\n` +
+            `• **Chất lượng tại shop:** 100% máy qua **quy trình test 28 bước phần cứng**, pin đảm bảo trên 88% - 92%, cam kết vỏ zin, main zin, màn zin (bao cắm máy tính kiểm tra 3uTools xanh lè 100%).\n` +
+            `• **Đặc quyền bảo vệ:** Vẫn được hưởng chính sách **Lỗi 1 đổi 1 trong 30 ngày** tương đương máy mới!\n\n` +
+            `👉 Bạn thích cảm giác đập hộp tự tay xé seal hay muốn tối ưu chi phí với máy lướt để em lọc danh sách cho bạn nhé! 😊`,
+        suggestions: ['Xem máy Mới Nguyên Seal', 'Xem máy Like New 99% giá hời', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.52 Sinh Viên & Dân Đồ Họa 2D/3D, Dựng Video (CapCut, Premiere, Blender, Photoshop)
+    {
+        id: 'advice_multimedia_video_creator_mac_vs_win',
+        patterns: [
+            /(hoc|lam|chuyen).*(do hoa|thiet ke|edit video|dung phim|photoshop|premiere|capcut|blender|figma).*(nen mua|dung|mac hay win)/i,
+            /(macbook|laptop gaming).*(do hoa|render video|edit phim|3d)/i
+        ],
+        keywords: [
+            'hoc do hoa nen mua macbook hay windows', 'dung video capcut premiere nen chon may gi',
+            'lam do hoa 2d 3d nen mua laptop nao', 'macbook co lam do hoa duoc khong',
+            'laptop render video nhanh', 'laptop thiet ke do hoa tot nhat'
+        ],
+        reply: `Dạ chào bạn! Để máy phục vụ công việc thiết kế và dựng phim mượt mà trong nhiều năm tới, việc chọn đúng hệ máy là cực kỳ quan trọng. Em xin tư vấn chi tiết theo từng chuyên ngành đồ họa nè: 🎨🎬💻\n\n` +
+            `✨ **1. NÊN CHỌN MACBOOK (MacBook Air / Pro M2, M3, M4 với RAM từ 16GB trở lên) KHI:**\n` +
+            `• 🖌️ **Thiết kế 2D & UI/UX (Photoshop, Illustrator, InDesign, Figma):** Màn hình Retina chuẩn màu **100% dải màu DCI-P3**, độ chuẩn màu cao nhất giúp bạn in ấn hay thiết kế không bao giờ bị lệch màu.\n` +
+            `• 🎞️ **Dựng Video ngắn & Vlog 4K (CapCut, Premiere Pro, Final Cut Pro):** Bộ xử lý Media Engine trên chip Apple Silicon tăng tốc xuất video cực nhanh và mát mẻ, đặc biệt pin trâu 12 - 15 tiếng giúp bạn ôm máy ra quán cafe làm việc cả ngày không cần cắm sạc.\n\n` +
+            `✨ **2. NÊN CHỌN LAPTOP WINDOWS (Card rời NVIDIA RTX 4050 / 4060, RAM 16GB - 32GB) KHI:**\n` +
+            `• 🗿 **Dựng hình 3D & Kỹ xảo nặng (Blender, 3ds Max, Maya, After Effects 3D, Cinema 4D):** Cần nhân CUDA của card NVIDIA và hệ thống tản nhiệt quạt kép công suất lớn để render nhiều giờ liên tục không bị bóp hiệu năng.\n` +
+            `• 📐 **Kiến trúc & Kỹ thuật (AutoCAD, Revit, SolidWorks):** Các phần mềm này được tối ưu tốt nhất trên nền tảng Windows.\n\n` +
+            `💡 **MẸO QUAN TRỌNG:** Dù chọn Mac hay Win, hãy ưu tiên chọn bản **RAM tối thiểu 16GB** (không chọn 8GB) để máy không bị tràn RAM khi mở nhiều layer đồ họa nặng bạn nhé!\n\n` +
+            `👉 Bạn làm mảng 2D dựng video hay chuyên sâu 3D kiến trúc để em gợi ý model chuẩn nhất cho bạn nha! 😊`,
+        suggestions: ['Xem MacBook RAM 16GB/24GB', 'Xem Laptop Gaming RTX đồ họa', 'Ưu đãi Sinh viên giảm 500k']
+    },
+
+    // 3.53 Bảo Mật Dữ Liệu Cá Nhân, Tránh Lộ Ảnh Nhạy Cảm Khi Thu Cũ / Bán Máy
+    {
+        id: 'advice_data_privacy_factory_reset_tradein',
+        patterns: [
+            /(ban may|thu cu|doi may).*(so bi lo|lo du lieu|khoi phuc anh|anh rieng tu|lo tin nhan)/i,
+            /(xoa sach du lieu|xoa du lieu|factory reset).*(an toan khong|co khoi phuc lai duoc khong)/i
+        ],
+        keywords: [
+            'ban may cu so bi lo anh', 'doi may cu co bi phuc hoi du lieu khong',
+            'cach xoa sach du lieu tren dien thoai', 'xoa het du lieu co so bi khoi phuc khong',
+            'bao mat du lieu khi thu cu doi moi', 'so bi lo thong tin ca nhan khi ban may'
+        ],
+        reply: `Dạ em thấu hiểu 100% băn khoăn của bạn! Thông tin cá nhân, ảnh gia đình, tin nhắn ngân hàng là điều thiêng liêng cần được bảo mật tuyệt đối. Em xin giải đáp rõ ràng để bạn hoàn toàn yên tâm khi đổi máy tại cửa hàng nhé: 🔒🛡️\n\n` +
+            `✨ **1. CƠ CHẾ BẢO MẬT PHẦN CỨNG TIÊU CHUẨN:**\n` +
+            `• Cả chip **Apple Secure Enclave (iPhone/iPad)** và **Samsung Knox (Android)** đều áp dụng cơ chế mã hóa phần cứng AES-256 bit.\n` +
+            `• Khi bạn thực hiện lệnh *"Xóa tất cả nội dung và cài đặt (Erase All Content and Settings)"*, hệ thống sẽ lập tức **tiêu hủy khóa giải mã phần cứng (Hardware Encryption Key)**. Lúc này toàn bộ dữ liệu trên chip nhớ lập tức biến thành chuỗi nhị phân ngẫu nhiên vô nghĩa, **hoàn toàn KHÔNG MỘT PHẦN MỀM NÀO CÓ THỂ KHÔI PHỤC LẠI ĐƯỢC**.\n\n` +
+            `✨ **2. QUY TRÌNH AN TOÀN TẠI CỬA HÀNG:**\n` +
+            `• Kỹ thuật viên sẽ hướng dẫn bạn tự tay thoát sạch iCloud / Google Account và tắt tính năng Tìm thiết bị (Find My).\n` +
+            `• Bấm lệnh Factory Reset trực tiếp trước mặt bạn và khởi động lại về màn hình kích hoạt ban đầu ("Hello" / "Chào mừng").\n` +
+            `• Cấp biên bản bàn giao xác nhận thiết bị đã được xóa trắng dữ liệu 100%.\n\n` +
+            `👉 Bạn cứ mang máy qua bên em hỗ trợ sao lưu toàn bộ ảnh và danh bạ sang máy mới rồi xóa trắng máy cũ an toàn tuyệt đối nhé! 😊`,
+        suggestions: ['Chương trình Thu cũ Đổi mới', 'Định giá máy cũ online', 'Địa chỉ Showroom hỗ trợ']
+    },
+
+    // 3.54 Mua Quà Tặng Cho Sếp / Đối Tác Kinh Doanh Sang Trọng
+    {
+        id: 'advice_luxury_gift_boss_partner',
+        patterns: [
+            /(mua|tang|chon).*(qua tang|cho sep|tang sep|tang doi tac|tang khach hang|sinh nhat sep)/i,
+            /(qua tang cao cap|dien thoai tang sep|may tinh bang tang sep)/i
+        ],
+        keywords: [
+            'mua dien thoai tang sep', 'tang qua cho sep cong nghe', 'dien thoai lam qua tang doi tac',
+            'chon qua cong nghe cho sep', 'qua tang doanh nhan', 'qua tang sang trong cho sep'
+        ],
+        reply: `Dạ chọn đồ công nghệ làm quà biếu sếp hoặc đối tác kinh doanh là một ý tưởng cực kỳ tinh tế, vừa thể hiện sự tôn trọng vừa mang giá trị sử dụng thực tế cao mỗi ngày! Em xin gợi ý các combo quà tặng sang trọng, đẳng cấp nhất: 🎁👔💼\n\n` +
+            `✨ **1. LỰA CHỌN THIẾT BỊ ĐẲNG CẤP DOANH NHÂN:**\n` +
+            `• 👑 **iPhone 16 Pro Max / 17 Pro Max (256GB - 512GB):** Ưu tiên chọn màu **Titan Tự Nhiên (Natural Titanium)** hoặc **Titan Sa Mạc (Desert Titanium)** – toát lên vẻ quyền uy, tinh tế, giữ giá và được công nhận rộng rãi.\n` +
+            `• 📱 **Samsung Galaxy Z Fold6 (Màn hình gập mở):** Thiết kế mở rộng thành tablet mini như cuốn sổ tay quyền lực, ký duyệt tài liệu và đa nhiệm thương gia cực kỳ uy tín.\n` +
+            `• ⌚ **Apple Watch Ultra 2 hoặc Galaxy Watch Ultra:** Khung viền Titan hầm hố, sang trọng khi kết hợp với vest lịch lãm.\n\n` +
+            `✨ **2. DỊCH VỤ QUÀ TẶNG VIP MIỄN PHÍ TẠI CỬA HÀNG:**\n` +
+            `• 🎀 Đóng gói hộp quà nhung thắt nơ cao cấp, trang trọng.\n` +
+            `• 💌 Tặng kèm thiệp chúc mừng dập nổi chữ vàng, hỗ trợ in lời chúc trang trọng theo yêu cầu.\n` +
+            `• 📄 Xuất hóa đơn đỏ VAT công ty đầy đủ để cơ quan/doanh nghiệp thanh toán thuận tiện.\n` +
+            `• 🚀 Giao hỏa tốc bảo hiểm tận nơi đúng giờ hẹn.\n\n` +
+            `👉 Bạn dự định ngân sách tầm bao nhiêu để em gợi ý phiên bản màu và dung lượng ưng ý nhất cho sếp bạn nha! 😊`,
+        suggestions: ['Xem iPhone 16 Pro Max Titan', 'Xem Galaxy Z Fold6 gập mở', 'Dịch vụ đóng hộp quà VIP', 'Xuất hóa đơn VAT công ty']
+    },
+
+    // 3.55 Tư Vấn Smartwatch Chạy Bộ Marathon, Bơi Lội & Theo Dõi Sức Khỏe
+    {
+        id: 'advice_smartwatch_sport_marathon_health',
+        patterns: [
+            /(dong ho|smartwatch).*(chay bo|marathon|tap gym|di boi|the thao|do tim|ecg|spo2)/i,
+            /(apple watch hay garmin|galaxy watch hay garmin|dong ho chay bo nao tot)/i
+        ],
+        keywords: [
+            'dong ho chay bo tot nhat', 'smartwatch di boi the thao', 'nen mua apple watch hay garmin',
+            'dong ho do dien tam do ecg', 'dong ho do nhip tim chay marathon', 'dong ho tap gym di boi'
+        ],
+        reply: `Dạ chào bạn! Để đồng hồ trở thành trợ lý luyện tập chuẩn xác và bảo vệ sức khỏe tim mạch hàng ngày, em xin phân tích thẳng thắn theo từng nhu cầu sử dụng thực tế nè: 🏃‍♂️🏊‍♀️⌚\n\n` +
+            `✨ **1. KHI NÀO NÊN CHỌN APPLE WATCH / SAMSUNG GALAXY WATCH?**\n` +
+            `• 🏙️ **Nhu cầu:** Dùng hàng ngày đi làm, nhận cuộc gọi độc lập qua eSIM (không cần mang điện thoại khi chạy bộ quanh công viên), nghe nhạc qua tai nghe Bluetooth, đo nhịp tim, đo điện tâm đồ **ECG**, nồng độ oxy trong máu **SpO2** và phát hiện ngã/va chạm SOS đạt chuẩn y tế.\n` +
+            `• ⚠️ **Lưu ý:** Màn hình OLED rực rỡ và nhiều tính năng thông minh nên thời lượng pin thường từ **1.5 đến 2.5 ngày** (cần sạc thường xuyên).\n\n` +
+            `✨ **2. KHI NÀO NÊN CHỌN ĐỒNG HỒ CHUYÊN DỤNG THỂ THAO (GPS ĐA BĂNG TẦN)?**\n` +
+            `• 🏅 **Nhu cầu:** Dành cho vận động viên chạy bộ đường dài (Marathon 21km - 42km), leo núi thám hiểm, ba môn phối hợp (Triathlon).\n` +
+            `• 🔋 **Ưu điểm vượt trội:** Pin siêu khủng từ **7 đến 14 ngày**, GPS 2 băng tần (L1+L5) vẽ tracklog cực kỳ chính xác dưới tán cây rừng, màn hình chống chói hiển thị rõ nét dưới nắng gắt.\n\n` +
+            `👉 Bạn chủ yếu tập gym, bơi lội, chạy bộ duy trì sức khỏe hay đang tập luyện để cày giải chạy Marathon để em tư vấn mẫu vừa vặn nhất nhé! 😊`,
+        suggestions: ['Xem Apple Watch Series 10', 'Xem Galaxy Watch thể thao', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.56 Dùng Lẫn Lộn Thiết Bị Khác Hãng vs Dùng Full Hệ Sinh Thái
+    {
+        id: 'advice_apple_vs_samsung_ecosystem',
+        patterns: [
+            /(he sinh thai|ecosystem).*(apple hay samsung|dung lan lon|dong bo)/i,
+            /(dung iphone nhung muon mua|dung iphone co dung duoc).*(laptop win|samsung tab|may tinh bang samsung)/i,
+            /(full he sinh thai|dung tron bo apple co suong khong)/i
+        ],
+        keywords: [
+            'dung tron bo he sinh thai apple co tot khong', 'dung iphone co dung laptop win duoc khong',
+            'dung iphone mua may tinh bang samsung duoc khong', 'so sanh he sinh thai apple va samsung',
+            'co nen dung full do apple khong'
+        ],
+        reply: `Dạ đây là một chủ đề cực kỳ thú vị và thực tế luôn bạn nhé! Em xin phân tích khách quan cả hai hướng để bạn không bị lãng phí tiền bạc nè: 🔄📱💻\n\n` +
+            `✨ **1. TRẢI NGHIỆM KHI DÙNG "FULL HỆ SINH THÁI APPLE" (iPhone + iPad + Mac + AirPods):**\n` +
+            `• ⚡ **Airdrop thần tốc:** Bắn ảnh, video 4K hàng chục GB giữa các máy chỉ mất vài giây, không tốn data.\n` +
+            `• 📋 **Universal Clipboard:** Copy một đoạn văn bản hay đường link trên iPhone là có thể Dán (Paste) ngay lập tức sang MacBook.\n` +
+            `• 🎧 **Chuyển đổi âm thanh tự động:** Đang xem phim trên iPad, có cuộc gọi đến iPhone là tai nghe AirPods tự chuyển kết nối sang iPhone mà không cần bấm nút nào.\n` +
+            `• ⌚ Tự động mở khóa MacBook khi đeo Apple Watch.\n\n` +
+            `✨ **2. CÓ NÊN DÙNG LẪN LỘN (iPhone + Laptop Windows hoặc iPad + Điện thoại Android)?**\n` +
+            `• **Hoàn toàn thoải mái:** Ngày nay các công cụ đám mây như **Google Drive, OneDrive, Zalo PC, Notion** và ứng dụng liên kết **Intel Unison** cho phép bạn nhắn tin, nghe gọi và truyền file giữa iPhone với Laptop Windows cực kỳ dễ dàng.\n` +
+            `• 💡 **Lời khuyên thực dụng:** Bạn không cần phải bỏ ra vài chục triệu để đổi toàn bộ sang một hệ sinh thái cùng lúc. Thiết bị nào phục vụ công việc của bạn tốt nhất trong tầm giá thì hãy ưu tiên chọn thiết bị đó trước nhé!\n\n` +
+            `👉 Bạn hiện đang dùng những thiết bị nào để em tư vấn cách kết nối đồng bộ tối ưu nhất cho bạn nha! 😊`,
+        suggestions: ['Xem hệ sinh thái Apple', 'Xem Laptop Windows mỏng nhẹ', 'Tư vấn giải pháp đồng bộ']
+    },
+
+    // 3.57 Tư Vấn Chọn Tai Nghe Chống Ồn Chuyên Sâu (In-ear vs Over-ear, Chống Ồn ANC, Không Đau Tai)
+    {
+        id: 'advice_noise_cancelling_headphones_selection',
+        patterns: [
+            /(tai nghe).*(chong on|anc|khong dau tai|deo lau|in[\s-]?ear|over[\s-]?ear|chup tai|nhet tai)/i,
+            /(nen mua tai nghe nhet tai hay chup tai|tai nghe chong on nao tot)/i,
+            /(airpods pro.*sony|sony.*airpods|tai nghe di may bay)/i
+        ],
+        keywords: [
+            'tai nghe chong on tot nhat', 'nen mua tai nghe in ear hay over ear', 'tai nghe chup tai chong on',
+            'tai nghe deo lau khong dau tai', 'tai nghe chong on di may bay', 'airpods pro hay sony xm5'
+        ],
+        reply: `Dạ chào bạn! Để có không gian làm việc tập trung tuyệt đối hoặc thư giãn nghe nhạc mà đeo cả ngày vẫn êm ái, em xin so sánh chuyên sâu giữa **Tai nghe nhét tai (In-ear)** và **Tai nghe chụp tai (Over-ear)** nha: 🎧🔇✨\n\n` +
+            `✨ **1. TAI NGHE NHÉT TAI CHỐNG ỒN (IN-EAR - như AirPods Pro 2 / Sony WF-1000XM5):**\n` +
+            `• 🚀 **Ưu điểm cơ động:** Kén sạc nhỏ gọn bỏ vừa túi quần, cực kỳ tiện lợi khi di chuyển ngoài đường, đi xe buýt hoặc tập gym (có kháng mồ hôi IPX4).\n` +
+            `• 🔇 **Chống ồn ANC:** Triệt tiêu đến 95% tiếng rù rì của động cơ máy bay, tiếng điều hòa và tiếng xe cộ.\n` +
+            `• 💡 **Để không bị đau tai:** Bạn chỉ cần chọn đúng kích cỡ nút đệm cao su silicon (đi kèm 4 size XS, S, M, L trong hộp) để tai nghe ôm vừa vặn khít ống tai mà không gây tức tai.\n\n` +
+            `✨ **2. TAI NGHE CHỤP TAI CHỐNG ỒN (OVER-EAR - như Sony WH-1000XM5 / AirPods Max):**\n` +
+            `• ☁️ **Độ êm ái vô địch:** Phần đệm da cao cấp ôm trọn toàn bộ vành tai chứ không nhét vào ống tai, do đó bạn có thể **đeo liên tục 8 - 10 tiếng làm việc/cày phim mà hoàn toàn KHÔNG HỀ ĐAU TAI**.\n` +
+            `• 🎵 **Chất âm & Pin:** Âm trường rộng thênh thang, dải bass sâu chắc nịch chuẩn phòng thu và thời lượng pin khủng lên đến **30 - 40 tiếng liên tục**.\n\n` +
+            `👉 Bạn ưu tiên tính nhỏ gọn bỏ túi mang đi khắp nơi hay muốn độ êm ái tối đa để làm việc tại văn phòng/ở nhà để em gợi ý model hợp gu nhất nhé! 😊`,
+        suggestions: ['Xem AirPods Pro 2 chính hãng', 'Xem Tai nghe chụp tai Sony', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.58 Setup Bàn Làm Việc Công Thái Học Cho Phòng Nhỏ / Chung Cư
+    {
+        id: 'advice_ergonomic_desk_setup_small_room',
+        patterns: [
+            /(setup|bo tri).*(ban lam viec|goc lam viec|phong nho|chung cu|dien tich hep)/i,
+            /(cong thai hoc|arm man hinh|do dau lung|gia do laptop)/i,
+            /(setup builder|phoi ban lam viec)/i
+        ],
+        keywords: [
+            'setup ban lam viec phong nho', 'cach setup goc lam viec cong thai hoc', 'co nen mua arm man hinh khong',
+            'setup ban lam viec khong dau lung', 'setup goc lam viec chung cu', 'phoi do cong thai hoc'
+        ],
+        reply: `Dạ biến một góc phòng nhỏ 1m - 1m2 thành một không gian làm việc công thái học vừa gọn gàng vừa bảo vệ cột sống là hoàn toàn khả thi luôn bạn nhé! Em xin chia sẻ công thức **4 MÓN CỨU TINH CỘT SỐNG** cực kỳ hiệu quả nè: 🖥️💺⚡\n\n` +
+            `1. 🦾 **Arm màn hình kẹp bàn (Monitor Arm):** Thay thế chân đế cồng kềnh, **giải phóng ngay 80% diện tích mặt bàn**. Bạn có thể nâng cao màn hình ngang tầm mắt để không bao giờ bị cúi đầu gù lưng hay đau mỏi đốt sống cổ.\n` +
+            `2. 💻 **Giá đỡ tản nhiệt nhôm cho Laptop:** Nâng màn hình laptop ngang tầm mắt và tạo khoảng thông gió giúp máy mát hơn 5 - 8°C khi làm việc liên tục.\n` +
+            `3. ⌨️ **Chuột công thái học (như Logitech MX Master 3S / Lift) + Bàn phím cơ layout 75% không dây:** Cảm giác cầm nắm dạng đứng triệt tiêu áp lực xoay cổ tay, bấm êm tĩnh âm và loại bỏ hoàn toàn dây nhợ bừa bộn.\n` +
+            `4. 💡 **Đèn treo màn hình (ScreenBar):** Chiếu sáng chuẩn xác khu vực bàn phím mà không gây chói hay lóa màn hình, bảo vệ mắt khi cày deadline ban đêm.\n\n` +
+            `👉 Bạn có thể bấm vào công cụ độc quyền **[🔥 Setup Builder](pages/tools/setup-builder.html)** trên thanh menu website để tự phối mô phỏng góc làm việc 3D trực quan và nhận báo giá trọn gói tiết kiệm nhất nhé! 😊`,
+        suggestions: ['Mở công cụ Setup Builder', 'Xem Chuột công thái học Logitech', 'Xem Phụ kiện bàn làm việc']
+    },
+
+    // 3.59 Tư Vấn Dùng eSIM & Chuyển Vùng Quốc Tế Khi Đi Du Lịch / Công Tác Nước Ngoài
+    {
+        id: 'advice_esim_travel_abroad_roaming',
+        patterns: [
+            /(may nay co|dung duoc).*(esim|2 sim)/i,
+            /(di du lich|cong tac|di nuoc ngoai|di nhat|di han|di thai|di my|di chau au).*(mua sim|dung esim|roaming)/i,
+            /(mot may add duoc may esim|cai esim the nao)/i
+        ],
+        keywords: [
+            'may co dung duoc esim khong', 'di du lich nuoc ngoai nen dung esim gi',
+            'cach cai esim cho iphone', 'mot may dung duoc may esim', 'esim du lich quoc te',
+            'cai dat esim di du lich'
+        ],
+        reply: `Dạ công nghệ eSIM hiện nay cực kỳ tiện lợi cho những chuyến đi du lịch hay công tác nước ngoài luôn bạn nhé! Em xin giải đáp chi tiết để bạn tự tin vi vu nè: ✈️🌍📱\n\n` +
+            `✨ **1. CƠ CHẾ HOẠT ĐỘNG 2 SIM SONG SONG:**\n` +
+            `• Hầu hết các dòng iPhone (từ iPhone XR/XS trở lên) và Samsung Galaxy cao cấp (S-series, Z Fold/Flip) đều hỗ trợ **hoạt động cùng lúc 1 Sim vật lý + 1 eSIM**.\n` +
+            `• **Mẹo vàng khi đi nước ngoài:** Bạn giữ nguyên Sim vật lý Việt Nam (bật nhận tin nhắn roaming miễn phí để **nhận mã OTP ngân hàng** khi quẹt thẻ mua sắm), đồng thời cài thêm 1 eSIM Data du lịch của nước sở tại để lướt mạng 4G/5G thả ga.\n\n` +
+            `✨ **2. CÁCH CÀI ĐẶT SIÊU TỐC TRONG 60 GIÂY:**\n` +
+            `• Bạn chỉ cần vào **Cài đặt -> Di động -> Thêm eSIM (Add eSIM) -> Quét mã QR code** mà nhà mạng cung cấp là sóng 4G lên ngay lập tức, không cần dùng que chọc sim hay tháo lắp thẻ sim vật lý.\n` +
+            `• Một chiếc iPhone có thể lưu trữ đến **8 hồ sơ eSIM khác nhau** và bật tắt linh hoạt theo từng quốc gia bạn đặt chân đến.\n\n` +
+            `👉 Bạn đang dùng mẫu điện thoại nào để em kiểm tra xem máy có sẵn tính năng eSIM cho chuyến đi sắp tới không nhé! 😊`,
+        suggestions: ['Xem điện thoại hỗ trợ eSIM', 'Tư vấn cấu hình máy', 'Hotline 0842.331.606']
+    },
+
+    // 3.60 Tư Vấn Điện Thoại Đi Đu Idol, Quay Concert Sân Vận Động (Zoom Xa Bắt Trọn Thần Tượng)
+    {
+        id: 'advice_camera_zoom_concert_idol',
+        patterns: [
+            /(concert|du idol|than tuong|fanzone|quay show|san van dong).*(zoom|camera|dien thoai|may nao|quay|net)/i,
+            /(di|xem|quay).*(concert|show am nhac|idol|than tuong)/i,
+            /(dien thoai zoom|zoom 10x|zoom 30x|zoom 100x).*(khong vo|net|quay video dep|concert)/i
+        ],
+        keywords: [
+            'dien thoai quay concert tot nhat', 'may nao zoom xa quay idol khong vo',
+            'di concert nen mua samsung hay iphone', 'dien thoai zoom 100x san van dong',
+            'quay video concert am thanh khong bi re', 'dien thoai di du idol',
+            'quay concert', 'di concert', 'du idol', 'zoom xa quay concert'
+        ],
+        reply: `Dạ chào bạn đồng môn đam mê âm nhạc! Đi concert hay fes thì chiếc điện thoại trên tay chính là 'vũ khí' bắt trọn khoảnh khắc thần tượng tỏa sáng trên sân khấu. Em xin chia sẻ kinh nghiệm thực chiến chọn máy số 1 hiện nay nè: 🎤🏟️✨\n\n` +
+            `✨ **1. VUA ZOOM XA TỪ KHÁN ĐÀI: SAMSUNG GALAXY S24 ULTRA / S25 ULTRA (Vô địch không đối thủ)**\n` +
+            `• 🔭 **Khả năng xuyên thấu:** Ống kính tiềm vọng Zoom quang học kết hợp thuật toán AI ProVisual Engine độc quyền. Dù bạn ngồi ở **khán đài xa (tầng 2, tầng 3 SVĐ Mỹ Đình hay Phú Thọ)**, máy vẫn có thể **zoom 10x, 20x, 30x đến 100x** bắt rõ từng nụ cười và giọt mồ hôi của idol mà không bị vỡ hạt hay nhòe hình.\n` +
+            `• 🎯 **Chống rung quang học OIS thế hệ mới:** Giơ tay quay lâu giữa đám đông nhảy nhót video vẫn mượt mà không bị rung lắc chóng mặt.\n\n` +
+            `✨ **2. VUA THU ÂM & QUAY CẬN CẢNH: IPHONE 16 PRO / 16 PRO MAX**\n` +
+            `• 🎙️ **Thu âm chuẩn phòng thu:** Trang bị **4 micro chất lượng cao** cùng tính năng **Audio Mix (Hòa âm thông minh)**, giúp lọc sạch tiếng la hét, fanchant của đám đông xung quanh để giữ nguyên vẹn giọng hát live trong trẻo của ca sĩ.\n` +
+            `• 🌟 Thích hợp nhất nếu bạn săn được vé khu vực đứng sát sân khấu (VIP / Fanzone) để bắt trọn từng khung hình 4K 120fps chuẩn điện ảnh.\n\n` +
+            `👉 Bạn dự định đu show nào và ngồi ở vị trí khán đài hay đứng sát sân khấu để em gợi ý phiên bản zoom chuẩn nhất nhé! 😊`,
+        suggestions: ['Xem Galaxy S24 Ultra Zoom 100x', 'Xem iPhone 16 Pro Max Camera', 'Tư vấn Trả góp 0% đi concert']
     }
 ];
 

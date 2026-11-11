@@ -8,10 +8,14 @@
     const starterSuggestions = [
         '📦 Tra cứu đơn hàng',
         '💳 Tính trả góp 0%',
+        '🎁 Combo phụ kiện tiết kiệm',
+        '🔄 Thu cũ đổi mới lên đời',
+        '🎨 Đồ họa: Mac hay Windows?',
         '📍 Địa chỉ showroom',
-        'Tư vấn laptop dưới 15 triệu',
-        'Mã giảm giá hôm nay',
-        'Tìm máy chơi mượt Genshin'
+        '🔥 Săn mã giảm giá',
+        '📱 Máy mới vs Like New 99%',
+        '🎧 Tai nghe chống ồn ANC',
+        '🎮 Máy chơi mượt Genshin'
     ];
 
     function getBasePath() {
