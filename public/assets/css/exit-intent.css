@@ -1,0 +1,441 @@
+/**
+ * TechEcommerce Exit-Intent & Cart Recovery Modal Styles
+ * Compatible with Light & Dark (html[data-theme='dark']) modes
+ */
+
+.te-exit-modal {
+    padding: 0;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    max-width: 580px;
+    width: calc(100% - 32px);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    overflow: visible;
+    opacity: 0;
+    transform: scale(0.92) translateY(15px);
+    transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.te-exit-modal.is-visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.te-exit-modal::backdrop {
+    background: rgba(10, 15, 30, 0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.28s ease;
+}
+
+.te-exit-modal.is-visible::backdrop {
+    opacity: 1;
+}
+
+.te-exit-card {
+    position: relative;
+    padding: 30px 28px 24px;
+    border-radius: 20px;
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-sizing: border-box;
+}
+
+/* Close button */
+.te-exit-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.te-exit-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+    transform: rotate(90deg);
+}
+
+/* Header */
+.te-exit-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.te-exit-pill {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.te-exit-title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1.35;
+    color: #0f172a;
+}
+
+.te-exit-desc {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: #475569;
+}
+
+/* Coupon Box */
+.te-exit-coupon-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 2px dashed #3b82f6;
+    gap: 14px;
+}
+
+.te-coupon-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.te-coupon-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.te-coupon-code {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #1e3a8a;
+    letter-spacing: 1.5px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.te-coupon-rule {
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+.te-coupon-copy-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #2563eb;
+    background: #ffffff;
+    color: #2563eb;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.te-coupon-copy-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.te-coupon-copy-btn.copied {
+    background: #10b981;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+/* Trust Badges Grid */
+.te-exit-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.te-trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+}
+
+.te-trust-icon {
+    font-size: 1.35rem;
+}
+
+.te-trust-item strong {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.te-trust-item span {
+    font-size: 0.72rem;
+    color: #64748b;
+    line-height: 1.3;
+}
+
+/* Action Buttons */
+.te-exit-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.te-exit-btn-primary {
+    width: 100%;
+    padding: 13px 20px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    transition: all 0.22s ease;
+    text-align: center;
+}
+
+.te-exit-btn-primary:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+}
+
+.te-exit-btn-secondary {
+    width: 100%;
+    padding: 11px 20px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.te-exit-btn-secondary:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+/* Showroom Address Note */
+.te-exit-footer-address {
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+}
+
+.te-exit-address {
+    font-style: normal;
+    font-size: 0.74rem;
+    color: #64748b;
+    line-height: 1.45;
+}
+
+.te-exit-address strong {
+    color: #334155;
+}
+
+/* Toast */
+.te-exit-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.te-exit-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ==========================================================================
+   DARK MODE SUPPORT (html[data-theme='dark'])
+   ========================================================================== */
+html[data-theme='dark'] .te-exit-card {
+    background: #131d32;
+    color: #f1f5f9;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme='dark'] .te-exit-close {
+    background: #1e293b;
+    color: #94a3b8;
+}
+
+html[data-theme='dark'] .te-exit-close:hover {
+    background: #334155;
+    color: #f8fafc;
+}
+
+html[data-theme='dark'] .te-exit-pill {
+    background: rgba(220, 38, 38, 0.2);
+    color: #f87171;
+}
+
+html[data-theme='dark'] .te-exit-title {
+    color: #f8fafc;
+}
+
+html[data-theme='dark'] .te-exit-desc {
+    color: #94a3b8;
+}
+
+html[data-theme='dark'] .te-exit-desc strong {
+    color: #60a5fa;
+}
+
+html[data-theme='dark'] .te-exit-coupon-box {
+    background: rgba(37, 99, 235, 0.12);
+    border-color: #3b82f6;
+}
+
+html[data-theme='dark'] .te-coupon-label {
+    color: #93c5fd;
+}
+
+html[data-theme='dark'] .te-coupon-code {
+    color: #60a5fa;
+}
+
+html[data-theme='dark'] .te-coupon-rule {
+    color: #cbd5e1;
+}
+
+html[data-theme='dark'] .te-coupon-copy-btn {
+    background: #1e293b;
+    border-color: #3b82f6;
+    color: #93c5fd;
+}
+
+html[data-theme='dark'] .te-coupon-copy-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .te-exit-trust-grid {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .te-trust-item strong {
+    color: #e2e8f0;
+}
+
+html[data-theme='dark'] .te-trust-item span {
+    color: #94a3b8;
+}
+
+html[data-theme='dark'] .te-exit-btn-secondary {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+
+html[data-theme='dark'] .te-exit-btn-secondary:hover {
+    background: #334155;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .te-exit-footer-address {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .te-exit-address {
+    color: #94a3b8;
+}
+
+html[data-theme='dark'] .te-exit-address strong {
+    color: #cbd5e1;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+    .te-exit-card {
+        padding: 24px 18px 18px;
+        gap: 14px;
+    }
+
+    .te-exit-title {
+        font-size: 1.15rem;
+    }
+
+    .te-exit-desc {
+        font-size: 0.84rem;
+    }
+
+    .te-exit-coupon-box {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .te-coupon-copy-btn {
+        width: 100%;
+    }
+
+    .te-exit-trust-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .te-trust-item {
+        flex-direction: row;
+        text-align: left;
+        gap: 8px;
+    }
+
+    .te-trust-item div {
+        display: flex;
+        flex-direction: column;
+    }
+}

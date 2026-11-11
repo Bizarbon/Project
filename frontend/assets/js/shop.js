@@ -4107,6 +4107,23 @@ function renderCart() {
     const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
     if (countBadge) countBadge.textContent = `(${totalQty})`;
 
+    // Tự động khôi phục mã giảm giá giữ giá / trợ giá AI nếu có trong phiên
+    if (!appliedCoupon && cart.length > 0) {
+        try {
+            const savedRaw = sessionStorage.getItem('appliedCoupon');
+            if (savedRaw) {
+                const saved = JSON.parse(savedRaw);
+                const subtotal = currentCartSubtotal();
+                if (saved.code && (!saved.minOrderValue || subtotal >= saved.minOrderValue)) {
+                    appliedCoupon = saved;
+                    const input = document.getElementById('couponCode');
+                    if (input) input.value = saved.code;
+                    syncCouponUI();
+                }
+            }
+        } catch (_) {}
+    }
+
     const customerGroup = document.getElementById('customerSelectionGroup');
     if (customerGroup) customerGroup.style.display = auth.isAdmin() ? 'block' : 'none';
 

@@ -2076,9 +2076,22 @@ async function answerBundleBargainQuestion(message, context = {}) {
             targetProduct = allActive.find(p => p.featured || /iphone|macbook|galaxy|asus/i.test(p.name)) || allActive[0];
         }
 
-        // 2. Tìm các phụ kiện tương thích có sẵn trong shop
-        let accessories = allActive.filter(p =>
-            p._id !== targetProduct._id && (
+        // 2. Tìm các phụ kiện tương thích chuẩn xác theo danh mục máy chính (Trụ cột 03: Smart Compatible Bundle)
+        const isTablet = targetProduct.category === 'Tablet' || /ipad|tab/i.test(targetProduct.name);
+        const isLaptop = targetProduct.category === 'Laptop' || /macbook|laptop|vivobook|legion|strix/i.test(targetProduct.name);
+        const isPhone = targetProduct.category === 'Điện thoại' || /iphone|galaxy|oppo|xiaomi|poco/i.test(targetProduct.name);
+
+        let priorityAccs = [];
+        if (isTablet) {
+            priorityAccs = allActive.filter(p => String(p._id) !== String(targetProduct._id) && /bút|but|sạc|sac|anker|tai nghe/i.test(p.name));
+        } else if (isLaptop) {
+            priorityAccs = allActive.filter(p => String(p._id) !== String(targetProduct._id) && /chuột|chuot|logitech|hub|balo|bàn phím/i.test(p.name));
+        } else if (isPhone) {
+            priorityAccs = allActive.filter(p => String(p._id) !== String(targetProduct._id) && /sạc|sac|anker|earpods|tai nghe|pin sạc|cáp/i.test(p.name));
+        }
+
+        let accessories = priorityAccs.length >= 2 ? priorityAccs : allActive.filter(p =>
+            String(p._id) !== String(targetProduct._id) && (
                 p.category === 'Phụ kiện' ||
                 p.category === 'Tai nghe' ||
                 /chuột|tai nghe|sạc|cáp|balo|bàn phím|hub/i.test(p.name)
@@ -2086,7 +2099,7 @@ async function answerBundleBargainQuestion(message, context = {}) {
         );
 
         if (accessories.length < 2) {
-            accessories = allActive.filter(p => p._id !== targetProduct._id && p.price < targetProduct.price * 0.25);
+            accessories = allActive.filter(p => String(p._id) !== String(targetProduct._id) && p.price < targetProduct.price * 0.25);
         }
 
         const selectedAccessories = accessories.slice(0, 3).map((acc, idx) => {
@@ -2111,11 +2124,47 @@ async function answerBundleBargainQuestion(message, context = {}) {
         const voucherCode = targetProduct.price >= 20000000 ? 'DEALHOT500' : (targetProduct.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME');
         const voucherDiscount = targetProduct.price >= 20000000 ? '500.000 ₫' : (targetProduct.price >= 3000000 ? '200.000 ₫' : '100.000 ₫');
 
-        const reply = `Dạ giá niêm yết **${money(targetProduct.price)}** của **${targetProduct.name}** hiện đã là mức giá kịch sàn cho hàng mới nguyên seal 100% chính hãng phân phối tại Việt Nam (kèm bảo hành lỗi 1 đổi 1 trong 30 ngày) ạ! 🛡️\n\n` +
-            `🎁 **ĐẶC QUYỀN TRỢ GIÁ RIÊNG CHO BẠN HÔM NAY:**\n` +
-            `Thấu hiểu bạn rất thiện chí chốt máy, em xin phép quản lý kích hoạt riêng cho bạn **Mã Trợ Giá Độc Quyền: \`${voucherCode}\` (Giảm ngay ${voucherDiscount})**, có hiệu lực giữ ưu đãi trong 15 phút!\n\n` +
-            `🛍️ **ƯU ĐÃI COMBO PHỤ KIỆN TƯƠNG THÍCH (Giảm đến 30%):**\n` +
-            `Khi mua kèm máy, bạn được giảm thêm **${money(totalSavings)}** cho combo phụ kiện chính hãng (củ sạc, ốp lưng, tai nghe) bên dưới. Bạn chốt đơn luôn để em áp mã giảm trừ trực tiếp nhé! 👇`;
+        // Trụ cột 01: AI Mặc cả & Đàm phán 2 lượt linh hoạt
+        const previousTurns = Number(context.bargainTurn || 0);
+        const normMsg = normalizeText(message);
+        const isHardBargain = /bot them|bot nua|bot nhe|giam nua|giam them|chot luon|lay luon|200k|500k|100k|fix nua|chua giam|dat qua/i.test(normMsg);
+        const isSecondTurn = previousTurns >= 1 || isHardBargain;
+        const nextTurn = isSecondTurn ? 2 : 1;
+
+        let reply = '';
+        let suggestions = [];
+
+        if (!isSecondTurn) {
+            // Lượt 1: Thuyết phục bằng giá trị chính hãng VN/A, bảo hành & gợi ý combo trợ giá
+            reply = `Dạ em hiểu bạn luôn muốn mua được với mức giá tốt nhất, tuy nhiên giá niêm yết **${money(targetProduct.price)}** của **${targetProduct.name}** bên em hiện đã là giá sát sàn cho máy mới nguyên seal 100% chính hãng phân phối tại Việt Nam rồi ạ! 🛡️\n\n` +
+                `🎁 **ĐẶC QUYỀN GIA TĂNG NẾU BẠN CHỐT HÔM NAY:**\n` +
+                `• 🚚 **Miễn phí giao hàng hỏa tốc trong 2h** (nội thành TP.HCM, hẹn giờ nhận máy chuẩn xác).\n` +
+                `• 📦 **Đồng kiểm 100%:** Khách mở hộp kiểm tra ngoại quan, cắm nguồn ưng ý mới thanh toán.\n` +
+                `• 🔄 **Lỗi 1 đổi 1 trong 30 ngày:** Máy lỗi phần cứng đổi ngay thân máy mới 100% cùng model.\n\n` +
+                `🛍️ **GỢI Ý COMBO PHỤ KIỆN TƯƠNG THÍCH (Tiết kiệm ${money(totalSavings)}):**\n` +
+                `Khi mua kèm máy, bạn được giảm đến 30% cho combo phụ kiện chính hãng bên dưới. Bạn có thiện chí lấy máy ngay hôm nay không, nhắn em để em xin quản lý hỗ trợ thêm deal tốt nhất cho bạn nhé! 😊`;
+
+            suggestions = [
+                'Bớt thêm chút đi em chốt luôn',
+                'Có mã giảm giá nào không?',
+                `Mua cả combo ${targetProduct.name}`,
+                'Tư vấn trả góp 0%'
+            ];
+        } else {
+            // Lượt 2: Nhượng bộ khéo léo chốt sale, cấp mã voucher độc quyền có hạn 15 phút
+            reply = `Dạ thấy bạn thật sự rất thiện chí và ưng chiếc **${targetProduct.name}** này rồi, em vừa xin phép Trưởng ca showroom kích hoạt riêng cho bạn **Mã Trợ Giá Độc Quyền: \`${voucherCode}\` (Giảm ngay ${voucherDiscount})**! 🎁\n\n` +
+                `⏱️ **LƯU Ý GIỮ CHỖ TRONG 15 PHÚT:** Mã có hiệu lực giữ giá ưu đãi riêng cho bạn trong vòng 15 phút. Khi đặt hàng, mã sẽ được tự động trừ thẳng vào tổng tiền đơn hàng!\n\n` +
+                `🛍️ **CỘNG DỒN COMBO TIẾT KIỆM ĐẾN ${money(totalSavings)}:**\n` +
+                `Nếu lấy kèm phụ kiện tương thích (sạc, ốp lưng, tai nghe) bên dưới, bạn được áp dụng đồng thời cả mã giảm giá và chiết khấu combo kịch sàn!\n\n` +
+                `Bạn bấm **Mua Ngay** hoặc đặt giữ hàng bên dưới để chốt deal hời này ngay nhé! 👇`;
+
+            suggestions = [
+                `Áp mã ${voucherCode} giảm ${voucherDiscount}`,
+                `Mua cả combo ${targetProduct.name}`,
+                'Đặt giữ máy 24h tại Showroom',
+                'Tư vấn trả góp 0%'
+            ];
+        }
 
         return {
             reply,
@@ -2131,16 +2180,12 @@ async function answerBundleBargainQuestion(message, context = {}) {
                 addons: selectedAccessories,
                 totalSavings
             },
-            suggestions: [
-                `Áp mã ${voucherCode} giảm ${voucherDiscount}`,
-                `Mua cả combo ${targetProduct.name}`,
-                'Tư vấn trả góp 0%',
-                'Đặt giữ hàng tại Showroom'
-            ],
+            suggestions,
             context: {
                 ...context,
                 lastProducts: [targetProduct],
                 stage: 'bundle_bargain',
+                bargainTurn: nextTurn,
                 activeVoucher: voucherCode
             }
         };
@@ -2312,25 +2357,28 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot',
             'co giam them', 'combo phu kien', 'co khuyen mai kem', 'bot khong shop', 'co bot khong', 'bot gia khong',
             'fix gia khong', 'fix gia', 'bot 200k', 'bot 500k', 'giam 200k', 'giam 500k', 'bot chut di', 'giam chut di',
+            'bot them', 'giam them', 'bot nua', 'giam nua', 'bot duoc', 'giam duoc', 'chot luon', 'lay luon',
             'co chiet khau khong', 'mua 2 cai co giam khong', 'mua nhieu co giam khong', 'co gia si khong', 'bot duoc khong'
-        ].some(k => hasWordOrPhrase(text, k)) || /\b(bot|giam|fix|chiet khau)\s+(\d+\s*(k|tr|trieu)|chut|it|ti)\b/i.test(text);
+        ].some(k => hasWordOrPhrase(text, k)) ||
+        /\b(bot|giam|fix|chiet khau)\s+(them\s+|duoc\s+|nua\s+|chut\s+)?(\d+\s*(k|tr|trieu)|chut|it|ti|nua|them)?\b/i.test(text) ||
+        (context?.stage === 'bundle_bargain' && /\b(chot|lay|dong y|ok|oke|duoc khong|nua khong|giam nua|bot nua)\b/i.test(text));
 
         const smallTalk = detectGreetingOrSmallTalk(text);
         if (isPresenceCheckOrGreeting(message)) {
             response = buildPresenceCheckResponse(message, req.body.context);
         } else if (isTabletStylusQuery(message, req.body.context)) {
             response = await handleTabletStylusExplanation(message, req.body.context);
+        } else if (isBargainOrBundle) {
+            response = await answerBundleBargainQuestion(message, req.body.context);
+            if (!response) {
+                response = await answerVoucherQuestion();
+            }
         } else if (smallTalk) {
             response = smallTalk;
         } else if (specialAdvisor) {
             response = specialAdvisor;
         } else if (await handleActionExecution(message, req.body.context)) {
             response = await handleActionExecution(message, req.body.context);
-        } else if (isBargainOrBundle) {
-            response = await answerBundleBargainQuestion(message, req.body.context);
-            if (!response) {
-                response = await answerVoucherQuestion();
-            }
         } else if (gameCapability) {
             response = gameCapability;
         } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => hasWordOrPhrase(text, k))) {

@@ -318,6 +318,10 @@
                         </div>
                     </div>
                     <div class="ai-chat-header-actions" aria-label="Tác vụ cửa sổ chat">
+                        <button class="ai-chat-call-btn" id="aiChatCallBtn" type="button" aria-label="Cuộc gọi thoại AI 2 chiều" title="Trò chuyện thoại trực tiếp thời gian thực với AI (Full-Duplex & Barge-in)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <span>Gọi AI</span>
+                        </button>
                         <button class="ai-chat-reset" type="button" aria-label="Làm mới đoạn chat" title="Làm mới đoạn chat">↺</button>
                         <button class="ai-chat-minimize" type="button" aria-label="Thu nhỏ chat" title="Thu nhỏ">─</button>
                         <a class="ai-chat-expand" href="${root}pages/ai/assistant.html" aria-label="Mở giao diện AI đầy đủ" title="Mở giao diện AI đầy đủ">↗</a>
@@ -367,6 +371,47 @@
                         <p>Hỏi thông số, giá bán &amp; ưu đãi ngay lập tức</p>
                     </div>
                 </aside>
+                <section class="ai-call-overlay" id="aiCallOverlay" hidden aria-label="Cuộc gọi thoại với Trợ lý AI" role="region">
+                    <article class="ai-call-card">
+                        <header class="ai-call-top-bar">
+                            <span class="ai-call-badge"><span class="ai-call-dot"></span> FULL-DUPLEX LIVE</span>
+                            <time class="ai-call-duration" id="aiCallDuration">00:00</time>
+                        </header>
+
+                        <figure class="ai-call-avatar-zone">
+                            <span class="ai-call-pulse-ring ring-1" aria-hidden="true"></span>
+                            <span class="ai-call-pulse-ring ring-2" aria-hidden="true"></span>
+                            <span class="ai-call-pulse-ring ring-3" aria-hidden="true"></span>
+                            <img src="${root}assets/images/logo/ai-consultant-logo.svg" alt="Avatar Trợ lý AI" width="76" height="76" class="ai-call-avatar-img">
+                        </figure>
+
+                        <h3 class="ai-call-heading">Trợ lý AI Bán Hàng</h3>
+                        <p class="ai-call-live-status" id="aiCallStatusText">Đang lắng nghe tiếng Việt...</p>
+
+                        <div class="ai-call-waveform" id="aiCallWaveform" aria-hidden="true">
+                            <span class="ai-wave-bar"></span>
+                            <span class="ai-wave-bar"></span>
+                            <span class="ai-wave-bar"></span>
+                            <span class="ai-wave-bar"></span>
+                            <span class="ai-wave-bar"></span>
+                            <span class="ai-wave-bar"></span>
+                            <span class="ai-wave-bar"></span>
+                        </div>
+
+                        <aside class="ai-call-caption-bubble" id="aiCallCaption" aria-live="polite">
+                            "Bạn có thể nói tự nhiên. Nếu muốn ngắt lời AI, bạn chỉ cần cất tiếng nói bất cứ lúc nào!"
+                        </aside>
+
+                        <footer class="ai-call-ctrl-bar">
+                            <button type="button" class="ai-call-btn ai-call-mute-btn" id="aiCallMuteBtn" aria-label="Tắt tiếng Microphone" title="Tắt tiếng Microphone">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            </button>
+                            <button type="button" class="ai-call-btn ai-call-end-btn" id="aiCallEndBtn" aria-label="Kết thúc cuộc gọi thoại" title="Kết thúc cuộc gọi">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </footer>
+                    </article>
+                </section>
             </section>
             <aside class="ai-fab-greeting" id="aiFabGreeting" role="tooltip" aria-hidden="true">
                 <span class="ai-fab-greeting-text">👋 Cần AI tư vấn chọn máy?</span>
@@ -673,7 +718,26 @@
             .join('');
 
         container.querySelectorAll('.ai-chip').forEach(button => {
-            button.addEventListener('click', () => onClick(button.textContent));
+            button.addEventListener('click', () => {
+                const txt = button.textContent.trim();
+                const voucherMatch = txt.match(/Áp mã\s+([A-Z0-9]+)/i);
+                if (voucherMatch) {
+                    const code = voucherMatch[1].toUpperCase();
+                    const discount = code === 'DEALHOT500' ? 500000 : (code === 'TECHVIP' ? 200000 : 100000);
+                    const minOrder = code === 'DEALHOT500' ? 20000000 : (code === 'TECHVIP' ? 3000000 : 500000);
+                    try {
+                        sessionStorage.setItem('appliedCoupon', JSON.stringify({ code, discount, discountAmount: discount, value: discount, type: 'fixed', minOrderValue: minOrder, name: `Mã Trợ Giá Độc Quyền ${code}` }));
+                        localStorage.setItem('checkout_coupon', code);
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(code).catch(() => {});
+                        }
+                        if (typeof window.showToast === 'function') {
+                            window.showToast(`🎉 Đã kích hoạt mã ${code} (-${Number(discount).toLocaleString('vi-VN')} đ) vào phiên mua của bạn!`);
+                        }
+                    } catch (_) {}
+                }
+                onClick(txt);
+            });
         });
 
         setupSuggestionsDragScroll(nav, container);
@@ -1112,7 +1176,7 @@
 
                 <div class="ai-icard-voucher" role="status">
                     <span class="ai-voucher-star" aria-hidden="true">🎁</span>
-                    <span>Mã AI trợ giá: <strong>TECHVIP</strong> (Giảm thêm 200.000 đ)</span>
+                    <span>Mã AI trợ giá: <strong>${consultationContext.activeVoucher || (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'))}</strong> (Giảm thêm ${(consultationContext.activeVoucher === 'DEALHOT500' || product.price >= 20000000) ? '500.000 đ' : ((consultationContext.activeVoucher === 'TECHVIP' || product.price >= 3000000) ? '200.000 đ' : '100.000 đ')})</span>
                 </div>
             </section>
 
@@ -1165,8 +1229,11 @@
             buyBtn.addEventListener('click', () => {
                 const variantInfo = { color: selectedColor, spec: selectedSpec.label };
                 handleAddToCartWithVariant(product._id, 1, variantInfo, currentPrice);
-                sessionStorage.setItem('appliedCoupon', JSON.stringify({ code: 'TECHVIP', discount: 200000 }));
-                localStorage.setItem('checkout_coupon', 'TECHVIP');
+                const code = consultationContext.activeVoucher || (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'));
+                const discount = code === 'DEALHOT500' ? 500000 : (code === 'TECHVIP' ? 200000 : 100000);
+                const minOrder = code === 'DEALHOT500' ? 20000000 : (code === 'TECHVIP' ? 3000000 : 500000);
+                sessionStorage.setItem('appliedCoupon', JSON.stringify({ code, discount, discountAmount: discount, value: discount, type: 'fixed', minOrderValue: minOrder, name: `Mã Trợ Giá Độc Quyền ${code}` }));
+                localStorage.setItem('checkout_coupon', code);
 
                 // 1. Nếu đang ở trang chi tiết sản phẩm: mở trực tiếp modal Thanh toán 1 chạm
                 if (typeof window.openExpressCheckoutModal === 'function') {
@@ -1244,6 +1311,13 @@
             if (origEl) origEl.textContent = savings > 0 ? `${Number(originalTotal).toLocaleString('vi-VN')} đ` : '';
             if (savingsEl) savingsEl.textContent = `${Number(savings).toLocaleString('vi-VN')} đ`;
             if (countEl) countEl.textContent = `${1 + checkedAddons.length}`;
+
+            const submitBtn = card.querySelector('.ai-bundle-btn-buy');
+            if (submitBtn && !submitBtn.classList.contains('added')) {
+                submitBtn.textContent = savings > 0
+                    ? `⚡ Thêm Cả Combo - Tiết Kiệm ${Number(savings).toLocaleString('vi-VN')} đ`
+                    : '⚡ Thêm Cả Combo Vào Giỏ Hàng';
+            }
         };
 
         const mainPrice = Number(mainProd.price) || 0;
@@ -1303,7 +1377,7 @@
                     </div>
                 </div>
                 <button type="button" class="ai-bundle-btn-buy">
-                    ⚡ Thêm Cả Combo Vào Giỏ Hàng
+                    ⚡ Thêm Cả Combo - Tiết Kiệm ${Number(initialSavings).toLocaleString('vi-VN')} đ
                 </button>
             </footer>
         `;
@@ -1428,6 +1502,46 @@
         const micButton = chat.querySelector('.ai-chat-mic');
         const voiceButton = chat.querySelector('.ai-chat-voice');
         const status = chat.querySelector('#aiChatStatus');
+        const callButton = chat.querySelector('#aiChatCallBtn');
+        const callOverlay = chat.querySelector('#aiCallOverlay');
+        const callDurationEl = chat.querySelector('#aiCallDuration');
+        const callStatusEl = chat.querySelector('#aiCallStatusText');
+        const callWaveform = chat.querySelector('#aiCallWaveform');
+        const callCaptionEl = chat.querySelector('#aiCallCaption');
+        const callMuteBtn = chat.querySelector('#aiCallMuteBtn');
+        const callEndBtn = chat.querySelector('#aiCallEndBtn');
+
+        let isCallActive = false;
+        let callTimer = null;
+        let callSeconds = 0;
+        let isCallMuted = false;
+        let callAudioCtx = null;
+        let callAnalyser = null;
+        let callAnimFrame = null;
+
+        function formatCallDuration(sec) {
+            const m = Math.floor(sec / 60);
+            const s = sec % 60;
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function setCallVisualState(state, text) {
+            if (!callOverlay) return;
+            callOverlay.classList.remove('is-listening', 'is-speaking', 'is-processing', 'is-bargein');
+            if (state) callOverlay.classList.add(`is-${state}`);
+            if (text && callStatusEl) callStatusEl.textContent = text;
+        }
+
+        function handleBargeIn(userText) {
+            if (!isCallActive) return;
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                stopSpeaking();
+                setCallVisualState('bargein', 'Khách đang nói (Barge-in)... Đang lắng nghe');
+                if (callCaptionEl) callCaptionEl.textContent = `Bạn: "${userText || '...'}"`;
+            }
+        }
+
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = SpeechRecognition ? new SpeechRecognition() : null;
         let recognizedText = '';
@@ -1605,9 +1719,9 @@
         };
 
         const speak = text => {
-            if (!voiceEnabled || !('speechSynthesis' in window)) return;
-            // Dừng micro ngay để tránh thu lại giọng bot
-            if (recognition) {
+            if ((!voiceEnabled && !isCallActive) || !('speechSynthesis' in window)) return;
+            // Dừng micro thông thường để tránh thu lại tiếng bot, trừ khi đang trong cuộc gọi đàm thoại 2 chiều với Barge-in
+            if (recognition && !isCallActive) {
                 suppressRecognitionEnd = true;
                 recognizedText = '';
                 window.clearTimeout(recognitionSilenceTimer);
@@ -1617,6 +1731,11 @@
 
             const cleanText = cleanSpeechText(humanizeStoreName(text));
             if (!cleanText) return;
+
+            if (isCallActive) {
+                setCallVisualState('speaking', 'AI đang trả lời...');
+                if (callCaptionEl) callCaptionEl.textContent = `AI: "${cleanText}"`;
+            }
 
             const utterance = new SpeechSynthesisUtterance(cleanText);
             utterance.lang = 'vi-VN';
@@ -1631,6 +1750,9 @@
                 stopSpeaking();
                 suppressRecognitionEnd = false;
                 voiceAwaitingReply = false;
+                if (isCallActive) {
+                    setCallVisualState('listening', 'Đang lắng nghe tiếng Việt...');
+                }
                 if (voiceSessionActive && !voiceAwaitingReply) {
                     restartVoiceRecognition(220);
                 }
@@ -1639,6 +1761,9 @@
                 stopSpeaking();
                 suppressRecognitionEnd = false;
                 voiceAwaitingReply = false;
+                if (isCallActive) {
+                    setCallVisualState('listening', 'Đang lắng nghe tiếng Việt...');
+                }
                 if (voiceSessionActive && !voiceAwaitingReply) {
                     restartVoiceRecognition(220);
                 }
@@ -1672,7 +1797,10 @@
                 status.textContent = 'Đang nghe...';
             };
             recognition.onresult = event => {
-                if (!voiceSessionActive || voiceAwaitingReply || suppressRecognitionEnd || (window.speechSynthesis && window.speechSynthesis.speaking)) return;
+                if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                    handleBargeIn('...');
+                }
+                if (!voiceSessionActive || voiceAwaitingReply || suppressRecognitionEnd) return;
                 const finalParts = [];
                 const interimParts = [];
                 Array.from(event.results).forEach(result => {
@@ -1680,9 +1808,12 @@
                 });
                 recognizedText = [...finalParts, ...interimParts].join(' ').trim();
                 input.value = recognizedText;
+                if (isCallActive && callCaptionEl) {
+                    callCaptionEl.textContent = `Bạn: "${recognizedText}"`;
+                }
                 status.textContent = 'Đang nghe...';
                 window.clearTimeout(recognitionSilenceTimer);
-                recognitionSilenceTimer = window.setTimeout(() => recognition.stop(), 1200);
+                recognitionSilenceTimer = window.setTimeout(() => recognition.stop(), 1100);
             };
             recognition.onspeechend = () => {
                 window.clearTimeout(recognitionSilenceTimer);
@@ -1748,6 +1879,124 @@
                     status.textContent = 'Thiết bị không hỗ trợ microphone';
                 }
             });
+
+            function startAiVoiceCall() {
+                if (isCallActive) return;
+                isCallActive = true;
+                callSeconds = 0;
+                if (callDurationEl) callDurationEl.textContent = '00:00';
+                if (callOverlay) {
+                    callOverlay.hidden = false;
+                    callOverlay.classList.add('is-active');
+                }
+                setCallVisualState('listening', 'Đang kết nối đàm thoại 2 chiều...');
+
+                clearInterval(callTimer);
+                callTimer = setInterval(() => {
+                    callSeconds++;
+                    if (callDurationEl) callDurationEl.textContent = formatCallDuration(callSeconds);
+                }, 1000);
+
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } })
+                        .then(stream => {
+                            voiceMediaStream = stream;
+                            voiceSessionActive = true;
+                            try {
+                                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                                if (AudioCtxClass) {
+                                    callAudioCtx = new AudioCtxClass();
+                                    const source = callAudioCtx.createMediaStreamSource(stream);
+                                    callAnalyser = callAudioCtx.createAnalyser();
+                                    callAnalyser.fftSize = 64;
+                                    source.connect(callAnalyser);
+
+                                    const freqData = new Uint8Array(callAnalyser.frequencyBinCount);
+                                    const waveBars = callOverlay.querySelectorAll('.ai-wave-bar');
+
+                                    function animateAudioWaves() {
+                                        if (!isCallActive) return;
+                                        callAnalyser.getByteFrequencyData(freqData);
+                                        let avg = 0;
+                                        for (let i = 0; i < freqData.length; i++) avg += freqData[i];
+                                        avg = avg / freqData.length;
+
+                                        if (avg > 25 && window.speechSynthesis && window.speechSynthesis.speaking) {
+                                            handleBargeIn('...');
+                                        }
+
+                                        waveBars.forEach((bar, idx) => {
+                                            const val = freqData[idx * 2] || avg;
+                                            const h = Math.max(6, Math.min(46, (val / 255) * 52));
+                                            bar.style.height = `${h}px`;
+                                        });
+
+                                        callAnimFrame = requestAnimationFrame(animateAudioWaves);
+                                    }
+                                    animateAudioWaves();
+                                }
+                            } catch (e) {
+                                console.warn('AudioContext init error:', e);
+                            }
+
+                            try { recognition && recognition.start(); } catch (_) {}
+                        })
+                        .catch(err => {
+                            console.warn('getUserMedia error:', err);
+                            voiceSessionActive = true;
+                            try { recognition && recognition.start(); } catch (_) {}
+                        });
+                } else {
+                    voiceSessionActive = true;
+                    try { recognition && recognition.start(); } catch (_) {}
+                }
+
+                setTimeout(() => {
+                    if (!isCallActive) return;
+                    speak('Dạ em chào bạn! Em là Trợ lý AI TechEcommerce. Em đang kết nối thoại trực tiếp đây ạ, bạn cần tư vấn thiết bị hay săn deal gì cứ nói tự nhiên nhé!');
+                }, 350);
+            }
+
+            function endAiVoiceCall() {
+                if (!isCallActive) return;
+                isCallActive = false;
+                clearInterval(callTimer);
+                cancelAnimationFrame(callAnimFrame);
+
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                if (recognition) {
+                    try { recognition.abort(); } catch (_) {}
+                }
+                if (voiceMediaStream) {
+                    voiceMediaStream.getTracks().forEach(t => t.stop());
+                    voiceMediaStream = null;
+                }
+                if (callAudioCtx) {
+                    try { callAudioCtx.close(); } catch (_) {}
+                    callAudioCtx = null;
+                }
+
+                voiceSessionActive = false;
+                if (callOverlay) {
+                    callOverlay.classList.remove('is-active');
+                    callOverlay.hidden = true;
+                }
+                status.textContent = 'Trực tuyến · Hỗ trợ 24/7';
+            }
+
+            if (callButton) callButton.addEventListener('click', startAiVoiceCall);
+            if (callEndBtn) callEndBtn.addEventListener('click', endAiVoiceCall);
+            if (callMuteBtn) {
+                callMuteBtn.addEventListener('click', () => {
+                    isCallMuted = !isCallMuted;
+                    callMuteBtn.classList.toggle('is-muted', isCallMuted);
+                    callMuteBtn.setAttribute('aria-label', isCallMuted ? 'Bật Micro' : 'Tắt tiếng Micro');
+                    if (voiceMediaStream) {
+                        voiceMediaStream.getAudioTracks().forEach(t => { t.enabled = !isCallMuted; });
+                    }
+                    setCallVisualState(isCallMuted ? 'processing' : 'listening', isCallMuted ? 'Microphone đang tắt tiếng' : 'Đang lắng nghe tiếng Việt...');
+                });
+            }
         } else {
             micButton.disabled = true;
             micButton.title = 'Trình duyệt này chưa hỗ trợ nhận dạng giọng nói';
@@ -2253,6 +2502,11 @@
             sendButton.disabled = true;
             panel.dataset.state = 'loading';
             window.TechMascot?.setState('thinking');
+
+            if (isCallActive) {
+                setCallVisualState('processing', 'AI đang xử lý câu trả lời...');
+                if (callCaptionEl) callCaptionEl.textContent = `Bạn: "${message}"`;
+            }
 
             try {
                 consultationContext.conversationHistory = chatHistory.slice(-7, -1).filter(item => item && item.text && !item.proactive).map(item => ({ role: item.role === 'user' ? 'user' : 'assistant', text: String(item.text).slice(0, 320) }));
