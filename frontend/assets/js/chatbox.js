@@ -6,9 +6,12 @@
     const apiUrl = window.API_URL || 'http://localhost:5000/api';
     let consultationContext = {};
     const starterSuggestions = [
+        '✨ Tư vấn chọn máy',
         '📦 Tra cứu đơn hàng',
         '💳 Tính trả góp 0%',
         '🎁 Combo phụ kiện tiết kiệm',
+        '🔍 Kiểm tra seal & IMEI',
+        '🛡️ Bảo hành rơi vỡ 1 đổi 1',
         '🔄 Thu cũ đổi mới lên đời',
         '🎨 Đồ họa: Mac hay Windows?',
         '📍 Địa chỉ showroom',
