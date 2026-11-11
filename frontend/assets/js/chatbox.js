@@ -4,6 +4,7 @@
 
     const root = typeof window.getAppBasePath === 'function' ? window.getAppBasePath() : getBasePath();
     const apiUrl = window.API_URL || 'http://localhost:5000/api';
+    let consultationContext = {};
     const starterSuggestions = [
         '📦 Tra cứu đơn hàng',
         '💳 Tính trả góp 0%',
@@ -1076,6 +1077,10 @@
 
         const origPrice = Math.round(currentPrice * 1.15 / 100000) * 100000;
         const perMonth = Math.round((currentPrice * 0.7) / 12);
+        const voucherCode = (typeof consultationContext !== 'undefined' && consultationContext && consultationContext.activeVoucher)
+            ? consultationContext.activeVoucher
+            : (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'));
+        const voucherDiscountText = (voucherCode === 'DEALHOT500' || product.price >= 20000000) ? '500.000 đ' : ((voucherCode === 'TECHVIP' || product.price >= 3000000) ? '200.000 đ' : '100.000 đ');
 
         card.innerHTML = `
             <header class="ai-icard-header">
@@ -1131,7 +1136,7 @@
 
                 <div class="ai-icard-voucher" role="status">
                     <span class="ai-voucher-star" aria-hidden="true">🎁</span>
-                    <span>Mã AI trợ giá: <strong>${consultationContext.activeVoucher || (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'))}</strong> (Giảm thêm ${(consultationContext.activeVoucher === 'DEALHOT500' || product.price >= 20000000) ? '500.000 đ' : ((consultationContext.activeVoucher === 'TECHVIP' || product.price >= 3000000) ? '200.000 đ' : '100.000 đ')})</span>
+                    <span>Mã AI trợ giá: <strong>${voucherCode}</strong> (Giảm thêm ${voucherDiscountText})</span>
                 </div>
             </section>
 
@@ -1184,7 +1189,9 @@
             buyBtn.addEventListener('click', () => {
                 const variantInfo = { color: selectedColor, spec: selectedSpec.label };
                 handleAddToCartWithVariant(product._id, 1, variantInfo, currentPrice);
-                const code = consultationContext.activeVoucher || (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'));
+                const code = (typeof consultationContext !== 'undefined' && consultationContext && consultationContext.activeVoucher)
+                    ? consultationContext.activeVoucher
+                    : (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'));
                 const discount = code === 'DEALHOT500' ? 500000 : (code === 'TECHVIP' ? 200000 : 100000);
                 const minOrder = code === 'DEALHOT500' ? 20000000 : (code === 'TECHVIP' ? 3000000 : 500000);
                 sessionStorage.setItem('appliedCoupon', JSON.stringify({ code, discount, discountAmount: discount, value: discount, type: 'fixed', minOrderValue: minOrder, name: `Mã Trợ Giá Độc Quyền ${code}` }));
@@ -1462,7 +1469,7 @@
         const recognition = SpeechRecognition ? new SpeechRecognition() : null;
         let recognizedText = '';
         let recognitionSilenceTimer = null;
-        let consultationContext = {};
+        consultationContext = {};
         let chatHistory = [];
         let voiceEnabled = localStorage.getItem('chatVoiceEnabled') === 'true';
         let reengagementTimer = null;
