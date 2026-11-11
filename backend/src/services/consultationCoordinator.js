@@ -592,7 +592,7 @@ const KNOWN_UNSUPPORTED_ITEMS = [
             'canon', 'nikon', 'fujifilm', 'leica', 'lumix', 'may film', 'may anh phim'
         ],
         name: 'máy ảnh / máy chụp hình độc lập',
-        excludeIf: (normText) => normText.includes('osmo') || normText.includes('pocket') || normText.includes('gimbal'),
+        excludeIf: (normText) => normText.includes('osmo') || normText.includes('pocket') || normText.includes('gimbal') || /\b(tiktok|vlog|reels|livestream|dien thoai|ninh da|song ao)\b/i.test(normText),
         customReply: (rawText, norm) => {
             const brand = extractBrandFromList(norm, UNCARRIED_CAMERA_BRANDS);
             const brandMention = brand ? ` của **${brand}**` : '';

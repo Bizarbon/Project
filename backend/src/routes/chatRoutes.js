@@ -711,6 +711,10 @@ async function answerComparison(message, context = {}) {
  */
 async function answerInstallmentQuestion(message, previousProducts = []) {
     const text = normalizeText(message);
+    if (/\b(chua du 18|17 tuoi|16 tuoi|chua du tuoi|hoc sinh cap 3|chua co cccd|khong co chung minh|khong di lam)\b/i.test(text)) {
+        const smartUnder18 = matchSmartAnswer(message);
+        if (smartUnder18) return smartUnder18;
+    }
     let product = null;
 
     if (Array.isArray(previousProducts) && previousProducts.length > 0) {
@@ -1808,21 +1812,21 @@ async function answerVoucherQuestion() {
 async function answerPolicyQuestion(message) {
     const text = normalizeText(message);
 
-    // Không xử lý chính sách cửa hàng nếu câu hỏi đang tìm/tư vấn sản phẩm hoặc có mức ngân sách
-    const hasExplicitBudget = Boolean(extractBudget(message));
-    const hasProductConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim may|mua may|laptop|dien thoai|tai nghe|dong ho|may choi game|ban phim|chuot|sac)\b/i.test(text);
-    if (hasExplicitBudget || (hasProductConsultation && /\b(tu van|tim|mua|gia|duoi|tam|tren)\b/i.test(text))) {
-        return null;
-    }
-
     // Nếu là câu hỏi về máy tính bảng kèm bút, nhường cho handleTabletStylusExplanation để kèm danh thiếp sản phẩm thực tế
     if (isTabletStylusQuery(message)) {
         return null;
     }
 
-    // Ưu tiên tri thức chính sách nâng cao, mẹo công nghệ & đối đáp đời thường
+    // Ưu tiên tri thức chính sách nâng cao, kịch bản tư vấn người thật, mẹo công nghệ & đối đáp đời thường
     const smart = matchSmartAnswer(message);
     if (smart) return smart;
+
+    // Không xử lý chính sách cửa hàng thuần túy nếu câu hỏi đang tìm/tư vấn sản phẩm cụ thể theo ngân sách
+    const hasExplicitBudget = Boolean(extractBudget(message));
+    const hasProductConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim may|mua may|laptop|dien thoai|tai nghe|dong ho|may choi game|ban phim|chuot|sac)\b/i.test(text);
+    if (hasExplicitBudget || (hasProductConsultation && /\b(tu van|tim|mua|gia|duoi|tam|tren)\b/i.test(text))) {
+        return null;
+    }
 
     try {
         const article = await findKnowledgeArticle(message, { type: 'policy' });
@@ -2373,6 +2377,13 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             if (!response) {
                 response = await answerVoucherQuestion();
             }
+        } else if (policyAnswer) {
+            response = {
+                reply: typeof policyAnswer === 'string' ? policyAnswer : policyAnswer.reply,
+                products: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.products)) ? policyAnswer.products : [],
+                suggestions: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.suggestions)) ? policyAnswer.suggestions : ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay'],
+                context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...(req.body.context || {}), ...policyAnswer.context } : { ...(req.body.context || {}), stage: 'policy' }
+            };
         } else if (smallTalk) {
             response = smallTalk;
         } else if (specialAdvisor) {
@@ -2392,13 +2403,6 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             /(?:don hang|don cua toi|don cua em)\s+(?:sdt\s*)?(?:0|\+84)\d{9,10}\b/i.test(text)
         ) {
             response = await answerOrderQuestion(req, message);
-        } else if (policyAnswer) {
-            response = {
-                reply: typeof policyAnswer === 'string' ? policyAnswer : policyAnswer.reply,
-                products: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.products)) ? policyAnswer.products : [],
-                suggestions: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.suggestions)) ? policyAnswer.suggestions : ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay'],
-                context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...(req.body.context || {}), ...policyAnswer.context } : { ...(req.body.context || {}), stage: 'policy' }
-            };
         } else {
             response = await coordinateConsultation({ message, user: req.user, context: req.body.context });
             if (!response || !response.reply) {

@@ -44,6 +44,7 @@ const STORE_POLICY_RULES = [
     // 1.2 Chương trình Thu cũ Đổi mới (Trade-in)
     {
         id: 'trade_in',
+        excludeIf: (norm) => /\b(ep gia|dinh gia|bi tru|minh bach)\b/i.test(norm),
         patterns: [
             /(thu cu|trade[\s-]?in|doi may cu).*(moi|cu|khong|gia|the nao)/i,
             /(co|nhan|ho tro).*(thu cu|trade[\s-]?in|thu lai)/i,
@@ -138,6 +139,7 @@ const STORE_POLICY_RULES = [
     // 1.7 Ưu đãi Học sinh - Sinh viên (Back to school)
     {
         id: 'student_discount',
+        excludeIf: (norm) => /\b(kinh te|marketing|cntt|lap trinh|nganh it|it|phan mem|do hoa|macbook hay windows|mac hay win|nen mua laptop nao|nen mua macbook)\b/i.test(norm),
         keywords: [
             'sinh vien', 'hoc sinh sinh vien', 'uu dai sinh vien', 'giam gia sinh vien',
             'sinh vien co duoc giam khong', 'back to school', 'the sinh vien'
@@ -186,6 +188,7 @@ const STORE_POLICY_RULES = [
     // 1.10 Chính sách Giao hàng & Đồng kiểm khi nhận hàng
     {
         id: 'shipping_and_cod',
+        excludeIf: (norm) => /\b(o tinh|ve tinh|ship tinh|tinh xa)\b/i.test(norm),
         patterns: [
             /(giao hang|ship).*(bao lau|may ngay|co lau khong|phi ship|tinh phi)/i,
             /(co duoc|cho).*(kiem tra hang|dong kiem|mo hop).*(khi nhan|truoc khi thanh toan)/i
@@ -246,6 +249,7 @@ const STORE_POLICY_RULES = [
     // 1.13 Hỗ trợ dán cường lực & chuyển dữ liệu miễn phí
     {
         id: 'policy_free_setup_and_transfer',
+        excludeIf: (norm) => /\b(zalo|mat tin nhan|mat anh|tin nhan zalo)\b/i.test(norm),
         patterns: [
             /(ho tro|co).*(chuyen du lieu|cai dat|dan cuong luc|dan man hinh|tang op)/i,
             /(chuyen du lieu).*(tu may cu|sang may moi)/i
@@ -352,17 +356,38 @@ const STORE_POLICY_RULES = [
 // -------------------------------------------------------------
 
 const OBJECTION_RULES = [
+    // 2.0 Khách cần hỏi ý kiến vợ/chồng/người yêu ("Về hỏi vợ đã", "Hỏi ý kiến vợ")
+    {
+        id: 'objection_ask_partner_spouse',
+        patterns: [
+            /(ve|de|cho).*(hoi vo|hoi chong|hoi ban gai|hoi nguoi yeu|ban lai voi vo|ban voi chong|hoi y kien vo|hoi y kien chong|hoi y kien ba xa|hoi y kien ong xa)/i,
+            /(vo|chong|nguoi yeu|ba xa|ong xa|noc nha).*(chua cho|chua dong y|la|mang|khong cho mua|kho tinh)/i,
+            /(hoi y kien|hoi).*(vo|chong|ba xa|ong xa|nguoi yeu|ban gai|ban trai|noc nha)/i
+        ],
+        keywords: [
+            'de ve hoi vo da', 'hoi y kien vo', 'hoi y kien chong', 'de ban voi vo',
+            'vo chua cho mua', 'de hoi ban gai da', 've xin y kien vo', 'hoi ba xa', 'de hoi vo', 've hoi y kien vo da'
+        ],
+        reply: `Dạ quá chuẩn luôn ạ! Việc sắm sửa đồ công nghệ giá trị cứ bàn bạc kỹ lưỡng cùng người thương là an tâm và hạnh phúc nhất luôn nè! 💖💑\n\n` +
+            `Để giúp bạn dễ dàng thuyết phục và có tiếng nói chung nhất với 'nóc nhà':\n` +
+            `• 📄 **Em đã tóm tắt đầy đủ cấu hình, mức giá sát sàn và quà tặng** ở phía trên màn hình để bạn gửi cho vợ/chồng xem tham khảo nhanh nhé.\n` +
+            `• 🔒 **Bảo lưu Deal Hời 24 Giờ:** Em xin phép hệ thống lưu riêng cho bạn **Mã Trợ Giá \`GIUGIA200\` (Giảm ngay 200.000 ₫)** và bộ quà tặng trong 24h, không lo bị tăng giá hay hết hàng.\n` +
+            `• 💡 **Mẹo nhỏ tâm lý:** Máy này camera chụp ảnh selfie/chân dung cực đẹp, sắm về thỉnh thoảng đưa vợ/người yêu sống ảo là bảo đảm được khen tấm tắc luôn á!\n\n` +
+            `👉 Bạn cứ bàn bạc thoải mái cùng gia đình nha, khi nào 'nóc nhà' gật đầu nhắn em để em kích hoạt ưu đãi giao ngay nhé! 😊`,
+        suggestions: ['Lưu mã giữ giá 24h', 'Tư vấn trả góp 0%', 'Hotline 0842.331.606']
+    },
+
     // 2.1 Khách lưỡng lự: "Để suy nghĩ thêm", "Chưa mua đâu", "Để hỏi ý kiến"
     {
         id: 'objection_think_about_it',
         patterns: [
-            /(de|cho).*(suy nghi|can nhac|xem lai|tinh lai|hoi vo|hoi chong|hoi ban|hoi y kien)/i,
+            /(de|cho).*(suy nghi|can nhac|xem lai|tinh lai|hoi ban|suy nghi them|can nhac them)/i,
             /chua mua (dau|ngay|voi)/i,
             /chi xem (thoi|tham khao)/i
         ],
         keywords: [
             'de minh suy nghi them', 'de suy nghi them', 'de anh suy nghi them', 'de chi suy nghi them',
-            'de em suy nghi da', 'de can nhac them', 'chua mua dau', 'de xem lai da', 'de hoi vo da',
+            'de em suy nghi da', 'de can nhac them', 'chua mua dau', 'de xem lai da',
             'de hoi y kien', 'xem thoi chu chua mua', 'de coi lai', 'de suy nghi da', 'de xem sau nha'
         ],
         reply: `Dạ em hoàn toàn hiểu ạ! Sắm một món đồ công nghệ giá trị cao thì việc cân nhắc kỹ lưỡng và hỏi thêm ý kiến người thân là điều vô cùng đúng đắn luôn bạn nhé. Bạn cứ thong thả suy nghĩ và tham khảo thêm nha, không việc gì phải vội đâu ạ! 🍀\n\n` +
@@ -416,8 +441,8 @@ const OBJECTION_RULES = [
     {
         id: 'objection_wife_afraid',
         patterns: [
-            /(vo|ba xa|noc nha).*(khong cho|chui|mang|so vo|hoi vo|xin phep)/i,
-            /(so|hoi y kien).*(vo|ba xa|noc nha)/i
+            /\b(vo|ba xa|noc nha)\b.*(khong cho|chui|mang|so vo|hoi vo|xin phep)/i,
+            /\b(so|ngai|hoi y kien)\s+(vo|ba xa|noc nha)\b/i
         ],
         keywords: [
             'vo khong cho mua', 'so vo mang', 'de hoi vo da', 'so noc nha',
@@ -449,6 +474,48 @@ const OBJECTION_RULES = [
             `• ⚡ **Lương về là máy tới ngay:** Bạn chỉ cần để lại thông tin và mẫu máy ưng ý, khi nào tiền ting ting về tài khoản, bạn chỉ cần bấm xác nhận là máy được giao hỏa tốc đến tận tay bạn trong ngày luôn nhé!\n\n` +
             `👉 Bạn đang ưng ý mẫu máy hoặc cấu hình nào nhất để em giữ deal hời này cho bạn trước nha! 😊`,
         suggestions: ['Đặt giữ hàng 24h miễn phí', 'Săn voucher giảm giá', 'Tư vấn sản phẩm hot', 'Hotline 0842.331.606']
+    },
+
+    // 2.6 Khách ngại xa / lười đi đến cửa hàng
+    {
+        id: 'objection_too_far_away',
+        patterns: [
+            /(shop|cua hang).*(o xa|xa qua|xa nha|xa the)/i,
+            /(minh|toi|em).*(luoi di|luoi chay|ngai di|ngai chay|o xa)/i,
+            /(co giao|co ship).*(tan noi|tan nha|tan giuong)/i
+        ],
+        keywords: [
+            'shop o xa qua', 'xa qua luoi di', 'xa nha minh', 'luoi chay qua showroom',
+            'ngai di xa', 'xa the shop', 'o xa qua co giao khong'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm, không cần phải vất vả đội nắng đội mưa chạy xa đâu ạ! 🛵💨\n\n` +
+            `Hiểu được tâm lý khách hàng bận rộn, TechEcommerce phục vụ chính sách **Giao Hàng Hỏa Tốc Tận Giường Siêu Tiện Lợi**:\n` +
+            `• 🚚 **Giao siêu tốc 2 giờ:** Đội ngũ giao hàng chuyên biệt bằng xe máy chống sốc giao đến tận nhà bạn khắp các quận huyện TP.HCM.\n` +
+            `• 📦 **Đồng kiểm 100% tại chỗ:** Bạn mở hộp kiểm tra ngoại quan nguyên seal, bật nguồn đối chiếu số IMEI sắc nét, ưng ý hoàn toàn mới trả tiền cho shipper.\n` +
+            `• 💳 **Thanh toán linh hoạt:** Shipper mang theo máy POS quẹt thẻ tận nhà hoặc bạn có thể chuyển khoản QR/tiền mặt sau khi kiểm tra xong.\n` +
+            `• 🎁 **Miễn phí ship 100%:** Áp dụng cho mọi đơn hàng điện thoại, laptop và tablet hôm nay!\n\n` +
+            `👉 Bạn đang ở khu vực/quận nào để em kiểm tra tuyến giao nhanh nhất cho bạn nhé! 😊`,
+        suggestions: ['Giao hỏa tốc 2h', 'Đồng kiểm 100%', 'Tư vấn sản phẩm hot', 'Hotline 0842.331.606']
+    },
+
+    // 2.8 Khách phân vân: Có nên đợi dòng máy mới ra không (FOMO vs Mua ngay)
+    {
+        id: 'advice_wait_new_model_or_buy_now',
+        patterns: [
+            /(co nen doi|co nen cho|doi.*(iphone 17|s25|dong moi|ra mat))/i,
+            /(mua bay gio hay doi|so rot gia|sap ra may moi)/i
+        ],
+        keywords: [
+            'co nen doi may moi ra khong', 'nen mua bay gio hay doi', 'doi iphone 17 ra khong',
+            'co so rot gia khong', 'sap ra may moi co nen mua', 'cho ra may moi roi mua'
+        ],
+        reply: `Dạ câu hỏi này rất thực tế và cũng là trăn trở của rất nhiều khách hàng sành công nghệ luôn ạ! Em xin chia sẻ góc nhìn chân thật từ trải nghiệm thực tế nè: 📱⚖️\n\n` +
+            `✨ **3 Lý do nên mua và tận hưởng ngay lúc này:**\n` +
+            `1. ⏱️ **Thời gian và giá trị sử dụng:** Đồ công nghệ là công cụ phục vụ công việc, học tập và lưu giữ kỷ niệm gia đình. Mua sớm là bạn được hưởng thụ sự mượt mà suốt 6 – 8 tháng tới, kiếm ra tiền và giải quyết công việc nhanh hơn rất nhiều so với việc chờ đợi.\n` +
+            `2. 💰 **Giá đang ở mức 'đáy' hợp lý nhất:** Dòng máy hiện tại sau một thời gian ra mắt đã được hãng và cửa hàng trợ giá kịch sàn (rẻ hơn thời điểm mở bán từ 3 - 6 triệu). Trong khi máy mới ra mắt đợt đầu luôn bị khan hàng và đội giá rất cao.\n` +
+            `3. 🔄 **Chính sách Thu Cũ Đổi Mới bảo chứng:** Sau này khi thế hệ mới ra mắt chính thức, TechEcommerce luôn có chương trình **Trade-in trợ giá lên đời đến 4.000.000 đ**, bù tiền cực kỳ ít mà vẫn được máy mới nhất.\n\n` +
+            `👉 Bạn đang cần máy phục vụ công việc chính nào hiện nay để em tư vấn phiên bản tối ưu chi phí nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem máy Flagship giá tốt', 'Thu cũ đổi mới trợ giá', 'Tư vấn trả góp 0%']
     }
 ];
 
@@ -798,6 +865,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.12 Củ sạc nhanh 65W/100W GaN có an toàn khi sạc cho iPhone, điện thoại nhỏ không?
     {
         id: 'advice_gan_charger_safety',
+        excludeIf: (norm) => /\b(co lam chai pin|lam chai pin|co bi chai pin|chai pin khong)\b/i.test(norm),
         patterns: [
             /(cu sac|sac).*(65w|100w|140w|gan|cong suat lon).*(sac duoc|sac cho|an toan|co no|so no|hai pin|chai pin)/i,
             /(dung sac laptop|sac macbook).*(sac dien thoai|sac tai nghe).*(duoc khong|co sao khong)/i
@@ -1015,6 +1083,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.21 Hẹn giờ trải nghiệm máy & giữ hàng 24h tại Showroom 78 Nguyễn Văn Khối Gò Vấp
     {
         id: 'advice_showroom_experience_appointment',
+        excludeIf: (norm) => /\b(dau xe|do xe|oto|xe hoi|gui xe|bai do xe|cho de xe)\b/i.test(norm),
         patterns: [
             /(den xem may|ghe showroom|trai nghiem may|co san may khong|mo cua den may gio|cho dau xe|giu may giup toi)/i,
             /(dia chi showroom o dau|o go vap khong|78 nguyen van khoi)/i
@@ -1034,6 +1103,639 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `3. **Dịch vụ Giữ máy 24 giờ:** Nếu bạn ưng ý mẫu nào, shop hỗ trợ niêm phong giữ máy tại quầy trong 24h **hoàn toàn miễn phí** (không cần cọc tiền trước).\n\n` +
             `👉 Bạn dự kiến ghé showroom vào khung giờ nào để em dặn các bạn chuyên viên chuẩn bị máy sẵn đón tiếp bạn chu đáo nhất nhé! 😊`,
         suggestions: ['Đặt giữ máy 24h tại Showroom', 'Hotline 0842.331.606', 'Tư vấn sản phẩm mới']
+    },
+
+    // 3.14 Tư vấn điện thoại cho tài xế công nghệ / Shipper / Hay đi ngoài đường nắng gió / Pin trâu 2 ngày
+    {
+        id: 'persona_driver_shipper_battery',
+        patterns: [
+            /(chay grab|chay xe om|shipper|tai xe|di ngoai duong|ngoai troi|nang gio|chay app|chay be)/i,
+            /(dien thoai|may).*(pin trau nhat|pin 2 ngay|pin 6000|pin khung)/i
+        ],
+        keywords: [
+            'dien thoai chay grab', 'dien thoai cho shipper', 'may pin trau chay xe om',
+            'dien thoai pin trau nhat', 'pin dung 2 ngay', 'man hinh sang ngoai troi',
+            'dien thoai bat gps tot', 'dien thoai di ngoai nang'
+        ],
+        reply: `Dạ chào bạn! Đi làm ngoài đường nắng gió cả ngày thì một chiếc điện thoại bền bỉ, 'trâu bò' chính là cần câu cơm quan trọng nhất luôn ạ! 🛵☀️🔋\n\n` +
+            `✨ **4 Tiêu chuẩn sống còn cho anh em tài xế / Shipper:**\n` +
+            `• 🔋 **Pin khủng từ 5.000mAh – 6.000mAh:** Đảm bảo mở 3G/4G và bật định vị GPS liên tục 10 – 12 tiếng không lo sập nguồn giữa đường.\n` +
+            `• ☀️ **Màn hình độ sáng cao ngoài trời (1.000 – 1.500 nits):** Đứng giữa trời nắng gắt 12h trưa vẫn nhìn rõ địa chỉ nhận cuốc và bản đồ không bị chói lóa.\n` +
+            `• 🛰️ **Định vị GPS đa băng tần:** Bắt sóng nhanh, nhảy vị trí chuẩn xác đến từng mét, không bị lệch đường hay lag bản đồ.\n` +
+            `• 🛡️ **Kháng nước & Chống va đập:** Đi mưa bất chợt không lo cháy màn hình hay hỏng máy.\n\n` +
+            `🏆 **Top 3 mẫu máy 'vua đường phố' bán chạy nhất tại shop:**\n` +
+            `1. **Samsung Galaxy A15 / A25 (Tầm 3 - 5 triệu):** Màn hình Super AMOLED siêu sáng, pin 5.000mAh, sóng 4G/5G cực khỏe, phụ tùng thay thế rẻ.\n` +
+            `2. **Xiaomi Redmi Note 13 / POCO (Tầm 4 - 6 triệu):** Sạc siêu nhanh 33W - 67W, cắm sạc nghỉ trưa 20 phút là đầy 70% pin tiếp tục chạy cuốc.\n` +
+            `3. **iPhone 15 Plus / 16 Plus (Phân khúc cao cấp):** 'Nhà vô địch thời lượng pin' của Apple, dùng 2 ngày không hết pin, độ mượt 5 năm không đơ giật.\n\n` +
+            `👉 Bạn dự kiến tầm ngân sách khoảng bao nhiêu triệu để em chọn con máy cày cuốc ưng ý nhất kèm sạc dự phòng giảm 30% cho bạn nhé! 😊`,
+        suggestions: ['Xem Samsung Galaxy A15', 'Xem Redmi Note 13 sạc nhanh', 'Sạc dự phòng Anker chống chai pin']
+    },
+
+    // 3.15 Tư vấn máy quay TikTok, làm Reels, Livestream bán hàng, YouTuber / Sống ảo nịnh da
+    {
+        id: 'persona_tiktok_livestream_vlog',
+        patterns: [
+            /(quay tiktok|lam tiktok|livestream|live stream|quay video|vlog|vlogger|lam youtube)/i,
+            /(chup hinh dep|song ao|ninh da|chup anh mau dep|chup chan dung)/i
+        ],
+        keywords: [
+            'dien thoai quay tiktok dep', 'may livestream ban hang', 'dien thoai quay vlog',
+            'dien thoai chup anh ninh da', 'dien thoai chup song ao', 'may lam video youtube'
+        ],
+        reply: `Dạ đối với anh chị em làm sáng tạo nội dung, livestream bán hàng hay quay video TikTok/Reels thì chất lượng hình ảnh chính là uy tín và doanh thu luôn nè! 🎬📸✨\n\n` +
+            `✨ **Bí quyết chọn máy chuẩn Content Creator:**\n` +
+            `1. 🍎 **Tại sao iPhone luôn là số 1 cho TikTok/Instagram?**\n` +
+            `   • Thuật toán của TikTok và Instagram được tối ưu riêng cho camera iPhone, video tải lên giữ nguyên độ nét 4K 60fps, màu da tự nhiên không bị vỡ hạt hay giật khung hình.\n` +
+            `   • Hệ thống chống rung quang học OIS mượt như dùng gimbal, mic thu âm lọc tiếng gió và tạp âm cực kỳ trong trẻo.\n` +
+            `   • *Khuyên dùng:* **iPhone 15 Pro / iPhone 16 Pro Max**.\n` +
+            `2. 🌟 **Nếu livestream bán hàng thời gian dài (3 - 5 tiếng liên tục):**\n` +
+            `   • **Samsung Galaxy S24 Ultra / OPPO Find X8 Pro:** Tản nhiệt buồng hơi lớn không bị quá nhiệt giảm độ sáng màn hình, camera màu sắc rực rỡ nịnh mắt khách xem live.\n` +
+            `3. 🎙️ **Combo phụ kiện khuyên dùng:** Mic thu âm không dây cài áo **DJI Mic 2** lọc ồn thông minh + Chân đế tripod và củ sạc nhanh công suất lớn.\n\n` +
+            `👉 Bạn định đầu tư trong tầm ngân sách bao nhiêu để em tư vấn trọn gói cả máy lẫn phụ kiện livestream trợ giá nhé! 😊`,
+        suggestions: ['Xem iPhone 16 Pro Max', 'Xem Samsung S24 Ultra', 'Xem DJI Mic 2 thu âm', 'Tư vấn trả góp 0%']
+    },
+
+    // 3.16 So sánh các dòng Chip vi xử lý điện thoại & laptop (Snapdragon vs Apple A vs Dimensity, Intel vs AMD vs M-series)
+    {
+        id: 'advice_chip_snapdragon_vs_apple_vs_dimensity',
+        patterns: [
+            /(so sanh chip|chip nao manh hon|chip nao tot hon)/i,
+            /(snapdragon.*(apple|a18|a17|dimensity)|a18.*snapdragon)/i,
+            /(intel.*(amd|ryzen|apple m)|core ultra.*ryzen|m3.*intel)/i
+        ],
+        keywords: [
+            'so sanh chip dien thoai', 'snapdragon hay apple a manh hon', 'chip dimensity co tot khong',
+            'so sanh chip snapdragon va apple', 'intel hay amd ngon hon', 'chip m3 so voi intel'
+        ],
+        reply: `Dạ thế giới chip xử lý hiện nay đang ở giai đoạn bùng nổ công nghệ đỉnh cao! Em xin tóm gọn cực kỳ dễ hiểu để bạn chọn đúng nhu cầu nè: ⚡🧠\n\n` +
+            `📱 **VỀ CHIP ĐIỆN THOẠI:**\n` +
+            `• 🍎 **Apple A18 Pro / A17 Pro (iPhone):** Vua về hiệu năng đơn nhân và sự mượt mà tối ưu cùng hệ điều hành iOS. Render video 4K siêu nhanh, dùng 4-5 năm vẫn mượt mà, tối ưu pin số 1.\n` +
+            `• 🐉 **Snapdragon 8 Elite / 8 Gen 3 (Flagship Android):** Vua về đồ họa GPU chơi game nặng! Hỗ trợ công nghệ Ray Tracing chân thực, chiến Genshin Impact / Honkai Star Rail 60fps ổn định tuyệt đối.\n` +
+            `• 💎 **MediaTek Dimensity 9300 / 9400:** 'Ngựa ô công nghệ' với tỷ lệ hiệu năng trên giá thành (P/P) vô đối, chạy rất mát máy và tối ưu AI xử lý ảnh cực đẹp.\n\n` +
+            `💻 **VỀ CHIP LAPTOP:**\n` +
+            `• 🍏 **Apple Silicon (M2 / M3 / M4):** Mát lạnh không cần quạt hú, pin trâu không tưởng 15 - 18 tiếng, làm đồ họa và dựng phim mượt mà.\n` +
+            `• 🔷 **Intel Core Ultra (Series mới):** Tích hợp nhân xử lý trí tuệ nhân tạo NPU, tương thích 100% mọi phần mềm kỹ thuật, CAD và văn phòng truyền thống.\n` +
+            `• 🔴 **AMD Ryzen 7000 / 8000 / AI 300:** Đồ họa tích hợp Radeon cực khỏe, tiết kiệm pin khi rút sạc và kiểm soát nhiệt độ rất êm ái.\n\n` +
+            `👉 Bạn đang dự định mua máy để chơi game nặng, làm đồ họa hay công việc văn phòng để em chọn con chip vừa vặn nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem Flagship Snapdragon 8', 'Xem iPhone chip A18 Pro', 'Xem MacBook chip M-series']
+    },
+
+    // 3.17 Hướng dẫn chuyển dữ liệu từ xa và bảo toàn tin nhắn Zalo khi mua online
+    {
+        id: 'advice_remote_data_transfer_zalo',
+        patterns: [
+            /(chuyen du lieu|chuyen anh|sao luu zalo|mat tin nhan zalo|doi may.*mat zalo)/i,
+            /(mua online.*chuyen may the nao|huong dan chuyen may|cai dat may moi)/i
+        ],
+        keywords: [
+            'mua online chuyen du lieu the nao', 'chuyen tin nhan zalo sang may moi',
+            'doi may co mat tin nhan zalo khong', 'sao luu du lieu dien thoai',
+            'huong dan chuyen may tu xa'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm 100% về vấn đề dữ liệu khi mua máy tại TechEcommerce nhé! Cửa hàng có quy trình chuẩn chỉ hỗ trợ bảo toàn toàn bộ dữ liệu cho bạn: 📲🔐\n\n` +
+            `✨ **Quy trình chuyển dữ liệu thông minh trong 15 phút:**\n` +
+            `1. 💬 **Bảo toàn tin nhắn & hình ảnh Zalo:**\n` +
+            `   • Kỹ thuật viên sẽ hướng dẫn bạn vào: *Cài đặt Zalo ➔ Sao lưu & Khôi phục ➔ Bấm Sao lưu ngay* (nhớ đặt mật khẩu sao lưu dễ nhớ).\n` +
+            `   • Khi sang máy mới, bạn chỉ cần đăng nhập và nhập mật khẩu là 100% tin nhắn, ảnh, tài liệu công việc khôi phục nguyên vẹn!\n` +
+            `2. 📱 **Từ iPhone sang iPhone:** Chỉ cần đặt 2 máy cạnh nhau, màn hình sẽ hiện quả cầu xanh quét 1 chạm, toàn bộ danh bạ, ảnh, app tự động bay sang máy mới.\n` +
+            `3. 🔄 **Từ Android sang Samsung (hoặc ngược lại):** Dùng tính năng *Smart Switch*, chuyển cả nhật ký cuộc gọi và ghi chú.\n` +
+            `4. 🍏 **Từ Android sang iPhone:** Dùng ứng dụng chính thức *Chuyển sang iOS (Move to iOS)*.\n\n` +
+            `💡 **Đặc quyền:** Kỹ thuật viên TechEcommerce có thể hỗ trợ Video Call 1-1 qua Zalo hoặc shipper hỗ trợ tận nơi cho bạn hoàn toàn miễn phí nhé!`,
+        suggestions: ['Hỗ trợ kỹ thuật 0842.331.606', 'Tư vấn sản phẩm mới', 'Chính sách bảo hành']
+    },
+
+    // 3.18 Bảo hiểm hàng hóa & cam kết đền bù nếu vận chuyển bị bể vỡ, móp hộp hoặc thất lạc
+    {
+        id: 'shipping_damaged_insurance_compensation',
+        patterns: [
+            /(be man hinh|vo man hinh|bi tray|mop hop|trao hang|mat hang|den bu|boi thuong).*(van chuyen|ship|giao hang)/i,
+            /(lo.*be vo|lo.*hang hu|nhan hang bi loi)/i
+        ],
+        keywords: [
+            'van chuyen bi be vo thi sao', 'giao hang bi vo man hinh', 'shipper trao hang',
+            'den bu hang vo', 'chinh sach bao hiem van chuyen', 'lo giao hang bi hong'
+        ],
+        reply: `Dạ bạn hoàn toàn có thể thở phào nhẹ nhõm và an tâm tuyệt đối luôn ạ! TechEcommerce áp dụng quy trình bảo vệ quyền lợi người mua nghiêm ngặt nhất: 🛡️📦✈️\n\n` +
+            `✨ **Cam kết vàng bảo hiểm vận chuyển 100%:**\n` +
+            `• 📦 **Đóng gói chuẩn công nghệ 3 lớp:** Máy nguyên seal được bọc bóng khí chống va đập dày 5cm, đựng trong hộp carton chịu lực và dán **Tem Niêm Phong Bảo Mật 7 Màu** của shop.\n` +
+            `• 🔍 **ĐẶC QUYỀN ĐỒNG KIỂM TẬN MẮT:** Khi shipper giao tới, bạn có quyền mở gói hàng kiểm tra ngoại quan nguyên vẹn, tem niêm phong không bị rách, máy đúng màu đúng model rồi mới ký nhận.\n` +
+            `• 🔄 **ĐỔI MỚI NGAY TRONG 2 GIỜ NẾU CÓ SỰ CỐ:** Nếu phát hiện hộp bị móp méo, trầy xước hay có dấu hiệu cạy mở, bạn chỉ cần từ chối nhận hàng và gọi hotline **0842.331.606**. Shop sẽ ngay lập tức gửi máy mới 100% khác đền bù hỏa tốc mà bạn không mất thêm 1 đồng phí nào!\n\n` +
+            `👉 Bạn đang quan tâm đến sản phẩm nào để em chuẩn bị đóng gói cẩn thận giao ngay cho bạn nhé! 😊`,
+        suggestions: ['Giao hàng hỏa tốc 2h', 'Đồng kiểm 100%', 'Hotline 0842.331.606']
+    },
+
+    // 3.19 Tư vấn laptop chuyên dụng cho Đồ họa 2D / 3D / Kiến trúc / Render video 4K
+    {
+        id: 'advice_graphic_design_architect_render',
+        patterns: [
+            /(do hoa 2d|do hoa 3d|photoshop|illustrator|autocad|revit|3ds max|blender|sketchup)/i,
+            /(premiere|after effects|dung phim|render 4k|capcut pc|da vinci)/i,
+            /(do hoa|kien truc|render).*(3d|render|do hoa|kien truc|dung phim)/i,
+            /(laptop|may).*(do hoa|kien truc|render 3d|3d render|dung phim)/i,
+            /(do hoa kien truc|kien truc 3d|3d render|render 3d)/i
+        ],
+        keywords: [
+            'laptop lam do hoa 2d', 'laptop lam do hoa 3d', 'laptop render video 4k',
+            'laptop hoc kien truc', 'laptop chay autocad revit', 'laptop dung phim premiere',
+            'tu van laptop lam do hoa kien truc 3d render', 'laptop lam do hoa kien truc 3d render'
+        ],
+        reply: `Dạ dân đồ họa, kiến trúc và dựng phim bên em phục vụ rất nhiều anh em trong nghề, nên em hiểu rất rõ cấu hình nào chạy mượt mà không bị 'văng app' hay giật lag khi deadline đến gần nè! 💻🎨🎬\n\n` +
+            `✨ **Cấu hình chuẩn theo từng chuyên ngành:**\n` +
+            `1. 🖌️ **Đồ họa 2D (Photoshop, Illustrator, Figma, Canva, Lightroom):**\n` +
+            `   • Yếu tố số 1 là **Màn hình chuẩn màu:** Độ phủ màu tối thiểu 100% sRGB hoặc DCI-P3 để in ấn không bị lệch màu.\n` +
+            `   • Cấu hình: CPU Intel Core i5/i7 hoặc Apple M2/M3, RAM tối thiểu 16GB.\n` +
+            `2. 🏗️ **Đồ họa 3D & Kiến trúc (AutoCAD, Revit, SketchUp, 3ds Max, Blender):**\n` +
+            `   • Bắt buộc phải có **Card đồ họa rời (NVIDIA RTX 4050 / RTX 4060 trở lên với VRAM tối thiểu 6GB)** để dựng hình mượt, xoay khối không bị khựng.\n` +
+            `   • CPU dòng H/HX hiệu năng cao, RAM 16GB – 32GB, tản nhiệt buồng hơi 2 quạt lớn.\n` +
+            `3. 🎞️ **Dựng phim & Render 4K (Premiere, After Effects, DaVinci Resolve):**\n` +
+            `   • Khuyên dùng: **MacBook Pro M-Series (Pro/Max)** với Media Engine giải mã ProRes siêu tốc, hoặc Laptop Gaming RTX 4060/4070.\n\n` +
+            `👉 Bạn chuyên về mảng 2D, 3D hay dựng phim và tầm ngân sách khoảng bao nhiêu triệu để em lọc máy chuẩn chỉ cho bạn nhé! 😊`,
+        suggestions: ['Xem Laptop đồ họa RTX 4060', 'Xem MacBook Pro chuyên đồ họa', 'Tư vấn trả góp 0%']
+    },
+
+    // 3.20 Giải tỏa lo lắng về màn hình OLED / AMOLED có bị Burn-in (lưu ảnh / bóng mờ) không
+    {
+        id: 'advice_screen_burnin_oled',
+        patterns: [
+            /(burn[\s-]?in|luu anh|bong mo|am anh)/i,
+            /(man oled co ben khong|oled co de bi hong khong|amoled co bi luu anh)/i
+        ],
+        keywords: [
+            'man hinh oled co bi burn in khong', 'man amoled co bi luu anh khong',
+            'man hinh bong mo', 'oled co ben khong', 'chong burn in oled'
+        ],
+        reply: `Dạ đây là nỗi băn khoăn rất chính đáng của nhiều khách hàng, vì các đời màn hình OLED cách đây 5 - 7 năm từng có hiện tượng này. Tuy nhiên với công nghệ hiện nay, bạn hoàn toàn có thể yên tâm tuyệt đối nhé! 📱🛡️✨\n\n` +
+            `✨ **Tại sao màn hình OLED / AMOLED ngày nay cực kỳ bền bỉ:**\n` +
+            `1. 🧠 **Thuật toán dịch chuyển điểm ảnh thông minh (Pixel Shift):** Các thanh trạng thái (pin, cột sóng, đồng hồ) luôn tự động dịch chuyển vi mô từng pixel mà mắt thường không thấy, ngăn chặn 100% việc đốt cháy cùng một điểm ảnh.\n` +
+            `2. 💎 **Vật liệu hữu cơ thế hệ mới:** Tấm nền *Super Retina XDR (Apple)* và *Dynamic AMOLED 2X (Samsung)* có tuổi thọ điểm ảnh lên đến hàng chục nghìn giờ liên tục.\n` +
+            `3. 🛡️ **Bảo hành chính hãng 12 - 24 tháng:** Nếu màn hình có bất kỳ lỗi lưu ảnh, sọc màn hay lỗi hiển thị từ nhà sản xuất, bạn được đổi mới cụm màn hình chính hãng nguyên seal miễn phí!\n\n` +
+            `👉 Mẹo nhỏ: Bạn chỉ cần cài thời gian sáng màn hình tự động và để độ sáng Auto là máy bền đẹp suốt 5 năm không lo nghĩ nhé! 😊`,
+        suggestions: ['Xem iPhone màn Super Retina', 'Xem Samsung Dynamic AMOLED', 'Chính sách bảo hành vàng']
+    },
+
+    // 3.21 Nên mua máy dung lượng cao hay mua máy vừa phải rồi mua thêm iCloud / Google One
+    {
+        id: 'advice_storage_cloud_vs_internal',
+        patterns: [
+            /(nen mua dung luong cao|mua icloud|mua google one)/i,
+            /(cloud hay bo nho trong|nang dung luong hay mua icloud|bo nho hay icloud)/i
+        ],
+        keywords: [
+            'nen mua 128gb roi mua icloud khong', 'mua icloud hay mua 256gb',
+            'mua bo nho trong hay mua cloud', 'dung icloud co tien khong'
+        ],
+        reply: `Dạ đây là bài toán kinh tế thông minh mà rất nhiều khách hàng hay hỏi em luôn nè! Em xin phân tích chi tiết ưu nhược điểm để bạn chọn đúng nhất nhé: 💾☁️💡\n\n` +
+            `✨ **So sánh chi tiết 2 phương án:**\n` +
+            `1. 📱 **Phương án Nâng bộ nhớ trong (Lên 256GB / 512GB):**\n` +
+            `   • *Ưu điểm:* Tiện lợi số 1! Tốc độ truy xuất ảnh, mở video và quay clip 4K tức thì mà không cần mạng Internet. Đi du lịch vùng cao, đi máy bay không có sóng vẫn xem phim, làm việc bình thường.\n` +
+            `   • *Giá trị:* Mua 1 lần dùng trọn đời máy, khi bán lại máy 256GB/512GB cũng giữ giá tốt hơn rất nhiều.\n` +
+            `2. ☁️ **Phương án Dùng máy 128GB + Mua gói Cloud (iCloud / Google Drive):**\n` +
+            `   • *Ưu điểm:* Chi phí ban đầu nhẹ hơn. Gói iCloud 50GB chỉ 19.000 đ/tháng, gói 200GB khoảng 69.000 đ/tháng (có thể chia sẻ cho cả gia đình 5 người cùng dùng).\n` +
+            `   • *Nhược điểm:* Muốn xem lại video cũ phải có mạng 4G/Wifi để tải về, app Zalo lưu dữ liệu nặng vẫn chiếm bộ nhớ trong máy.\n\n` +
+            `🎯 **Lời khuyên chân thành của nhân viên bán hàng:**\n` +
+            `Nếu bạn xác định dùng máy lâu dài 3 – 5 năm và quay chụp nhiều: Hãy đầu tư **bản 256GB** để thoải mái tinh thần, không bao giờ phải thấy thông báo 'Dung lượng đầy' khó chịu nhé!`,
+        suggestions: ['Xem phiên bản 256GB chuẩn vàng', 'Tư vấn trả góp 0%', 'Hotline 0842.331.606']
+    },
+
+    // 3.22 Hỏi về khả năng đi mưa, mồ hôi tập gym, chuẩn kháng nước IP68 thực tế
+    {
+        id: 'advice_water_resistant_rain_sweat',
+        patterns: [
+            /(di mua co sao khong|mo hoi|tap gym|chong nuoc the nao|chuan ip68|roi xuong nuoc)/i,
+            /(co duoc rua may khong|mang vao phong tam|chong nuoc that khong)/i,
+            /(dien thoai|may).*(di mua|chong nuoc|khang nuoc|dinh nuoc)/i,
+            /(di mua|troi mua).*(co sao khong|duoc khong|hu may)/i
+        ],
+        keywords: [
+            'dien thoai di mua co sao khong', 'mo hoi tap gym co hong may khong',
+            'chuan ip68 chong nuoc the nao', 'roi xuong nuoc co sao khong',
+            'mang dien thoai vao phong tam', 'di mua co sao khong'
+        ],
+        reply: `Dạ chuẩn kháng nước IP68 / IP67 trên các dòng máy cao cấp tại shop là một lớp bảo vệ tuyệt vời cho cuộc sống hàng ngày luôn ạ! 🌧️💧🏊\n\n` +
+            `✨ **Những trường hợp máy kháng nước an toàn 100%:**\n` +
+            `• 🌧️ Đi ngoài đường gặp trời mưa rào, dính nước mưa bất chợt.\n` +
+            `• 🏃 Mồ hôi tay khi tập gym, chạy bộ thể thao cường độ cao.\n` +
+            `• ☕ Vô tình làm đổ ly nước lọc, nước ngọt trên bàn làm việc hoặc rơi vào bồn rửa tay vớt lên ngay.\n\n` +
+            `⚠️ **2 Lưu ý vàng để máy dùng 5 năm vẫn như mới:**\n` +
+            `1. Không mang máy vào **phòng xông hơi, tắm nước nóng** (vì hơi nước nóng giãn nở gioăng cao su có thể lọt vào trong).\n` +
+            `2. Không ngâm máy dưới **nước biển** (muối biển có tính ăn mòn kim loại chân sạc). Sau khi dính nước, bạn nên lau khô bằng khăn mềm và đợi chân sạc khô ráo hoàn toàn rồi mới cắm sạc nhé!`,
+        suggestions: ['Xem máy chuẩn IP68 cao cấp', 'Chính sách bảo hành vàng', 'Tư vấn phụ kiện chống nước']
+    },
+
+    // 3.23 Tư vấn máy chơi game mượt, FPS cao, ping thấp (Liên Quân, Tốc Chiến, Free Fire, PUBG, Genshin)
+    {
+        id: 'advice_gaming_refresh_rate_ping',
+        patterns: [
+            /(choi lien quan|choi toc chien|choi free fire|choi pubg|choi genshin)/i,
+            /(may choi game|fps cao|ping thap|khong lag|khong rot fps|combat khong giat|tut fps|drop fps)/i,
+            /(combat|choi game).*(tut fps|drop fps|lag|giat|nong may)/i,
+            /(combat.*fps|tut fps|rot fps|drop fps)/i
+        ],
+        keywords: [
+            'dien thoai choi lien quan 120fps', 'may choi pubg muot', 'dien thoai choi game khong nong',
+            'may combat khong lag', 'dien thoai choi genshin muot', 'may game thu gia tot',
+            'may choi lien quan combat co bi tut fps khong'
+        ],
+        reply: `Dạ chào người anh em game thủ! Để leo rank Thách Đấu mượt mà không bị cay cú vì drop FPS lúc combat tổng thì đây là những vũ khí tối thượng cho bạn nè! 🎮🔥🏆\n\n` +
+            `✨ **3 Yếu tố vàng game thủ không thể bỏ qua:**\n` +
+            `1. 🎯 **Màn hình 120Hz + Tần số lấy mẫu cảm ứng 240Hz+:** Vuốt chiêu, tung skill, vẩy tâm ngắm chuẩn xác tức thì đến từng mili-giây, nhanh hơn đối thủ 1 nhịp.\n` +
+            `2. ❄️ **Tản nhiệt xịn & Sạc nhánh (Bypass Charging):** Vừa cắm sạc vừa chơi nhưng dòng điện đi thẳng vào máy không qua pin, giúp máy mát rượi và bảo vệ pin không bị chai phồng.\n` +
+            `3. 🚀 **Chipset ổn định dài lâu:**\n` +
+            `   • *Tầm giá 5 - 8 triệu:* **POCO / Xiaomi / Samsung Galaxy A** chiến mượt Liên Quân, Free Fire, Tốc Chiến 60 - 90 FPS.\n` +
+            `   • *Tầm giá trên 15 triệu:* **iPhone 15 Pro / 16 Pro Max** hoặc **Samsung S24 Ultra** kéo max setting PUBG, Genshin Impact 60 FPS mượt như nhung!\n\n` +
+            `👉 Bạn đang chơi tựa game nào là chính và dự kiến tầm giá bao nhiêu để em chọn con máy chiến game ưng ý nhất cho bạn nhé! ⚔️`,
+        suggestions: ['Xem điện thoại Gaming 120Hz', 'Xem Flagship chiến game nặng', 'Tư vấn củ sạc nhanh Bypass']
+    },
+
+    // 3.24 Trả góp khi chưa đủ 18 tuổi hoặc không có chứng minh thu nhập
+    {
+        id: 'advice_under_18_installment',
+        patterns: [
+            /(chua du 18|17 tuoi|16 tuoi|hoc sinh cap 3|chua co cccd|khong co chung minh thu nhap|khong di lam).*(tra gop|mua gop)/i,
+            /(chua du tuoi|chua 18|chua du 18 tuoi).*(mua gop|tra gop)/i
+        ],
+        keywords: [
+            'chua du 18 tuoi co tra gop duoc khong', '17 tuoi mua gop duoc khong',
+            'khong co chung minh thu nhap co gop duoc khong', 'hoc sinh co mua tra gop duoc khong'
+        ],
+        reply: `Dạ em hiểu bạn đang rất muốn sớm sở hữu chiếc máy ưng ý để phục vụ việc học tập hay giải trí! Em xin tư vấn giải pháp hợp pháp và êm đẹp nhất nè: 💳📚\n\n` +
+            `✨ **Quy định pháp lý của các công ty tài chính (Home Credit, FE Credit, HD SAISON):**\n` +
+            `• Người đứng tên trên hợp đồng vay bắt buộc phải **từ đủ 18 tuổi trở lên** và có **CCCD gắn chip gốc** còn hiệu lực.\n\n` +
+            `🌟 **2 GIẢI PHÁP ĐƠN GIẢN ĐỂ BẠN VẪN MUA ĐƯỢC MÁY:**\n` +
+            `1. 👨‍👩‍👦 **Nhờ Phụ huynh hoặc Anh/Chị ruột (đủ 18 tuổi) đứng tên hộ:**\n` +
+            `   • Thủ tục chỉ mất đúng 5 phút duyệt online tại nhà, không giữ giấy tờ gốc, không gọi thẩm định làm phiền nếu hồ sơ sạch.\n` +
+            `   • Bạn hàng tháng chỉ việc chuyển tiền cho người thân thanh toán là xong!\n` +
+            `2. 💳 **Thanh toán qua Thẻ tín dụng (Credit Card) của người thân:**\n` +
+            `   • Lãi suất 0%, không cần xét duyệt tuổi của người sử dụng, quẹt thẻ online 30 giây là nhận máy ngay.\n\n` +
+            `👉 Bạn có thể nhờ ba mẹ hoặc anh chị hỗ trợ đứng tên giúp không, để em gửi bảng tính chi tiết số tiền góp mỗi tháng chỉ vài trăm nghìn cực nhẹ nhàng nhé! 😊`,
+        suggestions: ['Bảng tính trả góp mỗi tháng', 'Tư vấn phụ huynh đứng tên', 'Hotline 0842.331.606']
+    },
+
+    // 3.25 Dung lượng pin bảo trì & chai pin bao nhiêu % thì nên thay
+    {
+        id: 'advice_battery_health_replacement',
+        patterns: [
+            /(pin chai bao nhieu|pin xuong bao nhieu|bao tri pin|thay pin chinh hang|pin duoi 80|dung luong toi da pin|khi nao nen thay pin)/i,
+            /(pin con bao nhieu.*nen thay|pin bao tri co sao khong|pin chai co no khong)/i
+        ],
+        keywords: [
+            'pin chai bao nhieu thi thay', 'pin duoi 80 co nen thay', 'thay pin chinh hang gia bao nhieu',
+            'pin bao tri co sao khong', 'meo dung pin khong chai', 'dung luong pin toi da con 79'
+        ],
+        reply: `Dạ đây là câu hỏi mà hầu như khách hàng nào dùng iPhone hay điện thoại Android sau 1 - 2 năm cũng đều băn khoăn luôn nè! Em xin giải đáp cực kỳ chuẩn kỹ thuật cho bạn an tâm nhé: 🔋🛠️\n\n` +
+            `✨ **1. Khi nào thì THỰC SỰ CẦN THAY PIN?**\n` +
+            `• 📉 **Ngưỡng chuẩn của hãng:** Khi *Dung lượng pin tối đa (Battery Health)* tụt **dưới 80%** hoặc máy báo dòng chữ **Bảo trì (Service)**.\n` +
+            `• ⚡ **Dấu hiệu thực tế:** Máy có hiện tượng tuột pin nhanh bất thường, sập nguồn đột ngột khi còn 10 - 20%, hoặc máy bị nóng và đơ lag nhẹ do hệ thống tự hạ xung nhịp để bảo vệ máy.\n\n` +
+            `🛡️ **2. DỊCH VỤ THAY PIN CHÍNH HÃNG TẠI TECHECOMMERCE:**\n` +
+            `• ⏱️ **Thay lấy liền sau 20 phút:** Khách ngồi xem trực tiếp kỹ thuật viên thao tác, không giữ máy qua đêm.\n` +
+            `• 🌟 **Cam kết linh kiện cao cấp:** Pin đạt chuẩn CE, đầy đủ mạch bảo vệ quá nhiệt, hiển thị 100% dung lượng chuẩn, không báo lỗi màn hình.\n` +
+            `• 🏷️ **Bảo hành vàng 12 tháng 1 đổi 1** nếu pin tụt nhanh hoặc chai quá 20% trong năm đầu.\n\n` +
+            `💡 **Mẹo vàng dùng pin 3 năm vẫn trên 85%:** Hãy bật tính năng *Sạc pin được tối ưu hóa (Optimized Battery Charging)*, duy trì mức pin từ 20% - 80% và tránh vừa cắm sạc vừa chơi game nặng nhé! 😊`,
+        suggestions: ['Bảng giá thay pin chính hãng', 'Kiểm tra pin miễn phí tại Showroom', 'Hotline 0842.331.606']
+    },
+
+    // 3.26 Tư vấn điện thoại cho ba mẹ, người lớn tuổi (chữ to, loa to, pin trâu, dễ dùng)
+    {
+        id: 'persona_elderly_parents_phone',
+        patterns: [
+            /(mua cho bo me|mua cho ba me|mua cho nguoi lon tuoi|mua cho ong ba|dien thoai cho nguoi gia|nguoi gia dung|nguoi lon tuoi dung)/i,
+            /(may cho bo me|may cho nguoi lon tuoi|dien thoai chu to|dien thoai loa to pin trau)/i
+        ],
+        keywords: [
+            'dien thoai cho nguoi lon tuoi', 'dien thoai cho bo me', 'dien thoai chu to loa to cho nguoi gia',
+            'mua may cho ba me de dung', 'dien thoai de su dung cho nguoi gia', 'may cho nguoi lon tuoi'
+        ],
+        reply: `Dạ em rất xúc động và trân quý tình cảm hiếu thảo của bạn dành cho phụ huynh ạ! Chọn máy cho người lớn tuổi thì yếu tố quan trọng nhất không phải cấu hình khủng mà là sự **tiện lợi, dễ nhìn, loa to và độ bền cao** nè: 👵👴💖\n\n` +
+            `✨ **4 Tiêu chí vàng cho điện thoại người lớn tuổi:**\n` +
+            `• 🔍 **Màn hình lớn 6.5 – 6.7 inch sắc nét:** Hỗ trợ phóng to cỡ chữ cực đại, biểu tượng ứng dụng rõ ràng giúp ba mẹ không cần đeo kính lão vẫn đọc báo, xem tin tức dễ dàng.\n` +
+            `• 🔊 **Loa ngoài âm lượng lớn & Rung mạnh:** Đảm bảo ba mẹ để máy trong túi áo hay ở phòng khách vẫn nghe rõ chuông gọi của con cháu.\n` +
+            `• 🔋 **Pin bền 5.000mAh:** Nghe gọi, xem YouTube mượt mà 2 - 3 ngày mới cần sạc 1 lần, không lo ba mẹ hay quên cắm sạc.\n` +
+            `• 📱 **Giao diện thân thiện:** Kỹ thuật viên bên em sẽ bật sẵn chế độ **Chế độ đơn giản (Simple Mode)**, gỡ sạch app rác, chặn thông báo quảng cáo làm phiền.\n\n` +
+            `🏆 **3 Gợi ý tuyệt vời nhất hiện có:**\n` +
+            `1. **Samsung Galaxy A15 / A25 (Tầm 3 - 5 triệu):** Màn hình Super AMOLED rực rỡ, thương hiệu Samsung quen thuộc, dễ dùng số 1.\n` +
+            `2. **Xiaomi Redmi Note 13 (Tầm 4 triệu):** Loa kép stereo to rõ, sạc nhanh tặng kèm củ sạc trong hộp.\n` +
+            `3. **iPhone 13 / iPhone 15 Plus (Phân khúc cao cấp):** Nếu cả nhà dùng iPhone, ba mẹ sẽ gọi FaceTime hình ảnh cực nét, định vị an toàn Tìm (Find My) để gia đình luôn an tâm về ba mẹ.\n\n` +
+            `👉 Bạn dự định ngân sách khoảng bao nhiêu triệu để em cài đặt sẵn trọn gói Zalo, YouTube trước khi giao tận tay ba mẹ nhé! 😊`,
+        suggestions: ['Xem Samsung Galaxy A15 cho ba mẹ', 'Xem Xiaomi Redmi Note 13', 'Giao máy cài đặt sẵn tận nhà']
+    },
+
+    // 3.27 Máy mới mua về có cần sạc 8 tiếng 3 lần như ngày xưa không?
+    {
+        id: 'advice_first_time_charging_myth',
+        patterns: [
+            /(sac 8 tieng|sac 3 lan 8 tieng|may moi co can sac 8 tieng|sac qua dem lan dau|co can sac xa khong)/i,
+            /(may moi mua ve.*sac the nao|lan dau sac may tieng|huong dan sac may moi)/i
+        ],
+        keywords: [
+            'may moi mua ve co can sac 8 tieng', 'sac 8 tieng 3 lan dau', 'cach sac pin may moi mua',
+            'may moi co can xa pin khong', 'lan dau mua may sac may tieng', 'sac lan dau the nao'
+        ],
+        reply: `Dạ đây là thói quen từ thời điện thoại dùng pin Niken cách đây hơn 15 năm trước rồi bạn ơi! Với công nghệ hiện đại ngày nay thì câu trả lời là: **HOÀN TOÀN KHÔNG CẦN SẠC 8 TIẾNG NỮA Ạ!** ❌🔋🎉\n\n` +
+            `✨ **Sự thật khoa học về pin hiện đại (Lithium-ion / Li-Po):**\n` +
+            `• 🧠 **Không còn hiệu ứng nhớ (No Memory Effect):** Pin thông minh ngày nay có chip quản lý nguồn điện tử IC tự ngắt dòng khi đầy 100%, bạn không cần phải 'kích pin' hay sạc xả 8 tiếng làm gì cả.\n` +
+            `• 🚀 **Mở hộp là dùng được ngay:** Máy mới khui seal thường có sẵn khoảng 50% - 60% pin từ nhà máy, bạn cứ bật nguồn thiết lập máy và trải nghiệm thoải mái luôn.\n\n` +
+            `🌟 **QUY TẮC VÀNG ĐỂ PIN BỀN SUỐT 4 NĂM:**\n` +
+            `1. Khi pin báo còn khoảng **15% - 20%**, bạn cắm sạc cho máy.\n` +
+            `2. Khi pin đạt **80% - 100%**, bạn có thể rút sạc dùng bình thường mà không cần canh đúng giờ.\n` +
+            `3. ⚠️ **Điều tối kỵ nhất:** Tránh để pin sập nguồn tắt máy về 0% thường xuyên (vì sẽ làm giảm điện áp tế bào pin) và hạn chế vừa chơi game nặng vừa cắm sạc nhanh bạn nhé!`,
+        suggestions: ['Tư vấn củ sạc GaN bảo vệ pin', 'Chính sách bảo hành pin 12 tháng', 'Hotline 0842.331.606']
+    },
+
+    // 3.28 Dán kính cường lực hay dán PPF dẻo? Có ảnh hưởng vân tay siêu âm không?
+    {
+        id: 'advice_tempered_glass_vs_ppf_fingerprint',
+        patterns: [
+            /(cuong luc|ppf).*(hay|va|vs).*(ppf|cuong luc)/i,
+            /(dan cuong luc hay ppf|nen dan cuong luc hay ppf|dan ppf co bi loan cam ung|dan man hinh co nhan van tay|van tay sieu am)/i,
+            /(nen dan gi cho man hinh|kinh cuong luc hay ppf|dan man hinh cong the nao)/i
+        ],
+        keywords: [
+            'nen dan cuong luc hay ppf', 'dan ppf co chong va dap khong', 'dan cuong luc co dung duoc van tay sieu am khong',
+            'dan man hinh o dau dep', 'dan ppf hay cuong luc ngon hon'
+        ],
+        reply: `Dạ đây là phân vân rất phổ biến của khách hàng khi vừa đập hộp máy mới! Em xin so sánh chi tiết ưu nhược điểm từng loại để bạn chọn đúng nhất nhé: 🛡️✨📱\n\n` +
+            `1. 💎 **KÍNH CƯỜNG LỰC (Tempered Glass 9H):**\n` +
+            `   • *Ưu điểm:* Khả năng **chống va đập nứt vỡ số 1!** Nếu lỡ làm rơi điện thoại xuống mặt đường, tấm kính sẽ chịu lực vỡ thay cho màn hình gốc của máy.\n` +
+            `   • *Cảm giác vuốt:* Trơn láng, mượt mà, chống bám vân tay cực tốt.\n` +
+            `   • *Phù hợp nhất:* iPhone, màn hình phẳng hoặc người hay vận động, dễ làm rơi máy.\n\n` +
+            `2. 🛡️ **MIẾNG DÁN NANO PPF (Film dẻo tự phục hồi):**\n` +
+            `   • *Ưu điểm:* Siêu mỏng nhẹ, trong suốt 99%, ôm khít 100% các mép cong của màn hình (rất thích hợp cho Samsung màn cong).\n` +
+            `   • *Khả năng tự phục hồi:* Các vết xước dăm li ti do móng tay hay chìa khóa sẽ tự biến mất sau 24h dưới nhiệt độ phòng.\n` +
+            `   • *Nhược điểm:* Chống trầy xước rất tốt nhưng không chống được lực va đập rơi rớt mạnh như cường lực.\n\n` +
+            `🔍 **ĐẶC BIỆT: Về Cảm biến vân tay siêu âm (trên Samsung S23/S24 Ultra):**\n` +
+            `• Khi dán cường lực cao cấp chuyên dụng tại TechEcommerce, kỹ thuật viên sẽ bật chế độ **Tăng độ nhạy cảm ứng (Touch Sensitivity)** và hướng dẫn bạn quét lại vân tay sau khi dán, nhận diện 1 chạm mở khóa trong 0.2 giây cực nhạy luôn ạ!\n\n` +
+            `👉 Mua máy tại shop bạn được **tặng kèm dán cường lực và hỗ trợ dán chuẩn không bụi bọt khí miễn phí 100%** luôn nhé! 😊`,
+        suggestions: ['Tặng dán màn hình miễn phí', 'Tư vấn ốp lưng chống sốc', 'Hotline 0842.331.606']
+    },
+
+    // 3.29 Sinh viên ngành Kinh tế, Ngoại thương, Marketing nên mua MacBook Air hay Laptop Windows?
+    {
+        id: 'advice_business_marketing_students_mac_vs_win',
+        patterns: [
+            /(sinh vien kinh te|hoc marketing|hoc quan tri|hoc ngoai thuong|hoc ke toan|sinh vien kinh te nen mua macbook hay windows)/i,
+            /(nganh kinh te.*macbook|kinh te nen dung may gi|marketing nen mua laptop nao)/i
+        ],
+        keywords: [
+            'sinh vien kinh te nen mua macbook hay laptop', 'hoc marketing nen dung may gi',
+            'sinh vien ngoai thuong mua macbook duoc khong', 'hoc ke toan dung macbook duoc khong',
+            'sinh vien kinh te nen mua laptop gi'
+        ],
+        reply: `Dạ chào bạn tân sinh viên tương lai! Khối ngành Kinh tế, Ngoại thương, Marketing và Quản trị kinh doanh là nhóm ngành rất năng động, cần thuyết trình nhiều và di chuyển liên tục nè: 💼📊🎓\n\n` +
+            `✨ **1. TẠI SAO MACBOOK AIR (M2 / M3) LÀ SỰ LỰA CHỌN SỐ 1 CHO MARKETING & QUẢN TRỊ?**\n` +
+            `• 🪶 **Siêu mỏng nhẹ chỉ 1.2kg:** Bỏ gọn trong balo hay túi xách, mang lên giảng đường, quán cà phê chạy deadline cả ngày cực kỳ nhẹ nhàng.\n` +
+            `• 🔋 **Pin trâu 15 - 18 tiếng:** Đi học từ sáng tới chiều tối mà không cần vác theo cục sạc vướng víu.\n` +
+            `• 🎨 **Thiết kế sang xịn & Màn hình Retina rực rỡ:** Làm slide PowerPoint, thiết kế Canva, biên tập video TikTok/Reels marketing cực kỳ mượt mà và chuẩn màu.\n\n` +
+            `✨ **2. KHI NÀO NÊN CHỌN LAPTOP WINDOWS (Asus Zenbook, HP Pavilion, Lenovo)?**\n` +
+            `• 📈 **Nếu bạn học chuyên sâu ngành Kế toán - Kiểm toán - Tài chính:** Phải làm việc với các bảng tính Excel nâng cao sử dụng Macro, VBA phức tạp hoặc các phần mềm kế toán chuyên dụng của trường như **MISA, SPSS, Stata** (những phần mềm này chạy tương thích tốt nhất trên Windows).\n` +
+            `• 🔌 **Cần nhiều cổng kết nối USB truyền thống:** Dễ dàng cắm máy chiếu trình chiếu đồ án trong lớp mà không cần mua thêm cổng chuyển Hub.\n\n` +
+            `🎯 **Tóm lại:** Nếu thiên về Marketing/Quản trị/Ngoại thương ➔ **MacBook Air** là chuẩn đẹp; nếu thiên về Kế toán/Tài chính số liệu nặng ➔ **Laptop Windows mỏng nhẹ** là lựa chọn an toàn tuyệt đối!\n\n` +
+            `👉 Bạn đang theo học ngành nào cụ thể và ngân sách tầm bao nhiêu để em chọn máy kèm ưu đãi Sinh viên giảm thêm 500k cho bạn nhé! 😊`,
+        suggestions: ['Xem MacBook Air M2 Sinh Viên', 'Xem Laptop Windows mỏng nhẹ', 'Ưu đãi Sinh viên giảm 500k']
+    },
+
+    // 3.30 Sạc nhanh 65W, 100W, 120W có làm chai pin điện thoại nhanh hơn không?
+    {
+        id: 'advice_fast_charging_battery_degradation',
+        patterns: [
+            /(sac nhanh co chai pin khong|sac 65w co hai pin|sac 120w co no khong|dung sac nhanh co bi chai pin)/i,
+            /(sac nhanh co hai may khong|dung cu sac watt cao co sao khong|sac nhanh 45w co chai pin)/i
+        ],
+        keywords: [
+            'sac nhanh co lam chai pin khong', 'sac nhanh co hai may khong', 'dung cu sac nhanh co sao khong',
+            'sac 67w co lam chai pin', 'sac 120w co hai pin khong', 'cu sac cong suat cao co no khong'
+        ],
+        reply: `Dạ em xin khẳng định ngay để bạn hoàn toàn yên tâm: **SẠC NHANH CHÍNH HÃNG HOÀN TOÀN KHÔNG LÀM CHAI PIN HỎNG MÁY ĐÂU Ạ!** ⚡🛡️✨\n\n` +
+            `✨ **Khoa học đằng sau công nghệ sạc nhanh hiện đại:**\n` +
+            `1. 🧠 **Giao thức điều phối dòng điện thông minh (Power Delivery / PPS):**\n` +
+            `   • Củ sạc và điện thoại liên tục 'nói chuyện' với nhau qua chip xử lý. Máy chỉ nhận đúng công suất mà nó được thiết kế. Ví dụ bạn dùng củ sạc MacBook 100W cắm cho iPhone, máy chỉ tự rút tối đa 27W - 30W chứ không bao giờ bị quá tải hay nổ đâu ạ!\n` +
+            `2. 📈 **Cơ chế sạc theo 2 giai đoạn an toàn:**\n` +
+            `   • *Từ 0% đến 70 - 80%:* Sạc ở công suất tối đa để bạn có pin dùng gấp chỉ sau 20 phút.\n` +
+            `   • *Từ 80% đến 100%:* Tự động giảm dần dòng điện xuống mức nhỏ giọt (Trickle Charge) để làm mát pin và bảo vệ tuổi thọ linh kiện tối đa.\n` +
+            `3. ❄️ **Công nghệ tản nhiệt bán dẫn GaN (Gallium Nitride):** Giúp củ sạc nhỏ gọn hơn 50% và luôn mát rượi khi sạc liên tục.\n\n` +
+            `⚠️ **Kẻ thù duy nhất làm chai pin là NHIỆT ĐỘ:** Bạn chỉ cần tránh đặt điện thoại lên nệm, gối khi sạc hoặc vừa cắm sạc vừa render video nặng là pin sẽ cực kỳ bền bỉ suốt 3 - 4 năm nhé!`,
+        suggestions: ['Xem Củ sạc nhanh Anker GaN', 'Xem Cáp sạc bọc dù chống đứt', 'Chính sách bảo hành phụ kiện 18 tháng']
+    },
+
+    // 3.31 Mua máy online giao về các tỉnh xa mất bao lâu? Có miễn phí ship không?
+    {
+        id: 'advice_provincial_shipping_timeline_fee',
+        patterns: [
+            /(o tinh|ve tinh|tinh xa).*(ship|giao|bao lau|phi|nhan duoc)/i,
+            /(ship|giao hang).*(ve tinh|o tinh|tinh xa)/i,
+            /(o tinh).*(bao lau|phi ship|phi van chuyen|nhan hang)/i,
+            /(ship ve tinh|giao ve tinh|o tinh thi bao lau nhan duoc|ship tinh mat bao lau|phi ship ve tinh)/i,
+            /(o tinh co mua duoc khong|mua online giao ve tinh|ship cod tinh)/i
+        ],
+        keywords: [
+            'ship ve tinh mat bao lau', 'giao hang ve tinh co ton phi khong', 'o tinh mua online the nao',
+            'phi ship tinh bao nhieu', 'giao ve mien tay mat bao lau', 'giao ve ha noi mat may ngay'
+        ],
+        reply: `Dạ dù bạn đang ở bất kỳ tỉnh thành nào trên khắp cả nước, TechEcommerce cũng phục vụ tận tình và giao máy nhanh như chớp luôn ạ! 🚚📦✈️\n\n` +
+            `✨ **1. THỜI GIAN GIAO HÀNG ĐẾN TỪNG KHU VỰC:**\n` +
+            `• 🚀 **Nội thành TP.HCM:** Giao hỏa tốc bằng xe máy chỉ **trong 2 giờ**, shipper bàn giao tận tay và hướng dẫn test máy chu đáo.\n` +
+            `• 🛵 **Các tỉnh lân cận miền Nam (Bình Dương, Đồng Nai, Long An, Vũng Tàu, Cần Thơ, Tây Ninh):** Nhận máy nhanh **trong vòng 24 giờ**.\n` +
+            `• ✈️ **Các tỉnh Miền Trung & Miền Bắc (Hà Nội, Đà Nẵng, Hải Phòng, Huế...):** Giao chuyển phát bay chuyên tuyến hỏa tốc chỉ từ **1 – 2 ngày làm việc**.\n\n` +
+            `🎁 **2. ĐẶC QUYỀN VÀNG KHI MUA HÀNG VỀ TỈNH:**\n` +
+            `• 💯 **MIỄN PHÍ GIAO HÀNG 100% (FREE SHIP TOÀN QUỐC):** Áp dụng cho mọi đơn hàng điện thoại, máy tính bảng và laptop.\n` +
+            `• 🛡️ **Bảo hiểm hàng hóa 100%:** Có mã Tracking để bạn theo dõi trực tiếp vị trí đơn hàng trên điện thoại.\n` +
+            `• 🔍 **Quyền lợi Đồng kiểm tận mắt:** Shipper giao tới, bạn được mở hộp kiểm tra máy nguyên seal, đúng màu, đúng quà tặng rồi mới thanh toán tiền COD hoặc quẹt thẻ.\n\n` +
+            `👉 Bạn đang ở tỉnh/thành phố nào để em kiểm tra thời gian giao sớm nhất cho bạn nhé! 😊`,
+        suggestions: ['Tra cứu thời gian giao hàng', 'Quy trình đồng kiểm 100%', 'Hotline 0842.331.606']
+    },
+
+    // 3.32 Nên mua iPad hay Samsung Galaxy Tab để học tập và ghi chép?
+    {
+        id: 'advice_tablet_ipad_vs_samsung_tab_notes',
+        patterns: [
+            /(nen mua|nen chon|so sanh)?\s*ipad\s*(hay|va|vs)\s*(samsung|galaxy)\s*(tab|s\d+)?/i,
+            /(ipad\s*(hay|va|vs)\s*(samsung|galaxy)\s*tab)/i,
+            /(nen mua ipad hay samsung tab|ipad hay galaxy tab|so sanh ipad va tab s|nen chon ipad hay samsung)/i,
+            /(ipad hay tab de hoc|nen mua tablet nao ghi chep)/i
+        ],
+        keywords: [
+            'nen mua ipad hay samsung tab de hoc', 'so sanh ipad va galaxy tab',
+            'mua tablet nao ghi chep hoc tap tot', 'ipad hay samsung tab ngon hon',
+            'hoc sinh nen mua ipad hay samsung tab'
+        ],
+        reply: `Dạ đây là 2 kỳ phùng địch thủ lớn nhất trong làng máy tính bảng hiện nay! Em xin tóm gọn đúng ưu nhược điểm để bạn chọn theo đúng thói quen sử dụng nè: 📲✍️📚\n\n` +
+            `✨ **1. CHỌN IPAD (iPad Gen 10 / iPad Air M2) KHI NÀO?**\n` +
+            `• 🍎 **Hệ sinh thái ứng dụng học tập & vẽ số 1 thế giới:** Kho ứng dụng App Store được tối ưu riêng cho iPad cực kỳ mượt mà. Các phần mềm ghi chép thần thánh như *GoodNotes, Notability, Procreate (vẽ)* gần như không có đối thủ bên Android.\n` +
+            `• 💎 **Độ mượt & Giữ giá lâu dài:** Dùng 5 - 6 năm vẫn mượt mà, hỗ trợ cập nhật iPadOS liên tục.\n` +
+            `• ⚠️ *Điểm cần lưu ý:* Hộp máy chỉ có củ cáp sạc, bạn cần chi thêm khoảng 1.5 - 2 triệu để mua thêm bút cảm ứng Apple Pencil.\n\n` +
+            `✨ **2. CHỌN SAMSUNG GALAXY TAB (Tab S9 / Tab S9 FE / Tab A9) KHI NÀO?**\n` +
+            `• ✍️ **KÈM SẴN BÚT S-PEN XỊN TRONG HỘP (Miễn phí 100%):** Tiết kiệm ngay vài triệu đồng! Đầu bút S-Pen bằng cao su mềm cho cảm giác viết êm ái, bám màn hình y hệt như bút bi viết trên giấy thật.\n` +
+            `• 💻 **Chế độ máy tính Samsung DeX:** Biến giao diện tablet thành màn hình máy tính Windows với thanh taskbar và cửa sổ đa nhiệm, cắm thêm bàn phím chuột là soạn thảo văn bản như laptop.\n` +
+            `• 📺 **Màn hình tỷ lệ 16:10:** Xem YouTube, Netflix xem phim viền đen siêu mỏng, đã mắt hơn iPad.\n\n` +
+            `🎯 **Lời khuyên chân tình:** Nếu bạn đã dùng iPhone/MacBook hoặc thích vẽ đồ họa chuyên nghiệp ➔ **iPad**; còn nếu cần tiết kiệm chi phí, thích kèm sẵn bút và đa nhiệm văn phòng ➔ **Samsung Galaxy Tab** là vô địch!\n\n` +
+            `👉 Bạn dự định đầu tư khoảng bao nhiêu triệu để em gửi chi tiết mẫu máy phù hợp nhất nhé! 😊`,
+        suggestions: ['Xem iPad Gen 10 học tập', 'Xem Galaxy Tab S9 kèm bút', 'Tư vấn phụ kiện bàn phím']
+    },
+
+    // 3.33 Làm nghề tự do, không có bảng lương sao kê có mua trả góp được không?
+    {
+        id: 'advice_freelance_no_payslip_installment',
+        patterns: [
+            /(lam tu do|kinh doanh tu do|khong co bang luong|khong co sao ke|khong di lam cong ty).*(tra gop|mua gop)/i,
+            /(chay xe om.*tra gop|buon ban nho.*tra gop|khong chung minh thu nhap.*tra gop)/i
+        ],
+        keywords: [
+            'khong co bang luong co tra gop duoc khong', 'lam tu do co mua gop duoc khong',
+            'khong co sao ke ngan hang mua gop the nao', 'thu tuc tra gop khong can chung minh thu nhap',
+            'kinh doanh tu do co duoc tra gop khong'
+        ],
+        reply: `Dạ bạn hoàn toàn có thể thở phào nhẹ nhõm nha: **KHÔNG CẦN BẢNG LƯƠNG, KHÔNG CẦN SAO KÊ NGÂN HÀNG VẪN MUA TRẢ GÓP 100% ĐƯỢC Ạ!** 💳🎉💼\n\n` +
+            `Rất nhiều khách hàng của shop là anh em kinh doanh tự do, bán hàng online, tài xế công nghệ hay làm freelancer đều đã lên đời máy thành công cực kỳ dễ dàng nhờ chính sách mới:\n\n` +
+            `✨ **3 ĐIỀU SIÊU ĐƠN GIẢN KHI TRẢ GÓP TẠI TECHECOMMERCE:**\n` +
+            `1. 🆔 **Chỉ cần duy nhất: CCCD gắn chip gốc** (từ đủ 18 tuổi trở lên, còn hạn sử dụng).\n` +
+            `2. 📱 **Duyệt hồ sơ online tự động qua VNeID trong 3 - 5 phút:** Hệ thống tài chính (Kredivo, Home Credit, HD SAISON) liên kết trực tiếp với dữ liệu định danh quốc gia để chấm điểm tín nhiệm, hoàn toàn không cần giấy tờ chứng minh thu nhập rườm rà.\n` +
+            `3. 🤫 **BẢO MẬT & KHÔNG GỌI NGƯỜI THÂN:** Cam kết không gọi thẩm định làm phiền gia đình hay bạn bè nếu lịch sử tín dụng của bạn không có nợ xấu.\n\n` +
+            `👉 Bạn chỉ cần trả trước từ 0 đồng hoặc 10 - 20% giá trị máy là rinh máy về ngay. Bạn đang nhắm mẫu máy nào để em lên bảng tính số tiền góp mỗi tháng chỉ bằng vài ly cà phê nhé! 😊`,
+        suggestions: ['Tính số tiền góp mỗi tháng', 'Kiểm tra hồ sơ online 3 phút', 'Hotline 0842.331.606']
+    },
+
+    // 3.34 Showroom có chỗ đậu xe ô tô không? Đi xe máy có giữ xe miễn phí không?
+    {
+        id: 'advice_showroom_parking_car_bike',
+        patterns: [
+            /(cho dau xe|cho do xe|do oto|dau oto|gui xe may|cho gui xe|bai do xe|co cho de xe khong)/i,
+            /(di oto den showroom|di xe hoi den cua hang|gui xe co mat tien khong)/i
+        ],
+        keywords: [
+            'showroom co cho dau oto khong', 'co cho do xe hoi khong', 'gui xe co mat phi khong',
+            'dia chi showroom co cho de xe khong', 'bai dau xe showroom', 'di oto toi xem may duoc khong'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm ghé Showroom TechEcommerce trải nghiệm máy mà không cần lo lắng bất cứ điều gì về chỗ đậu xe nhé! 🚗🛵✨\n\n` +
+            `🏢 **TIỆN ÍCH BÃI ĐỖ XE TẠI SHOWROOM (78 Nguyễn Văn Khối, Phường 11, Gò Vấp):**\n` +
+            `• 🚗 **Đối với khách đi Ô tô (Xe hơi 4 - 7 chỗ):** Tuyến đường Nguyễn Văn Khối lòng đường thông thoáng, trước cửa showroom có làn dừng đỗ ô tô rộng rãi, nhân viên bảo vệ sẽ hướng dẫn bạn đỗ xe ngay ngắn và hỗ trợ mang vác hàng hóa tận cốp xe cho bạn.\n` +
+            `• 🛵 **Đối với khách đi Xe máy:** Vỉa hè trước cửa hàng rộng thênh thang, có mái che râm mát và bảo vệ túc trực dắt xe, phát thẻ xe cẩn thận **hoàn toàn MIỄN PHÍ 100%**.\n` +
+            `• ❄️ **Không gian bên trong Showroom:** Máy lạnh mát rượi 24/7, có sẵn nước suối lạnh mời khách, khu vực ghế sofa êm ái cho người nhà ngồi thư giãn trong lúc bạn trải nghiệm và test máy.\n\n` +
+            `👉 Showroom mở cửa liên tục từ **08:30 đến 21:30** mỗi ngày. Bạn dự kiến ghé khung giờ nào để em dặn các bạn chuyên viên chuẩn bị sẵn máy chờ đón bạn nhé! 😊`,
+        suggestions: ['Xem bản đồ chỉ đường Showroom', 'Đặt giữ máy trước khi đến', 'Hotline 0842.331.606']
+    },
+
+    // 3.35 Dùng máy trần không ốp có dễ trầy xước viền Titan / Nhôm không?
+    {
+        id: 'advice_naked_phone_case_titanium_scratch',
+        patterns: [
+            /(dung may tran|khong dung op|de bi tray khong|vien titan co tray khong|vien nhom de tray khong)/i,
+            /(co nen dung op lung khong|dung may tran co sao khong|vien titan co de xuoc khong)/i
+        ],
+        keywords: [
+            'dung may tran co de xuoc khong', 'vien titan co bi tray khong', 'co nen dung op lung khong',
+            'dung may tran co sao khong', 'vien titan co de trua khong', 'khong xai op co sao khong'
+        ],
+        reply: `Dạ cảm giác cầm chiếc điện thoại trần nguyên bản, mát lạnh kim loại và siêu mỏng nhẹ trên tay thực sự là một trải nghiệm gây nghiện và cực kỳ đã luôn ạ! Tuy nhiên, em xin chia sẻ thực tế vật liệu để bạn cân nhắc nè: 📱💎🛡️\n\n` +
+            `✨ **Sự thật về độ bền của viền kim loại:**\n` +
+            `• 🌟 **Khung viền Titan Grade 5 (iPhone 15 Pro, iPhone 16 Pro, Galaxy S24 Ultra):** Độ cứng và khả năng chống móp khi va đập vượt trội hơn thép rất nhiều. Tuy nhiên, lớp phủ mạ nhám bên ngoài nếu cọ xát với chìa khóa, đồng xu hay hạt cát trong túi quần vẫn có thể để lại các vết xước lông mèo li ti.\n` +
+            `• 🪶 **Khung viền Nhôm tái chế (iPhone bản thường, các dòng Android tầm trung):** Trọng lượng nhẹ, tản nhiệt tốt, nhưng nhôm có đặc tính mềm hơn titan nên nếu lỡ rơi góc xuống nền bê tông sẽ dễ bị cấn móp nhẹ.\n\n` +
+            `💡 **2 GIẢI PHÁP ĐẸP TOÀN DIỆN CHO NGƯỜI THÍCH DÙNG MÁY TRẦN:**\n` +
+            `1. 📱 **Dùng Ốp lưng siêu mỏng trong suốt (Clear Case PC chống ố vàng):** Độ dày chỉ 0.8mm, khoe trọn 100% màu máy nguyên bản mà vẫn bảo vệ máy an toàn khi đặt lên mặt bàn.\n` +
+            `2. 🛡️ **Dán Film PPF viền nhám mờ:** Dán ôm khít từng milimet khung viền, chống trầy xước tuyệt đối mà khi cầm tay vẫn có cảm giác kim loại nhám như dùng máy trần.\n\n` +
+            `🎯 **Mẹo giữ giá:** Giữ máy không bị cấn móp viền sẽ giúp bạn bán lại hoặc Trade-in lên đời máy mới sau 1 - 2 năm với mức giá cao hơn từ 1.500.000 ₫ – 3.000.000 ₫ đó ạ! 😊`,
+        suggestions: ['Tặng ốp lưng trong suốt cao cấp', 'Dán PPF viền máy', 'Tư vấn trả góp 0%']
+    },
+
+    // 3.36 Chương trình Trade-in Thu cũ đổi mới & Cam kết không ép giá
+    {
+        id: 'advice_trade_in_old_for_new_transparency',
+        patterns: [
+            /(thu cu doi moi|trade in|doi may cu lay may moi|dinh gia may cu|ep gia|tro gia thu cu)/i,
+            /(doi may cu lay may moi co bi tru tien nhieu khong|thu lai may cu bao nhieu)/i
+        ],
+        keywords: [
+            'chuong trinh thu cu doi moi', 'trade in thu cu doi moi tro gia bao nhieu',
+            'may cu bi tray co bi ep gia khong', 'dinh gia may cu the nao',
+            'thu lai may xach tay khong', 'thu mua dien thoai cu'
+        ],
+        reply: `Dạ chương trình **Thu Cũ Đổi Mới (Trade-in Trợ Giá)** tại TechEcommerce chính là giải pháp tiết kiệm tiền thông minh nhất và được đông đảo khách hàng yêu thích luôn ạ! 🔄📱💰\n\n` +
+            `✨ **3 CAM KẾT VÀNG MINH BẠCH - NÓI KHÔNG VỚI ÉP GIÁ:**\n` +
+            `1. 🚀 **TRỢ GIÁ THÊM ĐẾN 4.000.000 ₫:** Ngoài số tiền định giá chiếc máy cũ của bạn, TechEcommerce trích quỹ khuyến mãi tặng thêm trực tiếp từ **1.000.000 ₫ đến 4.000.000 ₫** trừ thẳng vào giá máy mới!\n` +
+            `2. 🔍 **Định giá chuẩn bằng phần mềm trong 5 phút:** Kiểm tra camera, màn hình, loa, pin tự động bằng máy test chuyên dụng, phân loại rõ ràng loại 1, loại 2. Tuyệt đối không có chuyện nhân viên 'vẽ bệnh', bắt bẻ vết xước dăm để ép giá khách hàng.\n` +
+            `3. 📦 **Chính sách thu mua cực kỳ cởi mở:**\n` +
+            `   • Thu mua cả máy xách tay, máy trần không hộp không phụ kiện.\n` +
+            `   • Kể cả máy chai pin, màn hình trầy nhẹ vẫn được thu mua với mức giá tốt nhất thị trường.\n\n` +
+            `👉 Bạn chỉ cần bù số tiền chênh lệch (có thể trả góp 0% cho phần chênh lệch này). Chiếc máy cũ bạn đang dùng là model gì, bản bao nhiêu GB để em ước tính mức thu cao nhất cho bạn ngay nhé! 😊`,
+        suggestions: ['Định giá máy cũ ngay', 'Trợ giá lên đời 4 triệu', 'Hotline 0842.331.606']
+    },
+
+    // 3.37 Phân biệt mã iPhone VN/A, LL/A, ZA/A & Tại sao nên chọn hàng VN/A
+    {
+        id: 'advice_iphone_region_codes_vna_vs_lla',
+        patterns: [
+            /(ma vn\/a|ma ll\/a|ma za\/a|vna va lla|phan biet ma iphone|shop ban ma gi)/i,
+            /(iphone ma gi|vna khac gi lla|za\/a khac gi vn\/a|hang vna co tot hon khong)/i
+        ],
+        keywords: [
+            'iphone ma vna va lla khac gi nhau', 'tai sao nen mua ma vna', 'shop ban iphone ma gi',
+            'ma lla co dung duoc sim vat ly khong', 'phan biet cac ma iphone', 'hang vna la gi'
+        ],
+        reply: `Dạ đây là kiến thức cực kỳ quan trọng để bạn không bị 'tiền mất tật mang' khi mua iPhone nè! Em xin phân tích rõ ràng sự khác biệt giữa các thị trường: 🍏🌐📱\n\n` +
+            `✨ **BẢNG SO SÁNH CÁC MÃ IPHONE PHỔ BIẾN:**\n` +
+            `1. 🇻🇳 **Mã VN/A (Hàng phân phối chính thức cho thị trường Việt Nam):**\n` +
+            `   • *Khay sim:* Có **1 khe SIM vật lý + Hỗ trợ nhiều eSIM** (cực kỳ thuận tiện, không cần ra nhà mạng đổi sim).\n` +
+            `   • *Bảo hành:* Được tiếp nhận bảo hành chính hãng tại **100% Trung tâm Bảo hành Ủy quyền Apple (AASP)** trên toàn quốc như CareS, Thakral One, FPT Care mà không cần hóa đơn mua hàng phức tạp.\n` +
+            `   • *Thuế VAT:* Xuất hóa đơn VAT điện tử đầy đủ theo quy định của Bộ Tài chính.\n` +
+            `2. 🇺🇸 **Mã LL/A (Thị trường Mỹ):**\n` +
+            `   • Từ đời iPhone 14 trở đi, Apple đã **bỏ hoàn toàn khay SIM vật lý**, chỉ dùng 100% eSIM. Bất tiện nếu bạn hay đi du lịch nước ngoài hoặc thích tháo lắp sim nhanh.\n` +
+            `3. 🇭🇰 **Mã ZA/A (Thị trường Hong Kong):**\n` +
+            `   • Dùng **2 SIM vật lý 2 mặt**, nhưng không dùng được eSIM và không hỗ trợ cuộc gọi âm thanh FaceTime Audio.\n\n` +
+            `🏆 **CAM KẾT TẠI TECHECOMMERCE:**\n` +
+            `Cửa hàng cam kết **100% iPhone bán ra là hàng chính hãng VN/A nguyên seal hộp chưa kích hoạt (Active)**, bảo hành chính hãng 12 tháng tại các trung tâm Apple ủy quyền trên toàn quốc để bạn an tâm tuyệt đối! ✨`,
+        suggestions: ['Xem iPhone 16 Pro Max VN/A', 'Xem iPhone 15 Pro VN/A', 'Hotline 0842.331.606']
+    },
+
+    // 3.38 Có nên dán kính bảo vệ cụm camera không? Có làm mờ ảnh hoặc lóa đèn đêm không?
+    {
+        id: 'advice_camera_lens_protector_glare',
+        patterns: [
+            /(dan|bao ve).*(kinh camera|mat camera|camera|lens)/i,
+            /(camera).*(loa|mo anh|chup dem)/i,
+            /(co nen dan|dan).*(camera|lens|kinh camera)/i,
+            /(dan bao ve camera|dan kinh camera|chup dem bi loa|co nen dan camera khong|dan camera co mo anh khong)/i,
+            /(co nen dan mat kinh camera khong|dan camera co anh huong den anh chup khong)/i
+        ],
+        keywords: [
+            'co nen dan bao ve camera khong', 'dan kinh camera co bi loa sang khong',
+            'dan camera co lam mo anh khong', 'dan mat kinh camera', 'co nen bao ve lens camera khong'
+        ],
+        reply: `Dạ em tư vấn rất thật lòng từ góc độ người yêu nhiếp ảnh cho bạn luôn nè: **BẠN CẦN CỰC KỲ CÂN NHẮC VÀ NÊN CHỌN ĐÚNG LOẠI ĐỂ KHÔNG BỊ HỎNG CHẤT LƯỢNG ẢNH!** 📸🔍💡\n\n` +
+            `✨ **Sự thật khi dán kính bảo vệ camera:**\n` +
+            `• ⚠️ **Nếu dùng miếng dán kính giá rẻ (vài chục nghìn):** Chất liệu kính kém quang học sẽ làm giảm lượng ánh sáng đi vào cảm biến, ảnh chụp ban ngày bị ám sương mờ và đặc biệt khi chụp ban đêm hoặc chụp ngược sáng sẽ bị hiện tượng **lóe sáng (Lens Flare)** thành các vệt sáng chói rất xấu.\n` +
+            `• 💎 **Bản chất mặt kính camera gốc của máy:** Được chế tác từ tinh thể **Sapphire nhân tạo** siêu cứng (đạt độ cứng mức 8-9 theo thang Mohs), cực kỳ khó trầy xước trong điều kiện sử dụng bình thường.\n\n` +
+            `🌟 **2 GIẢI PHÁP TỐI ƯU NHẤT VỪA BẢO VỆ VỪA KHÔNG HẠI ẢNH:**\n` +
+            `1. 📱 **Dùng Ốp lưng có gờ bảo vệ camera nhô cao 1mm:** Khi bạn đặt điện thoại xuống mặt bàn phẳng, toàn bộ cụm camera hoàn toàn không chạm vào mặt bàn, an toàn 100% mà không cần dán bất cứ thứ gì lên mắt kính!\n` +
+            `2. 💍 **Dán viền kim loại bảo vệ mép (Lens Ring chuyên dụng):** Chỉ bọc quanh viền nhôm ngoài của camera, giữ nguyên khoảng trống trong suốt cho mắt kính gốc.\n\n` +
+            `👉 Mua máy tại shop bạn sẽ được tặng kèm mẫu ốp lưng có gờ bảo vệ camera đạt chuẩn để vừa bảo vệ tối đa vừa giữ trọn độ sắc nét 48MP của máy nhé! 😊`,
+        suggestions: ['Tặng ốp lưng có gờ camera', 'Xem ảnh thực tế chụp từ máy', 'Hotline 0842.331.606']
+    },
+
+    // 3.39 Sinh viên ngành Công nghệ thông tin (IT / Lập trình / Khoa học máy tính) nên mua MacBook hay Laptop Windows?
+    {
+        id: 'advice_it_computer_science_student_laptop',
+        patterns: [
+            /(sinh vien).*(it|cntt|cong nghe thong tin|lap trinh|khoa hoc may tinh)/i,
+            /(nganh it|nganh cntt|hoc lap trinh).*(laptop|may tinh|macbook)/i,
+            /(laptop|may tinh).*(hoc it|hoc lap trinh|cntt)/i,
+            /(sinh vien it|hoc cntt|hoc cong nghe thong tin|hoc lap trinh|hoc khoa hoc may tinh|lap trinh vien|lap trinh web|lap trinh game)/i,
+            /(lap trinh nen dung mac hay win|hoc lap trinh nen mua macbook hay windows|it nen mua laptop nao)/i
+        ],
+        keywords: [
+            'sinh vien it nen mua laptop gi', 'hoc lap trinh nen mua macbook hay windows',
+            'laptop cho sinh vien cong nghe thong tin', 'cau hinh laptop hoc it',
+            'hoc khoa hoc may tinh nen dung laptop gi'
+        ],
+        reply: `Dạ chào người đồng nghiệp công nghệ tương lai! Chọn máy học Lập trình (IT) là một quyết định đầu tư quan trọng cho sự nghiệp 4 - 5 năm đại học. Em xin phân tích chi tiết theo từng chuyên ngành lập trình nè: 💻👨‍💻🚀\n\n` +
+            `✨ **1. KHI NÀO NÊN CHỌN MACBOOK (MacBook Air / Pro M2, M3 với RAM tối thiểu 16GB)?**\n` +
+            `• 🌐 **Lập trình Web (Fullstack, Frontend, Backend - NodeJS, React, Python, Golang):** Hệ điều hành macOS xây dựng trên nhân UNIX tương thích 100% với môi trường máy chủ Linux production, cài đặt Docker, Git, Terminal cực kỳ mượt mà.\n` +
+            `• 📱 **Lập trình ứng dụng Di động (Mobile Dev - iOS & Android):** **BẮT BUỘC PHẢI DÙNG MACBOOK** mới có thể chạy Xcode để biên dịch ứng dụng iPhone/iPad và xuất bản lên App Store.\n` +
+            `• 🔋 **Pin vô địch 15 tiếng:** Ôm máy lên giảng đường làm bài nhóm, cắm code thâu đêm không lo tìm ổ cắm sạc.\n\n` +
+            `✨ **2. KHI NÀO NÊN CHỌN LAPTOP WINDOWS (Core i7 / Ryzen 7, Card RTX 4050/4060, RAM 16GB - 32GB)?**\n` +
+            `• 🎮 **Lập trình Game & Đồ họa (Unity, Unreal Engine 5, C++, DirectX):** Cần card đồ họa rời NVIDIA RTX cực mạnh để render môi trường 3D thời gian thực.\n` +
+            `• 🏢 **Học lập trình hệ sinh thái Microsoft (.NET, C#, Visual Studio đầy đủ, SQL Server):** Chạy mượt mà nhất trên môi trường Windows bản địa.\n` +
+            `• 🤖 **Khoa học dữ liệu & Trí tuệ nhân tạo (AI/Machine Learning cơ bản):** Card đồ họa rời NVIDIA với nhân Tensor Core hỗ trợ tăng tốc huấn luyện mô hình qua CUDA.\n\n` +
+            `💡 **LƯU Ý SỐNG CÒN:** Dù chọn Mac hay Windows, hãy chọn **RAM tối thiểu 16GB trở lên** (tuyệt đối không mua 8GB) để chạy mượt nhiều máy ảo Docker và trình giả lập điện thoại nhé!\n\n` +
+            `👉 Bạn dự định chuyên sâu mảng Web, Mobile, AI hay Game để em lọc mẫu máy tối ưu nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem MacBook Pro RAM 16GB/24GB', 'Xem Laptop Gaming RTX cho IT', 'Ưu đãi Sinh viên giảm 500k']
     }
 ];
 
@@ -1859,6 +2561,26 @@ const CHIT_CHAT_RULES = [
             `• **Samsung Galaxy Tab / Xiaomi Pad:** Mức giá cực mềm chỉ từ 4 - 7 triệu, có sẵn không gian an toàn cho trẻ em *Samsung Kids*.\n\n` +
             `👉 Bé nhà mình đang học lớp mấy và bạn cần máy trong tầm giá nào để em tư vấn mẫu bền bỉ kèm bao da chống va đập cho bé nhé! 😊`,
         suggestions: ['Xem iPad Gen 10 học tập', 'Xem Galaxy Tab giá tốt', 'Tư vấn bút cảm ứng cho bé']
+    },
+
+    // 6.19 Khách khen ngợi, cảm ơn sự tư vấn nhiệt tình của shop
+    {
+        id: 'compliment_and_gratitude',
+        patterns: [
+            /(tu van nhiet tinh|de thuong ghe|cam on shop|cam on em|nhiet tinh qua)/i,
+            /(shop phuc vu tot|tu van co tam|ai gioi qua|ai thong minh ghe)/i,
+            /(cam on ban nha|cam on nhiet tinh|rat hai long)/i
+        ],
+        keywords: [
+            'cam on shop nha', 'tu van nhiet tinh qua', 'de thuong qua shop',
+            'cam on em nhieu', 'shop tu van co tam ghe', 'ai thong minh qua', 'cam on ban'
+        ],
+        reply: `Dạ em cảm ơn bạn rất rất nhiều ạ! 💖🥰\n\n` +
+            `Nhận được lời khen và sự tin tưởng của bạn chính là niềm vui lớn nhất và là động lực to lớn cho cả đội ngũ TechEcommerce ngày hôm nay luôn á!\n` +
+            `• 🌟 Mục tiêu của tụi em là luôn tư vấn **đúng nhu cầu, tiết kiệm tiền bạc và trung thực nhất** cho khách hàng, chứ tuyệt đối không ép mua máy đắt tiền đâu ạ.\n` +
+            `• 🛠️ Bất cứ khi nào bạn cần hỗ trợ về kỹ thuật, sử dụng máy hay săn mã ưu đãi mới, bạn cứ nhắn tin cho em bất kể ngày đêm nhé!\n\n` +
+            `Chúc bạn và gia đình luôn dồi dào sức khỏe, tràn ngập niềm vui và có những trải nghiệm công nghệ thật tuyệt vời ạ! ✨🚀`,
+        suggestions: ['Xem mã giảm giá hôm nay', 'Đặt giữ hàng tại Showroom', 'Hotline 0842.331.606']
     }
 ];
 
@@ -1875,6 +2597,9 @@ function matchSmartAnswer(message) {
     const unaccented = norm.unaccented;
 
     function ruleMatches(rule) {
+        if (typeof rule.excludeIf === 'function' && rule.excludeIf(unaccented, cleanMsg)) {
+            return false;
+        }
         if (rule.id === 'color_best_seller_trend') {
             // Guard against "mẫu nào" (which model/machine) being confused with "màu nào" (color)
             if (/\b(?:mẫu|mẫu\s+nào|mẫu\s+gì|mẫu\s+máy|mẫu\s+phù\s+hợp|con\s+nào|máy\s+nào)\b/i.test(cleanMsg) ||
@@ -1893,6 +2618,7 @@ function matchSmartAnswer(message) {
 
     const groups = [
         { name: 'store_policy', rules: STORE_POLICY_RULES },
+        { name: 'budget_consultation', rules: BUDGET_AND_CONSULTATION_RULES },
         { name: 'objection', rules: OBJECTION_RULES },
         { name: 'hardware_and_software', rules: HARDWARE_AND_SOFTWARE_RULES },
         { name: 'comparison_and_fengshui', rules: COMPARISON_AND_FENGSHUI_RULES },
