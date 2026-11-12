@@ -385,6 +385,30 @@ const STORE_POLICY_RULES = [
             `• ⚡ **Cách đặt dịch vụ:** Khi đặt hàng trên website hoặc nhắn tư vấn viên, bạn chỉ cần chọn hoặc ghi chú *"Thanh toán quẹt thẻ mPOS tại nhà"* là shipper sẽ chuẩn bị sẵn máy quẹt thẻ mang theo nhé!\n\n` +
             `👉 Bạn đang quan tâm đến sản phẩm nào để em hỗ trợ lên đơn giữ hàng cho bạn nha! 😊`,
         suggestions: ['Kiểm tra hàng trước thanh toán', 'Tư vấn trả góp 0%', 'Hotline 0842.331.606']
+    },
+
+    // 1.18 Tra cứu đơn hàng & Lịch sử mua hàng (Order History & Tracking)
+    {
+        id: 'policy_order_history_tracking',
+        patterns: [
+            /(lich\s*su\s*mua\s*hang|lich\s*su\s*don\s*hang|don\s*hang\s*cua\s*toi|tra\s*cuu\s*don\s*hang|kiem\s*tra\s*don\s*hang|kiem\s*tra\s*don\s*da\s*dat|xem\s*don\s*hang|don\s*hang\s*da\s*mua)/i,
+            /(don\s*hang|don\s*da\s*mua|don\s*da\s*dat).*(o\s*dau|xem\s*the\s*nao|kiem\s*tra\s*sao|kiem\s*tra\s*the\s*nao|khi\s*nao\s*giao|da\s*giao\s*chua)/i,
+            /(xem\s*lai|tra\s*cuu|kiem\s*tra).*(don\s*hang|lich\s*su\s*mua|hoa\s*don)/i
+        ],
+        keywords: [
+            'lich su mua hang', 'lich su don hang', 'don hang cua toi', 'tra cuu don hang',
+            'kiem tra don hang', 'xem lich su mua hang', 'cac don hang da dat', 'tra cuu van don',
+            'don hang da mua', 'kiem tra don da dat'
+        ],
+        reply: `Dạ để xem **Lịch sử mua hàng** và theo dõi chi tiết tiến độ vận chuyển đơn hàng tại TechEcommerce, bạn có thể thực hiện cực kỳ dễ dàng qua các cách sau nhé: 📦🚚✨\n\n` +
+            `1. 🌐 **Xem trực tiếp trên Website:**\n` +
+            `• Bấm vào nút **'Lịch sử mua hàng'** (biểu tượng 📦 kiện hàng) ngay trên thanh Header trên cùng của website, hoặc bấm menu tài khoản chọn **'Lịch sử mua hàng'**.\n` +
+            `• Hoặc bấm xem ngay tại đây: [Xem Lịch Sử Mua Hàng](pages/account/orders.html)\n` +
+            `• Tại đây bạn có thể lọc đơn theo trạng thái (*Chờ xác nhận, Đang chuẩn bị, Đang giao hàng, Hoàn thành, Đã hủy*), xem lại cấu hình sản phẩm đã mua, kiểm tra mã vận đơn Shipper và xem hóa đơn điện tử VAT.\n\n` +
+            `2. 📞 **Tra cứu nhanh qua Tổng đài & Zalo:**\n` +
+            `• Nếu bạn cần tra cứu gấp tiến độ giao hàng hỏa tốc, đổi địa chỉ nhận hoặc cần xuất hóa đơn công ty bổ sung, bạn chỉ cần đọc Số điện thoại đặt hàng cho hotline **0842.331.606** để nhân viên hỗ trợ ngay lập tức ạ!\n\n` +
+            `👉 Bạn có muốn em hỗ trợ thêm thông tin gì về việc mua sắm hay kiểm tra đơn hàng không ạ? 😊`,
+        suggestions: ['Xem Lịch sử mua hàng', 'Chính sách bảo hành 1 đổi 1', 'Đổi địa chỉ nhận hàng', 'Hotline 0842.331.606']
     }
 ];
 

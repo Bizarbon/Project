@@ -67,7 +67,8 @@ let currentSearch = '';
 
 async function loadMyOrders() {
     if (!auth.isLoggedIn()) {
-        window.location.href = '../auth/login.html';
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `../auth/login.html?returnUrl=${returnUrl}`;
         return;
     }
 
@@ -157,6 +158,17 @@ function applyFiltersAndRender() {
     }
 
     if (!filtered.length) {
+        if (!rawOrders.length) {
+            ordersListEl.innerHTML = `
+                <article class="orders-status-box">
+                    <span class="orders-status-icon" aria-hidden="true">📦</span>
+                    <h3>Chưa có đơn hàng nào trong lịch sử</h3>
+                    <p>Bạn chưa phát sinh đơn hàng nào tại TechEcommerce. Khám phá ngay các siêu phẩm công nghệ chính hãng ưu đãi hôm nay nhé!</p>
+                    <a href="../../index.html" class="btn-view-detail" style="margin-top: 0.5rem; text-decoration: none;">Khám phá sản phẩm ngay</a>
+                </article>
+            `;
+            return;
+        }
         ordersListEl.innerHTML = `
             <article class="orders-status-box">
                 <span class="orders-status-icon" aria-hidden="true">🔍</span>

@@ -57,12 +57,16 @@
                     </form>
                     <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
                         <span id="nav-auth-section"></span>
-                        <a class="header-action-btn" href="${root}index.html?openCart=1" aria-label="Mở giỏ hàng">
+                        <a class="header-action-btn header-orders-btn" href="${root}pages/account/orders.html" aria-label="Lịch sử mua hàng">
+                            <span class="header-action-icon" aria-hidden="true">📦</span>
+                            <span class="header-action-copy"><small>Tra cứu</small><strong>Lịch sử mua hàng</strong></span>
+                        </a>
+                        <a class="header-action-btn header-cart-btn" href="${root}index.html?openCart=1" aria-label="Mở giỏ hàng">
                             <span class="header-action-icon" aria-hidden="true">🛒</span>
-                            <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
+                            <span class="header-action-copy"><small>Giỏ hàng</small><strong>Giỏ hàng</strong></span>
                             <span class="header-cart-badge"${cartCount ? '' : ' hidden'}>${cartCount}</span>
                         </a>
-                        <a class="header-action-btn" href="${root}index.html?openAddress=1" aria-label="Chọn khu vực giao hàng">
+                        <a class="header-action-btn header-location-btn" href="${root}index.html?openAddress=1" aria-label="Chọn khu vực giao hàng">
                             <span class="header-action-icon" aria-hidden="true">⌖</span>
                             <span class="header-action-copy"><small>Khu vực</small><strong data-shopping-location-label>${escapeHTML(location)}</strong></span>
                         </a>

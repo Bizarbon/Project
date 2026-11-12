@@ -76,7 +76,7 @@
                     <h3 class="cps-footer-title" id="footerFunctionsTitle">Chức năng</h3>
                     <ul class="cps-nav-list">
                         <li><a href="${root}index.html">Cửa hàng</a></li>
-                        <li><a href="${root}pages/account/orders.html">Đơn hàng của tôi</a></li>
+                        <li><a href="${root}pages/account/orders.html">Lịch sử mua hàng</a></li>
                         <li><a href="${root}pages/account/profile.html">Hồ sơ cá nhân</a></li>
                         <li><a href="${root}pages/legal/promotions.html">Khuyến mãi hot</a></li>
                         <li><a href="${root}pages/legal/installment.html">Trả góp 0%</a></li>

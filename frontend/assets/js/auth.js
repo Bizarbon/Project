@@ -548,7 +548,7 @@ function updateNavbar() {
                 </button>
                 <div class="dropdown-menu" role="menu">
                     ${isAdmin ? `<a href="${base}admin/dashboard.html" class="dropdown-item" role="menuitem">📊 Dashboard</a>` : ''}
-                    <a href="${base}pages/account/orders.html" class="dropdown-item" role="menuitem">📋 Đơn hàng của tôi</a>
+                    <a href="${base}pages/account/orders.html" class="dropdown-item" role="menuitem">📦 Lịch sử mua hàng</a>
                     <a href="${base}pages/account/profile.html" class="dropdown-item" role="menuitem">👤 Hồ sơ cá nhân</a>
                     <a href="#" class="dropdown-item logout" role="menuitem" onclick="auth.logout()">🚪 Đăng xuất</a>
                 </div>

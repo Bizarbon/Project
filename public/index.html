@@ -373,10 +373,16 @@
         <nav class="header-actions" aria-label="Tài khoản và giỏ hàng">
           <span id="nav-auth-section"><!-- Auth section injected by auth.js --></span>
 
+          <a href="pages/account/orders.html" class="header-action-btn header-orders-btn" id="headerOrdersButton"
+            aria-label="Lịch sử mua hàng">
+            <span class="header-action-icon" aria-hidden="true">📦</span>
+            <span class="header-action-copy"><small>Tra cứu</small><strong>Lịch sử mua hàng</strong></span>
+          </a>
+
           <button class="header-action-btn header-cart-btn" id="headerCartButton" type="button"
             onclick="toggleCartDrawer()" aria-label="Mở giỏ hàng">
             <span class="header-action-icon" aria-hidden="true">🛒</span>
-            <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
+            <span class="header-action-copy"><small>Giỏ hàng</small><strong>Giỏ hàng</strong></span>
             <span class="header-cart-badge" id="headerCartBadge" hidden>0</span>
           </button>
 
