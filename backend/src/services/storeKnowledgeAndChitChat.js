@@ -36,7 +36,7 @@ const STORE_POLICY_RULES = [
             'ban quan ao khong', 'ban thuc pham khong', 'ban my pham khong',
             'ban xe may khong', 'ban nha dat khong'
         ],
-        reply: `Dạ TechEcommerce là hệ thống chuyên phân phối các **thiết bị công nghệ chính hãng** (Điện thoại thông minh, Laptop, Máy tính bảng, Đồng hồ thông minh, Phụ kiện âm thanh cáp sạc, Máy chơi game và Thiết bị nhà thông minh Smarthome...), bên em không kinh doanh các mặt hàng thực vật, cây cảnh, sinh vật, động vật hay thú cưng bạn nhé! 😄🐾🌱\n\n` +
+        reply: `Dạ TechEcommerce là hệ thống chuyên phân phối các **thiết bị công nghệ chính hãng** (Điện thoại thông minh, Laptop, Máy tính bảng, Đồng hồ thông minh, Phụ kiện âm thanh cáp sạc, Máy chơi game và Thiết bị nhà thông minh Smarthome...), bên em chưa có mặt hàng này đâu bạn nhé! 😄🐾🌱\n\n` +
             `✨ Tuy nhiên, nếu bạn đang tìm kiếm các **thiết bị công nghệ phục vụ đời sống hoặc hỗ trợ chăm sóc thú cưng & gia đình** thì shop có sẵn nhiều món cực kỳ hữu ích luôn ạ:\n` +
             `• 📹 **Camera an ninh trong nhà xoay 360° đàm thoại 2 chiều:** Giúp bạn vừa trông nom vừa bật loa trò chuyện, dỗ dành thú cưng từ xa khi đi làm cả ngày.\n` +
             `• 🏷️ **Thẻ định vị thông minh (Apple AirTag / Samsung SmartTag):** Nhỏ gọn gắn trực tiếp vào vòng cổ cho cún cưng, mèo cưng để theo dõi vị trí qua điện thoại, an tâm không lo thất lạc.\n` +

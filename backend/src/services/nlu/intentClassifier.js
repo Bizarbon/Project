@@ -298,8 +298,10 @@ function classifyIntent(normalizedText, unaccentedText) {
     }
 
     // Ngoại trừ các câu hỏi mẹo công nghệ / tư vấn so sánh (VD: "Nên dán cường lực hay dán PPF")
+    // Hoặc nhu cầu mua laptop văn phòng không cần card đồ họa rời
     const isTechAdviceQuestion = /nên dán|nen dan|so sánh|so sanh|hay dán|hay dan|tốt hơn|tot hon|hay ppf|hay cường lực|hay cuong luc|có chống vỡ|co chong vo|có chai pin|co chai pin/i.test(text + ' ' + noAcc);
-    if (isTechAdviceQuestion) {
+    const isNoDiscreteGpuSpec = /(?:không|ko|k|khong|chẳng|chang|chưa|chua|đâu|dau)\s+(?:cần|can|có|co|xài|xai|dùng|dung)?\s*(?:card\s+rời|card\s+roi|vga)/i.test(text + ' ' + noAcc);
+    if (isTechAdviceQuestion || isNoDiscreteGpuSpec) {
         isOutOfCatalog = false;
         outOfCatalogType = null;
     }

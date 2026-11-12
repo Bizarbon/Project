@@ -37,6 +37,69 @@
             margin: 0;
         }
 
+        /* View Switcher: Đơn hàng của tôi vs Lịch sử mua hàng */
+        .orders-view-switcher {
+            display: inline-flex;
+            align-items: center;
+            background: var(--neo-surface, #ffffff);
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 12px;
+            padding: 5px;
+            gap: 6px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .view-switch-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.25rem;
+            border-radius: 9px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--neo-muted, #64748b);
+            font-size: 0.92rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-switch-btn:hover {
+            color: var(--primary, #2563eb);
+            background: rgba(37, 99, 235, 0.06);
+        }
+
+        .view-switch-btn.active {
+            background: var(--primary, #2563eb);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-reorder {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.55rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669 !important;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            font-size: 0.86rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reorder:hover {
+            background: #059669;
+            color: #ffffff !important;
+            border-color: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+        }
+
         /* Overview KPI Cards */
         .orders-overview-grid {
             display: grid;
@@ -508,9 +571,21 @@
     <script src="../../assets/js/storefront-header.js?v=navigation-sync-20261002-1"></script>
 
     <main class="customer-orders-container fade-in">
+        <!-- Switcher Chế độ xem: Đơn hàng của tôi vs Lịch sử mua hàng -->
+        <nav class="orders-view-switcher reveal" aria-label="Chuyển chế độ xem đơn hàng">
+            <button type="button" class="view-switch-btn active" id="viewBtnOrders" data-view="orders" aria-pressed="true">
+                <span aria-hidden="true">📋</span>
+                <span>Đơn hàng của tôi</span>
+            </button>
+            <button type="button" class="view-switch-btn" id="viewBtnHistory" data-view="history" aria-pressed="false">
+                <span aria-hidden="true">📦</span>
+                <span>Lịch sử mua hàng</span>
+            </button>
+        </nav>
+
         <header class="customer-orders-header reveal">
-            <h1>Lịch sử mua hàng</h1>
-            <p>Theo dõi chi tiết tiến độ xử lý, thanh toán, bảo hành và hành trình vận chuyển các đơn hàng của bạn.</p>
+            <h1 id="ordersPageHeading">Đơn hàng của tôi</h1>
+            <p id="ordersPageDesc">Theo dõi chi tiết tiến độ xử lý, thanh toán, bảo hành và hành trình vận chuyển các đơn hàng của bạn.</p>
         </header>
 
         <!-- KPI Overview Strip (Replaces old ORD box) -->

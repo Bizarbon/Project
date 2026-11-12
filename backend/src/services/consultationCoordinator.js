@@ -821,7 +821,7 @@ function buildOutOfCatalogResponse(unsupportedInfo, rawText = '') {
 
     const itemLabel = productName ? `mặt hàng **${productName}**` : '**sản phẩm này**';
     const reply = customReply || (
-        `Dạ chào bạn! Hiện tại cửa hàng bên em chuyên về **thiết bị công nghệ thông minh cá nhân**, nên cửa hàng chưa kinh doanh ${itemLabel} ạ. 🙏\n\n` +
+        `Dạ chào bạn! Hiện tại cửa hàng bên em chuyên kinh doanh **thiết bị công nghệ chính hãng** (Điện thoại, Laptop, Tablet, Phụ kiện, Máy chơi game...) nên em chưa có mặt hàng này đâu ạ! 🙏\n\n` +
         `Cửa hàng hiện phân phối chính hãng các dòng sản phẩm công nghệ cao cấp:\n` +
         `• 📱 **Điện thoại:** iPhone 16 / 15 Series, Samsung Galaxy S25 / S24, Xiaomi, OPPO...\n` +
         `• 💻 **Laptop:** MacBook Air / Pro M3, ASUS ROG, Acer Nitro, Lenovo IdeaPad, Dell Inspiron...\n` +

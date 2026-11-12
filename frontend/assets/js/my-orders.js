@@ -64,6 +64,53 @@ function showToast(message, type = 'success') {
 let rawOrders = [];
 let currentFilter = 'all';
 let currentSearch = '';
+let currentView = 'orders'; // 'orders' | 'history'
+
+function syncStatusTabsUI(status) {
+    document.querySelectorAll('#statusFilterTabs .status-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.status === status);
+    });
+}
+
+function setView(view, updateUrl = true) {
+    currentView = view === 'history' ? 'history' : 'orders';
+    const btnOrders = document.getElementById('viewBtnOrders');
+    const btnHistory = document.getElementById('viewBtnHistory');
+    const headingEl = document.getElementById('ordersPageHeading');
+    const descEl = document.getElementById('ordersPageDesc');
+
+    if (btnOrders) {
+        btnOrders.classList.toggle('active', currentView === 'orders');
+        btnOrders.setAttribute('aria-pressed', String(currentView === 'orders'));
+    }
+    if (btnHistory) {
+        btnHistory.classList.toggle('active', currentView === 'history');
+        btnHistory.setAttribute('aria-pressed', String(currentView === 'history'));
+    }
+
+    if (currentView === 'history') {
+        document.title = 'Lịch sử mua hàng - TechEcommerce';
+        if (headingEl) headingEl.textContent = 'Lịch sử mua hàng';
+        if (descEl) descEl.textContent = 'Danh sách sản phẩm và đơn hàng bạn đã mua thành công tại TechEcommerce. Bạn có thể xem chi tiết hoặc bấm "Mua lại" để đặt hàng nhanh chóng.';
+        currentFilter = 'completed';
+        syncStatusTabsUI('completed');
+    } else {
+        document.title = 'Đơn hàng của tôi - TechEcommerce';
+        if (headingEl) headingEl.textContent = 'Đơn hàng của tôi';
+        if (descEl) descEl.textContent = 'Theo dõi chi tiết tiến độ xử lý, thanh toán, bảo hành và hành trình vận chuyển các đơn hàng của bạn.';
+        currentFilter = 'all';
+        syncStatusTabsUI('all');
+    }
+
+    if (updateUrl && window.history?.replaceState) {
+        const newUrl = currentView === 'history' ? '?view=history' : '?view=orders';
+        window.history.replaceState({ view: currentView }, '', newUrl);
+    }
+
+    if (rawOrders.length) {
+        applyFiltersAndRender();
+    }
+}
 
 async function loadMyOrders() {
     if (!auth.isLoggedIn()) {
@@ -169,6 +216,19 @@ function applyFiltersAndRender() {
             `;
             return;
         }
+
+        if (currentView === 'history') {
+            ordersListEl.innerHTML = `
+                <article class="orders-status-box">
+                    <span class="orders-status-icon" aria-hidden="true">🛍️</span>
+                    <h3>Chưa có đơn hàng nào trong Lịch sử mua hàng</h3>
+                    <p>Các đơn hàng được giao thành công sẽ hiển thị tại đây để bạn tiện xem lại và mua lại.</p>
+                    <button type="button" class="btn-primary" onclick="setView('orders')">Xem Đơn hàng của tôi</button>
+                </article>
+            `;
+            return;
+        }
+
         ordersListEl.innerHTML = `
             <article class="orders-status-box">
                 <span class="orders-status-icon" aria-hidden="true">🔍</span>
@@ -278,6 +338,12 @@ function renderCustomerOrderCard(order) {
                     </div>
 
                     <div class="order-action-buttons">
+                        ${order.status === 'completed' ? `
+                            <button type="button" class="btn-reorder" onclick="reorderOrder('${order._id}')">
+                                <span aria-hidden="true">🔄</span>
+                                <span>Mua lại</span>
+                            </button>
+                        ` : ''}
                         <a class="btn-view-detail" href="order-detail.html?id=${encodeURIComponent(order._id)}">
                             <span>Xem chi tiết</span>
                             <span aria-hidden="true">&rarr;</span>
@@ -288,6 +354,53 @@ function renderCustomerOrderCard(order) {
             </footer>
         </article>
     `;
+}
+
+async function reorderOrder(orderId) {
+    const order = rawOrders.find(o => String(o._id) === String(orderId));
+    if (!order || !Array.isArray(order.products) || !order.products.length) {
+        showToast('Không tìm thấy thông tin sản phẩm của đơn hàng.', 'error');
+        return;
+    }
+
+    try {
+        const storageKey = auth?.getCartStorageKey ? auth.getCartStorageKey() : 'cart:guest';
+        let currentCart = [];
+        try {
+            currentCart = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            if (!Array.isArray(currentCart)) currentCart = [];
+        } catch (e) {
+            currentCart = [];
+        }
+
+        let addedCount = 0;
+        order.products.forEach(item => {
+            const pId = item.product?._id || item.product || item._id;
+            if (!pId) return;
+            const existing = currentCart.find(c => String(c.productId) === String(pId));
+            const addQty = Math.max(Number(item.quantity) || 1, 1);
+            if (existing) {
+                existing.quantity = (Number(existing.quantity) || 1) + addQty;
+            } else {
+                currentCart.push({
+                    productId: String(pId),
+                    quantity: addQty
+                });
+            }
+            addedCount += addQty;
+        });
+
+        localStorage.setItem(storageKey, JSON.stringify(currentCart));
+        window.dispatchEvent(new Event('cartUpdated'));
+
+        showToast(`Đã thêm ${addedCount} sản phẩm vào giỏ hàng! Đang chuyển đến giỏ hàng...`, 'success');
+        setTimeout(() => {
+            window.location.href = '../../index.html?openCart=1';
+        }, 700);
+    } catch (err) {
+        console.error('reorderOrder error:', err);
+        showToast('Không thể thêm sản phẩm vào giỏ hàng.', 'error');
+    }
 }
 
 async function cancelCustomerOrder(id) {
@@ -310,19 +423,32 @@ async function cancelCustomerOrder(id) {
 }
 
 function resetFilters() {
-    currentFilter = 'all';
+    currentFilter = currentView === 'history' ? 'completed' : 'all';
     currentSearch = '';
     const searchInput = document.getElementById('orderSearchInput');
     if (searchInput) searchInput.value = '';
 
-    document.querySelectorAll('#statusFilterTabs .status-tab-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.status === 'all');
-    });
+    syncStatusTabsUI(currentFilter);
     applyFiltersAndRender();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initial view from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialView = (urlParams.get('view') === 'history' || urlParams.get('status') === 'completed') ? 'history' : 'orders';
+    setView(initialView, false);
+
     loadMyOrders();
+
+    // View switch buttons listener
+    const btnOrders = document.getElementById('viewBtnOrders');
+    const btnHistory = document.getElementById('viewBtnHistory');
+    if (btnOrders) {
+        btnOrders.addEventListener('click', () => setView('orders'));
+    }
+    if (btnHistory) {
+        btnHistory.addEventListener('click', () => setView('history'));
+    }
 
     // Tab buttons event listener
     const tabsContainer = document.getElementById('statusFilterTabs');
