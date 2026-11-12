@@ -45,7 +45,7 @@ const STORE_POLICY_RULES = [
     // 1.2 Chương trình Thu cũ Đổi mới (Trade-in)
     {
         id: 'trade_in',
-        excludeIf: (norm) => /\b(ep gia|dinh gia|bi tru|minh bach|lo anh|lo du lieu|lo thong tin|du lieu ca nhan|xoa sach du lieu|reset may|bao mat du lieu)\b/i.test(norm),
+        excludeIf: (norm) => /\b(ep gia|dinh gia|bi tru|minh bach|lo anh|lo du lieu|lo thong tin|du lieu ca nhan|xoa sach du lieu|reset may|bao mat du lieu|xach tay|lock|sim ghep|dinh icloud|may my|lla|ja)\b/i.test(norm),
         patterns: [
             /(thu cu|trade[\s-]?in|doi may cu).*(moi|cu|khong|gia|the nao)/i,
             /(co|nhan|ho tro).*(thu cu|trade[\s-]?in|thu lai)/i,
@@ -318,6 +318,7 @@ const STORE_POLICY_RULES = [
     // 1.16 Mua số lượng lớn cho công ty / doanh nghiệp (B2B)
     {
         id: 'policy_b2b_corporate_bulk',
+        excludeIf: (norm) => /\b(ban phim|chuot|switch|tai nghe)\b/i.test(norm) && !/\b(so luong lon|b2b|doanh nghiep|hop dong)\b/i.test(norm),
         patterns: [
             /(mua|lay|dat).*(so luong lon|cho cong ty|cho doanh nghiep|b2b|du an|van phong)/i,
             /(chiet khau|bao gia).*(cong ty|doanh nghiep|so luong lon)/i,
@@ -677,6 +678,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.2 Khả năng nâng cấp RAM và SSD trên Laptop
     {
         id: 'hardware_laptop_upgrade',
+        excludeIf: (norm) => /\b(mat du lieu|cai lai win|clone win|mat ban quyen|mat du lieu khong|thay o ssd.*co mat)\b/i.test(norm),
         patterns: [
             /(laptop|may tinh|macbook).*(nang cap).*(ram|ssd|o cung)/i,
             /(nang cap).*(ram|ssd|o cung).*(duoc khong|the nao|khong)/i
@@ -879,7 +881,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.12 Củ sạc nhanh 65W/100W GaN có an toàn khi sạc cho iPhone, điện thoại nhỏ không?
     {
         id: 'advice_gan_charger_safety',
-        excludeIf: (norm) => /\b(co lam chai pin|lam chai pin|co bi chai pin|chai pin khong)\b/i.test(norm),
+        excludeIf: (norm) => /\b(co lam chai pin|lam chai pin|co bi chai pin|chai pin khong|samsung.*iphone|iphone.*samsung|apple.*xiaomi|cheo nhau|hang khac)\b/i.test(norm),
         patterns: [
             /(cu sac|sac).*(65w|100w|140w|gan|cong suat lon).*(sac duoc|sac cho|an toan|co no|so no|hai pin|chai pin)/i,
             /(dung sac laptop|sac macbook).*(sac dien thoai|sac tai nghe).*(duoc khong|co sao khong)/i
@@ -969,6 +971,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.16 Điện thoại màn hình gập (Galaxy Z Fold / Z Flip) vs Điện thoại dạng thanh (iPhone Pro Max / Galaxy Ultra)
     {
         id: 'advice_foldable_vs_bar_phone',
+        excludeIf: (norm) => /\b(nut nep gap|bong mieng dan|bong man hinh|tu boc|tu lot|nep gap)\b/i.test(norm),
         patterns: [
             /(co nen mua|nen mua).*(dien thoai gap|man hinh gap|z fold|z flip|galaxy fold)/i,
             /(so sanh|chon).*(z fold|galaxy fold|dien thoai gap).*(iphone|pro max|s24 ultra|s25 ultra|dien thoai thuong)/i,
@@ -995,7 +998,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.17 Chuyển đổi dữ liệu giữa iPhone và Android (sao lưu Zalo, danh bạ, hình ảnh)
     {
         id: 'advice_os_migration_ios_android',
-        excludeIf: (norm) => /\b(app ngan hang|banking|sinh trac hoc)\b/i.test(norm),
+        excludeIf: (norm) => /\b(app ngan hang|banking|sinh trac hoc|laptop|ssd|ram|o cung|thay o|cai lai win|o dia)\b/i.test(norm),
         patterns: [
             /(chuyen|doi|sang).*(tu iphone sang|tu android sang|tu samsung sang|ios sang android|android sang ios|iphone sang|android sang|samsung sang)/i,
             /(iphone|android|samsung|ios).*(doi sang|chuyen sang|chuyen qua|sang).*(iphone|android|samsung|may moi)/i,
@@ -1151,6 +1154,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.15 Tư vấn máy quay TikTok, làm Reels, Livestream bán hàng, YouTuber / Sống ảo nịnh da
     {
         id: 'persona_tiktok_livestream_vlog',
+        excludeIf: (norm) => /\b(4 tieng|5 tieng|6 tieng|lien tuc|toi man hinh|so lanh|qua nhiet|mic thu am|micro|dji mic|rode|boya|cai ao)\b/i.test(norm),
         patterns: [
             /(quay tiktok|lam tiktok|livestream|live stream|quay video|vlog|vlogger|lam youtube)/i,
             /(chup hinh dep|song ao|ninh da|chup anh mau dep|chup chan dung)/i
@@ -1276,6 +1280,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.20 Giải tỏa lo lắng về màn hình OLED / AMOLED có bị Burn-in (lưu ảnh / bóng mờ) không
     {
         id: 'advice_screen_burnin_oled',
+        excludeIf: (norm) => /\b(kiem tra|cach test|huong dan test|check man hinh|dead pixel|liet cam ung|tu test)\b/i.test(norm),
         patterns: [
             /(burn[\s-]?in|luu anh|bong mo|am anh)/i,
             /(man oled co ben khong|oled co de bi hong khong|amoled co bi luu anh)/i
@@ -1660,6 +1665,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.36 Chương trình Trade-in Thu cũ đổi mới & Cam kết không ép giá
     {
         id: 'advice_trade_in_old_for_new_transparency',
+        excludeIf: (norm) => /\b(xach tay|lock|sim ghep|dinh icloud|may my|lla|ja)\b/i.test(norm),
         patterns: [
             /(thu cu doi moi|trade in|doi may cu lay may moi|dinh gia may cu|ep gia|tro gia thu cu)/i,
             /(doi may cu lay may moi co bi tru tien nhieu khong|thu lai may cu bao nhieu)/i
@@ -1978,6 +1984,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.58 Setup Bàn Làm Việc Công Thái Học Cho Phòng Nhỏ / Chung Cư
     {
         id: 'advice_ergonomic_desk_setup_small_room',
+        excludeIf: (norm) => /\b(chuot|vertical mouse|dau co tay|te ngon tay)\b/i.test(norm),
         patterns: [
             /(setup|bo tri|sap xep).*(ban lam viec|goc lam viec|phong nho|chung cu|dien tich hep|phong tro)/i,
             /(ban lam viec|goc lam viec|phong tro|phong nho).*(setup|bo tri|sap xep|do cong nghe)/i,
@@ -2431,6 +2438,378 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             'Điện thoại chiến game pin trâu',
             'Flagship Apple & Samsung cao cấp'
         ]
+    },
+
+    // 3.77 Thu cũ đổi mới máy xách tay quốc tế (Mỹ LL/A, Nhật J/A), máy Lock, máy dính iCloud ẩn
+    {
+        id: 'advice_trade_in_international_or_carrier_lock',
+        patterns: [
+            /(thu cu|trade[\s-]?in|doi may|thu lai|dinh gia).*(xach tay|ll\/a|lla|j\/a|za\/a|may my|may nhat|lock|sim ghep|icloud an)/i,
+            /(xach tay|ll\/a|lla|j\/a|za\/a|may my|may nhat|may lock|sim ghep|dinh icloud).*(thu cu|trade[\s-]?in|doi may|co thu|thu lai|doi duoc khong)/i,
+            /(may xach tay|may my|may lock|dinh icloud|sim ghep).*(co thu|co doi|thu cu|doi moi)/i
+        ],
+        keywords: [
+            'thu cu may xach tay', 'thu may lock', 'may my lla co thu khong',
+            'may lock co doi duoc khong', 'may dinh icloud an co thu khong', 'trade in may xach tay'
+        ],
+        reply: `Dạ em xin giải đáp rất minh bạch về chính sách Thu Cũ Đổi Mới máy xách tay và máy có tình trạng đặc biệt tại TechEcommerce nha: 🔄📱\n\n` +
+            `• 🌐 **Máy xách tay quốc tế (Mỹ LL/A, Nhật J/A, Sing ZP/A, HongKong ZA/A):**\n` +
+            `  - Shop thu mua với mức giá **cực kỳ tốt tương đương máy chính hãng VN/A** nếu thân máy còn nguyên zin và các chức năng hoạt động hoàn hảo.\n` +
+            `  - Được áp dụng trọn vẹn chính sách **Trợ giá lên đời thêm đến 2.000.000đ** trừ trực tiếp vào giá máy mới!\n\n` +
+            `• 🔒 **Máy Lock nhà mạng hoặc máy có vấn đề iCloud:**\n` +
+            `  - Với máy Lock cước sim ghép hoặc máy có iCloud ẩn: Kỹ thuật viên sẽ hỗ trợ kiểm tra chi tiết tại quầy để tư vấn mở khóa hợp pháp hoặc thu gom linh kiện với mức giá hỗ trợ tốt nhất, không để khách bị ép giá thiệt thòi.\n\n` +
+            `👉 Bạn nhắn em dòng máy cũ bạn đang dùng và tình trạng pin/ngoại quan để em định giá tham khảo trước cho bạn nhé! 😊`,
+        suggestions: ['Định giá máy cũ online', 'Lên đời iPhone 16 Pro Max', 'Địa chỉ Showroom gần nhất']
+    },
+
+    // 3.78 Dùng sạc chéo hãng: Củ Samsung sạc iPhone, Củ sạc MacBook sạc máy Xiaomi có hại không?
+    {
+        id: 'advice_cross_brand_charger_compatibility_pd',
+        patterns: [
+            /(dung sac|lay sac|cu sac).*(samsung.*iphone|iphone.*samsung|macbook.*dien thoai|apple.*xiaomi|cheo nhau|hang khac)/i,
+            /(sac khac hang|cu sac khac hang).*(co sao khong|co hai pin|co chay no|co dung duoc khong)/i,
+            /(sac macbook|sac laptop).*(sac dien thoai|sac iphone).*(co no khong|co sao khong|hai may)/i
+        ],
+        keywords: [
+            'dung sac samsung cho iphone duoc khong', 'cu sac macbook sac dien thoai co no khong',
+            'dung sac khac hang co sao khong', 'sac cheo hang co hai pin khong', 'dung sac apple cho samsung'
+        ],
+        reply: `Dạ câu trả lời là **HOÀN TOÀN DÙNG ĐƯỢC VÀ AN TOÀN 100%** bạn nha! Em xin giải thích cơ chế kỹ thuật chuẩn Power Delivery để bạn yên tâm nè: ⚡🔌\n\n` +
+            `• 🤝 **Cơ chế bắt tay thông minh (Handshake Protocol):** Tất cả các củ sạc Type-C hiện đại (chuẩn USB-PD và Samsung PPS) đều có chip giao tiếp hai chiều. Dòng điện không bao giờ bị 'ép' vào máy mà do chính **chip quản lý nguồn (BMS)** trên điện thoại chủ động yêu cầu đúng mức điện áp thích hợp (5V/9V).\n` +
+            `• 💻 Dù bạn cắm củ sạc MacBook 67W hay 140W vào iPhone / Samsung, củ sạc sẽ tự động hạ công suất xuống đúng mức tối đa mà máy tiếp nhận (20W – 27W), hoàn toàn không thể gây nổ hay chai pin.\n\n` +
+            `⚠️ **LƯU Ý DUY NHẤT:** Chỉ sử dụng củ sạc và cáp sạc chính hãng hoặc các thương hiệu phụ kiện có tên tuổi (Anker, Apple, Samsung, Baseus, Ugreen). Tuyệt đối tránh xa củ sạc trôi nổi vài chục nghìn không rõ nguồn gốc nhé!`,
+        suggestions: ['Xem củ sạc Anker GaN chính hãng', 'Xem củ sạc Apple chính hãng', 'Hotline tư vấn phụ kiện']
+    },
+
+    // 3.79 Máy tính bảng cho con học tập & Hướng dẫn cài đặt khóa app, giới hạn giờ chơi (Parental Control / Family Link)
+    {
+        id: 'advice_kids_study_tablet_parental_control_family_link',
+        patterns: [
+            /(mua may|mua tablet|mua ipad|mua may tinh bang).*(cho con|cho be|hoc online|lop 1|lop 2|lop 3|lop 4|lop 5|tieu hoc)/i,
+            /(khoa app|gioi han gio|quan ly|chan game|chan web).*(cho con|cua be|tre em|family link|screen time)/i,
+            /(may tinh bang|ipad|tablet).*(cho tre em|cho hoc sinh cap 1|kiem soat thoi gian)/i
+        ],
+        keywords: [
+            'mua may tinh bang cho con hoc', 'ipad cho be hoc online', 'tablet cho hoc sinh tieu hoc',
+            'cach khoa app tren ipad cho con', 'cai family link gioi han gio choi', 'may tinh bang tre em gia re'
+        ],
+        reply: `Dạ đầu tư máy tính bảng cho con học tập là quyết định rất sáng suốt! Em xin tư vấn 2 mẫu máy 'quốc dân' bền đẹp kèm giải pháp giúp ba mẹ an tâm quản lý bé 100% nha: 📚👦👧\n\n` +
+            `🏆 **2 LỰA CHỌN MÁY TÍNH BẢNG HỌC TẬP TỐT NHẤT:**\n` +
+            `• 🍎 **iPad Gen 9 / Gen 10 (Từ 6.990.000đ):** Màn hình Retina sắc nét bảo vệ thị lực của bé, loa to rõ học tiếng Anh, hệ điều hành iPadOS mượt mà dùng suốt 4 – 5 năm không lo giật lag.\n` +
+            `• ⭐ **Samsung Galaxy Tab A9+ (Từ 4.490.000đ):** Giá mềm, màn hình 11 inch 90Hz mượt mà, tích hợp sẵn chế độ **Samsung Kids** tạo môi trường vui học lành mạnh.\n\n` +
+            `🛡️ **ĐẶC QUYỀN HỖ TRỢ MIỄN PHÍ TẠI CỬA HÀNG:**\n` +
+            `• Kỹ thuật viên sẽ hỗ trợ cài đặt công cụ **Apple Screen Time** hoặc **Google Family Link** trực tiếp lên điện thoại của ba mẹ để:\n` +
+            `  1. Khóa máy tự động sau 1 - 2 tiếng học bài.\n` +
+            `  2. Chặn các trang web đen và kênh YouTube độc hại.\n` +
+            `  3. Khóa quyền tự ý nạp tiền game trên App Store / Google Play.`,
+        suggestions: ['Xem iPad Gen 10 giá tốt', 'Xem Samsung Galaxy Tab A9+', 'Tư vấn trả góp 0% học sinh']
+    },
+
+    // 3.80 Quy định mang pin sạc dự phòng lên máy bay (Chuẩn IATA & Cục Hàng Không)
+    {
+        id: 'advice_powerbank_flight_airline_regulations_iata',
+        patterns: [
+            /(pin sac du phong|sac du phong|pin du phong).*(len may bay|mang len may bay|hang khong|ky gui|xach tay|san bay)/i,
+            /(mang pin du phong).*(len may bay|duoc khong|bao nhieu mah|bao nhieu wh)/i,
+            /(quy dinh|tieu chuan).*(pin du phong|pin sac).*may bay/i
+        ],
+        keywords: [
+            'pin du phong co duoc mang len may bay khong', 'sac du phong 20000mah co len may bay duoc khong',
+            'quy dinh pin du phong hang khong', 'pin du phong de hanh ly ky gui hay xach tay', 'tieu chuan mang pin len may bay'
+        ],
+        reply: `Dạ khi chuẩn bị đồ đi du lịch bằng máy bay, quy định về pin sạc dự phòng là cực kỳ nghiêm ngặt! Em xin chia sẻ đúng chuẩn IATA và Cục Hàng Không Việt Nam để bạn không bị an ninh sân bay giữ lại nha: ✈️🔋\n\n` +
+            `🚫 **1. ĐIỀU CẤM SỐNG CÒN:**\n` +
+            `• **TUYỆT ĐỐI KHÔNG ĐƯỢC ĐỂ PIN TRONG HÀNH LÝ KÝ GỬI!** Pin bắt buộc phải để trong **hành lý xách tay** mang lên cabin máy bay.\n\n` +
+            `📊 **2. QUY ĐỊNH DUNG LƯỢNG CHO PHÉP:**\n` +
+            `• **Dưới 100Wh (tương đương $\\le$ 20.000mAh):** Được phép mang tự do tối đa **2 cục / hành khách** mà không cần khai báo.\n` +
+            `• **Từ 100Wh đến 160Wh (khoảng 27.000mAh – 30.000mAh):** Cần thông báo và được hãng hàng không chấp thuận trước khi lên tàu bay.\n` +
+            `• **Trên 160Wh:** Bị CẤM hoàn toàn trên mọi chuyến bay thương mại.\n\n` +
+            `🔍 **3. LƯU Ý VỀ TÌNH TRẠNG VỎ PIN:**\n` +
+            `• Thông số Wh và mAh trên thân pin phải còn **in rõ nét**, không bị mờ chữ, phồng rộp hay nứt vỡ.\n\n` +
+            `👉 Bên em có sẵn các mẫu **Pin Anker 10.000mAh – 20.000mAh GaN chuẩn bay quốc tế**, bạn có muốn xem mẫu bỏ túi nhỏ gọn không ạ?`,
+        suggestions: ['Xem pin sạc Anker 10.000mAh', 'Xem pin sạc Anker 20.000mAh', 'Phụ kiện du lịch chính hãng']
+    },
+
+    // 3.81 Điện thoại bị mất hoặc giật trộm: Tắt nguồn hoặc tháo SIM có định vị tìm lại được không?
+    {
+        id: 'advice_lost_phone_tracking_offline_find_my',
+        patterns: [
+            /(mat dien thoai|bi giat dien thoai|bi roi dien thoai|mat may).*(tat nguon|thao sim|co tim duoc khong|dinh vi)/i,
+            /(dinh vi may|tim lai may).*(khi tat nguon|bi tat nguon|mat mang|khong co mang|find my)/i,
+            /(find my iphone|smartthings find).*(tat nguon|offline|tim may mat)/i
+        ],
+        keywords: [
+            'mat dien thoai tat nguon co tim duoc khong', 'dien thoai bi tat nguon co dinh vi duoc khong',
+            'cach tim iphone bi tat nguon', 'mat may samsung tat nguon tim the nao', 'bi giat dien thoai phai lam sao'
+        ],
+        reply: `Dạ câu trả lời là **CÓ THỂ ĐỊNH VỊ ĐƯỢC** nhờ công nghệ tìm kiếm ngoại tuyến hiện đại bạn nha! Em xin hướng dẫn các bước xử lý khẩn cấp ngay lập tức: 🚨📱\n\n` +
+            `✨ **1. VÌ SAO MÁY TẮT NGUỒN VẪN ĐỊNH VỊ ĐƯỢC?**\n` +
+            `• Kể từ iOS 15 (trên iPhone) và Android 15 (Samsung / Google), chip Bluetooth BLE tiết kiệm điện trong máy **vẫn âm thầm phát tín hiệu beacon mã hóa** tới các thiết bị xung quanh trong vòng **24 giờ** kể từ khi tắt nguồn hoặc tháo SIM.\n\n` +
+            `⚡ **2. NHỮNG VIỆC CẦN LÀM NGAY BÂY GIỜ:**\n` +
+            `1. Mượn máy khác hoặc dùng máy tính vào ngay trang: **icloud.com/find** (nếu dùng iPhone) hoặc **android.com/find** (nếu dùng Android).\n` +
+            `2. Bật ngay **Chế độ Mất (Lost Mode)**: Màn hình máy sẽ bị khóa cứng và hiện số điện thoại liên hệ chuộc máy.\n` +
+            `3. Khóa tài khoản ngân hàng và liên hệ nhà mạng khóa tạm thời thẻ SIM để tránh kẻ gian nhận mã OTP.\n\n` +
+            `⛔ **CẢNH BÁO LỪA ĐẢO:** Tuyệt đối KHÔNG bấm vào các đường link SMS giả mạo gửi tin nhắn *"Điện thoại của bạn đã được tìm thấy, vui lòng đăng nhập iCloud"* kẻo bị lộ mật khẩu bạn nhé!`,
+        suggestions: ['Hotline hỗ trợ kỹ thuật 0842.331.606', 'Chính sách bảo hành rơi vỡ', 'Tư vấn điện thoại mới']
+    },
+
+    // 3.82 Điện thoại livestream bán hàng TikTok / Shopee 4 - 6 tiếng liên tục không bị nóng tối màn hình
+    {
+        id: 'advice_livestream_phone_thermal_cooling_tiktok_shopee',
+        patterns: [
+            /(livestream|live stream|quay live).*(tiktok|shopee|ban hang|4 tieng|5 tieng|6 tieng|lien tuc)/i,
+            /(dien thoai live|dien thoai livestream).*(khong nong|khong toi man hinh|pin trau|on dinh)/i,
+            /(live tiktok bi nong|live bi giat|live bi toi man hinh).*(phai lam sao|khac phuc|may nao tot)/i
+        ],
+        keywords: [
+            'dien thoai livestream tiktok tot nhat', 'may livestream ban hang shopee',
+            'dien thoai live 4 tieng khong bi nong', 'livestream bi toi man hinh phai lam sao', 'so lanh cho dien thoai livestream'
+        ],
+        reply: `Dạ đối với anh chị em livestream bán hàng chuyên nghiệp 4 – 6 tiếng mỗi ngày, nhiệt độ và độ ổn định chính là yếu tố sống còn để chốt đơn mượt mà! Em xin chia sẻ combo vàng chuẩn phòng live nè: 🎥🔥✨\n\n` +
+            `🌡️ **1. NGUYÊN NHÂN MÁY BỊ TỐI MÀN HÌNH & GIẬT LAG:**\n` +
+            `• Khi livestream liên tục, camera + chip xử lý hình ảnh + sóng phát 4G/Wifi hoạt động 100% công suất làm máy nóng lên $45^\circ\text{C}$. Máy sẽ tự động kích hoạt tính năng **hạ độ sáng màn hình (Thermal Dimming)** và tụt FPS để chống cháy linh kiện.\n\n` +
+            `🏆 **2. BỘ ĐÔI MÁY LIVESTREAM SỐ 1 HIỆN NAY:**\n` +
+            `• **iPhone 13 Pro Max / 14 Pro Max / 15 Plus:** Thuật toán xử lý màu da trắng hồng nịnh mắt, camera bắt nét sản phẩm tức thì, pin 'khủng long' trụ vững suốt ca live.\n\n` +
+            `❄️ **3. VŨ KHÍ CỨU CÁNH BẮT BUỘC PHẢI CÓ:**\n` +
+            `1. **Sò lạnh tản nhiệt từ tính (MagSafe Cooler):** Hút chặt vào lưng máy hạ nhiệt $10^\circ\text{C} - 15^\circ\text{C}$ liên tục, giúp màn hình sáng 100% không bao giờ bị tối.\n` +
+            `2. **Hub chuyển đổi Type-C có cổng LAN mạng dây:** Cắm mạng dây trực tiếp vào điện thoại, đảm bảo đường truyền live Full HD ổn định không bao giờ bị rớt sóng.`,
+        suggestions: ['Xem iPhone 14 Pro Max chuyên Live', 'Xem sò lạnh tản nhiệt điện thoại', 'Tư vấn trả góp 0% cho Streamer']
+    },
+
+    // 3.83 Bàn phím cơ cho văn phòng & gõ đêm: Phân biệt Switch Red, Blue, Brown - chọn loại nào không ồn?
+    {
+        id: 'advice_mechanical_keyboard_switch_selection_office',
+        patterns: [
+            /(ban phim co).*(van phong|khong on|go em|go dem|lam viec)/i,
+            /(switch|red switch|blue switch|brown switch).*(khac gi|nen chon|loai nao em|van phong)/i,
+            /(nen mua ban phim co nao).*(khong on|cho van phong|cho coder)/i
+        ],
+        keywords: [
+            'ban phim co van phong khong on', 'switch nao go em nhat',
+            'so sanh switch red va blue', 'nen chon ban phim co switch nao',
+            'ban phim co cho lap trinh vien', 'ban phim co khong gay tieng on'
+        ],
+        reply: `Dạ dùng bàn phím cơ gõ văn phòng hoặc gõ đêm vừa đã tay vừa không làm phiền đồng nghiệp là mong muốn của rất nhiều bạn! Em xin giải mã nhanh 3 loại Switch phổ biến nhất nha: ⌨️🎧\n\n` +
+            `• 🔴 **RED SWITCH (Linear - 'Chân ái' văn phòng & gõ đêm):**\n` +
+            `  - Lực bấm nhẹ 45g, trơn tuột êm ái, KHÔNG có tiếng clicky lách cách. Gõ cả ngày không mỏi ngón tay và hoàn toàn giữ yên tĩnh cho không gian làm việc chung.\n\n` +
+            `• 🔵 **BLUE SWITCH (Clicky - Vua âm thanh giải trí tại nhà):**\n` +
+            `  - Có tiếng bấm 'tách tách' đanh giòn tai và nấc khấc rõ rệt. Cảm giác gõ cực kỳ sướng nhưng **RẤT ỒN**, tuyệt đối không nên mang vào văn phòng mở kẻo bị đồng nghiệp nhắc nhở nhé!\n\n` +
+            `• 🟤 **BROWN SWITCH (Tactile - Lựa chọn cân bằng):**\n` +
+            `  - Có khấc phản hồi nhẹ tay khi gõ để nhận diện đã ăn phím, nhưng âm lượng phát ra vừa phải, chấp nhận được trong văn phòng.\n\n` +
+            `💡 **Lời khuyên:** Bạn nên chọn các dòng bàn phím cơ **3 Mode không dây** (Bluetooth, USB 2.4GHz và Type-C) có lót sẵn foam tiêu âm như Akko, Keychron hoặc Logitech gõ siêu đầm và êm ái nhé!`,
+        suggestions: ['Xem bàn phím cơ văn phòng không ồn', 'Xem bàn phím không dây Bluetooth', 'Tư vấn setup bàn làm việc']
+    },
+
+    // 3.84 Vỡ màn hình điện thoại: Khi nào chỉ cần ép kính và khi nào phải thay cả cụm màn hình?
+    {
+        id: 'advice_screen_glass_replacement_vs_full_display_assembly',
+        patterns: [
+            /(vo man hinh|be man hinh|nut kinh|nut man hinh).*(ep kinh|thay man|thay ca cum|khac nhau the nao|gia bao nhieu)/i,
+            /(khi nao ep kinh|khi nao phai thay man hinh)/i,
+            /(man zin boc may|man linh kien|man oled gx).*(khac gi|nen thay loai nao)/i
+        ],
+        keywords: [
+            'vo man hinh khi nao ep kinh khi nao thay man', 'phan biet ep kinh va thay man hinh',
+            'man hinh nut kinh co phai thay ca man khong', 'man zin boc may va man linh kien', 'chi phi ep kinh dien thoai'
+        ],
+        reply: `Dạ khi điện thoại bị rơi nứt vỡ, biết rõ điểm khác biệt giữa Ép Kính và Thay Cả Màn Hình sẽ giúp bạn tiết kiệm được tiền triệu luôn nè: 📱🔧\n\n` +
+            `✨ **1. TRƯỜNG HỢP 1: CHỈ CẦN ÉP KÍNH (Tiết kiệm 80% chi phí):**\n` +
+            `• **Dấu hiệu:** Mặt kính bên ngoài bị nứt vỡ như mạng nhện, nhưng **màn hình hiển thị bên trong vẫn bình thường** (không bị sọc, không có đốm đen mực loang) và **cảm ứng vẫn vuốt mượt mà 100%**.\n` +
+            `• **Chi phí:** Chỉ từ **300.000đ – 600.000đ**, giữ nguyên vẹn 100% tấm nền hiển thị Retina / OLED gốc của máy.\n\n` +
+            `🚨 **2. TRƯỜNG HỢP 2: BẮT BUỘC PHẢI THAY CẢ CỤM MÀN HÌNH:**\n` +
+            `• **Dấu hiệu:** Màn hình xuất hiện sọc chỉ màu xanh/hồng, chảy mực đen, chớp nháy trắng xóa hoặc bị liệt cảm ứng đơ cứng.\n` +
+            `• **Nên thay loại nào?** Khuyên bạn nên chọn **Màn Zin bóc máy chính hãng** để giữ trọn độ sáng rực rỡ, cảm ứng mượt 120Hz và tính năng True Tone; tránh xa màn linh kiện giá rẻ vì màu sắc tái nhợt và rất dễ đơ khi máy nóng.`,
+        suggestions: ['Tư vấn chi phí ép kính', 'Địa chỉ trung tâm bảo hành sửa chữa', 'Hotline hỗ trợ 0842.331.606']
+    },
+
+    // 3.85 Chuột công thái học (Ergonomic Mouse) chống đau mỏi cổ tay, hội chứng ống cổ tay
+    {
+        id: 'advice_ergonomic_vertical_mouse_wrist_pain',
+        patterns: [
+            /(chuot cong thai hoc|chuot dung|vertical mouse).*(co tot khong|co do moi|co tac dung gi|nen mua)/i,
+            /(dung chuot).*(dau co tay|moi co tay|te ngon tay|ong co tay)/i,
+            /(chuot khong dau tay|chuot logitech mx master|chuot logitech lift).*(co ngon khong|tu van)/i
+        ],
+        keywords: [
+            'chuot cong thai hoc chong dau co tay', 'chuot dung vertical co do moi khong',
+            'hoi chung ong co tay khi dung chuot', 'chuot logitech mx master 3s co tot khong', 'tu van chuot cho nguoi hay dau tay'
+        ],
+        reply: `Dạ nếu bạn làm việc văn phòng 8 – 10 tiếng mỗi ngày và hay bị mỏi cổ tay hay tê buốt ngón trỏ, chuột công thái học chính là 'vị cứu tinh' y tế đích thực! 🖱️🩺✨\n\n` +
+            `🩺 **VÌ SAO CHUỘT TRUYỀN THỐNG LÀM ĐAU CỔ TAY?**\n` +
+            `• Cầm chuột phẳng thông thường bắt cẳng tay bạn phải xoay vặn $90^\circ$ úp xuống mặt bàn, đè nén dây thần kinh giữa lâu ngày dẫn đến **hội chứng ống cổ tay (Carpal Tunnel)**.\n\n` +
+            `🏆 **LỢI ÍCH ĐỘT PHÁ CỦA CHUỘT DỌC (VERTICAL ERGONOMIC):**\n` +
+            `1. **Góc nghiêng vàng $57^\circ$:** Đặt bàn tay ở tư thế 'bắt tay' tự nhiên nhất của giải phẫu học cơ thể, giải phóng 30% áp lực cơ cẳng tay.\n` +
+            `2. **Con lăn MagSpeed siêu tốc:** Cuộn vèo vèo 1.000 dòng văn bản trong 1 giây mà ngón tay không cần gảy liên tục.\n` +
+            `3. **Phím bấm Silent Click:** Êm ái tuyệt đối không phát ra tiếng ồn lách cách.\n\n` +
+            `👉 **Gợi ý chọn size chuẩn:**\n` +
+            `• Tay vừa & nhỏ: Chọn **Logitech Lift Vertical** (form dáng ôm tay cực xinh).\n` +
+            `• Tay to & đa nhiệm nhiều màn hình: Chọn **Logitech MX Master 3S** (vua chuột văn phòng thế giới)!`,
+        suggestions: ['Xem chuột Logitech Lift Vertical', 'Xem chuột Logitech MX Master 3S', 'Combo phụ kiện công thái học']
+    },
+
+    // 3.86 Điện thoại màn hình gập (Galaxy Z Fold, Z Flip): Nếp gấp có bị nứt không & bảo dưỡng miếng dán
+    {
+        id: 'advice_foldable_screen_crease_film_maintenance',
+        patterns: [
+            /(man hinh gap|z fold|z flip).*(nep gap|nut nep gap|co bi nut|co ben khong|bong mieng dan)/i,
+            /(mieng dan z fold|mieng dan z flip).*(bi bong|tu boc duoc khong|dan lai o dau)/i,
+            /(co nen mua dien thoai gap|dien thoai gap co ben)/i
+        ],
+        keywords: [
+            'man hinh gap z fold co bi nut khong', 'bong mieng dan man hinh trong z fold',
+            'nep gap z flip co sau khong', 'man hinh gap dung duoc bao lau', 'co tu lot mieng dan z fold duoc khong'
+        ],
+        reply: `Dạ điện thoại màn hình gập là đỉnh cao của xu hướng công nghệ tương lai! Em xin chia sẻ thực tế trải nghiệm và những lưu ý quan trọng để bạn an tâm tuyệt đối nha: 📱💫\n\n` +
+            `✨ **1. NẾP GẤP CÓ BỊ NỨT HAY GÃY MÀN HÌNH KHÔNG?**\n` +
+            `• Hoàn toàn không lo nứt gãy trong điều kiện sử dụng bình thường! Bản lề Flex Hinge kép trên các thế hệ mới (Z Fold6, Z Flip6) chịu được trên **200.000 lần gập mở** (tương đương hơn 5 năm dùng với 100 lần gập/ngày).\n` +
+            `• Nếp gấp ở giữa là đặc tính quang học vật lý, khi bạn bật màn hình sáng xem video trực diện thì nếp gấp gần như tàng hình.\n\n` +
+            `⚠️ **2. LƯU Ý SỐNG CÒN VỀ MIẾNG DÁN MÀN HÌNH TRONG:**\n` +
+            `• Miếng dán dẻo màn hình bên trong là lớp bảo vệ cấu trúc kính siêu mỏng Ultra Thin Glass (UTG).\n` +
+            `• Nếu sau 1 – 2 năm miếng dán có dấu hiệu bong mép ở nếp gấp, **TUYỆT ĐỐI KHÔNG DÙNG TAY TỰ LỘT MẠNH** vì có thể kéo theo cả lớp tấm nền hiển thị!\n` +
+            `• Hãy mang máy qua Showroom của TechEcommerce, kỹ thuật viên bên em sẽ hỗ trợ **dán lại miếng dán chính hãng miễn phí** bằng máy ép nhiệt chân không nhé!`,
+        suggestions: ['Xem Galaxy Z Fold6 chính hãng', 'Xem Galaxy Z Flip6 thời trang', 'Tư vấn gói Bảo Hành Vàng màn gập']
+    },
+
+    // 3.87 Tai nghe Open-Ear & Dẫn truyền qua xương (Bone Conduction) cho người chạy bộ, đạp xe an toàn
+    {
+        id: 'advice_open_ear_bone_conduction_headphones_safety',
+        patterns: [
+            /(tai nghe dan truyen xuong|bone conduction|open ear|tai nghe mo).*(la gi|co tot khong|co an toan|chay bo|dap xe)/i,
+            /(tai nghe chay bo|tai nghe dap xe).*(ngoai duong|an toan|nghe coi xe|khong bi tai nan)/i,
+            /(tai nghe shokz|openrock).*(nghe the nao|co hay khong)/i
+        ],
+        keywords: [
+            'tai nghe dan truyen qua xuong co tot khong', 'tai nghe chay bo ngoai duong an toan',
+            'tai nghe open ear vua nghe nhac vua nghe coi xe', 'tai nghe the thao khong nhet tai', 'tai nghe shokz chay marathon'
+        ],
+        reply: `Dạ đối với anh chị em đam mê chạy bộ, đạp xe hay chạy marathon ngoài đường phố, tai nghe Open-Ear / Dẫn truyền xương chính là trang bị an toàn số 1 hiện nay! 🏃🚴🎶\n\n` +
+            `🦻 **1. CƠ CHẾ HOẠT ĐỘNG KHÔNG NHÉT TAI ĐỘC ĐÁO:**\n` +
+            `• Thay vì nhét núm cao su bịt kín ống tai, tai nghe truyền rung động âm thanh qua **xương gò má (Bone Conduction)** hoặc dùng loa vi mô định hướng thẳng vào tai. Ống tai của bạn hoàn toàn thông thoáng 100%!\n\n` +
+            `🛡️ **2. NHỮNG LỢI THẾ VÔ ĐỊCH:**\n` +
+            `• 🚨 **An toàn giao thông tuyệt đối:** Vừa thưởng thức âm nhạc sôi động tiếp lửa chạy bộ, vừa nghe rõ tiếng còi xe ô tô, tiếng còi tàu và tiếng người gọi xung quanh để phản xạ kịp thời.\n` +
+            `• 🍃 **Không đau tai, không viêm tai:** Mồ hôi thoát ra tự nhiên, không bị bí khí hay ẩm ướt gây ngứa ống tai khi tập luyện 2 – 3 tiếng dưới trời nắng nóng.\n` +
+            `• 🌧️ Kháng nước và mồ hôi chuẩn **IP55 – IP67**, thoải mái chạy dưới mưa rào.\n\n` +
+            `👉 Thương hiệu số 1 thế giới dòng này là **Shokz OpenRun / OpenFit**, bạn có muốn xem thử phiên bản thể thao này không ạ?`,
+        suggestions: ['Xem tai nghe thể thao Shokz', 'Xem đồng hồ chạy bộ Garmin', 'Tư vấn phụ kiện chạy marathon']
+    },
+
+    // 3.88 Cùng tầm giá 12 - 15 triệu: Nên mua Flagship cũ Like New 99% hay Tầm trung mới đập hộp?
+    {
+        id: 'advice_flagship_used_vs_midrange_brand_new',
+        patterns: [
+            /(flagship cu|may cu|like new).*(tam trung|may moi|moi dap hop)/i,
+            /(tam trung).*(flagship cu|may cu|like new)/i,
+            /(cung tam gia|cung gia|tam 10|tam 12|tam 15|15 trieu).*(may cu hay may moi|flagship cu|like new hay|cu hay moi)/i,
+            /(nen mua).*(flagship cu|may cu).*(hay|hoac).*(tam trung|may moi)/i
+        ],
+        keywords: [
+            'nen mua flagship cu hay tam trung moi', '15 trieu nen mua may cu hay may moi',
+            'cung tam gia nen mua may cu like new hay may moi', 'so sanh flagship cu va tam trung moi'
+        ],
+        reply: `Dạ đây là bài toán 'cân não' của rất nhiều khách hàng khi cầm ngân sách 12 – 15 triệu! Em xin phân tích khách quan ưu nhược điểm của 2 phương án để bạn chọn đúng gu nha: ⚖️📱\n\n` +
+            `👑 **PHƯƠNG ÁN 1: CHỌN FLAGSHIP CŨ LIKE NEW 99% (iPhone 13 Pro Max / Galaxy S23 Ultra):**\n` +
+            `• **Được gì:** Khung viền Thép/Titan cao cấp, camera ống kính tiềm vọng Zoom xa 5x – 10x quang học, màn hình 2K 120Hz viền mỏng dính, đẳng cấp thương hiệu sang trọng và giữ giá cực tốt.\n` +
+            `• **Tại shop:** Máy được kiểm tra 30 bước nghiêm ngặt, pin còn trên 85% – 90% và có **Bảo hành 1 đổi 1 trong 30 ngày** cực kỳ an tâm.\n\n` +
+            `📦 **PHƯƠNG ÁN 2: CHỌN MÁY TẦM TRUNG MỚI ĐẬP HỘP (Samsung Galaxy A55 5G / Xiaomi 13T Pro):**\n` +
+            `• **Được gì:** Tự tay bóc seal nguyên hộp 100%, pin mới 100% cực trâu 5.000mAh, củ sạc siêu tốc 67W – 120W đi kèm sẵn, bảo hành chính hãng nguyên vẹn 12 – 18 tháng trên toàn quốc.\n\n` +
+            `👉 **Lời khuyên thực chiến:** Nếu bạn chuộng hình thức sang trọng và thích chụp ảnh/quay video sống ảo đỉnh chóp $\rightarrow$ Chọn **Flagship cũ Like New**. Còn nếu thích ăn chắc mặc bền không phải bận tâm suy nghĩ $\rightarrow$ Chọn **Máy mới đập hộp** nhé!`,
+        suggestions: ['Xem iPhone Like New 99% tuyển chọn', 'Xem Samsung Galaxy A55 5G mới', 'Tư vấn trả góp 0%']
+    },
+
+    // 3.89 Mic thu âm cài áo không dây mini: Quay TikTok, Vlog, Podcast giọng ấm không bị vỡ/rè tiếng
+    {
+        id: 'advice_wireless_microphone_vlog_podcast_karaoke',
+        patterns: [
+            /(mic thu am|micro thu am|mic cai ao|mic khong day).*(tiktok|vlog|podcast|livestream|quay video|dien thoai)/i,
+            /(dji mic|rode wireless|boya).*(loai nao tot|nen mua|thu am ro)/i,
+            /(quay video ngoai troi).*(mic nao loc gio|khong bi re|am thanh am)/i
+        ],
+        keywords: [
+            'mic thu am khong day cho dien thoai', 'mic cai ao quay tiktok tot nhat',
+            'dji mic 2 co tot khong', 'mic thu am livestream loc tap am', 'micro khong day quay vlog'
+        ],
+        reply: `Dạ một video triệu view trên TikTok hay YouTube thì âm thanh chiếm tới 50% cảm xúc của người xem! Em xin gợi ý các dòng mic thu âm cài áo không dây chuẩn mực cho Creator nè: 🎙️✨🎬\n\n` +
+            `✨ **3 TIÊU CHUẨN VÀNG CỦA MIC THU ÂM HIỆN ĐẠI:**\n` +
+            `1. 🌬️ **Lọc ồn AI & Bông lọc gió (Deadcat):** Thu giọng nói ấm rõ, lọc sạch 95% tiếng còi xe và tiếng gió rít ngoài trời.\n` +
+            `2. 🛡️ **Công nghệ 32-bit Float chống vỡ tiếng:** Dù bạn nói thì thầm hay hét to cảm xúc, âm thanh không bao giờ bị rè hay vỡ hạt (clipping).\n` +
+            `3. ⚡ **Cắm là nhận (Plug & Play):** Đầu thu nhỏ gọn cắm thẳng vào cổng Type-C (iPhone 15/16, Android) hoặc Lightning, thu xa 100m – 250m ổn định.\n\n` +
+            `🏆 **TOP SẢN PHẨM KHUYÊN DÙNG:**\n` +
+            `• 🥇 **DJI Mic 2 (Đỉnh cao chuyên nghiệp):** Chất âm chuẩn phòng thu, có hộp sạc thông minh dùng 18 tiếng.\n` +
+            `• 🥈 **Rode Wireless ME / GO II:** Thương hiệu âm thanh số 1 của các nhà làm phim.\n` +
+            `• 🥉 **Boya Magic / K8 (Kinh tế cho người mới bắt đầu):** Giá chỉ vài trăm nghìn đồng, cực kỳ dễ dùng.`,
+        suggestions: ['Xem mic thu âm DJI Mic 2', 'Xem mic cài áo không dây Boya', 'Combo phụ kiện quay TikTok']
+    },
+
+    // 3.90 Nâng cấp SSD & RAM cho laptop: Có bị mất dữ liệu hay phải cài lại Windows không?
+    {
+        id: 'advice_laptop_ssd_ram_upgrade_cloning_windows',
+        patterns: [
+            /(nang cap ssd|thay o ssd|nang cap ram|them ram).*(co mat du lieu|co phai cai lai win|laptop)/i,
+            /(laptop chay cham).*(nang cap ssd|them ram|chi phi bao nhieu)/i,
+            /(sao chep win sang ssd|clone win sang ssd|nang cap laptop)/i
+        ],
+        keywords: [
+            'nang cap ssd co mat ban quyen win khong', 'them ram cho laptop co mat du lieu khong',
+            'laptop chay cham muon nang cap ssd', 'thay o cung laptop co can cai lai win khong', 'chi phi nang cap ram va ssd laptop'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm 100% nha: **NÂNG CẤP RAM & Ổ CỨNG SSD KHÔNG HỀ MẤT DỮ LIỆU VÀ KHÔNG PHẢI CÀI LẠI WINDOWS TỪ ĐẦU ĐÂU Ạ!** 💻⚡🛠️\n\n` +
+            `🔄 **CÔNG NGHỆ SAO CHÉP NGUYÊN TRẠNG (DISK CLONING) TẠI SHOP:**\n` +
+            `• Kỹ thuật viên sẽ sao chép toàn bộ hệ điều hành Windows bản quyền, phần mềm văn phòng, kế toán, dữ liệu Zalo và file cá nhân từ ổ cứng cũ sang ổ SSD NVMe siêu tốc mới trong vòng **15 – 20 phút**.\n` +
+            `• Khi bật máy lên, mọi thứ giữ nguyên vị trí cũ 100% nhưng tốc độ khởi động vọt lên chỉ còn **5 giây**, mở hàng chục tab Chrome và file Excel nặng mượt mà trơn tru!\n\n` +
+            `💰 **CHI PHÍ CỰC KỲ HỢP LÝ:**\n` +
+            `• Ổ SSD 256GB – 512GB chính hãng Kingston / Samsung giá chỉ từ **500.000đ – 950.000đ**.\n` +
+            `• Thanh RAM DDR4 / DDR5 8GB – 16GB giá chỉ từ **450.000đ – 850.000đ**.\n` +
+            `• 🎁 **Đặc quyền tại shop:** Miễn phí 100% công lắp đặt, sao chép dữ liệu và vệ sinh tra keo tản nhiệt máy trọn gói!`,
+        suggestions: ['Xem ổ cứng SSD chính hãng', 'Xem RAM laptop Kingston', 'Hotline hỗ trợ kỹ thuật 0842.331.606']
+    },
+
+    // 3.91 Cách tự kiểm tra màn hình điện thoại mới / cũ: Điểm chết (Dead Pixel), ám màn Burn-in & liệt cảm ứng
+    {
+        id: 'advice_screen_inspection_dead_pixel_burnin_touch',
+        patterns: [
+            /(kiem tra man hinh|test man hinh|check man hinh).*(diem chet|dead pixel|liet cam ung|am man|burn in)/i,
+            /(cach test man hinh|huong dan test man hinh).*(dien thoai|iphone|samsung)/i,
+            /(man hinh bi diem chet|man hinh bi liet cam ung).*(kiem tra the nao)/i
+        ],
+        keywords: [
+            'cach kiem tra diem chet man hinh', 'huong dan test cam ung dien thoai',
+            'cach nhan biet man hinh bi am burn in', 'test man hinh iphone cu', 'kiem tra dead pixel tren man hinh'
+        ],
+        reply: `Dạ kiểm tra màn hình là bước quan trọng nhất khi nhận máy! Em xin chia sẻ 3 'tuyệt chiêu' test màn hình chuẩn thợ lành nghề cực kỳ đơn giản ai cũng làm được nha: 📱🔍✨\n\n` +
+            `🖐️ **BƯỚC 1: TEST CẢM ỨNG TOÀN DIỆN (Tránh liệt mép màn hình):**\n` +
+            `• Bấm giữ 1 icon ứng dụng bất kỳ trên màn hình chính cho rung lên, sau đó giữ tay và **rê icon đi khắp màn hình theo hình zíc-zắc**, đặc biệt là dọc 4 mép viền và thanh điều hướng dưới cùng.\n` +
+            `• Nếu icon đột ngột bị 'rơi' tuột ra ở điểm nào thì khu vực đó đã bị đứt cảm ứng!\n\n` +
+            `⚪ **BƯỚC 2: TEST ĐIỂM CHẾT (DEAD PIXEL):**\n` +
+            `• Mở YouTube gõ tìm kiếm clip *"Full White Screen"* và *"Full Black Screen"*, xoay ngang màn hình và tăng độ sáng 100%.\n` +
+            `• Soi kỹ xem có chấm đen li ti nào trên nền trắng hoặc chấm xanh/đỏ chói sáng bất thường trên nền đen không.\n\n` +
+            `👻 **BƯỚC 3: TEST ÁM MÀN & LƯU ẢNH (BURN-IN):**\n` +
+            `• Mở một bức ảnh nền xám hoặc trắng, nhìn nghiêng xem có bóng mờ của bàn phím gõ hay icon TikTok in hằn mờ mờ trên nền không.\n\n` +
+            `🛡️ Tại TechEcommerce, 100% máy xuất xưởng đều được kỹ thuật viên test kỹ qua 30 bước và bảo hành **1 đổi 1 trong 30 ngày** nếu có bất kỳ lỗi hiển thị nào ạ!`,
+        suggestions: ['Chính sách bảo hành 1 đổi 1', 'Kiểm tra hàng trước thanh toán', 'Hotline hỗ trợ 0842.331.606']
+    },
+
+    // 3.92 Máy dính khóa quản lý từ xa MDM (Mobile Device Management) là gì? Cách kiểm tra máy sạch
+    {
+        id: 'advice_mdm_profile_corporate_locked_device_check',
+        patterns: [
+            /(may mdm|khoa mdm|dinh mdm|an mdm|dinh quan ly tu xa).*(la gi|co dung duoc khong|co nen mua|co nguy hiem)/i,
+            /(cach kiem tra|check mdm).*(iphone|macbook|ipad)/i,
+            /(remote management|quan ly tu xa).*(tren iphone|tren macbook)/i
+        ],
+        keywords: [
+            'may dinh mdm la gi', 'co nen mua macbook mdm khong',
+            'iphone dinh quan ly tu xa la gi', 'cach kiem tra iphone co bi mdm khong',
+            'phan biet may mdm va may quoc te', 'kiem tra mdm macbook'
+        ],
+        reply: `Dạ đây là lưu ý 'sống còn' khi mua thiết bị Apple cũ hoặc Like New trên thị trường trôi nổi bên ngoài nè! Em xin giải thích cực kỳ rõ ràng để bạn không bị 'mất tiền oan' nha: 🍏🛡️⚠️\n\n` +
+            `🏢 **MÁY MDM LÀ GÌ?**\n` +
+            `• MDM (Mobile Device Management) là máy thuộc diện tài sản được doanh nghiệp/tập đoàn nước ngoài cấp cho nhân viên làm việc, có cài đặt **Hồ sơ quản lý từ xa**.\n` +
+            `• **Rủi ro lớn:** Máy MDM vẫn dùng bình thường nếu dùng thủ thuật 'ẩn profile'. Nhưng mỗi khi bạn **Cài đặt lại máy (Factory Reset) hoặc cập nhật hệ điều hành mới**, máy sẽ lập tức khóa cứng và đòi đăng nhập tài khoản email công ty (Remote Management) khiến máy biến thành 'cục gạch'!\n\n` +
+            `🔍 **CÁCH TEST MÁY SẠCH 100% TẠI CHỖ:**\n` +
+            `• Trên iPhone/iPad: Vào *Cài đặt > Cài đặt chung > Chuyển hoặc đặt lại > Chọn "Xóa tất cả nội dung và cài đặt"*. Kích hoạt lại từ đầu qua Wi-Fi. Nếu máy vào thẳng màn hình chính mượt mà thì đó là máy chuẩn quốc tế sạch 100%!\n\n` +
+            `👑 **CAM KẾT VÀNG TẠI TECHECOMMERCE:**\n` +
+            `• 100% máy bán ra là **bản Quốc Tế sạch**, cam kết trọn đời KHÔNG dính iCloud ẩn, KHÔNG dính MDM, bao test Reset máy tại chỗ không giới hạn số lần!`,
+        suggestions: ['Cam kết máy chính hãng nguyên seal', 'Chính sách bảo hành trọn đời', 'Hotline tư vấn 0842.331.606']
     }
 ];
 
@@ -2986,10 +3365,11 @@ const CHIT_CHAT_RULES = [
     // 6.4 Khách hỏi thời tiết / ngày mưa gió
     {
         id: 'weather_rain',
+        excludeIf: (norm, raw) => !/\b(mưa|thời tiết|trời nắng|trời mưa|mưa gió|bão)\b/i.test(raw) || /\b(flagship)\b/i.test(norm),
         patterns: [
             /(troi|thoi tiet).*(mua|nang|lanh|bao)/i,
             /mua\s+(to|lon|tam ta|gio|nhieu)/i,
-            /(mua|gio).*(ship|giao)/i
+            /\b(mua|gio)\b.*\b(ship|giao hang|giao)\b/i
         ],
         keywords: [
             'troi mua to qua', 'mua to co ship khong', 'troi mua', 'mua gio the nay',
@@ -3066,9 +3446,10 @@ const CHIT_CHAT_RULES = [
     // 6.9 Khách khen AI thông minh, giỏi, dễ thương
     {
         id: 'ai_compliment_praise',
+        excludeIf: (norm) => /\b(dinh sim|dinh icloud|dinh mdm|dinh nuoc|dinh kem|bi dinh)\b/i.test(norm),
         patterns: [
-            /(em|bot|ai).*(thong minh|gioi|de thuong|dinh|co tam|hay qua)/i,
-            /(gioi qua|thong minh qua|de thuong qua|xin qua)/i
+            /(em|bot|ai).*(thong minh|gioi|de thuong|dinh cao|dinh qua|dinh the|co tam|hay qua)/i,
+            /(gioi qua|thong minh qua|de thuong qua|xin qua|dinh qua)/i
         ],
         keywords: [
             'em gioi qua', 'thong minh the', 'de thuong qua', 'gioi qua em', 'ai nay xin the',
