@@ -4577,16 +4577,30 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     const isContextualFollowUpSignal = Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
         /\b(nam\s+choi|nam|mau\s+nao|may\s+nao|con\s+nao|phu\s+hop|nen\s+chon|nen\s+mua|so\s+sanh|phan\s+van)\b/i.test(text);
 
-    if (!isContextualFollowUpSignal && !hasExplicitBudget && !(hasExplicitProductQuery && isConsultationSearch)) {
+    if (!isContextualFollowUpSignal && !hasExplicitBudget) {
         const smartAnswer = matchSmartAnswer(message);
         if (smartAnswer) {
-            return {
-                reply: smartAnswer.reply,
-                products: prev.lastProducts || [],
-                suggestions: smartAnswer.suggestions,
-                context: { ...prev, ...smartAnswer.context },
-                meta: { provider: 'store_knowledge_engine', isFallback: false, model: 'none' }
-            };
+            const isGenericWelcome = smartAnswer.intent === 'advice_consultation_welcome_stepper';
+            if (!isGenericWelcome || (!hasExplicitProductQuery && !isConsultationSearch)) {
+                let attachedProducts = prev.lastProducts || [];
+                try {
+                    if (Array.isArray(smartAnswer.productSlugs) && smartAnswer.productSlugs.length > 0) {
+                        const found = await Product.find({ slug: { $in: smartAnswer.productSlugs }, active: true }).limit(4);
+                        if (found && found.length > 0) attachedProducts = found;
+                    } else if (smartAnswer.category) {
+                        const found = await Product.find({ category: smartAnswer.category, active: true }).sort({ featured: -1, rating: -1 }).limit(3);
+                        if (found && found.length > 0) attachedProducts = found;
+                    }
+                } catch (e) {}
+
+                return {
+                    reply: smartAnswer.reply,
+                    products: attachedProducts,
+                    suggestions: smartAnswer.suggestions,
+                    context: { ...prev, ...smartAnswer.context },
+                    meta: { provider: 'store_knowledge_engine', isFallback: false, model: 'none' }
+                };
+            }
         }
     }
 

@@ -20,14 +20,41 @@ function hasWordOrPhrase(text, phrase) {
 // -------------------------------------------------------------
 
 const STORE_POLICY_RULES = [
+    // 1.0 Tư vấn danh mục sản phẩm ngoài hệ sinh thái công nghệ (Thực vật, Động vật, Thú cưng, Cây cảnh, Thời trang, Thực phẩm...)
+    {
+        id: 'out_of_catalog_goods',
+        excludeIf: (norm) => /\b(thiet bi|camera|airtag|smarttag|dinh vi|theo doi|chong lac)\b/i.test(norm),
+        patterns: [
+            /(co\s+ban|co\s+kinh\s+doanh|co\s+cung\s+cap|ban\s+khong|co\s+ban\s+khong).*(thuc\s*vat|dong\s*vat|sinh\s*vat|cay\s*canh|chau\s*cay|hoa\s*tuoi|thu\s*cung|cho\s*meo|cho\s*canh|meo\s*canh|vat\s*nuoi|hamster|chim\s*canh|ca\s*canh|quan\s*ao|giay\s*dep|tui\s*xach|thoi\s*trang|my\s*pham|son\s*moi|nuoc\s*hoa|do\s*an|thuc\s*an|thuc\s*pham|tra\s*sua|banh\s*keo|do\s*uong|xe\s*may|o\s*to|nha\s*dat|bat\s*dong\s*san)/i,
+            /(ban|co|mua).*(thuc\s*vat|dong\s*vat|cay\s*canh|thu\s*cung|cho\s*meo|vat\s*nuoi).*(khong|o\s+dau|duoc\s+khong)/i,
+            /^(co\s+ban\s+thuc\s*vat\s+khong|co\s+ban\s+dong\s*vat\s+khong|co\s+ban\s+cay\s+khong|co\s+ban\s+cho\s+khong|co\s+ban\s+meo\s+khong|ban\s+co\s+ban\s+thuc\s*vat\s+khong|ban\s+co\s+ban\s+dong\s*vat\s+khong)$/i,
+            /\b(ban\s+thuc\s*vat|ban\s+dong\s*vat|ban\s+cay\s*canh|ban\s+thu\s*cung|ban\s+cho\s*meo|ban\s+quan\s*ao|ban\s+my\s*pham|ban\s+do\s*an)\b/i
+        ],
+        keywords: [
+            'ban thuc vat', 'ban dong vat', 'ban cay canh', 'ban thu cung', 'ban cho meo',
+            'co ban thuc vat khong', 'co ban dong vat khong', 'co ban cay khong',
+            'ban quan ao khong', 'ban thuc pham khong', 'ban my pham khong',
+            'ban xe may khong', 'ban nha dat khong'
+        ],
+        reply: `Dạ TechEcommerce là hệ thống chuyên phân phối các **thiết bị công nghệ chính hãng** (Điện thoại thông minh, Laptop, Máy tính bảng, Đồng hồ thông minh, Phụ kiện âm thanh cáp sạc, Máy chơi game và Thiết bị nhà thông minh Smarthome...), bên em không kinh doanh các mặt hàng thực vật, cây cảnh, sinh vật, động vật hay thú cưng bạn nhé! 😄🐾🌱\n\n` +
+            `✨ Tuy nhiên, nếu bạn đang tìm kiếm các **thiết bị công nghệ phục vụ đời sống hoặc hỗ trợ chăm sóc thú cưng & gia đình** thì shop có sẵn nhiều món cực kỳ hữu ích luôn ạ:\n` +
+            `• 📹 **Camera an ninh trong nhà xoay 360° đàm thoại 2 chiều:** Giúp bạn vừa trông nom vừa bật loa trò chuyện, dỗ dành thú cưng từ xa khi đi làm cả ngày.\n` +
+            `• 🏷️ **Thẻ định vị thông minh (Apple AirTag / Samsung SmartTag):** Nhỏ gọn gắn trực tiếp vào vòng cổ cho cún cưng, mèo cưng để theo dõi vị trí qua điện thoại, an tâm không lo thất lạc.\n` +
+            `• 📱 **Điện thoại & Tablet camera sắc nét, pin trâu:** Bắt trọn những khoảnh khắc cưng xỉu, chụp ảnh và quay video sống ảo đăng TikTok / Reels mượt mà.\n\n` +
+            `👉 Bạn đang quan tâm dòng thiết bị công nghệ nào để em gửi thông tin chi tiết và ưu đãi tốt nhất cho bạn nhé! 😊`,
+        suggestions: ['Tư vấn Camera đàm thoại 2 chiều', 'Thẻ định vị AirTag cho thú cưng', 'Điện thoại chụp ảnh sắc nét', 'Hotline 0842.331.606']
+    },
+
     // 1.1 Hóa đơn đỏ VAT / Hóa đơn điện tử công ty
     {
         id: 'vat_invoice',
-        excludeIf: (norm) => /\b(so luong lon|chiet khau|b2b|si|cho truong hoc|cho phong ban|nhieu may)\b/i.test(norm),
+        excludeIf: (norm) => /\b(so luong lon|chiet khau|b2b|dai ly|mua si|cho truong hoc|cho phong ban|nhieu may|thuc vat|dong vat|sinh vat|nhan vat|vat nuoi|vat tu|vat the|do vat|vat pham|vat dung|vat ly|cay canh|thu cung|cho meo|hoa tuoi|bong hoa|chau hoa|rau cu|trai cay)\b/i.test(norm),
         patterns: [
-            /(xuat|lay|co|can|tinh).*(hoa don|vat)/i,
-            /(hoa don|vat).*(cong ty|do|mst|dien tu)/i,
-            /gia.*(da co|da gom|bao gom).*vat/i
+            /(xuat|lay|can|tinh)\s+(?:duoc\s+)?\b(hoa\s*don|vat|thue\s*vat)\b/i,
+            /\bco\s+(?:xuat\s+)?(?:hoa\s*don|vat|thue\s*vat)\b/i,
+            /\b(hoa\s*don|vat)\b.*(cong\s*ty|do|mst|dien\s*tu)/i,
+            /gia.*(da\s*co|da\s*gom|bao\s*gom).*\bvat\b/i,
+            /\b(hoa\s*don\s*do|hoa\s*don\s*vat|xuat\s*vat|lay\s*vat|thue\s*vat|co\s*vat\s*khong)\b/i
         ],
         keywords: [
             'hoa don vat', 'hoa don do', 'xuat hoa don', 'hoa don cong ty', 'hoa don dien tu',
@@ -45,11 +72,11 @@ const STORE_POLICY_RULES = [
     // 1.2 Chương trình Thu cũ Đổi mới (Trade-in)
     {
         id: 'trade_in',
-        excludeIf: (norm) => /\b(ep gia|dinh gia|bi tru|minh bach|lo anh|lo du lieu|lo thong tin|du lieu ca nhan|xoa sach du lieu|reset may|bao mat du lieu|xach tay|lock|sim ghep|dinh icloud|may my|lla|ja)\b/i.test(norm),
+        excludeIf: (norm) => /\b(thu cung|cho meo|vat nuoi|ep gia|dinh gia|bi tru|minh bach|lo anh|lo du lieu|lo thong tin|du lieu ca nhan|xoa sach du lieu|reset may|bao mat du lieu|xach tay|lock|sim ghep|dinh icloud|may my|lla|ja)\b/i.test(norm),
         patterns: [
-            /(thu cu|trade[\s-]?in|doi may cu).*(moi|cu|khong|gia|the nao)/i,
-            /(co|nhan|ho tro).*(thu cu|trade[\s-]?in|thu lai)/i,
-            /(chuong trinh|chinh sach).*(thu cu|len doi)/i
+            /\b(thu\s+cu|trade[\s-]?in|doi\s+may\s+cu)\b.*(moi|cu|khong|gia|the\s+nao)/i,
+            /(co|nhan|ho\s+tro).*\b(thu\s+cu|trade[\s-]?in|thu\s+lai)\b/i,
+            /(chuong\s+trinh|chinh\s+sach).*\b(thu\s+cu|len\s+doi)\b/i
         ],
         keywords: [
             'thu cu doi moi', 'thu cu', 'trade in', 'trade-in', 'doi may cu', 'len doi may',
@@ -1127,10 +1154,11 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.14 Tư vấn điện thoại cho tài xế công nghệ / Shipper / Hay đi ngoài đường nắng gió / Pin trâu 2 ngày
     {
         id: 'persona_driver_shipper_battery',
-        excludeIf: (norm) => /\b(giao hoa toc|ship hoa toc|giao hang|theo doi|tracking|dinh vi don hang)\b/i.test(norm),
+        excludeIf: (norm) => /\b(giao hoa toc|ship hoa toc|giao hang|theo doi|tracking|dinh vi don hang|do sang cao|nit|nits|gorilla armor|chong phan xa|anti reflective)\b/i.test(norm),
         patterns: [
-            /(chay grab|chay xe om|shipper|tai xe|di ngoai duong|ngoai troi|nang gio|chay app|chay be)/i,
-            /(dien thoai|may).*(pin trau nhat|pin 2 ngay|pin 6000|pin khung)/i
+            /(chay grab|chay xe om|shipper|tai xe|chay app|chay be|tai xe cong nghe)/i,
+            /(dien thoai|may).*(chay grab|chay xe om|shipper|tai xe|pin trau nhat|pin 2 ngay|pin 6000|pin khung)/i,
+            /(di ngoai duong|nang gio).*(chay xe|tai xe|shipper)/i
         ],
         keywords: [
             'dien thoai chay grab', 'dien thoai cho shipper', 'may pin trau chay xe om',
@@ -1423,13 +1451,17 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.26 Tư vấn điện thoại cho ba mẹ, người lớn tuổi (chữ to, loa to, pin trâu, dễ dùng)
     {
         id: 'persona_elderly_parents_phone',
+        category: 'Điện thoại',
         patterns: [
             /(mua cho bo me|mua cho ba me|mua cho nguoi lon tuoi|mua cho ong ba|dien thoai cho nguoi gia|nguoi gia dung|nguoi lon tuoi dung)/i,
-            /(may cho bo me|may cho nguoi lon tuoi|dien thoai chu to|dien thoai loa to pin trau)/i
+            /(may cho bo me|may cho nguoi lon tuoi|dien thoai chu to|dien thoai loa to pin trau)/i,
+            /(dien thoai|may).*(bo me|ong ba|nguoi gia|nguoi lon tuoi|phu huynh|me dung|ba dung|ong dung)/i,
+            /(mua cho|tang).*(bo me|ong ba|phu huynh).*(dien thoai|may)/i
         ],
         keywords: [
             'dien thoai cho nguoi lon tuoi', 'dien thoai cho bo me', 'dien thoai chu to loa to cho nguoi gia',
-            'mua may cho ba me de dung', 'dien thoai de su dung cho nguoi gia', 'may cho nguoi lon tuoi'
+            'mua may cho ba me de dung', 'dien thoai de su dung cho nguoi gia', 'may cho nguoi lon tuoi',
+            'dien thoai cho ong ba', 'dien thoai cho phu huynh', 'mua may cho me', 'mua may cho bo'
         ],
         reply: `Dạ em rất xúc động và trân quý tình cảm hiếu thảo của bạn dành cho phụ huynh ạ! Chọn máy cho người lớn tuổi thì yếu tố quan trọng nhất không phải cấu hình khủng mà là sự **tiện lợi, dễ nhìn, loa to và độ bền cao** nè: 👵👴💖\n\n` +
             `✨ **4 Tiêu chí vàng cho điện thoại người lớn tuổi:**\n` +
@@ -2413,6 +2445,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.76 Lời chào tư vấn bán hàng chủ động & Điều hướng nhanh 3 bước theo nhu cầu (Consultation Stepper)
     {
         id: 'advice_consultation_welcome_stepper',
+        excludeIf: (norm) => /\b(mat|moi mat|nhuc mat|can thi|nguoi gia|bo me|tre em|con gai|giai tri|do hoa|choi game|tai xe|shipper|lap trinh|dan van phong|hoc sinh|sinh vien|gia re|chong choi|pwm|dc dimming)\b/i.test(norm),
         patterns: [
             /^(tu van cho toi|tu van giup toi|tu van giup minh|tu van gium|chua biet mua may nao|chua biet chon may|nho shop tu van|can tu van mua|tu van chon may|minh can tu van|em can tu van|tư vấn cho tôi|tư vấn giúp|tư vấn chọn máy)$/i,
             /(tu van cho toi|tu van giup toi|tu van giup minh|chua biet mua may nao|nho shop tu van).*(duoc khong|nha|nhe|a|di shop)/i
@@ -2810,6 +2843,163 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `👑 **CAM KẾT VÀNG TẠI TECHECOMMERCE:**\n` +
             `• 100% máy bán ra là **bản Quốc Tế sạch**, cam kết trọn đời KHÔNG dính iCloud ẩn, KHÔNG dính MDM, bao test Reset máy tại chỗ không giới hạn số lần!`,
         suggestions: ['Cam kết máy chính hãng nguyên seal', 'Chính sách bảo hành trọn đời', 'Hotline tư vấn 0842.331.606']
+    },
+
+    // 3.93 Tư vấn điện thoại cho người mắt kém / mắt yếu / hay mỏi mắt / cận thị nặng
+    {
+        id: 'advice_poor_eyesight_eye_protection_phone',
+        category: 'Điện thoại',
+        excludeIf: (norm) => /\b(laptop|may tinh|macbook|pc|chuot|ban phim|cho meo|thu cung)\b/i.test(norm),
+        patterns: [
+            /(mat.*(khong tot|kem|yeu|mo|can|loan|can thi|nhay cam)|(moi|nhuc|dau|kho|cay)\s+mat|bao ve mat|chong moi mat|chong loa|chong nhay|pwm|dc dimming|giam anh sang xanh|eye comfort)/i,
+            /(dien thoai|may).*(mat khong tot|mat kem|mat yeu|mat mo|moi mat|bao ve mat|can thi)/i,
+            /(nguoi lon tuoi|nguoi gia|ong ba|bo me).*(mat kem|mat yeu|mat mo|chu to)/i,
+            /^(mat toi khong duoc tot|mat toi kem|mat toi yeu|hay bi moi mat|nhin man hinh hay bi moi mat)/i
+        ],
+        keywords: [
+            'mat toi khong duoc tot', 'mat khong tot', 'mat kem', 'mat yeu', 'moi mat',
+            'dien thoai cho nguoi mat kem', 'chong moi mat', 'man hinh chong nhay',
+            'pwm dimming', 'dc dimming', 'eye comfort shield', 'dien thoai chu to'
+        ],
+        reply: `Dạ nếu mắt bạn không được tốt, mắt yếu hoặc thường xuyên bị nhức mỏi khi nhìn màn hình, việc lựa chọn đúng mẫu điện thoại có công nghệ bảo vệ thị lực là cực kỳ quan trọng luôn ạ! Em xin chia sẻ 3 tiêu chuẩn vàng để chọn máy êm mắt nhất nhé: 👁️✨\n\n` +
+            `1. 🛡️ **Tần số chống nháy PWM cao hoặc DC Dimming:**\n` +
+            `• Màn hình OLED thông thường hay bị nhấp nháy ngầm ở tần số thấp (240Hz - 480Hz) khi giảm độ sáng ban đêm, khiến cơ đồng tử mắt phải co bóp liên tục gây mỏi mắt, khô giác mạc và nhức đầu.\n` +
+            `• Bạn nên ưu tiên máy có PWM Dimming cao (2.160Hz - 3.840Hz) hoặc có chế độ điều chỉnh ánh sáng thích ứng bảo vệ mắt đạt chứng nhận TÜV Rheinland / SGS Eye Care.\n\n` +
+            `2. 📱 **Màn hình lớn từ 6.7 inch & Tấm nền tương phản cao:**\n` +
+            `• Màn hình lớn (như dòng Plus hoặc Pro Max / Ultra) giúp không gian hiển thị rộng rãi, không phải căng mắt nhìn chi tiết nhỏ.\n` +
+            `• Tấm nền OLED / Super AMOLED hiển thị màu đen sâu tuyệt đối, độ sắc nét cao giúp nét chữ nổi bật rõ ràng, không bị nhòe viền như màn hình LCD giá rẻ.\n\n` +
+            `3. 👓 **Trợ năng phóng to cỡ chữ & Chế độ bảo vệ mắt thông minh:**\n` +
+            `• **Apple iPhone:** Có tính năng *True Tone* (tự cân bằng trắng theo môi trường), *Night Shift* (lọc ánh sáng xanh) và hệ thống *Dynamic Type* phóng to phông chữ + Chữ đậm (Bold Text) cực kỳ sắc nét, thân thiện cho thị lực.\n` +
+            `• **Samsung Galaxy:** Trang bị *Eye Comfort Shield* (Bảo vệ mắt theo nhịp sinh học) và đặc biệt là *Chế độ Đơn giản (Easy Mode)* phóng to toàn bộ icon và cỡ chữ cực đại, rất dễ đọc.\n\n` +
+            `🌟 **GỢI Ý CÁC MẪU ĐIỆN THOẠI BẢO VỆ MẮT TỐT NHẤT:**\n` +
+            `• 👑 **Samsung Galaxy S24 Ultra / S25 Ultra:** Đỉnh cao với kính cường lực *Corning Gorilla Armor chống phản xạ ánh sáng (Anti-Reflective)* giảm chói lóa tới 75% ngoài trời, màn hình Dynamic AMOLED 2X 6.8 inch phẳng rộng thênh thang.\n` +
+            `• 🍎 **iPhone 16 Plus / iPhone 15 Plus (hoặc Pro Max):** Màn hình Super Retina XDR 6.7 inch to rõ, True Tone dịu mắt và thời lượng pin trâu nhất thế giới smartphone giúp dùng cả ngày không cần căng mắt.\n` +
+            `• 💰 **Samsung Galaxy A15 / A25 / A35 (4 – 7 triệu):** Tầm giá tiết kiệm nhưng sở hữu màn hình Super AMOLED 6.5 inch đạt chuẩn Eye Care, có sẵn Easy Mode chữ to cực hợp cho người mắt yếu / người lớn tuổi.\n\n` +
+            `👉 Bạn dự kiến mức ngân sách khoảng bao nhiêu và đang quen dùng iPhone (iOS) hay Android để em chọn máy sẵn hàng kho giá ưu đãi nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem Galaxy S24 Ultra chống chói', 'Xem iPhone 16 Plus màn to', 'Tư vấn chế độ Easy Mode', 'Hotline 0842.331.606']
+    },
+
+    // 3.95 Tư vấn màn hình laptop chống mỏi mắt cho dân văn phòng, lập trình viên, học sinh sinh viên
+    {
+        id: 'advice_laptop_eye_strain_anti_glare',
+        category: 'Laptop',
+        patterns: [
+            /(laptop|may tinh|man hinh).*(moi mat|nhuc mat|dau mat|bao ve mat|chong choi|anti[\s-]?glare|tuv)/i,
+            /(dung may tinh|lam viec ca ngay).*(moi mat|nhuc mat|kho mat)/i
+        ],
+        keywords: [
+            'laptop chong moi mat', 'man hinh chong choi', 'dung may tinh bi moi mat',
+            'laptop anti glare', 'laptop man hinh bao ve mat', 'laptop lam viec ca ngay'
+        ],
+        reply: `Dạ nếu bạn phải ngồi làm việc, học tập hoặc viết code liên tục 8 - 10 tiếng mỗi ngày trước laptop, tình trạng nhức mỏi và khô mắt là rất phổ biến! Để bảo vệ 'cửa sổ tâm hồn', bạn nên chú ý các tiêu chuẩn màn hình sau nhé: 💻👁️🛡️\n\n` +
+            `1. 🌟 **Màn hình chống chói Anti-Glare (Nhám / Matte):**\n` +
+            `• Khác với màn hình gương (Glossy) hay bị phản chiếu bóng đèn tuýp hay cửa sổ gây hoa mắt, màn hình chống chói Anti-Glare giúp ánh sáng tán xạ đều, nhìn lâu cực kỳ êm dịu.\n\n` +
+            `2. 📜 **Chứng nhận bảo vệ mắt TÜV Rheinland Low Blue Light:**\n` +
+            `• Các dòng laptop cao cấp hiện nay đều có chứng chỉ lọc ánh sáng xanh ở cấp độ phần cứng (Hardware Low Blue Light) giúp bảo vệ võng mạc mà không làm ám vàng lệch màu khi làm đồ họa.\n\n` +
+            `3. ⚡ **Tần số quét 90Hz – 120Hz & Độ phân giải cao:**\n` +
+            `• Tần số quét cao giúp việc cuộn lướt văn bản, bảng tính Excel mượt mà, không bị giật hay bóng ma (ghosting) làm mắt phải điều tiết liên tục.\n\n` +
+            `💡 **MẸO CÔNG NGHỆ CHỐNG MỎI MẮT TẠI BÀN LÀM VIỆC:**\n` +
+            `• Áp dụng quy tắc vàng **20 - 20 - 20**: Cứ sau 20 phút nhìn màn hình, hãy nhìn xa 20 feet (~6 mét) trong vòng 20 giây để cơ mắt được thả lỏng.\n` +
+            `• Vào *Settings > Display > Scale*, chỉnh tỉ lệ hiển thị lên **125% hoặc 150%** để phông chữ to rõ, không cần rướn người sát màn hình.\n\n` +
+            `👉 Bạn đang tìm laptop mỏng nhẹ văn phòng hay máy cấu hình cao làm đồ họa / code để em gợi ý mẫu có màn hình êm mắt nhất nhé! 😊`,
+        suggestions: ['Tư vấn Laptop văn phòng màn đẹp', 'Xem MacBook Air màn Liquid Retina', 'Xem Laptop ASUS OLED Eye Care', 'Hotline 0842.331.606']
+    },
+
+    // 3.96 Tư vấn thiết bị công nghệ chăm sóc thú cưng (Camera giám sát 360, Thẻ định vị AirTag / SmartTag)
+    {
+        id: 'advice_smart_tech_for_pets',
+        category: 'Phụ kiện',
+        patterns: [
+            /(thiet bi|camera|dinh vi|theo doi|airtag|smarttag).*(thu cung|cho meo|cun|meo|pet)/i,
+            /(cham soc|trong nom|tim|chong lac).*(thu cung|cho meo|cun|meo)/i
+        ],
+        keywords: [
+            'thiet bi cho thu cung', 'camera theo doi cho meo', 'airtag cho cho meo',
+            'dinh vi thu cung', 'chong lac cho meo', 'thiet bi cham soc thu cung'
+        ],
+        reply: `Dạ chăm sóc và bảo vệ các bé 'hoàng thượng' / boss cún cưng bằng thiết bị công nghệ thông minh đang là xu hướng cực kỳ hot luôn bạn ơi! 🐶🐱📡\n\n` +
+            `✨ **2 MÓN CÔNG NGHỆ ĐẮC LỰC NHẤT CHO 'SEN' YÊU THÚ CƯNG:**\n\n` +
+            `1. 🏷️ **Thẻ định vị thông minh (Apple AirTag / Samsung Galaxy SmartTag 2):**\n` +
+            `• Nhỏ gọn chỉ nặng ~11g, chống nước chuẩn IP67, gắn trực tiếp vào vòng cổ các bé.\n` +
+            `• **Nguyên lý tìm kiếm:** Sử dụng mạng lưới mã hóa an toàn của hàng trăm triệu chiếc iPhone / điện thoại Samsung xung quanh để cập nhật vị trí chính xác của bé lên bản đồ điện thoại của bạn, an tâm tuyệt đối không lo các bé ham chơi chạy lạc!\n` +
+            `• Pin dùng bền bỉ cả năm mới cần thay.\n\n` +
+            `2. 📹 **Camera an ninh trong nhà xoay 360° đàm thoại 2 chiều:**\n` +
+            `• Đặt tại phòng khách hoặc khu vực chuồng/khay thức ăn của bé.\n` +
+            `• Tích hợp tính năng AI nhận diện thú cưng (Pet Tracking), gửi thông báo ngay khi bé thức dậy nghịch ngợm. Bạn có thể bật micro nói chuyện, gọi tên dỗ dành để bé đỡ buồn khi bạn vắng nhà cả ngày.\n\n` +
+            `👉 Bạn đang quan tâm thẻ định vị gắn vòng cổ hay camera quan sát trong nhà để em tư vấn chi tiết và báo giá ưu đãi nhé! 😊`,
+        suggestions: ['Xem Apple AirTag chính hãng', 'Xem Samsung SmartTag 2', 'Tư vấn Camera đàm thoại 2 chiều', 'Hotline 0842.331.606']
+    },
+
+    // 3.97 Tư vấn điện thoại dùng ngoài trời nắng gắt (Độ sáng nits cao, Kính chống phản xạ)
+    {
+        id: 'advice_phone_for_outdoor_sunlight',
+        category: 'Điện thoại',
+        patterns: [
+            /(dien thoai|man hinh).*(ngoai troi|troi nang|nang gat|do sang cao|nit|nits|sang ro)/i,
+            /(chay grab|chay xe|giao hang|shipper|ky su cong trinh).*(man hinh|nhin ro|nang)/i
+        ],
+        keywords: [
+            'dien thoai dung ngoai troi nang', 'man hinh sang nhat ngoai nang',
+            'dien thoai do sang cao', 'man hinh chong choi ngoai troi'
+        ],
+        reply: `Dạ nếu bạn thường xuyên phải làm việc ngoài trời, chạy xe công nghệ hoặc kỹ sư giám sát công trình dưới ánh nắng gắt nhiệt đới, một chiếc điện thoại có độ sáng màn hình 'khủng' và kính chống lóa là yếu tố tiên quyết! ☀️📱🔥\n\n` +
+            `1. 🔆 **Tiêu chuẩn độ sáng đỉnh (Peak Brightness) tối thiểu:**\n` +
+            `• Dưới ánh nắng trực tiếp, màn hình cần đạt từ **1.500 nits đến 2.600 nits** trở lên kèm tính năng tăng cường hiển thị ngoài trời (như Vision Booster của Samsung hay Sunlight Display của Xiaomi) thì mới không bị tối đen màn hình.\n\n` +
+            `2. 🛡️ **Kính cường lực chống phản xạ (Anti-Reflective):**\n` +
+            `• Đặc quyền trên dòng **Samsung Galaxy S24 Ultra / S25 Ultra** với kính Corning Gorilla Armor giúp giảm tới 75% độ chói lóa từ ánh mặt trời chiếu trực tiếp, hình ảnh trong trẻo rõ mồn một như trong phòng mát!\n\n` +
+            `🌟 **CÁC DÒNG MÁY XUẤT SẮC NHẤT DƯỚI TRỜI NẮNG:**\n` +
+            `• **Vua ngoài trời:** Samsung Galaxy S24 Ultra / S25 Ultra (2.600 nits + kính chống chói số 1 hành tinh).\n` +
+            `• **Apple iPhone:** iPhone 15 / 16 series (Độ sáng ngoài trời tự kích hoạt lên tới 2.000 nits, hiển thị bản đồ Google Maps cực kỳ nét).\n` +
+            `• **Tầm trung giá rẻ:** Galaxy A25 / A35 / A55 (Độ sáng 1.000 nits Super AMOLED + Vision Booster hiển thị rất ổn định).\n\n` +
+            `👉 Bạn dự kiến tầm ngân sách khoảng bao nhiêu để em chọn chiếc máy pin trâu và hiển thị ngoài nắng tốt nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem Galaxy S24 Ultra chống chói', 'Xem iPhone 16 độ sáng 2000 nits', 'Điện thoại pin trâu cho Shipper', 'Hotline 0842.331.606']
+    },
+
+    // 3.98 Tư vấn điện thoại loa to, chuông lớn cho người lãng tai / nghe kém
+    {
+        id: 'advice_phone_loud_speaker_hard_of_hearing',
+        category: 'Điện thoại',
+        patterns: [
+            /(dien thoai|may).*(loa to|am thanh lon|chuong to|tai kem|lang tai|nang tai|tro thinh)/i,
+            /(nguoi gia|nguoi lon tuoi).*(tai kem|nghe kem|lang tai).*(dien thoai|may)/i
+        ],
+        keywords: [
+            'dien thoai loa to', 'dien thoai am thanh lon', 'dien thoai cho nguoi lang tai',
+            'dien thoai chuong to', 'dien thoai ho tro tro thinh'
+        ],
+        reply: `Dạ đối với khách hàng có thính lực kém, người lớn tuổi bị lãng tai hoặc làm việc trong môi trường nhà xưởng ồn ào, việc nghe rõ tiếng chuông và giọng nói đàm thoại là cực kỳ quan trọng! 📢🔊👂\n\n` +
+            `1. 🔊 **Hệ thống loa kép Dual Stereo công suất lớn:**\n` +
+            `• Bạn nên chọn máy có loa kép stereo (1 loa dưới đáy và 1 loa trên tai nghe) kết hợp công nghệ âm thanh vòm Dolby Atmos. Âm lượng phát chuông sẽ to gấp đôi so với các dòng máy loa đơn giá rẻ.\n\n` +
+            `2. 🦻 **Tính năng hỗ trợ thiết bị trợ thính (MFi / Bluetooth LE Audio):**\n` +
+            `• **Apple iPhone:** Đạt chuẩn *Made for iPhone (MFi) Hearing Aids*, kết nối trực tiếp với máy trợ thính không dây. Đặc biệt là tính năng **Live Listen (Nghe trực tiếp)**: Bạn đặt iPhone trên bàn ăn, micro của iPhone sẽ thu âm giọng nói của người đối diện và truyền thẳng vào tai nghe trợ thính cực kỳ rõ ràng, loại bỏ hoàn toàn tiếng ồn xung quanh!\n` +
+            `• **Samsung Galaxy:** Có tính năng *Bộ khuếch đại âm thanh xung quanh (Sound Amplifier)* và *Adapt Sound* tự đo thính lực của từng bên tai để tinh chỉnh tần số âm thanh nghe rõ nhất.\n\n` +
+            `👉 Bạn đang tìm máy mức giá khoảng bao nhiêu để em giới thiệu mẫu máy có loa đàm thoại to vang và rõ tiếng nhất nhé! 😊`,
+        suggestions: ['Xem iPhone hỗ trợ Live Listen', 'Xem Samsung Galaxy loa kép Stereo', 'Tư vấn tai nghe chống ồn đàm thoại', 'Hotline 0842.331.606']
+    },
+
+    // 3.99 Tư vấn điện thoại nhỏ gọn cao cấp cho người tay nhỏ / thích bỏ túi quần nhẹ nhàng
+    {
+        id: 'advice_phone_compact_small_hand',
+        category: 'Điện thoại',
+        patterns: [
+            /(dien thoai|may).*(nho gon|vua tay|tay nho|gon nhe|man hinh nho|de bo tui)/i,
+            /(thich may nho|may nhe|cam mot tay)/i
+        ],
+        keywords: [
+            'dien thoai nho gon', 'dien thoai cam vua tay', 'dien thoai cho nguoi tay nho',
+            'smartphone nho gon cao cap', 'dien thoai man hinh nho'
+        ],
+        reply: `Dạ giữa xu hướng smartphone ngày càng 'to bản và nặng tay', những chiếc điện thoại nhỏ gọn, hoàn thiện cao cấp và cầm vừa vặn trong lòng bàn tay luôn có sức hút cực kỳ đặc biệt! 📱✨👌\n\n` +
+            `👑 **CÁC DÒNG FLAGSHIP NHỎ GỌN ĐÁNG MUA NHẤT HIỆN NAY:**\n\n` +
+            `1. 🍎 **iPhone 16 / iPhone 15 (6.1 inch):**\n` +
+            `• Kích thước 'tỉ lệ vàng' chỉ 6.1 inch, trọng lượng siêu nhẹ (~170g), viền bo cong công thái học cầm êm tay tuyệt đối.\n` +
+            `• Thao tác vuốt chạm 1 tay từ góc màn hình đến bàn phím cực kỳ dễ dàng, đút túi quần jean hay túi xách nhỏ không hề bị cộm.\n\n` +
+            `2. 🌟 **Samsung Galaxy S24 (6.2 inch):**\n` +
+            `• Viền màn hình mỏng bậc nhất thế giới, trọng lượng chỉ 167g. Màn Dynamic AMOLED 2X 120Hz siêu mượt mà kích thước tổng thể lại cực kỳ thon gọn và sang trọng.\n\n` +
+            `3. 💄 **Samsung Galaxy Z Flip6 (Gập vỏ sò thời thượng):**\n` +
+            `• Khi gập lại chỉ vuông vắn bằng một hộp phấn trang điểm, dễ dàng cầm gọn lỏn trong lòng bàn tay hoặc nhét vừa mọi chiếc túi áo nhỏ xinh của các bạn nữ!\n\n` +
+            `👉 Bạn thích phong cách thanh lịch của iPhone hay thiết kế gập biến hình của Galaxy Z Flip để em tư vấn màu sắc hot nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem iPhone 16 nhỏ gọn', 'Xem Samsung Galaxy S24', 'Xem Galaxy Z Flip6 gập vỏ sò', 'Hotline 0842.331.606']
     }
 ];
 
@@ -3710,7 +3900,9 @@ function matchSmartAnswer(message) {
                     suggestions: rule.suggestions,
                     context: { stage: g.name, currentIntent: rule.id },
                     intent: rule.id,
-                    group: g.name
+                    group: g.name,
+                    category: rule.category || null,
+                    productSlugs: rule.productSlugs || null
                 };
             }
         }
