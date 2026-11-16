@@ -1089,6 +1089,7 @@ function setCategory(category, options = {}) {
 
         if (searchInput) searchInput.value = '';
         if (headerSearchInput) headerSearchInput.value = '';
+        window.__syncHeaderSearchTicker?.();
         if (minPriceInput) minPriceInput.value = '';
         if (maxPriceInput) maxPriceInput.value = '';
         if (brandFilterSelect) brandFilterSelect.value = 'all';
@@ -1117,8 +1118,15 @@ function setCategory(category, options = {}) {
     if (options.scroll !== false) {
         document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    try {
+        window.dispatchEvent(new CustomEvent('storefront:category-changed', {
+            detail: { category: activeCategory || 'all' }
+        }));
+    } catch (_) { }
 }
 window.setCategory = setCategory;
+window.getActiveStorefrontCategory = () => activeCategory || 'all';
 
 function setBrandFilter(brand, options = {}) {
     const select = document.getElementById('brandFilter');
@@ -1146,6 +1154,7 @@ function setShopSearch(searchTerm, options = {}) {
     const headerSearch = document.getElementById('headerSearchInput');
     if (catalogSearch) catalogSearch.value = searchTerm || '';
     if (headerSearch) headerSearch.value = searchTerm || '';
+    window.__syncHeaderSearchTicker?.();
     renderProducts();
     if (options.scroll !== false) {
         document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1263,6 +1272,7 @@ function setupStorefrontHeader() {
     catalogSearch?.addEventListener('input', () => {
         if (headerSearch && headerSearch.value !== catalogSearch.value) {
             headerSearch.value = catalogSearch.value;
+            window.__syncHeaderSearchTicker?.();
         }
     });
 
@@ -1327,6 +1337,7 @@ function setupStorefrontHeader() {
                 tickerEl.classList.toggle('is-active', show);
                 searchForm.classList.toggle('has-ticker', show);
             };
+            window.__syncHeaderSearchTicker = syncTickerVisibility;
             const showTickerLine = (idx, first) => {
                 const item = trendingList[idx % trendingList.length];
                 const ln = document.createElement('span');
@@ -1349,7 +1360,13 @@ function setupStorefrontHeader() {
             headerSearch.addEventListener('focus', syncTickerVisibility);
             headerSearch.addEventListener('blur', syncTickerVisibility);
             headerSearch.addEventListener('input', syncTickerVisibility);
+            headerSearch.addEventListener('change', syncTickerVisibility);
+            window.addEventListener('pageshow', syncTickerVisibility);
             setInterval(() => {
+                if (headerSearch.value || document.activeElement === headerSearch) {
+                    if (tickerEl.classList.contains('is-active')) syncTickerVisibility();
+                    return;
+                }
                 if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('visual-reduce-motion')) return;
                 if (tickerEl.classList.contains('is-active')) {
                     tickerIdx = (tickerIdx + 1) % trendingList.length;
@@ -1474,6 +1491,7 @@ function setupStorefrontHeader() {
                     const term = btn.getAttribute('data-search-term');
                     if (term) {
                         headerSearch.value = term;
+                        window.__syncHeaderSearchTicker?.();
                         saveRecentSearch(term);
                         performLiveSearch(term);
                     }
@@ -3290,6 +3308,7 @@ function resetAllFilters() {
 
     if (searchInput) searchInput.value = '';
     if (headerSearchInput) headerSearchInput.value = '';
+    window.__syncHeaderSearchTicker?.();
     if (minPrice) minPrice.value = '';
     if (maxPrice) maxPrice.value = '';
     if (brandFilter) brandFilter.value = 'all';
@@ -3336,6 +3355,7 @@ window.clearSearchFilter = function() {
     const headSearch = document.getElementById('headerSearchInput');
     if (catSearch) catSearch.value = '';
     if (headSearch) headSearch.value = '';
+    window.__syncHeaderSearchTicker?.();
     const url = new URL(window.location.href);
     url.searchParams.delete('search');
     window.history.replaceState({}, '', url.toString());
@@ -3410,15 +3430,17 @@ function syncActiveFilterChipsAndBreadcrumbs(count = null) {
     }
     breadcrumbs.innerHTML = crumbs.join('');
 
-    // 3. Xây dựng các chip lọc đang kích hoạt
+    // 3. Xây dựng các chip lọc đang kích hoạt (100% Semantic list items)
     const chips = [];
     if (isCategoryFiltered) {
         const catLabel = categoryLabels[activeCategory] || activeCategory;
         chips.push(`
-            <span class="storefront-chip">
-                <span class="chip-label">${escapeHTML(catLabel)}</span>
-                <button type="button" class="chip-remove" onclick="setCategory('all')" aria-label="Bỏ lọc danh mục ${escapeHTML(catLabel)}" title="Bỏ lọc danh mục">×</button>
-            </span>
+            <li class="storefront-chip-item">
+                <span class="storefront-chip">
+                    <span class="chip-label">${escapeHTML(catLabel)}</span>
+                    <button type="button" class="chip-remove" onclick="setCategory('all')" aria-label="Bỏ lọc danh mục ${escapeHTML(catLabel)}" title="Bỏ lọc danh mục">×</button>
+                </span>
+            </li>
         `);
     }
     if (isPriceFiltered) {
@@ -3431,34 +3453,42 @@ function syncActiveFilterChipsAndBreadcrumbs(count = null) {
             priceChipLabel = `Trên ${Math.round(filters.minPrice / 1000000)} triệu`;
         }
         chips.push(`
-            <span class="storefront-chip">
-                <span class="chip-label">${escapeHTML(priceChipLabel)}</span>
-                <button type="button" class="chip-remove" onclick="window.clearPriceFilter()" aria-label="Bỏ lọc khoảng giá" title="Bỏ lọc khoảng giá">×</button>
-            </span>
+            <li class="storefront-chip-item">
+                <span class="storefront-chip">
+                    <span class="chip-label">${escapeHTML(priceChipLabel)}</span>
+                    <button type="button" class="chip-remove" onclick="window.clearPriceFilter()" aria-label="Bỏ lọc khoảng giá" title="Bỏ lọc khoảng giá">×</button>
+                </span>
+            </li>
         `);
     }
     if (isBrandFiltered) {
         chips.push(`
-            <span class="storefront-chip">
-                <span class="chip-label">${escapeHTML(filters.brand)}</span>
-                <button type="button" class="chip-remove" onclick="selectBrandFilter('all')" aria-label="Bỏ lọc hãng ${escapeHTML(filters.brand)}" title="Bỏ lọc hãng">×</button>
-            </span>
+            <li class="storefront-chip-item">
+                <span class="storefront-chip">
+                    <span class="chip-label">${escapeHTML(filters.brand)}</span>
+                    <button type="button" class="chip-remove" onclick="selectBrandFilter('all')" aria-label="Bỏ lọc hãng ${escapeHTML(filters.brand)}" title="Bỏ lọc hãng">×</button>
+                </span>
+            </li>
         `);
     }
     if (isStockFiltered) {
         chips.push(`
-            <span class="storefront-chip">
-                <span class="chip-label">Chỉ còn hàng</span>
-                <button type="button" class="chip-remove" onclick="window.clearStockFilter()" aria-label="Bỏ lọc tình trạng hàng" title="Bỏ lọc tình trạng">×</button>
-            </span>
+            <li class="storefront-chip-item">
+                <span class="storefront-chip">
+                    <span class="chip-label">Chỉ còn hàng</span>
+                    <button type="button" class="chip-remove" onclick="window.clearStockFilter()" aria-label="Bỏ lọc tình trạng hàng" title="Bỏ lọc tình trạng">×</button>
+                </span>
+            </li>
         `);
     }
     if (isSearchFiltered) {
         chips.push(`
-            <span class="storefront-chip">
-                <span class="chip-label">"${escapeHTML(filters.search)}"</span>
-                <button type="button" class="chip-remove" onclick="window.clearSearchFilter()" aria-label="Bỏ lọc từ khóa" title="Bỏ lọc từ khóa">×</button>
-            </span>
+            <li class="storefront-chip-item">
+                <span class="storefront-chip">
+                    <span class="chip-label">"${escapeHTML(filters.search)}"</span>
+                    <button type="button" class="chip-remove" onclick="window.clearSearchFilter()" aria-label="Bỏ lọc từ khóa" title="Bỏ lọc từ khóa">×</button>
+                </span>
+            </li>
         `);
     }
     chipsContainer.innerHTML = chips.join('');
@@ -3466,6 +3496,7 @@ function syncActiveFilterChipsAndBreadcrumbs(count = null) {
     const matchCount = typeof count === 'number' ? count : filteredProducts().length;
     if (countBadge) {
         countBadge.textContent = `${matchCount} sản phẩm`;
+        countBadge.classList.toggle('is-empty', matchCount === 0);
     }
 }
 
@@ -4968,6 +4999,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const headerSearch = document.getElementById('headerSearchInput');
         if (catalogSearch) catalogSearch.value = initialSearch;
         if (headerSearch) headerSearch.value = initialSearch;
+        window.__syncHeaderSearchTicker?.();
     }
     const initialMaxPrice = pageParams.get('maxPrice') || '';
     if (initialMaxPrice) {

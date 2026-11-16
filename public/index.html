@@ -33,10 +33,10 @@
   <meta http-equiv="Expires" content="0" />
   <title>TechEcommerce - Cửa hàng công nghệ</title>
   <link rel="stylesheet" href="assets/css/style.css?v=20261116-modern-cat-v5" />
-  <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261116-modern-cat-v5" />
-  <link rel="stylesheet" href="assets/css/chatbox.css?v=20261116-ai-rag-v1" data-ai-chat-style="true" />
+  <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261116-mobile-fix-v3" />
+  <link rel="stylesheet" href="assets/css/chatbox.css?v=20261116-mobile-fix-v3" data-ai-chat-style="true" />
   <link rel="stylesheet" href="assets/css/exit-intent.css?v=20261111-v1" />
-  <link rel="stylesheet" href="assets/css/mascot.css?v=20261109-playful-cat-v1" data-tm-mascot-style="true" />
+  <link rel="stylesheet" href="assets/css/mascot.css?v=20261116-mobile-fix-v3" data-tm-mascot-style="true" />
   <link rel="stylesheet" href="assets/css/checkout.css?v=20261109-contact-v3" />
   <style>
     .hero-banner {
@@ -474,7 +474,7 @@
   <script src="assets/js/auth.js?v=20261103-lucian-p1"></script>
 
   <main class="container fade-in">
-    <!-- Category Navigation & Standout Setup Builder Tool -->
+    <!-- Category Navigation -->
     <nav class="header-categories" id="storefrontCategories" aria-label="Danh mục sản phẩm">
       <div class="header-categories-container">
         <div class="category-scroll-wrapper">
@@ -505,17 +505,6 @@
           <button type="button" class="category-scroll-arrow category-scroll-next" aria-label="Cuộn danh mục sang phải"
             hidden>›</button>
         </div>
-        <aside class="header-builder-slot">
-          <a href="pages/tools/setup-builder.html" class="btn-setup-builder-highlight"
-            title="Công cụ phối cấu hình PC, bàn ghế & phụ kiện chuẩn công thái học">
-            <span class="builder-flame-icon" aria-hidden="true">🔥</span>
-            <span class="builder-text-group">
-              <strong class="builder-title">Setup Builder</strong>
-              <small class="builder-sub">Tự phối góc làm việc</small>
-            </span>
-            <span class="builder-arrow-pill" aria-hidden="true">→</span>
-          </a>
-        </aside>
       </div>
     </nav>
 
@@ -690,19 +679,27 @@
 
     <div class="flex-layout">
       <section class="main-content" id="catalogStart" aria-label="Danh sách và bộ lọc sản phẩm">
-        <!-- Storefront Active Filter Status & Breadcrumbs (Đặt lên đầu khi lọc danh mục) -->
+        <!-- Storefront Active Filter Status & Breadcrumbs (Semantic HTML5) -->
         <section class="storefront-filter-status-bar" id="storefrontFilterStatusBar"
           aria-label="Trạng thái lọc và đường dẫn phân cấp" hidden>
-          <nav class="storefront-breadcrumb-nav" id="storefrontBreadcrumbNav" aria-label="Đường dẫn phân cấp">
-            <ol class="storefront-breadcrumbs" id="storefrontBreadcrumbs"></ol>
-          </nav>
-          <div class="storefront-active-chips-wrap">
-            <span class="active-chips-title">🏷️ Đang lọc theo:</span>
-            <div class="storefront-active-chips" id="storefrontActiveChips"></div>
-            <span class="active-filter-count" id="activeFilterCountBadge"></span>
+          <header class="storefront-filter-top-row">
+            <nav class="storefront-breadcrumb-nav" id="storefrontBreadcrumbNav" aria-label="Đường dẫn phân cấp">
+              <ol class="storefront-breadcrumbs" id="storefrontBreadcrumbs"></ol>
+            </nav>
+            <output class="active-filter-count" id="activeFilterCountBadge" aria-live="polite"></output>
+          </header>
+          <footer class="storefront-active-chips-wrap">
+            <span class="active-chips-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+              Đang lọc:
+            </span>
+            <ul class="storefront-active-chips" id="storefrontActiveChips" aria-label="Các bộ lọc đang áp dụng"></ul>
             <button type="button" class="btn-clear-all-chips" id="btnClearAllChips" onclick="resetAllFilters()">Xóa tất
-              cả bộ lọc ×</button>
-          </div>
+              cả bộ lọc</button>
+          </footer>
         </section>
 
         <!-- Unified Modern Category & Filter Hub -->
@@ -1519,11 +1516,11 @@
     </a>
   </aside>
 
-  <script src="assets/js/shop.js?v=20261116-modern-cat-v5"></script>
+  <script src="assets/js/shop.js?v=20261116-cat-consult-v4"></script>
   <script src="assets/js/buy-now-sticker.js?v=20261109-playful-cat-v1"></script>
   <script src="assets/js/footer.js?v=20261109-contact-v3"></script>
   <script src="assets/js/mascot.js?v=20261109-playful-cat-v1"></script>
-  <script src="assets/js/chatbox.js?v=20261116-ai-rag-v1"></script>
+  <script src="assets/js/chatbox.js?v=20261116-cat-consult-v4"></script>
   <script src="assets/js/exit-intent.js?v=20261111-v1" defer></script>
 </body>
 

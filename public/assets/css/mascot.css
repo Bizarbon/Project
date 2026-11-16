@@ -7,10 +7,10 @@
 /* --- Khung chứa linh vật (Mascot Wrapper) --- */
 .tm-mascot-wrapper {
     position: fixed;
-    right: 50px;
-    bottom: calc(600px + 6px);
-    width: 84px;
-    height: 94px;
+    right: calc(var(--ai-panel-right, 20px) + 28px);
+    bottom: calc(var(--ai-panel-bottom, 20px) + var(--ai-panel-height, min(600px, calc(100dvh - 80px))) - 12px);
+    width: 80px;
+    height: 90px;
     z-index: 2001;
     pointer-events: auto;
     user-select: none;
@@ -43,8 +43,8 @@
 /* --- SVG Định dạng cơ bản --- */
 .tm-svg {
     display: block;
-    width: 84px;
-    height: 84px;
+    width: 80px;
+    height: 80px;
     overflow: visible;
 }
 
@@ -576,26 +576,32 @@ html[data-theme='dark'] .tm-mascot-wrapper {
    ========================================================================== */
 @media (max-width: 768px) {
     .tm-mascot-wrapper {
-        right: 24px;
-        bottom: calc(min(500px, calc(100dvh - 120px)) + 52px + env(safe-area-inset-bottom, 0px));
-        width: 72px;
-        height: 80px;
+        right: calc(var(--ai-panel-right, 12px) + 18px);
+        bottom: calc(var(--ai-panel-bottom, calc(64px + env(safe-area-inset-bottom, 0px))) + var(--ai-panel-height, clamp(275px, 46dvh, 385px)) - 8px);
+        width: 58px;
+        height: 66px;
     }
 
     .tm-svg {
-        width: 72px;
-        height: 72px;
+        width: 58px;
+        height: 58px;
     }
 
     .tm-bubble {
-        top: -8px;
-        right: -10px;
+        top: -6px;
+        right: -8px;
         padding: 3px 6px;
     }
 
     .tm-dot {
         width: 4px;
         height: 4px;
+    }
+}
+
+@media (max-height: 520px) {
+    .tm-mascot-wrapper {
+        display: none !important;
     }
 }
 

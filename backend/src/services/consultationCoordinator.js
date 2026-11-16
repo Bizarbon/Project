@@ -2619,6 +2619,135 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
     };
 }
 
+const TOOLBAR_CONSULTATION_CONFIG = {
+    'Điện thoại': {
+        badge: '📱 Điện thoại',
+        budgetPrompt: 'Dưới 7 triệu, 7 – 15 triệu, 15 – 25 triệu hay trên 25 triệu',
+        needPrompt: 'Chụp ảnh/quay video sắc nét, chiến game mượt 120Hz, pin trâu dùng cả ngày, hay dòng flagship cao cấp nhỏ gọn',
+        suggestions: ['Điện thoại chụp ảnh 7-15 triệu', 'Điện thoại chơi game dưới 15tr', 'iPhone chính hãng trên 20tr', 'Ngân sách dưới 10 triệu']
+    },
+    'Laptop': {
+        badge: '💻 Laptop',
+        budgetPrompt: 'Dưới 15 triệu, 15 – 20 triệu, 20 – 25 triệu hay trên 25 triệu',
+        needPrompt: 'Học tập/văn phòng mỏng nhẹ pin lâu, lập trình CNTT, hay thiết kế đồ họa 3D / chơi game cấu hình mạnh',
+        suggestions: ['Laptop văn phòng dưới 15 triệu', 'Laptop lập trình 15 - 25 triệu', 'Laptop đồ họa / gaming', 'MacBook mỏng nhẹ pin trâu']
+    },
+    'Tablet': {
+        badge: '📲 Tablet (Máy tính bảng)',
+        budgetPrompt: 'Dưới 10 triệu, 10 – 15 triệu hay trên 15 triệu',
+        needPrompt: 'Học tập/ghi chép kèm bút cảm ứng, vẽ đồ họa chuyên nghiệp, hay giải trí xem phim – đọc tài liệu màn hình lớn',
+        suggestions: ['Tablet học tập dưới 10 triệu', 'iPad vẽ đồ họa chuyên nghiệp', 'Tablet xem phim pin trâu', 'iPad chính hãng mới nhất']
+    },
+    'Tai nghe': {
+        badge: '🎧 Tai nghe',
+        budgetPrompt: 'Dưới 1 triệu, 1 – 3 triệu, 3 – 6 triệu hay trên 6 triệu',
+        needPrompt: 'Tai nghe chụp tai (Over-ear) chống ồn chủ động ANC, tai nghe True Wireless nhỏ gọn tập thể thao, hay nghe nhạc Hi-Fi/bass ấm',
+        suggestions: ['Tai nghe chống ồn 2 - 4 triệu', 'Tai nghe True Wireless dưới 1tr', 'Tai nghe chụp tai Sony / Marshall', 'Ngân sách dưới 3 triệu']
+    },
+    'Đồng hồ thông minh': {
+        badge: '⌚ Đồng hồ thông minh',
+        budgetPrompt: 'Dưới 3 triệu, 3 – 7 triệu hay trên 7 triệu',
+        needPrompt: 'Theo dõi sức khỏe & chạy bộ GPS chuyên sâu, nghe gọi/nhận thông báo đồng bộ iPhone/Android, hay pin trâu bền bỉ cả tuần',
+        suggestions: ['Smartwatch thể thao & GPS dưới 5tr', 'Apple Watch / Galaxy Watch', 'Đồng hồ nghe gọi pin trâu', 'Ngân sách dưới 3 triệu']
+    },
+    'Phụ kiện': {
+        badge: '🔌 Phụ kiện công nghệ',
+        budgetPrompt: 'Dưới 500 nghìn, 500k – 1.5 triệu hay trên 1.5 triệu',
+        needPrompt: 'Chuột công thái học/gaming, bàn phím cơ gõ êm, củ sạc nhanh GaN, pin sạc dự phòng hay hub chuyển đổi USB-C (bạn đang dùng cho thiết bị nào ạ?)',
+        suggestions: ['Chuột không dây dưới 1 triệu', 'Pin sạc dự phòng dưới 1 triệu', 'Bàn phím cơ dưới 2 triệu', 'Củ sạc nhanh GaN chính hãng']
+    },
+    'Máy chơi game': {
+        badge: '🎮 Máy chơi game',
+        budgetPrompt: 'Khoảng 7 – 12 triệu, 12 – 18 triệu hay trên 18 triệu',
+        needPrompt: 'Máy cầm tay chơi mọi lúc mọi nơi (Nintendo Switch OLED, Steam Deck, ROG Ally) hay máy Console cắm TV 4K đỉnh cao như PlayStation 5 Slim',
+        suggestions: ['PlayStation 5 Slim 4K', 'Nintendo Switch OLED', 'Máy chơi game cầm tay dưới 15tr', 'Ngân sách khoảng 10 - 15 triệu']
+    }
+};
+
+function isGenericPickDeviceTrigger(message) {
+    const norm = normalizeText(message)
+        .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    return /^(?:tu van chon may|tu van chon san pham|tu van giup toi|tu van giup minh|tu van cho toi|chua biet mua may nao|chua biet chon may|nho shop tu van|can tu van chon may)$/i.test(norm);
+}
+
+function resolveToolbarCategoryEntry(rawCategory = '') {
+    const clean = String(rawCategory || '').trim();
+    if (!clean || clean.toLowerCase() === 'all' || normalizeText(clean) === 'tat ca san pham') {
+        return { category: '', config: null };
+    }
+    const exactKey = Object.keys(TOOLBAR_CONSULTATION_CONFIG).find(
+        key => key === clean || normalizeText(key) === normalizeText(clean)
+    );
+    if (!exactKey) return { category: clean, config: null };
+    return { category: exactKey, config: TOOLBAR_CONSULTATION_CONFIG[exactKey] };
+}
+
+function buildToolbarCategoryConsultationResponse(rawSelectedCategory = '', existingSlots = {}) {
+    const { category, config: catCfg } = resolveToolbarCategoryEntry(rawSelectedCategory);
+    const cleanContext = {
+        ...(existingSlots || {}),
+        category,
+        selectedCategory: category,
+        pageCategory: category,
+        brand: '',
+        budget: 0,
+        budgetType: 'unspecified',
+        budgetMin: null,
+        budgetMax: null,
+        useCase: '',
+        major: '',
+        preference: '',
+        productType: '',
+        eliminatedBrands: [],
+        lastProducts: [],
+        topProduct: null,
+        pendingBrandSuggestion: null,
+        lastQuestionKey: category ? `toolbar_consult_${category}` : 'toolbar_consult_all',
+        askedSlots: [],
+        repeatCount: 0,
+        consultationTrigger: ''
+    };
+
+    if (category && catCfg) {
+        return {
+            reply: `Dạ em thấy bạn đang xem danh mục **${catCfg.badge}** ạ! 😊\n\n` +
+                `Để em lọc và gợi ý đúng những mẫu **${category}** hợp ý bạn nhất đang sẵn hàng tại shop, bạn chia sẻ giúp em **2 thông tin nhanh** nhé:\n\n` +
+                `1. 💰 **Ngân sách dự kiến của bạn:** ${catCfg.budgetPrompt}?\n` +
+                `2. 🎯 **Bạn đang muốn tìm sản phẩm nào / ưu tiên tiêu chí gì:** ${catCfg.needPrompt}?\n\n` +
+                `👉 Bạn chỉ cần nhắn ngắn gọn tầm giá + nhu cầu (hoặc bấm nhanh các gợi ý bên dưới) là em lọc ngay danh sách máy tối ưu nhất cho bạn liền ạ!`,
+            products: [],
+            suggestions: catCfg.suggestions,
+            context: {
+                ...cleanContext,
+                stage: 'clarify_needs',
+                currentIntent: 'selected_category_consultation'
+            },
+            meta: { provider: 'toolbar_category_consult_engine', isFallback: false, model: 'none' }
+        };
+    }
+
+    return {
+        reply: `Dạ em chào bạn! Em sẵn sàng giúp bạn chọn mẫu sản phẩm phù hợp nhất tại TechEcommerce ạ! 😊\n\n` +
+            `Để em tư vấn chính xác nhất, bạn cho em biết nhanh:\n` +
+            `1. 🗂️ **Bạn đang tìm nhóm sản phẩm nào?** (Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh, Phụ kiện hay Máy chơi game)\n` +
+            `2. 💰 **Ngân sách dự kiến** khoảng bao nhiêu và phục vụ **nhu cầu chính** gì?\n\n` +
+            `👉 Bạn có thể chọn nhanh một danh mục ở thanh phía trên hoặc bấm gợi ý bên dưới để em tư vấn ngay nhé!`,
+        products: [],
+        suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Tư vấn Tai nghe', 'Tư vấn Đồng hồ & Tablet'],
+        context: {
+            ...cleanContext,
+            category: '',
+            selectedCategory: '',
+            pageCategory: '',
+            stage: 'awaiting_category_choice',
+            currentIntent: 'general_consultation_intake'
+        },
+        meta: { provider: 'toolbar_category_consult_engine', isFallback: false, model: 'none' }
+    };
+}
+
 /**
  * 3. Khách hỏi nhu cầu chung nhưng thiếu thông tin (Clarify Needs)
  */
@@ -2786,12 +2915,12 @@ async function handleClarifyNeeds(category, existingSlots = {}, userProficiency 
         }
 
         case 'Phụ kiện': {
-            question = `Dạ chào bạn! Bạn đang cần tìm **phụ kiện công nghệ** nào cho thiết bị của bạn ạ (chuột máy tính, bàn phím cơ, củ sạc nhanh GaN, pin sạc dự phòng hay hub chuyển đổi đa năng)? Bạn nhắn em tên thiết bị bạn đang dùng để em chọn loại tương thích tốt nhất nhé! 😊`;
+            question = `Dạ chào bạn! Bạn đang cần tìm **phụ kiện công nghệ** nào cho thiết bị của bạn (chuột máy tính, bàn phím cơ, củ sạc nhanh GaN, pin sạc dự phòng hay hub chuyển đổi đa năng) và dự kiến **ngân sách khoảng bao nhiêu** (dưới 500k, 500k - 1.5tr hay trên 1.5tr) để em chọn mẫu tương thích tốt nhất cho bạn ạ? 😊`;
             suggestions = [
-                'Chuột công thái học Logitech',
+                'Chuột không dây dưới 1 triệu',
                 'Bàn phím cơ gõ êm',
                 'Củ sạc nhanh GaN Anker',
-                'Pin sạc dự phòng dung lượng cao'
+                'Pin sạc dự phòng dưới 1 triệu'
             ];
             break;
         }
@@ -4626,6 +4755,16 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         return await handleOldDeviceDiagnosis(message, prev);
     }
 
+    // 1a. Khách bấm "Tư vấn chọn máy" (hoặc hỏi chọn máy chung) khi đang chọn danh mục ở thanh công cụ
+    const explicitToolbarCat = (typeof prev.selectedCategory === 'string')
+        ? prev.selectedCategory
+        : (prev.pageCategory || '');
+    const isPickDeviceMsg = isGenericPickDeviceTrigger(message);
+    const selectedConsultCat = messageCategory || explicitToolbarCat || (isPickDeviceMsg ? '' : (prev.category || ''));
+    if (isPickDeviceMsg) {
+        return buildToolbarCategoryConsultationResponse(selectedConsultCat, prev);
+    }
+
     // 1b. Kiểm tra tri thức chính sách cửa hàng, xử lý từ chối, mẹo công nghệ & đối đáp đời thường
     // Chỉ áp dụng smartAnswer khi câu hỏi KHÔNG hỏi tìm/tư vấn sản phẩm theo ngân sách hoặc danh mục cụ thể
     const hasExplicitBudget = Boolean(extractBudget(message)) || Boolean(extractBudgetInfo(message)?.amount);
@@ -5084,22 +5223,50 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
     const norm = normalizeText(message);
     const cleanMsg = String(message || '').trim();
 
-    // 1. Phép tính toán học (ví dụ: "1+1", "1 + 1 bằng mấy", "10 * 5", "100 chia 2", "5x5")
-    const mathMatch = cleanMsg.match(/(\d+(?:\.\d+)?)\s*([\+\-\*\/xX×÷]|cong|tru|nhan|chia)\s*(\d+(?:\.\d+)?)/i);
+    // 1. Phép tính toán học (hỗ trợ cả 1 phép tính lẫn nhiều phép tính ưu tiên nhân/chia: "1+1", "1 + 1 chia 2 bằng mấy")
     let deterministicMathReply = null;
-    if (mathMatch) {
-        const num1 = parseFloat(mathMatch[1]);
-        const opRaw = mathMatch[2].toLowerCase();
-        const num2 = parseFloat(mathMatch[3]);
-        let calcResult = null;
-        if (opRaw === '+' || opRaw === 'cong') calcResult = num1 + num2;
-        else if (opRaw === '-' || opRaw === 'tru') calcResult = num1 - num2;
-        else if (opRaw === '*' || opRaw === 'x' || opRaw === '×' || opRaw === 'nhan') calcResult = num1 * num2;
-        else if (opRaw === '/' || opRaw === '÷' || opRaw === 'chia') calcResult = num2 !== 0 ? (Math.round((num1 / num2) * 100) / 100) : 'vô cực';
+    const exprMatch = norm.match(/\d+(?:\.\d+)?(?:\s*(?:\+|\-|\*|\/|x|cong|tru|nhan|chia)\s*\d+(?:\.\d+)?)+/i);
+    if (exprMatch) {
+        const exprTokens = exprMatch[0]
+            .replace(/\bcong\b/gi, '+')
+            .replace(/\btru\b/gi, '-')
+            .replace(/\b(?:nhan|x)\b/gi, '*')
+            .replace(/\bchia\b/gi, '/')
+            .match(/\d+(?:\.\d+)?|[+\-*/]/g);
 
-        if (calcResult !== null) {
-            const opSymbol = (opRaw === 'cong' || opRaw === '+') ? '+' : (opRaw === 'tru' || opRaw === '-') ? '-' : (opRaw === 'nhan' || opRaw === '*' || opRaw === 'x' || opRaw === '×') ? 'x' : '÷';
-            deterministicMathReply = `Dạ kết quả ${num1} ${opSymbol} ${num2} = **${calcResult}** nè bạn ơi! 😄\n\nBạn đang kiểm tra độ thông minh của AI bên em đúng không nè? Nếu bạn đang tính toán ngân sách sắm thiết bị công nghệ hay cần săn combo giảm giá hời thì cứ nhắn em hỗ trợ nhé!`;
+        if (exprTokens && exprTokens.length >= 3) {
+            const values = [];
+            const ops = [];
+            let divZero = false;
+            const applyTopOp = () => {
+                const op = ops.pop();
+                const b = values.pop();
+                const a = values.pop();
+                if (op === '+') values.push(a + b);
+                else if (op === '-') values.push(a - b);
+                else if (op === '*') values.push(a * b);
+                else if (op === '/') {
+                    if (b === 0) divZero = true;
+                    values.push(b !== 0 ? a / b : 0);
+                }
+            };
+            const prec = { '+': 1, '-': 1, '*': 2, '/': 2 };
+            for (const tk of exprTokens) {
+                if (/^\d/.test(tk)) {
+                    values.push(parseFloat(tk));
+                } else {
+                    while (ops.length && prec[ops[ops.length - 1]] >= prec[tk]) {
+                        applyTopOp();
+                    }
+                    ops.push(tk);
+                }
+            }
+            while (ops.length) applyTopOp();
+            if (values.length === 1 && Number.isFinite(values[0])) {
+                const resultStr = divZero ? 'vô cực (không thể chia cho 0)' : (Math.round(values[0] * 1000) / 1000);
+                const prettyExpr = exprTokens.map(t => (t === '*' ? '×' : t === '/' ? '÷' : t)).join(' ');
+                deterministicMathReply = `Dạ theo đúng quy tắc nhân/chia trước, cộng/trừ sau thì **${prettyExpr} = ${resultStr}** nè bạn ơi! 😄\n\nNếu bạn đang tính toán ngân sách mua máy hoặc tính khoản trả góp 0% mỗi tháng thì cứ nhắn em hỗ trợ nhé!`;
+            }
         }
     }
 

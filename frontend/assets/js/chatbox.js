@@ -84,7 +84,7 @@
         if (!document.querySelector('link[data-ai-chat-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/chatbox.css?v=20261116-ai-rag-v1`;
+            link.href = `${root}assets/css/chatbox.css?v=20261116-mobile-fix-v3`;
             link.dataset.aiChatStyle = 'true';
             document.head.appendChild(link);
         }
@@ -95,7 +95,7 @@
         if (!document.querySelector('link[data-tm-mascot-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/mascot.css?v=20261109-playful-cat-v1`;
+            link.href = `${root}assets/css/mascot.css?v=20261116-mobile-fix-v3`;
             link.dataset.tmMascotStyle = 'true';
             document.head.appendChild(link);
         }
@@ -487,7 +487,7 @@
         const bubble = document.createElement('section');
         bubble.className = 'ai-bubble';
         if (String(role).includes('ai-typing')) {
-            bubble.innerHTML = `<div class="u086-thinking-row"><span class="u086-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>${escapeHTML(text)}</span></div>`;
+            bubble.innerHTML = `<div class="u086-thinking-row"><span class="u086-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="u086-thinking-text">${escapeHTML(text)}</span></div>`;
         } else if (role === 'user' && meta?.droppedProduct) {
             const p = meta.droppedProduct;
             const thumbHtml = p.img ? `<img src="${escapeHTML(p.img)}" alt="${escapeHTML(p.name)}" class="ai-dropped-thumb">` : '';
@@ -1461,6 +1461,32 @@
         scrollToBottom(body);
     }
 
+    function getActiveStorefrontCategory() {
+        const fromGlobal = typeof window.getActiveStorefrontCategory === 'function'
+            ? window.getActiveStorefrontCategory()
+            : '';
+        const fromUrl = new URLSearchParams(window.location.search).get('category') || '';
+        const activeBtn = document.querySelector('#storefrontCategories [data-header-category].active, .header-categories [data-header-category].active');
+        const fromDom = activeBtn ? (activeBtn.getAttribute('data-header-category') || '') : '';
+        const raw = String(fromUrl || fromGlobal || fromDom || '').trim();
+        if (!raw || raw.toLowerCase() === 'all' || raw.toLowerCase() === 'tất cả sản phẩm') {
+            return '';
+        }
+        return raw;
+    }
+
+    function clearCategoryScopedConsultationSlots(target) {
+        if (!target || typeof target !== 'object') return target;
+        const fields = [
+            'brand', 'budget', 'budgetType', 'budgetMin', 'budgetMax',
+            'useCase', 'major', 'preference', 'productType', 'lastProducts',
+            'topProduct', 'stage', 'currentIntent', 'lastQuestionKey',
+            'askedSlots', 'repeatCount', 'pendingBrandSuggestion', 'eliminatedBrands'
+        ];
+        fields.forEach(key => { delete target[key]; });
+        return target;
+    }
+
     async function askAssistant(message, context) {
         const token = localStorage.getItem('token');
         const headers = { 'Content-Type': 'application/json' };
@@ -1470,10 +1496,19 @@
         hydrateLongTermMemorySnapshot();
 
         const urlParams = new URLSearchParams(window.location.search);
-        const pageCategory = urlParams.get('category') || '';
+        const resolvedCategory = getActiveStorefrontCategory();
+        const isPickDeviceTrigger = /^(?:✨\s*)?(?:tư vấn chọn máy|tư vấn chọn sản phẩm|tư vấn giúp (?:tôi|mình)|tư vấn cho tôi|chưa biết (?:mua|chọn) máy nào|nhờ shop tư vấn)$/i.test(String(message || '').trim());
+        const pageCategory = resolvedCategory;
         const pageProductId = window.location.pathname.includes('product.html') ? (urlParams.get('id') || '') : '';
         const requestContext = { ...(context || {}), ...(pageProductId ? { pageProductId } : {}) };
-        if (pageCategory) {
+
+        if (isPickDeviceTrigger) {
+            clearCategoryScopedConsultationSlots(requestContext);
+            requestContext.selectedCategory = pageCategory;
+            requestContext.pageCategory = pageCategory;
+            requestContext.category = pageCategory;
+            requestContext.consultationTrigger = 'toolbar_pick_device';
+        } else if (pageCategory) {
             const hasActiveConversationScope = Boolean(
                 requestContext.productType
                 || requestContext.stage === 'qualifying_needs'
@@ -1483,18 +1518,19 @@
                 || requestContext.currentIntent === 'clarify_needs'
             );
             if (!hasActiveConversationScope && requestContext.pageCategory && requestContext.pageCategory !== pageCategory) {
-                delete requestContext.brand;
-                delete requestContext.budget;
-                delete requestContext.budgetType;
-                delete requestContext.useCase;
-                delete requestContext.lastProducts;
-                delete requestContext.currentIntent;
-                delete requestContext.productType;
+                clearCategoryScopedConsultationSlots(requestContext);
             }
             if (!hasActiveConversationScope) {
                 requestContext.category = pageCategory;
             }
+            requestContext.selectedCategory = pageCategory;
             requestContext.pageCategory = pageCategory;
+        } else {
+            if (requestContext.selectedCategory && requestContext.category === requestContext.selectedCategory) {
+                requestContext.category = '';
+            }
+            requestContext.selectedCategory = '';
+            delete requestContext.pageCategory;
         }
 
         const response = await fetch(`${apiUrl}/chat`, {
@@ -1528,6 +1564,19 @@
         let recognitionSilenceTimer = null;
         consultationContext = {};
         hydrateLongTermMemorySnapshot();
+
+        window.addEventListener('storefront:category-changed', (event) => {
+            const rawCat = String(event?.detail?.category || '').trim();
+            const nextCat = (!rawCat || rawCat.toLowerCase() === 'all') ? '' : rawCat;
+            const prevToolbarCat = consultationContext.selectedCategory || consultationContext.pageCategory || '';
+            if (nextCat !== prevToolbarCat) {
+                clearCategoryScopedConsultationSlots(consultationContext);
+                consultationContext.category = nextCat;
+            }
+            consultationContext.selectedCategory = nextCat;
+            consultationContext.pageCategory = nextCat;
+            saveSession();
+        });
         let chatHistory = [];
         let voiceEnabled = localStorage.getItem('chatVoiceEnabled') === 'true';
         let reengagementTimer = null;
@@ -2074,6 +2123,10 @@
             if (data.notFound) {
                 return;
             }
+            const skipNavIntents = ['selected_category_consultation', 'general_consultation_intake', 'clarify_needs'];
+            if (skipNavIntents.includes(data.context?.currentIntent)) {
+                return;
+            }
 
             const currentUrl = new URL(window.location.href);
             const currentProductId = currentUrl.searchParams.get('id');
@@ -2505,13 +2558,22 @@
                         delete consultationContext.pendingBrandSuggestion;
                     }
                     consultationContext = { ...consultationContext, ...data.context };
+                    delete consultationContext.consultationTrigger;
                     persistLongTermMemorySnapshot(consultationContext);
                     if (!data.context.brand) {
                         consultationContext.brand = '';
                     }
-                    if (data.context.currentIntent === 'qualifying_needs' && (!data.products || data.products.length === 0)) {
+                    if ((data.context.currentIntent === 'qualifying_needs' || data.context.currentIntent === 'selected_category_consultation' || data.context.currentIntent === 'general_consultation_intake') && (!data.products || data.products.length === 0)) {
                         consultationContext.lastProducts = [];
                         delete consultationContext.topProduct;
+                    }
+                    if (data.context.currentIntent === 'selected_category_consultation' || data.context.currentIntent === 'general_consultation_intake') {
+                        clearCategoryScopedConsultationSlots(consultationContext);
+                        consultationContext.category = data.context.category || '';
+                        consultationContext.selectedCategory = data.context.selectedCategory || '';
+                        consultationContext.pageCategory = data.context.pageCategory || '';
+                        consultationContext.currentIntent = data.context.currentIntent;
+                        consultationContext.stage = data.context.stage || '';
                     }
                 }
                 if (Array.isArray(data.products) && data.products.length > 0) {

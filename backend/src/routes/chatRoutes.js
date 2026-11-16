@@ -686,28 +686,129 @@ async function answerComparison(message, context = {}) {
     };
 }
 
+function detectInstallmentCategory(normText = '') {
+    if (/\b(dien thoai|smartphone|iphone|galaxy s|oppo|xiaomi|redmi|poco|honor)\b/i.test(normText)) return 'Điện thoại';
+    if (/\b(laptop|macbook|may tinh xach tay|asus|dell|lenovo|msi|hp|acer|surface laptop)\b/i.test(normText)) return 'Laptop';
+    if (/\b(tablet|ipad|may tinh bang|matepad|tab)\b/i.test(normText)) return 'Tablet';
+    if (/\b(tai nghe|airpods|sony wh|marshall|jbl|earbuds)\b/i.test(normText)) return 'Tai nghe';
+    if (/\b(dong ho|smartwatch|apple watch|garmin|galaxy watch|band)\b/i.test(normText)) return 'Đồng hồ thông minh';
+    if (/\b(may choi game|ps5|playstation|nintendo|switch|rog ally|claw|legion go)\b/i.test(normText)) return 'Máy chơi game';
+    if (/\b(phu kien|ban phim|chuot|sac du phong|hub|gimbal)\b/i.test(normText)) return 'Phụ kiện';
+    return '';
+}
+
 /**
- * Xử lý tính toán trả góp 0%
+ * Xử lý tính toán trả góp 0% và tư vấn sản phẩm phù hợp theo số tiền trả trước / góp mỗi tháng
  */
-async function answerInstallmentQuestion(message, previousProducts = []) {
+async function answerInstallmentQuestion(message, previousProducts = [], context = {}) {
     const text = normalizeText(message);
     if (/\b(chua du 18|17 tuoi|16 tuoi|chua du tuoi|hoc sinh cap 3|chua co cccd|khong co chung minh|khong di lam)\b/i.test(text)) {
         const smartUnder18 = matchSmartAnswer(message);
         if (smartUnder18) return smartUnder18;
     }
+
+    const budgetAmt = extractBudget(message) || 0;
+    const explicitCat = detectInstallmentCategory(text);
+    const isDiscoveryIntent = Boolean(
+        budgetAmt > 0 ||
+        explicitCat ||
+        /\b(mua duoc|gop duoc|mau nao|con nao|may nao|dong nao|loai nao|goi y|tu van)\b/i.test(text)
+    );
+
     let product = null;
 
-    if (Array.isArray(previousProducts) && previousProducts.length > 0) {
+    // Chỉ dùng lại previousProducts nếu người dùng KHÔNG hỏi tìm theo ngân sách/danh mục mới
+    if (!isDiscoveryIntent && Array.isArray(previousProducts) && previousProducts.length > 0) {
         product = previousProducts[0];
-    } else {
+    } else if (!budgetAmt) {
         let words = text.replace(/tinh\s*tra\s*gop|tra\s*gop|tinh\s*gop|lai\s*suat|moi\s*thang|bao\s*nhieu|thu\s*tuc|co\s*khong|the\s*nao|huong\s*dan|dieu\s*kien|giay\s*to/g, ' ').trim();
-        words = words.replace(/^(?:tinh|cho|mua|xem|hoi|gia)\s+/i, '').trim();
-        if (words && words.length >= 2) {
+        words = words.replace(/^(?:tinh|cho|mua|xem|hoi|gia|mua duoc|mau|san pham)\s+/i, '').trim();
+        // Tránh match nhầm tên danh mục chung thành 1 sản phẩm ngẫu nhiên khi khách hỏi "trả góp laptop/điện thoại"
+        const isGenericCatWord = !words || ['dien thoai', 'laptop', 'tablet', 'may tinh bang', 'tai nghe', 'dong ho', 'may choi game', 'phu kien'].includes(words);
+        if (words && words.length >= 2 && !isGenericCatWord) {
             const pattern = words.split(/\s+/).filter(Boolean).map(escapeRegex).join('.*');
             product = await Product.findOne({
                 active: { $ne: false },
+                stock: { $gt: 0 },
                 name: { $regex: pattern, $options: 'i' }
             });
+        }
+    }
+
+    // Nhánh 1: Khách hỏi "tôi có X triệu mua trả góp được mẫu điện thoại/laptop nào?" hoặc "trả góp <danh mục>"
+    if (!product && (budgetAmt > 0 || explicitCat)) {
+        const targetCategory = explicitCat || context?.category || 'Điện thoại';
+        const catProducts = await Product.find({
+            category: targetCategory,
+            active: { $ne: false },
+            stock: { $gt: 0 }
+        }).sort({ price: 1, featured: -1, rating: -1 }).lean();
+
+        if (catProducts.length > 0) {
+            const maxReachCccd10Pct = budgetAmt > 0 ? budgetAmt * 10 : 0; // Trả trước tối thiểu 10% qua CCCD
+            const maxReachCard12M = budgetAmt > 0 ? budgetAmt * 12 : 0;   // Góp 0% qua thẻ 12 tháng (~budgetAmt/tháng)
+            const maxReach = Math.max(maxReachCccd10Pct, maxReachCard12M);
+
+            let picked = [];
+            let reachesDirectly = true;
+            if (budgetAmt > 0) {
+                picked = catProducts.filter(p => p.price <= maxReach).slice(0, 4);
+                if (picked.length === 0) {
+                    reachesDirectly = false;
+                    picked = catProducts.slice(0, 3);
+                }
+            } else {
+                picked = catProducts.slice(0, 4);
+            }
+
+            const lowestPrice = picked[0]?.price || 0;
+            const minDown10 = Math.round(lowestPrice * 0.1);
+            const card12Low = Math.round(lowestPrice / 12);
+
+            const intro = budgetAmt > 0
+                ? (reachesDirectly
+                    ? `Dạ với **${money(budgetAmt)}** hiện có, bạn **hoàn toàn có thể mua trả góp** các mẫu **${targetCategory}** chính hãng sau đây theo **2 phương án cực kỳ nhẹ ví**:\n` +
+                      `• 🪪 **Qua CCCD (từ 18 tuổi, không cần thẻ tín dụng):** Trả trước chỉ từ **10%–30%** giá máy -> Với **${money(budgetAmt)}** đủ làm khoản trả trước cho máy tầm giá tới **${money(maxReachCccd10Pct)}**.\n` +
+                      `• 💳 **Qua Thẻ tín dụng 0% lãi suất:** Trả trước **0 đ**, chia góp 12 tháng mỗi tháng chỉ ~**${money(budgetAmt)}** cho máy tới **${money(maxReachCard12M)}**.\n`
+                    : `Dạ trong danh mục **${targetCategory}**, mẫu chính hãng có giá tốt nhất hiện từ **${money(lowestPrice)}** (${picked[0].name}):\n` +
+                      `• 🪪 **Qua CCCD (trả trước tối thiểu 10%):** Cần trả trước từ **${money(minDown10)}** (bạn có ${money(budgetAmt)}, thêm khoảng ${money(Math.max(0, minDown10 - budgetAmt))} là nhận máy ngay).\n` +
+                      `• 💳 **Qua Thẻ tín dụng 0% lãi suất:** Trả trước **0 đ**, góp 12 tháng chỉ **~${money(card12Low)}/tháng** -> bạn dùng **${money(budgetAmt)}** vẫn sở hữu được ngay ạ!\n`)
+                : `Dạ cửa hàng hỗ trợ **trả góp 0% qua thẻ tín dụng (trả trước 0đ)** và **trả góp qua CCCD (trả trước 10%–30%, duyệt 15 phút)** cho toàn bộ danh mục **${targetCategory}**. Dưới đây là các mẫu dễ góp hàng tháng nhất:\n`;
+
+            const itemsText = picked.map((p, idx) => {
+                const down10 = Math.round(p.price * 0.1);
+                const actualDown = budgetAmt > 0
+                    ? Math.min(p.price, Math.max(budgetAmt >= down10 ? budgetAmt : down10, down10))
+                    : Math.round(p.price * 0.2);
+                const cccdMonthly12 = Math.round(Math.max(0, p.price - actualDown) / 12);
+                const cardMonthly12 = Math.round(p.price / 12);
+                const downPct = Math.round((actualDown / p.price) * 100);
+
+                return `${idx + 1}. 🌟 **${p.name}** — Giá: **${money(p.price)}**\n` +
+                    `   • 🪪 **Góp CCCD:** Trả trước **${money(actualDown)}** (~${downPct}%), còn lại góp 12 tháng chỉ **~${money(cccdMonthly12)}/tháng**.\n` +
+                    `   • 💳 **Thẻ tín dụng 0%:** Trả trước **0 đ**, góp 12 tháng chỉ **~${money(cardMonthly12)}/tháng** (0% lãi suất).`;
+            }).join('\n\n');
+
+            const reply = `${intro}\n${itemsText}\n\n👉 Bạn ưng mẫu nào để em tính chi tiết kỳ hạn **3 – 6 – 9 – 12 tháng** hoặc hướng dẫn hồ sơ duyệt online 15 phút nhé! 😊`;
+
+            return {
+                reply,
+                products: picked,
+                suggestions: [
+                    picked[0] ? `Tính trả góp ${picked[0].name}` : null,
+                    picked.length >= 2 ? 'So sánh 2 máy vừa rồi' : null,
+                    'Hồ sơ trả góp CCCD gồm gì?',
+                    'Mã giảm giá hôm nay'
+                ].filter(Boolean),
+                context: {
+                    ...(context || {}),
+                    category: targetCategory,
+                    budget: budgetAmt || context?.budget || 0,
+                    lastProducts: picked,
+                    currentIntent: 'installment_budget_discovery',
+                    stage: 'installment_recommendation'
+                }
+            };
         }
     }
 
@@ -721,12 +822,12 @@ async function answerInstallmentQuestion(message, previousProducts = []) {
             `2. 💳 **Trả góp 0% lãi suất qua Thẻ tín dụng (Credit Card):**\n` +
             `   • **Ngân hàng hỗ trợ:** Hơn 25 ngân hàng liên kết (Techcombank, Vietcombank, VPBank, Sacombank, HSBC, TPBank, MB Bank...).\n` +
             `   • **Ưu điểm:** **0% lãi suất**, không cần chứng minh thu nhập hay duyệt hồ sơ, trả trước 0 đồng, kỳ hạn 3 - 6 - 9 - 12 tháng.\n\n` +
-            `👉 Bạn đang quan tâm mẫu máy nào (ví dụ: *iPhone 15*, *Laptop ASUS TUF*, *MacBook Air*...) để em tính bảng trả góp và số tiền thanh toán hàng tháng chi tiết cho bạn nhé! 😊`;
+            `👉 Bạn đang quan tâm mẫu máy nào (ví dụ: *iPhone 15*, *Laptop ASUS TUF*, *MacBook Air*...) hoặc có sẵn khoảng bao nhiêu tiền trả trước để em gợi ý máy và tính bảng góp chi tiết nhé! 😊`;
 
         return {
             reply,
             products: [],
-            suggestions: ['Trả góp iPhone', 'Trả góp Laptop', 'Chính sách bảo hành', 'Săn mã giảm giá']
+            suggestions: ['Có 1tr mua trả góp điện thoại nào', 'Có 1tr mua trả góp laptop nào', 'Hồ sơ trả góp CCCD gồm gì?', 'Săn mã giảm giá']
         };
     }
 
@@ -2477,7 +2578,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => hasWordOrPhrase(text, k))) {
             response = await answerVoucherQuestion();
         } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => hasWordOrPhrase(text, k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => hasWordOrPhrase(text, k))) {
-            response = await answerInstallmentQuestion(message, hydratedContext?.lastProducts);
+            response = await answerInstallmentQuestion(message, hydratedContext?.lastProducts, hydratedContext);
         } else if (
             ['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi', 'don cua em', 'kiem tra don', 'tra cuu don', 'kiem tra hang da den dau', 'khi nao giao'].some(k => hasWordOrPhrase(text, k)) ||
             /(?:tra cuu|kiem tra|check|trang thai|tinh trang)?\s*(?:don|order|ma don|van don)\s*#?\d{1,8}\b/i.test(text) ||
