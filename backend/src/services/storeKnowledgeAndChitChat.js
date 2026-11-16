@@ -116,7 +116,7 @@ const STORE_POLICY_RULES = [
     // 1.4 Gói Bảo Hành Vàng (Rơi vỡ, Vào nước)
     {
         id: 'golden_warranty',
-        excludeIf: (norm) => /\b(co nen mua|co dang tien|ton kem|chi phi sua|chi tra 90|chi tra 100)\b/i.test(norm),
+        excludeIf: (norm) => /\b(co nen mua|co dang tien|ton kem|chi phi sua|chi tra 90|chi tra 100|applecare|apple care|so sanh)\b/i.test(norm),
         patterns: [
             /(bao hanh|chinh sach bao hanh).*(roi vo|vao nuoc|be man hinh|roi rot)/i,
             /bao hanh vang/i
@@ -169,7 +169,7 @@ const STORE_POLICY_RULES = [
     // 1.7 Ưu đãi Học sinh - Sinh viên (Back to school)
     {
         id: 'student_discount',
-        excludeIf: (norm) => /\b(kinh te|marketing|cntt|lap trinh|nganh it|it|phan mem|do hoa|macbook hay windows|mac hay win|nen mua laptop nao|nen mua macbook|tra gop|18 tuoi|bang luong|kredivo|home credit|chung minh thu nhap)\b/i.test(norm),
+        excludeIf: (norm) => /\b(kinh te|marketing|cntt|lap trinh|nganh it|it|phan mem|do hoa|macbook hay windows|mac hay win|nen mua laptop nao|nen mua macbook|tra gop|18 tuoi|bang luong|kredivo|home credit|chung minh thu nhap|sinh vien y|nganh y|y khoa|bac si|duoc si|di lam sang)\b/i.test(norm),
         keywords: [
             'sinh vien', 'hoc sinh sinh vien', 'uu dai sinh vien', 'giam gia sinh vien',
             'sinh vien co duoc giam khong', 'back to school', 'the sinh vien'
@@ -579,6 +579,67 @@ const OBJECTION_RULES = [
             `3. 🔄 **Chính sách Thu Cũ Đổi Mới bảo chứng:** Sau này khi thế hệ mới ra mắt chính thức, TechEcommerce luôn có chương trình **Trade-in trợ giá lên đời đến 4.000.000 đ**, bù tiền cực kỳ ít mà vẫn được máy mới nhất.\n\n` +
             `👉 Bạn đang cần máy phục vụ công việc chính nào hiện nay để em tư vấn phiên bản tối ưu chi phí nhất cho bạn nhé! 😊`,
         suggestions: ['Xem máy Flagship giá tốt', 'Thu cũ đổi mới trợ giá', 'Tư vấn trả góp 0%']
+    },
+
+    // 2.9 Khách ngại mua đồ công nghệ giá trị cao (20-40 triệu) qua mạng sợ tráo hàng / va đập
+    {
+        id: 'objection_fear_buying_online_high_value',
+        patterns: [
+            /(so|lo|ngai|khong dam).*(mua online|mua qua mang|dat online|ship xa|trao hang|be vo|va dap|hang gia)/i,
+            /(may dat tien|hang gia tri cao|20 trieu|30 trieu).*(mua online|ship|co an toan khong)/i
+        ],
+        keywords: [
+            'so mua online', 'ngai mua online', 'mua online co an toan khong',
+            'so ship bi vo', 'so bi trao hang', 'mua may dat tien online co sao khong',
+            'dat hang online co uy tin khong'
+        ],
+        reply: `Dạ em hoàn toàn thấu hiểu tâm lý của bạn! Bỏ ra số tiền hàng chục triệu đồng để mua điện thoại hay laptop qua mạng thì việc cẩn trọng là hoàn toàn chính đáng ạ! 🤝🛡️\n\n` +
+            `Tại cửa hàng bên em, mọi đơn hàng công nghệ giá trị cao đều áp dụng **QUY TRÌNH BẢO VỆ 4 LỚP ĐỘC QUYỀN**:\n` +
+            `1. 🎥 **Quay video đóng gói kèm số IMEI/Serial:** Trước khi xuất kho, kỹ thuật viên quay video cận cảnh hộp máy nguyên seal kèm số Serial gửi trực tiếp cho bạn đối chiếu.\n` +
+            `2. 📦 **Niêm phong tem vỡ chống tráo + Bọc chống sốc 5 lớp:** Hộp hàng được dán tem niêm phong bảo mật có chữ ký trưởng kho.\n` +
+            `3. 🔍 **Đồng kiểm 100% trước khi thanh toán:** Shipper giao tới, bạn được tự tay rạch kiện hàng, đối chiếu đúng số IMEI/Serial trong video, bật nguồn kiểm tra màn hình hoàn hảo mới thanh toán.\n` +
+            `4. 🛡️ **Bảo hiểm hàng hóa 100%:** Mọi rủi ro va đập trong quá trình vận chuyển đều do cửa hàng chịu trách nhiệm 100%, đổi máy mới ngay lập tức mà bạn không mất 1 đồng phí nào!\n\n` +
+            `👉 Bạn hoàn toàn có thể chọn hình thức **Nhận hàng kiểm tra rồi mới thanh toán (COD)** để yên tâm tuyệt đối nhé! 😊`,
+        suggestions: ['Chính sách đồng kiểm 100%', 'Chính sách 1 đổi 1 trong 30 ngày', 'Đặt giữ máy tại Showroom', 'Hotline 0842.331.606']
+    },
+
+    // 2.10 Khách phân vân đợi dịp lễ / Tết / Black Friday / 11.11 / 12.12 mua cho rẻ
+    {
+        id: 'objection_wait_black_friday_tet_sale',
+        patterns: [
+            /(doi|cho).*(black friday|dip le|tet|11\.11|12\.12|sale lon|cuoi nam).*(mua|giam gia|re hon)/i,
+            /(black friday|tet|cuoi nam|dip le).*(co giam sau khong|co sale manh khong)/i
+        ],
+        keywords: [
+            'doi black friday mua', 'doi tet mua cho re', 'cho sale 11.11', 'cho sale 12.12',
+            'cuoi nam co giam gia manh khong', 'doi dip le mua', 'sap toi co dot sale nao khong'
+        ],
+        reply: `Dạ câu hỏi rất hay của một 'thợ săn deal' chính hiệu luôn nè! 🛍️🔥 Em xin bật mí thực tế về giá bán tại hệ thống để bạn không phải chờ đợi mất thời gian nha:\n\n` +
+            `• 💰 **Giá hôm nay đã áp mức Flash Sale kịch sàn:** Thay vì dồn khuyến mãi vào 1 ngày lễ khiến quá tải kho và cháy màu hot, cửa hàng bên em đang trợ giá trực tiếp từ **1.500.000đ – 4.000.000đ** ngay trong tuần này.\n` +
+            `• 🎟️ **Đặc quyền tặng mã sớm thông qua Trợ lý AI:** Em có thể kích hoạt ngay mã **\`DEALHOT500\` (Giảm 500.000đ)** hoặc **\`TECHVIP\` (Giảm 200.000đ)** tương đương mức giảm sâu nhất dịp lễ.\n` +
+            `• 🛡️ **CAM KẾT BẢO VỆ GIÁ 15 NGÀY:** Nếu bạn mua máy hôm nay mà trong vòng 15 ngày tới cửa hàng có đợt sale lễ giảm rẻ hơn, bên em **hoàn lại 100% phần tiền chênh lệch** hoặc tặng phiếu mua hàng tương ứng cho bạn luôn ạ!\n\n` +
+            `👉 Mua sớm vừa có đủ màu đẹp nguyên seal chọn lựa, vừa có máy dùng ngay không lo tắc biên giao hàng dịp lễ. Bạn đang nhắm mẫu máy nào để em áp sẵn mã ưu đãi lễ cho bạn ngay hôm nay nhé! 😊`,
+        suggestions: ['Kích hoạt mã giảm giá ngay', 'Xem sản phẩm đang Flash Sale', 'Tư vấn Trả góp 0%', 'Hotline 0842.331.606']
+    },
+
+    // 2.11 Khách ngại đổi máy mới vì sợ mất dữ liệu Zalo, VNeID, sinh trắc học ngân hàng
+    {
+        id: 'objection_afraid_complex_data_transfer',
+        patterns: [
+            /(ngai doi may|luoi doi may|so doi may).*(mat zalo|mat du lieu|ngan hang|sinh trac hoc|vneid)/i,
+            /(doi may moi).*(sinh trac hoc|app ngan hang|vneid|tin nhan zalo).*(co phuc tap khong|sao chep)/i
+        ],
+        keywords: [
+            'ngai doi may vi so mat zalo', 'doi may moi co phai cai lai sinh trac hoc ngan hang khong',
+            'chuyen app ngan hang sang may moi', 'luoi doi may vi nhieu du lieu', 'chuyen vneid sang may moi'
+        ],
+        reply: `Dạ em hiểu cực kỳ rõ nỗi lòng này luôn ạ! Rất nhiều anh/chị khách hàng muốn lên đời máy mới lắm rồi nhưng cứ ngại khâu đăng nhập lại Zalo công việc, app Ngân hàng và VNeID! 📱🔄✨\n\n` +
+            `Bạn hoàn toàn quẳng gánh lo đi nha, vì kỹ thuật viên cửa hàng sẽ **phục vụ tận răng từ A – Z chỉ trong 15 phút**:\n` +
+            `• 💬 **Sao lưu 100% tin nhắn & hình ảnh Zalo:** Giữ nguyên toàn bộ lịch sử trò chuyện công việc, file hợp đồng từ nhiều năm trước sang máy mới không mất 1 dòng nào.\n` +
+            `• 🏦 **Chuyển đổi App Ngân hàng & Sinh trắc học:** Hỗ trợ đăng nhập, quét NFC CCCD gắn chip để xác thực sinh trắc học khuôn mặt trên máy mới mượt mà trong 2 phút.\n` +
+            `• 🪪 **Kích hoạt VNeID mức độ 2 & Danh bạ, iCloud/Google Photos:** Đồng bộ sang máy mới nguyên vẹn như chưa từng đổi máy.\n\n` +
+            `👉 Dù bạn ghé Showroom hay nhận hàng tại nhà (hỗ trợ Video Call 1-1), bên em đều đồng hành cài đặt xong xuôi 100% bạn mới yên tâm sử dụng nhé! 😊`,
+        suggestions: ['Tư vấn Thu cũ đổi mới', 'Xem iPhone chính hãng', 'Xem Samsung Galaxy mới', 'Hotline 0842.331.606']
     }
 ];
 
@@ -789,6 +850,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.5 Học Lập trình CNTT, Kỹ thuật phần mềm, Data Science
     {
         id: 'software_coding_developer',
+        excludeIf: (norm) => /\b(ke toan|kiem toan|excel|misa|htkk|numpad)\b/i.test(norm),
         patterns: [
             /(hoc|lam|code).*(cntt|cong nghe thong tin|lap trinh|developer|phan mem|docker|android studio)/i,
             /(laptop|may tinh|macbook).*(cho lap trinh|hoc cntt|hoc code)/i
@@ -1102,6 +1164,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.19 Tư vấn mua quà tặng công nghệ theo dịp & đối tượng (Tặng sếp, người yêu/vợ, bố mẹ, con cái)
     {
         id: 'advice_gifting_persona_selection',
+        excludeIf: (norm) => /\b(cap doi|couple|do doi|hai vo chong)\b/i.test(norm),
         patterns: [
             /(mua qua|tang qua|chon qua).*(cho sep|cho ban gai|cho vo|cho chong|cho bo me|cho con|sinh nhat|tot nghiep|8\/3|20\/10|tet)/i,
             /(tu van qua tang|qua sinh nhat|qua tang cong nghe)/i
@@ -1206,7 +1269,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.15 Tư vấn máy quay TikTok, làm Reels, Livestream bán hàng, YouTuber / Sống ảo nịnh da
     {
         id: 'persona_tiktok_livestream_vlog',
-        excludeIf: (norm) => /\b(4 tieng|5 tieng|6 tieng|lien tuc|toi man hinh|so lanh|qua nhiet|mic thu am|micro|dji mic|rode|boya|cai ao)\b/i.test(norm),
+        excludeIf: (norm) => /\b(4 tieng|5 tieng|6 tieng|lien tuc|toi man hinh|so lanh|qua nhiet|mic thu am|micro|dji mic|rode|boya|cai ao|obs|stream game|livestream game|vua choi game|fps|streamer)\b/i.test(norm),
         patterns: [
             /(quay tiktok|lam tiktok|livestream|live stream|quay video|vlog|vlogger|lam youtube)/i,
             /(chup hinh dep|song ao|ninh da|chup anh mau dep|chup chan dung)/i
@@ -1403,6 +1466,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.23 Tư vấn máy chơi game mượt, FPS cao, ping thấp (Liên Quân, Tốc Chiến, Free Fire, PUBG, Genshin)
     {
         id: 'advice_gaming_refresh_rate_ping',
+        excludeIf: (norm) => /\b(ban ron|di lam|gia dinh|vo con|ps5|switch|steam deck|cam tay|obs|livestream|streamer)\b/i.test(norm),
         patterns: [
             /(choi lien quan|choi toc chien|choi free fire|choi pubg|choi genshin)/i,
             /(may choi game|fps cao|ping thap|khong lag|khong rot fps|combat khong giat|tut fps|drop fps)/i,
@@ -2541,6 +2605,7 @@ const HARDWARE_AND_SOFTWARE_RULES = [
     // 3.79 Máy tính bảng cho con học tập & Hướng dẫn cài đặt khóa app, giới hạn giờ chơi (Parental Control / Family Link)
     {
         id: 'advice_kids_study_tablet_parental_control_family_link',
+        excludeIf: (norm) => /\b(nghien game|len choi game|so con choi game)\b/i.test(norm),
         patterns: [
             /(mua may|mua tablet|mua ipad|mua may tinh bang).*(cho con|cho be|hoc online|lop 1|lop 2|lop 3|lop 4|lop 5|tieu hoc)/i,
             /(khoa app|gioi han gio|quan ly|chan game|chan web).*(cho con|cua be|tre em|family link|screen time)/i,
@@ -3024,6 +3089,628 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `• Khi gập lại chỉ vuông vắn bằng một hộp phấn trang điểm, dễ dàng cầm gọn lỏn trong lòng bàn tay hoặc nhét vừa mọi chiếc túi áo nhỏ xinh của các bạn nữ!\n\n` +
             `👉 Bạn thích phong cách thanh lịch của iPhone hay thiết kế gập biến hình của Galaxy Z Flip để em tư vấn màu sắc hot nhất cho bạn nhé! 😊`,
         suggestions: ['Xem iPhone 16 nhỏ gọn', 'Xem Samsung Galaxy S24', 'Xem Galaxy Z Flip6 gập vỏ sò', 'Hotline 0842.331.606']
+    },
+
+    // 3.100 Tư vấn Laptop cho Kế toán / Kiểm toán / Tài chính Ngân hàng (Excel nặng, MISA, HTKK, cần phím số Numpad)
+    {
+        id: 'persona_accountant_excel_numpad',
+        category: 'Laptop',
+        patterns: [
+            /(ke toan|kiem toan|tai chinh|ngan hang|nhap lieu|excel nang|misa|htkk|hoa don dien tu).*(laptop|may tinh|mua may|chon may)/i,
+            /(laptop|may tinh).*(lam ke toan|chay excel|co ban phim so|numpad|nhap so lieu)/i
+        ],
+        keywords: [
+            'laptop cho ke toan', 'mua laptop lam ke toan', 'laptop chay excel nang',
+            'laptop co ban phim so numpad', 'ke toan nen mua laptop nao', 'laptop chay phan mem misa'
+        ],
+        reply: `Dạ với đặc thù nghề **Kế toán – Kiểm toán – Tài chính**, việc xử lý những file Excel hàng trăm nghìn dòng công thức VLOOKUP/PivotTable và chạy phần mềm MISA, HTKK thuế đòi hỏi chiếc laptop phải đáp ứng chuẩn **4 TIÊU CHÍ VÀNG** sau đây ạ: 📊💼💻\n\n` +
+            `1. 🔢 **Bắt buộc có Bàn phím số phụ (Numpad) kích thước 15.6 inch:**\n` +
+            `• Giúp bạn gõ nhập số liệu hóa đơn, chứng từ bằng 1 tay nhanh gấp 3 lần so với dãy phím số ngang trên các dòng máy 13 - 14 inch.\n\n` +
+            `2. ⚡ **RAM tối thiểu 16GB & CPU đa nhân (Core i5 / Ryzen 5 trở lên):**\n` +
+            `• Mở cùng lúc 10 - 15 file Excel nặng, phần mềm MISA, trình duyệt kê khai thuế điện tử và Zalo trao đổi chứng từ mà máy vẫn mượt mà, không bao giờ bị treo *"Not Responding"*.\n\n` +
+            `3. 🪟 **Hệ điều hành Windows bản quyền:**\n` +
+            `• Tương thích 100% với chữ ký số (USB Token), phần mềm thuế HTKK, MISA và trọn bộ phím tắt Excel chuyên sâu (MacBook sẽ không chạy trực tiếp được HTKK và USB Token thuế).\n\n` +
+            `🏆 **TOP LAPTOP KẾ TOÁN ĐƯỢC ƯA CHUỘNG NHẤT TẠI SHOP:**\n` +
+            `• **Lenovo IdeaPad Slim 3 / ThinkBook 15 (16GB/512GB):** Bàn phím gõ cực kỳ êm và nảy tay, có Numpad riêng, màn hình chống chói bảo vệ mắt.\n` +
+            `• **Dell Inspiron 15 3520 / 3530:** Độ bền nồi đồng cối đá, màn hình 120Hz cuộn bảng tính siêu mượt, đầy đủ cổng USB cắm chữ ký số.\n` +
+            `• **HP Pavilion 15:** Thiết kế vỏ kim loại sang trọng, thanh lịch nơi công sở.\n\n` +
+            `👉 Bạn dự kiến ngân sách tầm bao nhiêu để em lọc ngay mẫu máy có sẵn bàn phím số và tặng kèm bộ cài Office bản quyền miễn phí nhé! 😊`,
+        suggestions: ['Xem Lenovo IdeaPad Slim 3', 'Xem Dell Inspiron 15', 'Tư vấn Trả góp 0%', 'Xuất hóa đơn VAT công ty']
+    },
+
+    // 3.101 Tư vấn Laptop & iPad cho Giáo viên / Giảng viên (Soạn giáo án, trình chiếu PowerPoint, chấm bài)
+    {
+        id: 'persona_teacher_lecturer_presentation',
+        category: 'Laptop',
+        patterns: [
+            /(giao vien|giang vien|di day|day hoc|soan giao an|trinh chieu|powerpoint|cham bai).*(laptop|may tinh|ipad|tablet|mua may)/i,
+            /(laptop|may tinh|ipad).*(cho giao vien|cho giang vien|di day hoc|chieu slide)/i
+        ],
+        keywords: [
+            'laptop cho giao vien', 'mua may tinh cho giao vien', 'giao vien nen mua laptop nao',
+            'may tinh bang cho giao vien', 'ipad cho giao vien day hoc', 'laptop trinh chieu powerpoint'
+        ],
+        reply: `Dạ em xin gửi lời chào trân trọng đến quý Thầy/Cô ạ! 👨‍🏫👩‍🏫 Với công việc giảng dạy, soạn giáo án điện tử, thiết kế bài giảng PowerPoint/Canva và di chuyển giữa các lớp học, một thiết bị lý tưởng cần ưu tiên: **Mỏng nhẹ dễ mang theo, Pin bền cả buổi dạy và Kết nối máy chiếu nhanh chóng**:\n\n` +
+            `✨ **1. NẾU CHỌN LAPTOP SOẠN GIÁO ÁN & TRÌNH CHIẾU TRÊN LỚP:**\n` +
+            `• **Ưu tiên máy có sẵn cổng HDMI & USB tiêu chuẩn (như ASUS Vivobook 14/15, Dell Inspiron, Lenovo IdeaPad):** Cắm trực tiếp dây máy chiếu trên giảng đường và bút trình chiếu (Laser Pointer) ngay lập tức mà không cần mang theo cổng chuyển rườm rà.\n` +
+            `• **Nếu yêu thích sự mỏng nhẹ tuyệt đối & pin cả ngày (MacBook Air M2/M3):** Nặng chỉ 1.24kg bỏ gọn vào cặp giáo án, pin thực tế 10 - 14 tiếng dạy cả ngày từ sáng đến tối không cần mang cục sạc.\n\n` +
+            `✨ **2. NẾU CHỌN MÁY TÍNH BẢNG KÈM BÚT CẢM ỨNG (iPad Air / Gen 10 / Galaxy Tab):**\n` +
+            `• Chấm bài tập, viết lời phê trực tiếp bằng bút cảm ứng lên bài kiểm tra của học sinh như viết phấn lên bảng và phản chiếu không dây lên màn hình TV thông minh của lớp học.\n\n` +
+            `🎁 **Đặc quyền tri ân ngành Giáo dục:** Cửa hàng giảm thêm **300.000đ – 500.000đ** và hỗ trợ cài đặt trọn đời bộ phần mềm Office, phần mềm trộn đề thi & thiết kế bài giảng miễn phí cho quý Thầy/Cô!`,
+        suggestions: ['Xem MacBook Air mỏng nhẹ', 'Xem Laptop ASUS Vivobook có cổng HDMI', 'Xem iPad kèm bút cảm ứng', 'Hotline 0842.331.606']
+    },
+
+    // 3.102 Tư vấn Thiết bị cho Nhân viên Kinh doanh / Bất động sản / Bảo hiểm / Tư vấn Tài chính
+    {
+        id: 'persona_real_estate_sales_fieldwork',
+        patterns: [
+            /(bat dong san|moi gioi|sale|kinh doanh|bao hiem|gap khach hang|tu van khach).*(laptop|dien thoai|ipad|tablet|mua may)/i,
+            /(hay di gap khach|lam sale|di thi truong).*(nen mua may gi|laptop nao|dien thoai nao)/i
+        ],
+        keywords: [
+            'laptop cho nhan vien kinh doanh', 'lam bat dong san nen dung may gi',
+            'ipad cho sale bat dong san', 'dien thoai cho dan sale', 'laptop di gap khach hang'
+        ],
+        reply: `Dạ làm nghề **Kinh doanh (Sales), Bất động sản, Bảo hiểm hay Tư vấn Tài chính** thì thiết bị công nghệ trên tay không chỉ là công cụ làm việc mà còn là **hình ảnh chuyên nghiệp, tạo dựng niềm tin** ngay từ giây đầu tiên ngồi xuống bàn cafe cùng khách hàng! 🤝💼✨\n\n` +
+            `🌟 **3 "VŨ KHÍ" ĐẮC LỰC NHẤT GIÚP BẠN CHỐT DEAL THẦN TỐC:**\n\n` +
+            `1. 💻 **MacBook Air M2 / M3 hoặc Laptop vỏ kim loại siêu mỏng nhẹ:**\n` +
+            `• Thiết kế sang trọng, đẳng cấp, mở nắp máy là sáng màn hình ngay trong 1 giây để trình bày bảng tính dòng tiền, hợp đồng hay mặt bằng dự án 3D mà không bắt khách phải chờ máy khởi động.\n` +
+            `• Pin dùng xuyên suốt 10 - 12 tiếng ngoài quán cafe mà không cần loay hoay tìm ổ cắm điện.\n\n` +
+            `2. 📲 **iPad Air M2 hoặc Samsung Galaxy Z Fold6 (Màn hình gập):**\n` +
+            `• Cầm trên tay gọn nhẹ, xoay màn hình đưa cho khách hàng xem sa bàn quy hoạch, bảng minh họa quyền lợi bảo hiểm hoặc ký tên xác nhận bằng bút cảm ứng cực kỳ chuyên nghiệp.\n\n` +
+            `3. 📱 **iPhone 16 Pro Max / Galaxy S25 Ultra:**\n` +
+            `• Pin siêu trâu nghe gọi hàng trăm cuộc điện thoại và nhắn Zalo chăm sóc khách hàng từ sáng tới khuya, camera góc siêu rộng chụp ảnh căn hộ/sản phẩm sắc nét lung linh.\n\n` +
+            `👉 Bạn đang cần tìm **Laptop mỏng nhẹ**, **iPad trình chiếu** hay **Smartphone pin trâu** để em lên cấu hình tối ưu nhất cho công việc của bạn nhé! 😊`,
+        suggestions: ['Xem MacBook Air sang trọng', 'Xem Galaxy Z Fold6 doanh nhân', 'Xem iPad Air M2', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.103 Tư vấn Bác sĩ / Dược sĩ / Sinh viên Y khoa chọn iPad hay Laptop
+    {
+        id: 'persona_medical_doctor_pharmacist',
+        patterns: [
+            /(bac si|duoc si|sinh vien y|hoc y|nganh y|benh vien|di lam sang|x-quang|dicom).*(ipad|laptop|tablet|may tinh|mua may)/i,
+            /(ipad|laptop|tablet).*(cho sinh vien y|cho bac si|hoc y khoa)/i
+        ],
+        keywords: [
+            'sinh vien y nen mua ipad nao', 'laptop cho sinh vien y khoa',
+            'bac si nen dung ipad gi', 'ipad hoc giai phau y khoa', 'mua ipad đi lâm sàng'
+        ],
+        reply: `Dạ đối với **Bác sĩ, Dược sĩ và các bạn Sinh viên Y Dược**, khối lượng giáo trình y khoa (Atlas Giải phẫu học Sobotta/Netter, sách ngoại văn hàng nghìn trang PDF) và việc đi trực lâm sàng tại bệnh viện có yêu cầu rất đặc thù! 🩺🏥📚\n\n` +
+            `✨ **1. ĐI BỆNH VIỆN & HỌC LÂM SÀNG: iPad là "Trợ thủ số 1" không thể thay thế!**\n` +
+            `• 📲 **iPad Air M2 / iPad Gen 10 (Dung lượng từ 128GB - 256GB):** Nhỏ gọn bỏ vừa túi áo Blouse hoặc túi đeo chéo khi đi buồng bệnh.\n` +
+            `• 🧬 **Ứng dụng chuyên ngành Y đỉnh cao:** Chạy cực mượt các ứng dụng giải phẫu 3D (*Complete Anatomy, Essential Anatomy 5*), xem phim chụp X-Quang/CT/MRI chuẩn màu sắc nét và ghi chú triệu chứng lâm sàng tức thì bằng bút cảm ứng.\n\n` +
+            `✨ **2. LÀM LUẬN VĂN, NGHIÊN CỨU KHOA HỌC (SPSS) & TRỰC KHOA PHÒNG:**\n` +
+            `• 💻 **MacBook Air hoặc Laptop Windows mỏng nhẹ (RAM 16GB):** Phục vụ chạy phần mềm thống kê y sinh SPSS, viết báo cáo nghiên cứu khoa học, làm slide báo cáo giao ban và tra cứu hồ sơ bệnh án điện tử (HIS/EMR).\n\n` +
+            `👉 Bạn đang tìm **iPad đi lâm sàng học giải phẫu** hay **Laptop làm nghiên cứu/trực viện** để em áp ngay gói ưu đãi Y tế & Sinh viên tốt nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem iPad Air M2 học Y khoa', 'Xem iPad Gen 10 giá tiết kiệm', 'Xem MacBook Air M3', 'Ưu đãi Sinh viên giảm 500k']
+    },
+
+    // 3.104 Tư vấn Game thủ / Streamer vừa chơi game vừa livestream OBS mượt không tụt FPS
+    {
+        id: 'persona_streamer_gamer_dual_setup',
+        category: 'Laptop',
+        patterns: [
+            /(livestream game|stream game|vua choi game vua stream|obs|streamer).*(laptop|may tinh|dien thoai|cau hinh)/i,
+            /(laptop|may tinh|dien thoai|cau hinh).*(livestream game|stream game|vua choi game.*livestream|obs|streamer)/i,
+            /(laptop gaming).*(livestream|stream obs|quay man hinh khong giat)/i
+        ],
+        keywords: [
+            'laptop vua choi game vua livestream', 'cau hinh livestream game obs',
+            'laptop cho streamer', 'may vua choi game vua quay tiktok'
+        ],
+        reply: `Dạ vừa chiến game đồ họa nặng vừa bật phần mềm **OBS Studio / TikTok Live Studio** để phát sóng trực tiếp (Livestream) là tác vụ "ngốn" phần cứng gấp đôi thông thường! Để khung hình luôn mượt 120FPS+ mà luồng live vẫn nét căng 1080p 60fps, em xin tư vấn cấu hình chuẩn Streamer nha: 🎮🎙️🔥\n\n` +
+            `1. 🚀 **Card đồ họa rời NVIDIA GeForce RTX 40-Series (RTX 4050 / 4060 trở lên):**\n` +
+            `• Bí quyết nằm ở nhân mã hóa phần cứng độc lập **NVENC thế hệ thứ 8 (hỗ trợ chuẩn AV1)** trên dòng RTX 40-series! Nhân này gánh toàn bộ việc nén video livestream giúp CPU và GPU không bị tụt FPS khi đang giao tranh tổng.\n\n` +
+            `2. 🧠 **Dung lượng RAM tối thiểu 16GB – 32GB:**\n` +
+            `• Chạy đồng thời Game + OBS + Trình duyệt đọc comment + Discord giao tiếp đồng đội mà không bị tràn bộ nhớ.\n\n` +
+            `3. ❄️ **Hệ thống tản nhiệt đa quạt & Keo kim loại lỏng:**\n` +
+            `• Các dòng **ASUS ROG Strix G16** và **Acer Nitro V / Predator** tại shop được thiết kế khe thoát nhiệt 4 hướng giúp máy giữ xung nhịp ổn định suốt phiên live 4 - 6 tiếng liên tục.\n\n` +
+            `👉 Bạn thường xuyên live tựa game nào (Valorant, Liên Minh, PUBG, GTA V hay game mobile giả lập) để em chọn mẫu Laptop Gaming kèm Micro thu âm lọc ồn chuẩn nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem ASUS ROG Strix G16', 'Xem Acer Nitro V RTX 4050', 'Xem Micro thu âm không dây', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.105 Tư vấn Combo Doanh nhân hay đi công tác máy bay (Travel Tech Kit)
+    {
+        id: 'persona_frequent_business_traveler',
+        patterns: [
+            /(hay di cong tac|di cong tac xa|di may bay nhieu|lam viec tren may bay|doanh nhan di cong tac).*(mua gi|laptop|phu kien|combo)/i,
+            /(laptop|thiet bi).*(di cong tac|gon nhe di may bay)/i
+        ],
+        keywords: [
+            'laptop cho nguoi hay di cong tac', 'combo cong nghe di cong tac',
+            'di cong tac nen mang phu kien gi', 'laptop sieu nhe di may bay'
+        ],
+        reply: `Dạ với lịch trình thường xuyên di chuyển qua các sân bay và làm việc linh hoạt tại khách sạn hay phòng chờ, tiêu chí số 1 chính là **"Tối giản trọng lượng – Tối đa năng lượng"** ạ! ✈️💼⚡\n\n` +
+            `Em xin gợi ý **BỘ TỨ VẬT BẤT LY THÂN (TRAVEL TECH KIT)** được các anh/chị doanh nhân tại shop đánh giá 5 sao:\n\n` +
+            `1. 💻 **Laptop siêu mỏng nhẹ dưới 1.25kg (MacBook Air M3 hoặc Surface Pro 2-in-1):**\n` +
+            `• Mở máy làm việc ngay trên bàn ăn nhỏ gọn của ghế máy bay, thời lượng pin thực tế bền bỉ 12 - 15 tiếng xuyên suốt chuyến bay dài.\n\n` +
+            `2. 🔌 **1 Củ sạc nhanh GaN Anker 65W / 100W đa cổng duy nhất:**\n` +
+            `• Thay vì mang theo 3 cục sạc cồng kềnh, chỉ cần 1 củ sạc GaN nhỏ bằng bao diêm là sạc cùng lúc cho cả **Laptop + Điện thoại + Đồng hồ/Tai nghe**.\n\n` +
+            `3. 🔋 **Pin sạc dự phòng 10.000mAh – 20.000mAh (37Wh – 74Wh):**\n` +
+            `• Đạt chuẩn an toàn Hàng không Quốc tế IATA để xách tay lên cabin máy bay hợp lệ 100%.\n\n` +
+            `4. 🎧 **Tai nghe chống ồn chủ động (Sony WH-1000XM5 / AirPods Pro 2):**\n` +
+            `• Bật ANC một chạm là tắt hẳn tiếng ồn động cơ phản lực, giúp bạn ngủ ngon hoặc tập trung đọc tài liệu trên suốt hành trình.\n\n` +
+            `👉 Khi mua theo gói Combo Công Tác, cửa hàng **giảm ngay 25% – 30% cho toàn bộ phụ kiện đi kèm**! Bạn đang cần trang bị món nào trước để em lên danh sách ưu đãi nhé! 😊`,
+        suggestions: ['Xem MacBook Air M3 siêu nhẹ', 'Xem Củ sạc nhanh Anker GaN', 'Xem Tai nghe chống ồn đi máy bay', 'Xem Pin dự phòng chuẩn Hàng không']
+    },
+
+    // 3.106 Phân vân kích thước màn hình Laptop: 13-14 inch nhỏ gọn hay 15.6-16 inch rộng rãi?
+    {
+        id: 'advice_laptop_screen_size_13_vs_14_vs_15_16',
+        category: 'Laptop',
+        patterns: [
+            /(laptop|man hinh).*(13 inch|14 inch).*(hay|va|so voi).*(15\.6 inch|15 inch|16 inch)/i,
+            /(nen mua laptop).*(14 inch hay 15\.6 inch|13 inch hay 15 inch|man nho hay man to)/i,
+            /(laptop 14 inch|laptop 15\.6 inch).*(co vua cop xe|balo|nen chon)/i
+        ],
+        keywords: [
+            'nen mua laptop 14 inch hay 15.6 inch', 'so sanh laptop 13 inch va 15 inch',
+            'laptop 14 inch hay 15 inch tot hon', 'laptop 15.6 inch co nang khong',
+            'chon kich thuoc man hinh laptop'
+        ],
+        reply: `Dạ việc chọn kích thước màn hình **13 – 14 inch** hay **15.6 – 16 inch** ảnh hưởng trực tiếp đến cảm giác đeo balo trên vai và sự thoải mái của đôi mắt mỗi ngày! Em xin đặt lên bàn cân thực tế để bạn chọn đúng ngay lần đầu nhé: 💻📏⚖️\n\n` +
+            `✨ **1. DÒNG 13.3 – 14 INCH (Cơ động, Gọn nhẹ tuyệt đối):**\n` +
+            `• 🎒 **Ưu điểm:** Trọng lượng chỉ từ **1.2kg – 1.4kg**, bỏ vừa vặn mọi túi xách thời trang, balo nhỏ và thậm chí bỏ vừa cốp xe tay ga (Lead, Grande, SH Mode).\n` +
+            `• ⚠️ **Đánh đổi:** Không có cụm bàn phím số phụ (Numpad) bên phải; khi chia đôi 2 cửa sổ trên màn hình thì chữ sẽ hơi nhỏ.\n` +
+            `• 🎯 **Ai nên chọn?** Sinh viên đi học cả ngày, nhân viên văn phòng/Sales hay mang máy đi họp, đi cafe.\n\n` +
+            `✨ **2. DÒNG 15.6 – 16 INCH (Không gian hiển thị rộng, Có phím số Numpad):**\n` +
+            `• 🖥️ **Ưu điểm:** Màn hình rộng thênh thang giúp chia đôi 2 cửa sổ (1 bên đọc tài liệu/web, 1 bên gõ Word/Excel/Code) cực kỳ thoải mái không mỏi mắt; hầu hết đều có **bàn phím số phụ Numpad** nhập liệu siêu tốc.\n` +
+            `• ⚠️ **Đánh đổi:** Trọng lượng thường từ **1.65kg – 2.2kg**, cần dùng balo chuẩn 15.6 inch trở lên.\n` +
+            `• 🎯 **Ai nên chọn?** Kế toán – Tài chính, Lập trình viên, Thiết kế đồ họa, Game thủ hoặc người ít phải di chuyển bộ nhiều.\n\n` +
+            `👉 Thói quen hàng ngày của bạn là **mang máy đi lại liên tục** hay **đặt cố định trên bàn làm việc** nhiều hơn để em gợi ý model chuẩn nhất ạ? 😊`,
+        suggestions: ['Xem Laptop 13-14 inch mỏng nhẹ', 'Xem Laptop 15.6 inch có phím số', 'Tư vấn theo ngân sách', 'Hotline 0842.331.606']
+    },
+
+    // 3.107 Phân vân iPhone / Samsung bản thường & Pro (6.1 - 6.3 inch) hay Pro Max / Plus / Ultra (6.7 - 6.9 inch)
+    {
+        id: 'advice_phone_pro_vs_promax_plus_size',
+        category: 'Điện thoại',
+        patterns: [
+            /(nen mua|phan van).*(pro hay pro max|ban thuong hay plus|nho hay to|6\.1 hay 6\.7|6\.3 hay 6\.9)/i,
+            /(iphone 16 pro hay 16 pro max|iphone 15 pro hay 15 pro max|iphone 16 hay 16 plus)/i
+        ],
+        keywords: [
+            'nen mua pro hay pro max', 'nen mua iphone 16 pro hay pro max',
+            'nen mua ban thuong hay ban plus', 'pro max co to qua khong', 'tay nho co nen mua pro max khong'
+        ],
+        reply: `Dạ đây là câu hỏi khiến tới 80% khách hàng đứng phân vân tại bàn trải nghiệm của shop luôn đó ạ! Giữa dòng **Gọn tay (6.1 – 6.3 inch)** và dòng **Màn đại Pin khủng (6.7 – 6.9 inch)**, em xin phân tích rõ điểm được - mất thực tế nhé: 📱⚖️✨\n\n` +
+            `✨ **1. DÒNG PRO MAX / PLUS / ULTRA (6.7 – 6.9 inch):**\n` +
+            `• 🔋 **Vô địch thời lượng pin:** Nhờ thân máy lớn nên chứa được viên pin khổng lồ, thời gian on-screen thực tế **lâu hơn từ 2.5 đến 3.5 tiếng** so với bản nhỏ. Dùng cường độ cao từ 7h sáng đến 11h đêm vẫn còn 20% pin!\n` +
+            `• 🎬 **Giải trí & Làm việc đã mắt:** Xem phim Netflix, lướt TikTok, đọc hợp đồng PDF hay chơi game bằng 2 tay cực kỳ sướng mắt.\n` +
+            `• ⚠️ **Lưu ý:** Trọng lượng khoảng ~220g - 227g, khi nằm lướt điện thoại hoặc dùng 1 tay lúc đi đường sẽ hơi mỏi cổ tay nếu bàn tay bạn nhỏ.\n\n` +
+            `✨ **2. DÒNG PRO / TIÊU CHUẨN (6.1 – 6.3 inch):**\n` +
+            `• 👌 **Cầm nắm hoàn hảo bằng 1 tay:** Trọng lượng nhẹ hơn gần 30g - 40g, ngón cái chạm tới mọi góc màn hình dễ dàng, đút túi quần âu hay túi áo khoác nhẹ tênh.\n` +
+            `• 📸 **Sức mạnh tương đương:** Trên thế hệ iPhone 16 Pro và 16 Pro Max, Apple đã trang bị **chung chip A18 Pro và chung ống kính Zoom quang 5x** (không còn bị cắt giảm camera như đời cũ)!\n\n` +
+            `👉 **Chốt nhanh:** Nếu bạn ưu tiên **Pin trâu nhất & Màn hình lớn** -> Chọn **Pro Max / Plus**. Nếu ưu tiên **Cầm nhẹ tay, Gọn gàng mà vẫn mạnh mẽ** -> Chọn **Pro / Bản thường** nhé!`,
+        suggestions: ['Xem iPhone 16 Pro Max', 'Xem iPhone 16 Pro gọn tay', 'Xem Galaxy S25 Ultra', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.108 Màn hình 120Hz ProMotion / LTPO có tốn pin hơn 60Hz không?
+    {
+        id: 'advice_refresh_rate_promotion_battery_saving',
+        patterns: [
+            /(man hinh 120hz|promotion|tan so quet 120hz).*(co ton pin|hao pin|ngon pin)/i,
+            /(bat 120hz|de 120hz).*(co nhanh het pin|co nen tat)/i
+        ],
+        keywords: [
+            'man hinh 120hz co ton pin khong', 'bat 120hz co hao pin khong',
+            'promotion 120hz co ngon pin khong', 'co nen tat 120hz de tiet kiem pin'
+        ],
+        reply: `Dạ nhiều bạn nghĩ màn hình 120Hz mượt gấp đôi thì sẽ tốn pin gấp đôi, nhưng trên các dòng máy công nghệ mới hiện nay thì điều ngược lại mới đúng đó ạ! ⚡📱🔋\n\n` +
+            `✨ **BÍ MẬT CÔNG NGHỆ TẤM NỀN LTPO / PROMOTION THÍCH ỨNG (1Hz – 120Hz):**\n` +
+            `• 🚀 **Khi bạn vuốt chạm, cuộn lướt Facebook/TikTok:** Màn hình tự động đẩy tốc độ lên **120Hz** để từng chuyển động mượt như lụa, không có độ trễ.\n` +
+            `• 📖 **Khi bạn dừng tay đọc báo, xem ảnh tĩnh hoặc bật Always-On Display:** Tấm nền LTPO lập tức **hạ tần số quét xuống chỉ còn 1Hz – 10Hz** (thấp hơn rất nhiều so với màn hình 60Hz truyền thống luôn phải chạy cố định ở mức 60Hz!).\n\n` +
+            `💡 **Kết luận thực tế:** Nhờ cơ chế tự động tăng giảm thông minh này, màn hình ProMotion / Dynamic AMOLED 2X 120Hz trên iPhone Pro/Pro Max và Samsung Galaxy S-Series **vừa cho trải nghiệm vuốt chạm siêu mượt, vừa tiết kiệm từ 10% – 15% pin** so với màn hình cũ! Bạn cứ yên tâm bật 120Hz tận hưởng trọn vẹn nhé! 😊`,
+        suggestions: ['Xem điện thoại màn hình 120Hz', 'Xem iPhone 16 Pro ProMotion', 'Xem Samsung Galaxy 120Hz', 'Hotline 0842.331.606']
+    },
+
+    // 3.109 Mua MacBook chỉ có cổng Type-C thì cắm chuột USB, HDMI máy chiếu thế nào? (Tư vấn Hub chuyển đổi)
+    {
+        id: 'advice_macbook_hub_dongle_ports',
+        category: 'Phụ kiện',
+        patterns: [
+            /(macbook|laptop mong nhe).*(khong co cong usb|chi co type c|cam chuot usb|cam may chieu|cam hdmi|thieu cong)/i,
+            /(hub chuyen doi|cong chuyen type c).*(cho macbook|cho ipad|ugreen|loai nao tot|khong nong)/i
+        ],
+        keywords: [
+            'macbook khong co cong usb thi lam sao', 'cach cam may chieu cho macbook',
+            'hub chuyen doi cho macbook loai nao tot', 'hub type c ra hdmi va usb', 'mua hub ugreen cho macbook'
+        ],
+        reply: `Dạ đúng rồi ạ! Để đạt độ mỏng nhẹ kỷ lục, các dòng **MacBook Air / Pro** và Ultrabook đời mới đã tinh giản chỉ giữ lại cổng **Thunderbolt / USB-C** siêu tốc. Để kết nối với máy chiếu HDMI, chuột USB-A hay thẻ nhớ máy ảnh, giải pháp gọn gàng nhất chính là **Hub chuyển đổi đa năng Type-C**: 🔌💻✨\n\n` +
+            `🏆 **TIÊU CHÍ CHỌN HUB CHUYỂN ĐỔI AN TOÀN CHO MACBOOK:**\n` +
+            `• 🛡️ **Vỏ hợp kim nhôm tản nhiệt & Chip chống quá dòng:** Giúp truyền dữ liệu ổn định, không gây nóng máy và không làm đơ chuột không dây.\n` +
+            `• 📺 **Đầy đủ các cổng thiết yếu (5-in-1 đến 9-in-1):**\n` +
+            `  - **1 cổng HDMI 4K:** Xuất hình ảnh sắc nét ra màn hình rời hoặc máy chiếu hội trường.\n` +
+            `  - **2 – 3 cổng USB 3.0 (5Gbps):** Cắm đầu thu chuột không dây, bàn phím cơ, ổ cứng di động hoặc USB dữ liệu.\n` +
+            `  - **Cổng USB-C PD 100W Pass-through:** Vừa cắm sạc nhanh cho máy vừa truyền dữ liệu cùng lúc.\n` +
+            `  - **Khe đọc thẻ nhớ SD / MicroSD:** Dành cho các bạn hay chép ảnh/video từ máy ảnh, flycam.\n\n` +
+            `🎁 Tại cửa hàng, mẫu **Hub chuyển đổi Ugreen / Baseus chính hãng** đang được **giảm ngay 25%** khi mua kèm Laptop hoặc bạn có thể chọn chuột Bluetooth (như *Logitech MX Anywhere / MX Master 3S*) kết nối trực tiếp vào MacBook không cần đầu thu USB luôn nhé! 😊`,
+        suggestions: ['Xem Hub chuyển đổi Type-C', 'Xem Chuột Bluetooth Logitech', 'Xem MacBook Air M3', 'Hotline 0842.331.606']
+    },
+
+    // 3.110 iPad kèm bàn phím rời có thay thế hoàn toàn được Laptop làm Word, Excel, Code không?
+    {
+        id: 'advice_ipad_magic_keyboard_vs_laptop',
+        patterns: [
+            /(ipad|may tinh bang|tablet).*(kem ban phim|gan ban phim).*(thay the laptop|thay laptop|lam word excel|lap trinh)/i,
+            /(nen mua ipad kem ban phim hay mua laptop|ipad co thay the duoc laptop khong)/i
+        ],
+        keywords: [
+            'ipad co thay the duoc laptop khong', 'nen mua ipad kem ban phim hay laptop',
+            'ipad lam excel co tot khong', 'ipad co code duoc khong', 'mua ipad thay laptop'
+        ],
+        reply: `Dạ với tư cách là người tư vấn thực tế để bạn đầu tư đúng đồng tiền bát gạo, em xin trả lời thật lòng: **iPad kèm bàn phím có thể thay thế được 80% nhu cầu cơ bản, nhưng KHÔNG THỂ thay thế 100% Laptop trong các tác vụ chuyên sâu** ạ! 📲⚖️💻\n\n` +
+            `✅ **KHI NÀO IPAD + BÀN PHÍM LÀ LỰA CHỌN TUYỆT VỜI?**\n` +
+            `• Bạn chủ yếu soạn thảo văn bản Word, trả lời Email, làm slide thuyết trình Canva, đọc & ký duyệt hợp đồng PDF, ghi chép bài giảng bằng bút cảm ứng, vẽ minh họa Procreate, cắt ghép video CapCut và giải trí nhẹ nhàng mọi lúc mọi nơi.\n\n` +
+            `⚠️ **KHI NÀO BẠN BẮT BUỘC PHẢI CHỌN LAPTOP (MACBOOK / WINDOWS)?**\n` +
+            `• **Làm Excel nặng & Kế toán:** Bản Office trên iPad là bản rút gọn, không hỗ trợ đầy đủ Macro VBA, PivotTable phức tạp hay mở nhiều cửa sổ Excel song song như trên Laptop.\n` +
+            `• **Lập trình (Coding / IT):** iPadOS không cài được môi trường lập trình đầy đủ như VS Code, Docker, SQL Server hay máy ảo.\n` +
+            `• **Phần mềm chuyên ngành:** AutoCAD, 3Ds Max, SPSS, MISA chỉ chạy trên hệ điều hành macOS / Windows đầy đủ.\n\n` +
+            `👉 Công việc hoặc ngành học chính của bạn hiện tại là gì để em tư vấn chọn **Laptop** hay **iPad** chuẩn xác nhất, tránh mua về bị thiếu tính năng nhé! 😊`,
+        suggestions: ['Xem Laptop mỏng nhẹ làm việc', 'Xem iPad Air M2 sáng tạo', 'So sánh MacBook Air và iPad Air', 'Hotline 0842.331.606']
+    },
+
+    // 3.111 So sánh gói AppleCare+ và Gói Bảo Hành Vàng 1 đổi 1 tại cửa hàng
+    {
+        id: 'advice_apple_care_vs_shop_golden_warranty',
+        patterns: [
+            /(so sanh|nen mua|khac nhau).*(applecare|apple care).*(bao hanh vang|bao hanh vip|bao hanh shop)/i,
+            /(applecare\+|apple care plus).*(la gi|co nen mua|hay bao hanh vang)/i
+        ],
+        keywords: [
+            'so sanh applecare va bao hanh vang', 'nen mua applecare hay bao hanh vang',
+            'applecare+ la gi', 'bao hanh vang khac gi applecare'
+        ],
+        reply: `Dạ cả **AppleCare+** và **Gói Bảo Hành Vàng (VIP)** tại cửa hàng đều là những 'tấm khiên' bảo vệ thiết bị trước rủi ro rơi vỡ, vào nước, nhưng có sự khác biệt rất lớn về **Chi phí và Thời gian xử lý** để bạn dễ chọn nè: 🛡️⚖️🍏\n\n` +
+            `1. 👑 **GÓI BẢO HÀNH VÀNG 1 ĐỔI 1 TẠI CỬA HÀNG (Được 85% khách hàng chọn):**\n` +
+            `• 💰 **Chi phí tiết kiệm:** Mức giá chỉ bằng khoảng **40% – 50%** so với gói AppleCare+, đang được giảm thêm 20% khi mua kèm máy.\n` +
+            `• ⚡ **Xử lý siêu tốc & Có máy dùng tạm:** Tiếp nhận trực tiếp ngay tại Showroom mà không cần chờ gửi đi thẩm định hãng dài ngày; bạn được **cấp miễn phí 1 chiếc điện thoại dự phòng** để dùng trong lúc chờ bảo dưỡng.\n` +
+            `• 🔄 **Đổi máy tương đương:** Nếu máy rơi vỡ/vào nước hư hỏng nặng không sửa được, shop đổi ngay thân máy khác cùng model mà **không thu thêm phí đồng chi trả (Deductible Fee)** cao như hãng.\n\n` +
+            `2. 🍏 **GÓI APPLECARE+ CHÍNH HÃNG APPLE:**\n` +
+            `• 🌍 **Bảo hành toàn cầu:** Phù hợp nhất nếu bạn sắp đi du học, định cư hoặc công tác dài hạn ở nước ngoài (có thể mang vào bất kỳ Apple Store nào trên thế giới).\n\n` +
+            `👉 Nếu bạn sinh sống và làm việc tại Việt Nam thì **Gói Bảo Hành Vàng của shop** vừa tiết kiệm tiền triệu vừa nhanh gọn hơn rất nhiều đó ạ! 😊`,
+        suggestions: ['Xem chi tiết Gói Bảo Hành Vàng', 'Chính sách 1 đổi 1 trong 30 ngày', 'Tư vấn iPhone / MacBook mới', 'Hotline 0842.331.606']
+    },
+
+    // 3.112 Tại sao điện thoại mới mua ngày đầu lại ấm / nóng máy và hao pin nhanh hơn? (Cơ chế Indexing)
+    {
+        id: 'advice_phone_heating_camera_5g_summer',
+        patterns: [
+            /(may moi mua|moi khui hop|ngay dau|moi chuyen du lieu).*(nong may|am may|tụt pin nhanh|hao pin)/i,
+            /(tai sao|vi sao).*(iphone|samsung|dien thoai).*(moi mua).*(nong|hao pin)/i
+        ],
+        keywords: [
+            'may moi mua bi nong', 'tai sao dien thoai moi mua hao pin nhanh',
+            'iphone moi mua bi nong may', 'chuyen du lieu xong may bi nong', 'quay 4k may bi am'
+        ],
+        reply: `Dạ bạn hoàn toàn yên tâm nha! Hiện tượng máy mới khui hộp hoặc vừa chuyển dữ liệu xong hơi ấm lên trong **24 – 48 giờ đầu tiên** là cơ chế hoạt động hoàn toàn bình thường của cả Apple iOS lẫn Android (Hãng cũng có văn bản giải thích chính thức về việc này ạ): 📱🌡️💡\n\n` +
+            `🔍 **NGUYÊN NHÂN KHOA HỌC (BACKGROUND INDEXING):**\n` +
+            `• Khi bạn vừa đăng nhập iCloud / Google và chuyển hàng chục nghìn bức ảnh, tin nhắn từ máy cũ sang, vi xử lý AI của máy sẽ phải **chạy ngầm liên tục 100% công suất** để quét nhận diện khuôn mặt trong ảnh, lập chỉ mục tìm kiếm (Spotlight Indexing) và tải cập nhật các ứng dụng.\n` +
+            `• **Sau 1 – 2 ngày:** Khi quá trình đồng bộ ngầm hoàn tất và AI học xong thói quen sử dụng của bạn (Adaptive Battery), máy sẽ **mát rượi trở lại và thời lượng pin tăng vọt lên mức tối đa**!\n\n` +
+            `🛡️ **BẢO CHỨNG AN TÂM 100%:**\n` +
+            `• Bạn cứ thoải mái trải nghiệm máy trong vài ngày tới, vì đơn hàng của bạn luôn có đặc quyền **Bao test 1 đổi 1 trong suốt 30 ngày đầu tiên** tại cửa hàng. Nếu sau 3 ngày máy vẫn bất thường, bạn mang qua shop đổi ngay cây máy mới nguyên seal khác trong 5 phút nhé! 😊`,
+        suggestions: ['Mẹo tiết kiệm pin hiệu quả', 'Chính sách 1 đổi 1 trong 30 ngày', 'Hotline kỹ thuật 0842.331.606']
+    },
+
+    // 3.113 Tư vấn Đồ Công Nghệ Đôi (Couple) cho các cặp đôi / vợ chồng (Audio Sharing, Smartwatch đôi)
+    {
+        id: 'advice_couple_matching_tech_gifts',
+        patterns: [
+            /(do doi|couple|cap doi|mua 2 cai cho 2 vo chong|mua cho ca hai|qua valentine|ky niem tinh yeu).*(dong ho|dien thoai|tai nghe|cong nghe)/i,
+            /(dong ho doi|smartwatch doi|dien thoai doi)/i
+        ],
+        keywords: [
+            'dong ho thong minh doi', 'mua dien thoai doi cho cap doi',
+            'qua tang cong nghe cho cap doi', 'smartwatch couple', 'mua 2 may co giam gia khong'
+        ],
+        reply: `Dạ sắm **Đồ Công Nghệ Đôi (Tech Couple)** vừa lãng mạn, tinh tế lại vừa gắn kết hai người mỗi ngày là ý tưởng tuyệt vời điểm 10 luôn ạ! 💑💖✨\n\n` +
+            `🌟 **3 GỢI Ý "ĐỒ ĐÔI CÔNG NGHỆ" NGỌT NGÀO NHẤT TẠI SHOP:**\n\n` +
+            `1. ⌚ **Đồng hồ thông minh đôi (Apple Watch Series 10 / SE hoặc Galaxy Watch):**\n` +
+            `• Bạn nam đeo bản **44mm/46mm Đen Midnight**, bạn nữ đeo bản **40mm/42mm Vàng Hồng (Rose Gold) / Starlight**.\n` +
+            `• Tính năng cực dễ thương: Gửi nhịp tim trực tiếp sang cổ tay người ấy, vẽ hình chạm tay (Digital Touch) và cùng nhau thi đua hoàn thành vòng tròn vận động mỗi ngày!\n\n` +
+            `2. 🎧 **Cặp tai nghe AirPods Pro 2 / AirPods 4 (Tính năng Audio Sharing):**\n` +
+            `• Hai chiếc tai nghe AirPods có thể **kết nối chung vào 1 chiếc iPhone/iPad cùng lúc**, giúp hai bạn ngồi cạnh nhau trên xe bus, máy bay hay quán cafe cùng xem chung 1 bộ phim, nghe chung 1 bản nhạc tình yêu mà vẫn có không gian riêng tư tuyệt đối.\n\n` +
+            `3. 📱 **Smartphone đôi khác tone màu (Titan Sa Mạc & Titan Tự Nhiên):**\n` +
+            `• Lên hình chụp ảnh đôi trước gương cực kỳ sang chảnh và đồng điệu.\n\n` +
+            `🎁 **Ưu đãi Couple:** Khi mua từ **2 sản phẩm trở lên** trên cùng hóa đơn, shop **giảm thêm ngay 300.000đ – 500.000đ** và tặng gói hộp quà đôi kèm thiệp miễn phí nha! 😊`,
+        suggestions: ['Xem Apple Watch đôi', 'Xem AirPods Pro 2 Audio Sharing', 'Xem iPhone 16 Series', 'Nhận mã giảm giá mua 2 máy']
+    },
+
+    // 3.114 Phụ huynh lo mua máy cho con học nhưng sợ con nghiện game / TikTok đêm khuya
+    {
+        id: 'advice_parent_control_anti_game_addiction',
+        patterns: [
+            /(so con choi game|so be nghien game|khoa game|chan tiktok|quan ly thoi gian dung may cua con|kiem soat con)/i,
+            /(mua may cho con hoc).*(nhung so|ma so|lam sao de con khong choi game)/i
+        ],
+        keywords: [
+            'lam sao de con khong choi game tren ipad', 'cach khoa game tren dien thoai cua con',
+            'mua may cho con hoc nhung so nghien game', 'kiem soat thoi gian dung may cua con'
+        ],
+        reply: `Dạ đây chính là nỗi trăn trở lớn nhất của hầu hết các bậc phụ huynh khi sắm máy cho con học tập! Anh/chị hoàn toàn yên tâm vì cả **iPad/iPhone (Screen Time)** và **Samsung/Android (Google Family Link)** đều có tính năng **"Quản gia Giám sát Từ xa"** cực kỳ chặt chẽ ạ: 👨‍👩‍👧‍👦🔒📚\n\n` +
+            `✨ **4 QUYỀN NĂNG GIÚP BA MẸ QUẢN LÝ TỪ XA TRÊN ĐIỆN THOẠI CỦA MÌNH:**\n` +
+            `1. 🚫 **Phê duyệt tải ứng dụng:** Mỗi khi bé muốn tải bất kỳ trò chơi hay ứng dụng nào trên App Store / CH Play, hệ thống sẽ gửi thông báo về điện thoại của ba mẹ. Ba mẹ bấm *"Từ chối"* là máy bé không thể cài đặt được.\n` +
+            `2. ⏰ **Khóa máy theo giờ đi ngủ (Downtime):** Tự động khóa toàn bộ ứng dụng giải trí từ **21:30 tối đến 06:30 sáng hôm sau**, chỉ mở lại ứng dụng học tiếng Anh (Zoom, Duolingo, Từ điển).\n` +
+            `3. ⏳ **Giới hạn thời gian từng ứng dụng:** Ví dụ chỉ cho phép xem YouTube Kids đúng **30 phút/ngày**, hết 30 phút ứng dụng tự động khóa lại.\n` +
+            `4. 🛡️ **Lọc sạch web đen & nội dung người lớn 100%.**\n\n` +
+            `🎁 Khi mua máy tại cửa hàng, kỹ thuật viên sẽ **cài đặt sẵn trọn bộ tính năng Kiểm soát Phụ huynh này và kết nối vào điện thoại của anh/chị hoàn toàn miễn phí** trước khi bàn giao máy cho bé nhé! 😊`,
+        suggestions: ['Xem iPad Gen 10 học tập', 'Xem Samsung Galaxy Tab Kids Mode', 'Tư vấn Laptop học sinh', 'Hotline 0842.331.606']
+    },
+
+    // 3.115 Khách hỏi đồng hồ thông minh có đo được huyết áp và đường huyết cho người lớn tuổi không?
+    {
+        id: 'advice_smartwatch_blood_pressure_diabetes_elderly',
+        category: 'Đồng hồ thông minh',
+        patterns: [
+            /(dong ho|smartwatch|apple watch|galaxy watch).*(do huyet ap|do duong huyet|tieu duong|cao huyet ap)/i,
+            /(mua dong ho).*(theo doi huyet ap|do duong mau).*(cho bo me|nguoi gia)/i
+        ],
+        keywords: [
+            'dong ho thong minh do huyet ap', 'smartwatch co do duoc duong huyet khong',
+            'apple watch co do huyet ap khong', 'galaxy watch do huyet ap co chinh xac khong'
+        ],
+        reply: `Dạ liên quan đến sức khỏe của bố mẹ và người lớn tuổi, em xin tư vấn **trung thực và chuẩn xác 100% về mặt y khoa** để gia đình mình nắm rõ nhất ạ: ⌚❤️🩺\n\n` +
+            `1. 🩸 **VỀ ĐO ĐƯỜNG HUYẾT (TIỂU ĐƯỜNG):**\n` +
+            `• Hiện nay **CHƯA CÓ bất kỳ chiếc đồng hồ thông minh chính hãng nào trên thế giới (kể cả Apple, Samsung, Garmin) tự đo được chỉ số đường huyết qua da** mà không cần lấy mẫu máu (các loại đồng hồ giá rẻ vài trăm nghìn quảng cáo đo đường huyết trên mạng đều là cảm biến giả, sai lệch nguy hiểm).\n\n` +
+            `2. 💓 **VỀ ĐO HUYẾT ÁP & TIM MẠCH (ECG / NHỊP TIM / SpO2):**\n` +
+            `• **Samsung Galaxy Watch (Series 6 / 7 / Ultra):** Có tính năng **Đo Huyết Áp & Điện tâm đồ ECG** thông qua cảm biến quang học BioActive (cần hiệu chuẩn định kỳ với máy đo huyết áp bắp tay y tế để theo dõi xu hướng tăng/giảm huyết áp hàng ngày).\n` +
+            `• **Apple Watch (Series 10 / SE):** Cực kỳ mạnh và chính xác về **Cảnh báo nhịp tim cao/thấp bất thường, Rung nhĩ (AFib), Đo điện tâm đồ ECG, Oxy trong máu SpO2** và đặc biệt là **Phát hiện té ngã (Fall Detection)** tự động gọi cấp cứu và nhắn vị trí GPS cho con cái khi người lớn tuổi chẳng may bị ngất hay trượt ngã!\n\n` +
+            `👉 Nếu mua tặng bố mẹ để **cảnh báo nhịp tim, theo dõi giấc ngủ và phát hiện té ngã khẩn cấp** thì Apple Watch hoặc Galaxy Watch là món quà bảo vệ sức khỏe vô giá đó ạ! 😊`,
+        suggestions: ['Xem Apple Watch cảnh báo té ngã', 'Xem Samsung Galaxy Watch đo ECG', 'Hotline tư vấn 0842.331.606']
+    },
+
+    // 3.116 Tư vấn Loa Bluetooth đi biển, cắm trại, tiệc BBQ ngoài trời (Chống nước IP67, Pin trâu, Bass mạnh)
+    {
+        id: 'advice_water_speaker_beach_camping_party',
+        category: 'Tai nghe',
+        patterns: [
+            /(loa bluetooth|loa di dong|loa khong day).*(di bien|cam trai|camping|ngoai troi|tiec|party|bbq|ho boi|chong nuoc)/i,
+            /(nen mua loa).*(jbl hay marshall|di du lich|da ngoai)/i
+        ],
+        keywords: [
+            'loa bluetooth di cam trai', 'loa bluetooth di bien chong nuoc',
+            'nen mua loa jbl hay marshall', 'loa bluetooth bass manh ngoai troi'
+        ],
+        reply: `Dạ mang âm nhạc đi biển, cắm trại (Camping) hay mở tiệc BBQ ngoài trời cùng hội bạn thân thì chiếc loa cần phải có **Chất âm lực lưỡng vượt qua không gian mở và Độ bền "nồi đồng cối đá"**! Em xin phân tích 2 trường phái loa đỉnh nhất tại shop nha: 🔊🏖️⛺🔥\n\n` +
+            `✨ **1. VUA DÃ NGOẠI & TIỆC TÙNG: LOA JBL (Flip 6 / Charge 5):**\n` +
+            `• 🌊 **Kháng nước & kháng bụi chuẩn IP67:** Dù vô tình rơi xuống hồ bơi, dính cát biển hay gặp cơn mưa rào bất chợt khi cắm trại, loa vẫn hát vang bình thường.\n` +
+            `• 🥁 **Âm Bass JBL Original Pro Sound uy lực:** Đánh nhạc EDM, Remix, Pop cực kỳ sung; có tính năng **PartyBoost** kết nối nhiều loa JBL phát nhạc cùng lúc và kiêm luôn pin dự phòng sạc cho điện thoại (trên dòng Charge 5).\n\n` +
+            `✨ **2. VUA THẨM MỸ & CHILL ACOUSTIC: LOA MARSHALL (Emberton II / Willen):**\n` +
+            `• 🎸 **Thiết kế cổ điển sang chảnh:** Đặt lên bàn gỗ camping hay góc phòng chụp ảnh sống ảo cực kỳ nghệ thuật.\n` +
+            `• 🎶 **Âm thanh đa hướng 360° (True Stereophonic):** Nghe nhạc Acoustic, Ballad, Lofi, nhạc Trịnh cực kỳ ngọt ngào, ấm áp với thời lượng pin siêu khủng lên đến **30+ giờ** và vẫn đạt chuẩn chống nước IP67!\n\n` +
+            `👉 Hội mình thích gu nhạc **sôi động bùng nổ (JBL)** hay **chill sâu lắng, decor đẹp (Marshall)** để em báo giá ưu đãi tốt nhất nhé! 😊`,
+        suggestions: ['Xem Loa JBL chống nước IP67', 'Xem Loa Marshall Emberton II', 'Xem Tai nghe không dây', 'Mã giảm giá hôm nay']
+    },
+
+    // 3.117 Máy cũ bị vỡ màn hình đen thui / liệt cảm ứng có cứu được dữ liệu và Thu cũ đổi mới được không?
+    {
+        id: 'advice_backup_photos_before_selling_or_broken',
+        patterns: [
+            /(vo man hinh|be man hinh|hong man hinh|den man hinh|liet cam ung).*(cuu du lieu|lay anh|lay danh ba|chuyen du lieu|thu cu doi moi)/i,
+            /(may cu bi hong man|may bi be man).*(co thu cu khong|co lay duoc du lieu khong)/i
+        ],
+        keywords: [
+            'may vo man hinh co lay duoc du lieu khong', 'liet cam ung lam sao chuyen du lieu',
+            'may hong man hinh co thu cu doi moi duoc khong', 'cuu anh trong dien thoai bi hong man hinh'
+        ],
+        reply: `Dạ bạn đừng quá lo lắng nha! Rất nhiều khách hàng gặp tình huống máy cũ chẳng may rơi hỏng màn hình hoặc liệt cảm ứng nhưng bên trong còn bao nhiêu ảnh kỷ niệm gia đình, danh bạ và dữ liệu công việc quan trọng! 🛠️📱💖\n\n` +
+            `✨ **1. GIẢI PHÁP CỨU DỮ LIỆU MIỄN PHÍ 100% TẠI SHOWROOM:**\n` +
+            `• Chỉ cần bo mạch chính (Mainboard) của máy vẫn còn lên nguồn (cắm sạc vẫn rung hoặc báo chuông): Kỹ thuật viên bên em sẽ dùng **Thiết bị xuất hình ảnh chuyên dụng kết nối chuột rời hoặc gá tạm màn hình test kỹ thuật** để giúp bạn mở khóa máy, **sao lưu toàn bộ Hình ảnh, Danh bạ, Zalo sang máy mới hoàn toàn MIỄN PHÍ**!\n\n` +
+            `✨ **2. HỖ TRỢ THU CŨ ĐỔI MỚI CẢ MÁY LỖI / VỠ MÀN:**\n` +
+            `• Thay vì bạn phải tốn vài triệu đồng đi thay màn hình mới rồi mới bán lại, cửa hàng nhận **Thu mua trực tiếp máy cũ theo tình trạng hiện tại** và vẫn tặng thêm **Trợ giá lên đời đến 2.000.000đ** trừ thẳng vào máy mới để bạn tiết kiệm tối đa chi phí!\n\n` +
+            `👉 Bạn đang dùng dòng máy nào bị hỏng màn và muốn chuyển dữ liệu sang mẫu máy mới nào để em báo kỹ thuật chuẩn bị dụng cụ hỗ trợ ngay cho bạn nhé! 😊`,
+        suggestions: ['Chính sách Thu cũ đổi mới trợ giá 2tr', 'Xem iPhone chính hãng mới', 'Xem Samsung Galaxy mới', 'Hotline kỹ thuật 0842.331.606']
+    },
+
+    // 3.118 Mở rộng màn hình làm việc cho Laptop (Dùng iPad làm màn phụ Sidecar hoặc xuất màn hình rời 4K)
+    {
+        id: 'advice_second_monitor_portable_for_laptop',
+        patterns: [
+            /(man hinh phu|2 man hinh|xuat man hinh roi|dung ipad lam man hinh phu|sidecar)/i,
+            /(man hinh laptop nho).*(mo rong|ket noi man hinh|lam viec 2 man hinh)/i
+        ],
+        keywords: [
+            'cach dung ipad lam man hinh phu cho macbook', 'xuat man hinh roi cho laptop',
+            'lam viec 2 man hinh tren laptop', 'sidecar ipad va macbook'
+        ],
+        reply: `Dạ làm việc với **2 màn hình song song (Dual Monitor)** được chứng minh giúp tăng tới **42% hiệu suất làm việc** vì bạn không phải bấm Alt+Tab chuyển qua lại liên tục! Em xin gợi ý 2 cách mở rộng màn hình cực xịn và gọn gàng nhé: 💻➕🖥️✨\n\n` +
+            `1. 🍏 **DÙNG IPAD LÀM MÀN HÌNH PHỤ KHÔNG DÂY (Apple Sidecar / Universal Control):**\n` +
+            `• Nếu bạn có **MacBook + iPad**: Chỉ cần đặt iPad cạnh MacBook, bấm 1 nút là iPad biến ngay thành màn hình phụ thứ 2 sắc nét mà **không cần cắm bất kỳ sợi dây nào**! Bạn có thể kéo bảng màu Photoshop, cửa sổ Zalo hoặc tài liệu tham khảo sang iPad cực kỳ mượt mà.\n` +
+            `• Nếu dùng **Laptop Windows + iPad / Galaxy Tab**: Cài ứng dụng *Spacedesk* hoặc *Second Screen* (trên Samsung Tab) cũng biến tablet thành màn hình phụ không dây trong 30 giây.\n\n` +
+            `2. 🔌 **XUẤT MÀN HÌNH RỜI 4K QUA CÁP TYPE-C / HUB HDMI:**\n` +
+            `• Chỉ cần 1 chiếc **Hub chuyển đổi Type-C sang HDMI 4K 60Hz**, bạn có thể cắm laptop vào màn hình lớn 24 - 27 inch tại bàn làm việc để vừa sạc vừa xuất hình ảnh siêu nét.\n\n` +
+            `👉 Bạn đang dùng dòng Laptop nào để em tư vấn giải pháp ghép nối màn hình thứ 2 mượt nhất cho bạn nhé! 😊`,
+        suggestions: ['Xem iPad làm màn hình phụ', 'Xem Hub chuyển đổi Type-C sang HDMI', 'Xem MacBook Air M3', 'Hotline 0842.331.606']
+    },
+
+    // 3.119 Người đi làm bận rộn, có gia đình: Nên mua PS5 cắm TV hay máy chơi game cầm tay (Switch OLED / Steam Deck)?
+    {
+        id: 'advice_gaming_handheld_ps5_vs_rog_ally_switch',
+        category: 'Máy chơi game',
+        patterns: [
+            /(nguoi di lam|ban ron|co gia dinh|co vo con|it thoi gian).*(nen mua ps5 hay|mua may choi game nao|switch hay ps5|steam deck hay ps5)/i,
+            /(choi game cung gia dinh|choi game voi vo|choi game voi con).*(ps5 hay switch|nen mua may nao)/i
+        ],
+        keywords: [
+            'nguoi di lam ban ron nen mua may choi game gi', 'mua may choi game cho gia dinh',
+            'choi game cung vo con nen mua ps5 hay switch', 'nen mua ps5 hay may cam tay'
+        ],
+        reply: `Dạ câu hỏi này chạm đúng "nỗi niềm" của rất nhiều anh em đã đi làm và có gia đình nhỏ luôn ạ: **Có tiền mua máy nhưng lại ít thời gian ngồi cố định trước TV!** Em xin phân tích thực tế để bạn chọn đúng hệ máy không bị 'đắp chiếu' nha: 🎮👨‍👩‍👧‍👦✨\n\n` +
+            `✨ **1. NẾU MUỐN TRANH THỦ CHƠI 30 PHÚT TRƯỚC KHI NGỦ & CHƠI CÙNG VỢ CON -> CHỌN NINTENDO SWITCH OLED!**\n` +
+            `• 🛋️ **Linh hoạt số 1:** Vợ đang xem phim trên TV phòng khách? Bạn rút máy ra nằm trên sofa hoặc trên giường chơi chế độ cầm tay màn hình OLED 7 inch rực rỡ. Bấm nút nguồn 1 giây là tạm dừng game, bật lại là chơi tiếp ngay lập tức không cần chờ khởi động!\n` +
+            `• 🎉 **Gắn kết gia đình:** Cuối tuần cắm vào Dock nối TV, tháo 2 tay cầm Joy-Con đưa cho vợ và bé cùng chơi *Mario Kart, Mario Party, Just Dance, Nintendo Switch Sports* (đánh cầu lông, bóng bàn vận động cả nhà cười nghiêng ngả).\n\n` +
+            `✨ **2. NẾU ĐAM MÊ GAME BOM TẤN PC MỌI LÚC MỌI NƠI -> CHỌN STEAM DECK OLED!**\n` +
+            `• Chiến mượt kho game Steam đồ sộ (*Black Myth: Wukong, Elden Ring, GTA V, Red Dead 2*) ngay trên giường hoặc khi đi công tác.\n\n` +
+            `✨ **3. NẾU CÓ KHÔNG GIAN TV 4K RIÊNG & MÊ ĐÁ PES / FC25, GOD OF WAR -> CHỌN SONY PS5 SLIM!**\n` +
+            `• Đồ họa 4K 120Hz choáng ngợp và tay cầm DualSense rung phản hồi đỉnh cao nhất thế giới console.\n\n` +
+            `👉 Bạn thiên về trải nghiệm **chơi cầm tay linh hoạt + vui vẻ cùng gia đình (Switch OLED)** hay **đồ họa bom tấn 4K trên TV (PS5 Slim)** để em báo giá combo kèm tay cầm nhé! 😊`,
+        suggestions: ['Xem Nintendo Switch OLED', 'Xem Sony PlayStation 5 Slim', 'Xem Steam Deck OLED', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.120 Quy định mang Pin sạc dự phòng lên máy bay (100Wh IATA)
+    {
+        id: 'advice_powerbank_airplane_iata_rule',
+        category: 'Phụ kiện',
+        patterns: [
+            /(pin du phong|sac du phong|pin sac|anker|baseus|20000|25000|20\.000|25\.000|165w).*(mang len may bay|len may bay|di may bay|ky gui|xach tay|co bi giu)/i,
+            /(di may bay|len may bay).*(mang duoc|dem duoc|co duoc mang).*(sac du phong|pin du phong)/i
+        ],
+        keywords: [
+            'pin sac du phong mang len may bay duoc khong', '20000mah co duoc mang len may bay',
+            'anker 25000mah mang len may bay duoc khong', 'quy dinh pin du phong tren may bay',
+            'sac du phong bo hanh ly ky gui duoc khong'
+        ],
+        reply: `Dạ theo quy định an toàn hàng không quốc tế (IATA) và các hãng bay Việt Nam (Vietnam Airlines, Vietjet, Bamboo), **bạn hoàn toàn ĐƯỢC MANG pin sạc dự phòng có dung lượng năng lượng ≤ 100Wh lên máy bay** nhé! ✈️🔋\n\n` +
+            `• 📐 **Cách quy đổi nhanh (mAh → Wh):** Hầu hết pin sạc dự phòng 10.000mAh (~37Wh), **20.000mAh (~74Wh)** và cả **Anker A1695 25.000mAh 165W (~90Wh)** đều nằm **DƯỚI mức trần 100Wh**, hoàn toàn hợp chuẩn an ninh sân bay!\n` +
+            `• 🎒 **LƯU Ý BẮT BUỘC:** Pin sạc dự phòng **PHẢI ĐỂ TRONG HÀNH LÝ XÁCH TAY** mang lên cabin, **TUYỆT ĐỐI KHÔNG bỏ vào vali ký gửi** (hành lý ký gửi sẽ bị soi chiếu giữ lại).\n` +
+            `• 💡 Nên chọn các hãng chính hãng có in rõ thông số ` + '`Wh`' + ` và chứng chỉ an toàn trên vỏ (như **Anker, Baseus, Ugreen**) để qua cửa an ninh soi chiếu trong 3 giây không cần giải trình ạ!\n\n` +
+            `👉 Em đính kèm các mẫu pin sạc dự phòng chuẩn bay PD 100W/165W đang giảm giá sâu để bạn tham khảo nhé! 😊`,
+        suggestions: ['Xem Pin sạc dự phòng Anker', 'Xem Củ sạc nhanh GaN đi du lịch', 'Tư vấn Tai nghe chống ồn đi máy bay']
+    },
+
+    // 3.121 Tương thích hệ sinh thái Apple (iPhone + Watch + AirPods + MacBook) vs Android
+    {
+        id: 'advice_ecosystem_iphone_watch_airpods_compatibility',
+        excludeIf: (norm) => /\b(do huyet ap|tieu duong|te nga|nguoi lon tuoi)\b/i.test(norm),
+        patterns: [
+            /(he sinh thai|dong bo|dung chung).*(iphone|apple|macbook|airpods|apple watch|android|samsung)/i,
+            /(apple watch|airpods).*(ket noi|dung chung|xai duoc voi).*(android|samsung|xiaomi|windows)/i,
+            /(dang dung|co san).*(iphone|macbook).*(mua gi|chon tai nghe nao|chon dong ho nao|chon tablet nao|dong bo)/i
+        ],
+        keywords: [
+            'apple watch co dung voi android duoc khong', 'airpods dung voi samsung duoc khong',
+            'dang dung iphone nen mua dong ho nao', 'he sinh thai apple dong bo gi',
+            'macbook va iphone ket noi gi', 'tuong thich iphone va tai nghe'
+        ],
+        reply: `Dạ lựa chọn thiết bị **cùng hệ sinh thái** sẽ giúp trải nghiệm hàng ngày sướng hơn gấp nhiều lần đấy ạ! Em xin tóm tắt nhanh ma trận tương thích chuẩn nhất:\n\n` +
+            `1. 🍏 **NẾU BẠN ĐANG DÙNG iPHONE / MACBOOK:**\n` +
+            `• **Apple Watch:** Bắt buộc kết nối với iPhone (KHÔNG ghép đôi trực tiếp với điện thoại Android được). Nếu đang xài iPhone -> Apple Watch Series 10 / SE là số 1.\n` +
+            `• **AirPods Pro 2 + MacBook + iPhone:** Tự động chuyển âm thanh 0 giây khi có cuộc gọi, dùng chung **Copy-Paste xuyên thiết bị (Universal Clipboard)** và truyền ảnh video 4K bằng AirDrop tức thì.\n\n` +
+            `2. 🤖 **NẾU BẠN DÙNG ANDROID / WINDOWS HOẶC CẢ 2 HỆ:**\n` +
+            `• **Đồng hồ đa nền tảng:** **Garmin (Forerunner / Venu)** dùng mượt trên CẢ iOS lẫn Android (pin 7–14 ngày). **Samsung Galaxy Watch** tối ưu nhất khi ghép với điện thoại Android/Samsung.\n` +
+            `• **Tai nghe đa nền tảng:** **Sony WH-1000XM5** hay **JBL / Marshall** hỗ trợ kết nối Multipoint cùng lúc 2 thiết bị (vừa nối Laptop Windows vừa nối iPhone cực tiện)!\n\n` +
+            `👉 Hiện tại bạn đang sở hữu thiết bị nào rồi (nhắn em biết để em ghi nhớ và chọn đúng máy đồng bộ nhất cho bạn nhé)! 😊`,
+        suggestions: ['Xem Apple Watch chính hãng', 'Xem Garmin đa nền tảng', 'Xem Sony WH-1000XM5 Multipoint', 'Xem AirPods Pro 2']
+    },
+
+    // 3.122 Người bị cận thị nặng / mỏi mắt ban đêm nên chọn màn hình OLED PWM hay IPS?
+    {
+        id: 'advice_eye_comfort_myopia_pwm_screen',
+        category: 'Điện thoại',
+        patterns: [
+            /(can thi|bi can|moi mat|dau mat|nhuc mat|chong moi mat|bao ve mat).*(man hinh|oled|ips|pwm|dien thoai|tablet|laptop)/i,
+            /(man hinh).*(nao do moi mat|bao ve mat tot nhat|chong nhap nhay|pwm cao)/i
+        ],
+        keywords: [
+            'bi can thi nen chon man hinh nao', 'man hinh bao ve mat chong moi mat',
+            'dien thoai nao do moi mat ban dem', 'pwm dimming chong nhap nhay la gi',
+            'oled hay ips do hai mat'
+        ],
+        reply: `Dạ với người bị cận thị hoặc thường xuyên đọc tài liệu, lướt máy ban đêm thì chọn đúng công nghệ màn hình cực kỳ quan trọng để không bị nhức mỏi mắt! 👁️✨\n\n` +
+            `• ⚡ **Vấn đề nhấp nháy PWM Dimming ở màn OLED:** Một số màn OLED điều chỉnh độ sáng bằng cách bật/tắt cực nhanh ở tần số thấp (240Hz–480Hz), dễ gây mỏi mắt với người nhạy cảm khi hạ độ sáng dưới 40% trong phòng tối.\n` +
+            `• 🛡️ **LỰA CHỌN TỐI ƯU BẢO VỆ MẮT HIỆN NAY:**\n` +
+            `  1. **Smartphone có High-Frequency PWM (1920Hz – 3840Hz):** Các dòng flagship Android thế hệ mới (như **HONOR, OPPO Find X8, Xiaomi**) có tần số làm mờ siêu cao gần như triệt tiêu hiện tượng nhấp nháy mắt thường không thấy.\n` +
+            `  2. **Màn hình IPS LCD chống chói (MacBook / iPad / Laptop văn phòng):** Dùng công nghệ DC Dimming không nhấp nháy ở mọi mức sáng, cực kỳ êm dịu cho sinh viên đọc PDF hay kế toán nhìn bảng tính 8 tiếng/ngày.\n` +
+            `  3. **Mẹo cài đặt ngay:** Luôn bật chế độ **True Tone / Night Shift (Ánh sáng ấm ban đêm)** và tránh tắt hết đèn phòng khi dùng điện thoại nha!\n\n` +
+            `👉 Bạn đang tìm **Điện thoại**, **Tablet** hay **Laptop** dịu mắt để em lọc các mẫu có chứng nhận TÜV Rheinland Low Blue Light nhé! 😊`,
+        suggestions: ['Xem Điện thoại bảo vệ mắt', 'Xem iPad & Tablet dịu mắt', 'Xem Laptop chống chói', 'Tư vấn Trả góp 0%']
+    },
+
+    // 3.123 Laptop Gaming quạt ồn có mang vào thư viện / lớp học / phòng họp được không?
+    {
+        id: 'advice_gaming_laptop_library_silent_mode',
+        category: 'Laptop',
+        patterns: [
+            /(laptop gaming|may gaming|rog|nitro|katana|victus|tuf).*(thu vien|lop hoc|phong hop|giang duong|quat on|keu to|co on khong)/i,
+            /(mang laptop gaming).*(di hoc|vao thu vien|len lop).*(co on khong|co bat tien khong)/i
+        ],
+        keywords: [
+            'laptop gaming mang vao thu vien co on khong', 'cach lam laptop gaming im lang',
+            'mua laptop gaming di hoc tren lop co bat tien khong', 'che do silent mode laptop gaming'
+        ],
+        reply: `Dạ đây là câu hỏi cực kỳ thực tế của các bạn sinh viên IT/Kỹ thuật muốn mua **Laptop Gaming** để vừa đi học trên giảng đường vừa về nhà chiến game! 💻📚🎮\n\n` +
+            `• 🤫 **Câu trả lời là ĐƯỢC và RẤT ÊM NẾU BẬT ĐÚNG CHẾ ĐỘ:** Laptop Gaming chỉ hú quạt to khi kích hoạt card đồ họa rời (RTX) để chơi game hoặc render.\n` +
+            `• ⚙️ **Bí quyết đi học thư viện im phăng phắc (0 tiếng ồn):**\n` +
+            `  1. Chuyển sang chế độ **Silent / Quiet Mode** trong phần mềm hãng (ASUS *Armoury Crate*, Acer *NitroSense*, Lenovo *Vantage* — chỉ 1 phím tắt *Fn+F5* hoặc *Fn+Q*).\n` +
+            `  2. Tắt card rời sang **Eco / Hybrid Mode** khi rút sạc dùng pin -> quạt gần như đứng yên hoàn toàn, pin tăng thêm gấp đôi (được 5–6 giờ Word/Chrome) và máy mát rượi như laptop văn phòng.\n\n` +
+            `👉 Nếu bạn hay di chuyển cả ngày, có thể cân nhắc các dòng thiết kế thanh lịch không hầm hố như **ASUS TUF / Acer Nitro V / MSI Modern**, mang vào phòng họp hay thư viện đều rất lịch sự nhé! 😊`,
+        suggestions: ['Xem Laptop Gaming gọn nhẹ lịch sự', 'So sánh Gaming vs Ultrabook', 'Laptop dưới 20 triệu đi học']
+    },
+
+    // 3.124 Mua số lượng nhiều cho Công ty / Doanh nghiệp (B2B) + Xuất hóa đơn VAT
+    {
+        id: 'advice_b2b_bulk_corporate_vat_discount',
+        patterns: [
+            /(cong ty|doanh nghiep|van phong|to chuc|truong hoc).*(mua so luong|mua nhieu|bao gia|b2b|5 may|10 may|hoa don vat)/i,
+            /(mua tu|mua so luong|lay si|dat so luong).*(chiet khau|giam gia|hoa don do|hop dong)/i
+        ],
+        keywords: [
+            'cong ty mua so luong lon co giam gia khong', 'bao gia b2b laptop doanh nghiep',
+            'mua 10 cai laptop co chiet khau khong', 'xuat hoa don vat cong ty'
+        ],
+        reply: `Dạ hệ thống bên em có bộ phận chuyên trách **Khách hàng Doanh nghiệp (B2B) & Dự án** với chính sách ưu đãi cực kỳ linh hoạt ạ! 🏢💼\n\n` +
+            `• 🧾 **Hóa đơn VAT & Chứng từ đầy đủ 100%:** Xuất hóa đơn GTGT điện tử theo đúng MST công ty, hợp đồng mua bán, biên bản bàn giao và CO/CQ chính hãng minh bạch.\n` +
+            `• 💸 **Chiết khấu riêng theo số lượng:** Từ **3 – 5 máy trở lên**, em áp dụng mức giá sỉ doanh nghiệp ưu đãi hơn giá niêm yết website, kèm hỗ trợ **công nợ / thanh toán chuyển khoản công ty** nhanh chóng.\n` +
+            `• 🛠️ **Hỗ trợ kỹ thuật tận nơi:** Miễn phí cài đặt phần mềm văn phòng/bảo mật đồng loạt trước khi bàn giao và bảo hành ưu tiên 1 đổi 1 trong 30 ngày.\n\n` +
+            `👉 Anh/chị nhắn em **danh sách model + số lượng dự kiến** hoặc liên hệ trực tiếp Hotline B2B **0842.331.606** (Zalo) để bên em gửi bảng báo giá chính thức trong 10 phút nhé! 😊`,
+        suggestions: ['Hotline B2B 0842.331.606', 'Xem Laptop văn phòng đồng bộ', 'Chính sách xuất hóa đơn VAT']
+    },
+
+    // 3.125 Dịch vụ Gói quà sinh nhật, Thiệp chúc & Giao đúng giờ hẹn
+    {
+        id: 'advice_gift_wrapping_birthday_same_day',
+        patterns: [
+            /(goi qua|hop qua|viet thiep|thiep chuc|sinh nhat|ky niem).*(giao dung gio|hen gio|tang qua|mien phi|duoc khong)/i,
+            /(tang sinh nhat|mua tang).*(giao qua quan khac|giao tan tay|giao hoa toc|goi qua)/i
+        ],
+        keywords: [
+            'mua tang sinh nhat co goi qua khong', 'co viet thiep chuc khong',
+            'giao dung gio hen tang qua duoc khong', 'ship hoa toc tang ban gai'
+        ],
+        reply: `Dạ quá tuyệt vời luôn ạ! Shop em rất thường xuyên giúp các bạn chuẩn bị quà tặng bất ngờ cho người yêu, bạn bè và gia đình đấy nhé 🎁💐✨\n\n` +
+            `• 🎀 **Gói quà & Thiệp chúc MIỄN PHÍ 100%:** Cửa hàng chuẩn bị hộp/túi quà sang trọng kèm nơ và hỗ trợ **viết thiệp chúc tay** trang trọng theo đúng lời nhắn của bạn.\n` +
+            `• ⏰ **Giao hỏa tốc đúng giờ hẹn (TP.HCM trong 2H):** Bạn chỉ cần ghi chú khung giờ muốn người nhận mở quà ở mục *Ghi chú đơn hàng* (hoặc nhắn Zalo **0842.331.606** kèm mã đơn), shipper hỏa tốc bên em sẽ giao chuẩn xác tận tay người nhận.\n` +
+            `• 📸 **Chụp ảnh thực tế trước khi gửi:** Nhân viên sẽ chụp lại ảnh hộp quà đã gói và gửi qua Zalo để bạn duyệt ưng ý trước khi xuất kho ạ!\n\n` +
+            `👉 Bạn đang định chọn món quà công nghệ nào (AirPods, Apple Watch, iPhone hay iPad) để em gợi ý mẫu hot nhất làm quà nhé! 😊`,
+        suggestions: ['Quà cho Bạn gái / Người yêu', 'Xem AirPods Pro 2 làm quà', 'Xem Apple Watch làm quà', 'Hotline 0842.331.606']
+    },
+
+    // 3.126 Setup Builder phối góc làm việc công thái học & Kiểm tra tương thích Combo
+    {
+        id: 'advice_setup_builder_ergonomic_desk',
+        patterns: [
+            /(setup builder|phoi goc lam viec|tu phoi|build setup|goc lam viec|combo ban lam viec)/i,
+            /(muon phoi|tu build).*(laptop|chuot|ban phim|hub|tai nghe).*(combo|dong bo)/i
+        ],
+        keywords: [
+            'setup builder la gi', 'phoi goc lam viec cong thai hoc', 'combo laptop chuot ban phim hub',
+            'tu phoi combo thiet bi lam viec'
+        ],
+        reply: `Dạ tính năng **🔥 Setup Builder (Tự phối góc làm việc)** ngay trên thanh danh mục của cửa hàng là công cụ "độc quyền" giúp bạn thiết kế trọn bộ góc học tập / làm việc cực kỳ chuyên nghiệp đấy ạ! 🖥️⌨️🖱️✨\n\n` +
+            `• 🧩 **Tự chọn & Xem tổng chi phí tức thì:** Bạn tự chọn từng món (*Laptop chính -> Chuột công thái học -> Bàn phím cơ/không dây -> Hub USB-C -> Tai nghe*) theo đúng ngân sách.\n` +
+            `• 🔌 **Tự động kiểm tra tương thích:** Hệ thống đảm bảo Hub chuẩn Power Delivery (PD) đủ công suất sạc và xuất hình 4K cho chiếc Laptop bạn chọn.\n` +
+            `• 💰 **Tiết kiệm Combo đến 20–30%:** Phối nhiều món cùng lúc tự động nhận ưu đãi giảm giá phụ kiện và gợi ý mã giảm giá tốt nhất!\n\n` +
+            `👉 Bạn muốn tự bấm vào nút **🔥 Setup Builder** ở thanh công cụ phía trên, hay nhắn em **ngân sách tổng + nhu cầu** để em phối sẵn ngay một bộ tối ưu cho bạn tham khảo nhé! 😊`,
+        suggestions: ['Phối góc làm việc 25 triệu', 'Xem Chuột Logitech MX Master 3S', 'Xem Hub chuyển đổi Ugreen']
+    },
+
+    // 3.127 Hướng dẫn sử dụng AI Tìm kiếm bằng Hình ảnh (Visual Search)
+    {
+        id: 'advice_visual_search_usage_guide',
+        patterns: [
+            /(tim kiem bang hinh anh|tim bang anh|visual search|gui anh tim|chup anh tim|upload anh).*(nhu the nao|the nao|ra sao|o dau|cach dung)/i,
+            /(cach tim san pham bang anh|tim may giong trong anh)/i
+        ],
+        keywords: [
+            'tim kiem bang hinh anh nhu the nao', 'cach dung tim kiem bang anh',
+            'ai nhan dien hinh anh o dau', 'gui anh tim san pham'
+        ],
+        reply: `Dạ tính năng **📷 AI Visual Search (Tìm kiếm sản phẩm bằng hình ảnh)** đã được tích hợp sẵn ngay trong khung chat này luôn ạ! Bạn có thể dùng theo 3 cách siêu nhanh:\n\n` +
+            `1. 📷 **Bấm biểu tượng Máy ảnh** ở góc trái ô nhập tin nhắn để chọn ảnh từ điện thoại/máy tính.\n` +
+            `2. 🖱️ **Kéo thả trực tiếp file ảnh** vào khung chat.\n` +
+            `3. ⌨️ **Nhấn ` + '`Ctrl + V`' + ` (Dán ảnh trực tiếp)** từ ảnh chụp màn hình ngay vào ô nhập chữ!\n\n` +
+            `✨ **Khả năng thông minh của AI Vision 3.x:** Có thể nhận diện **NHIỀU thiết bị trong cùng 1 bức ảnh** (ví dụ: ảnh bàn làm việc có cả MacBook, iPhone và Apple Watch), phân loại chính xác thương hiệu/dòng máy và khớp ngay các sản phẩm tương ứng kèm giá bán trong kho của cửa hàng! Bạn thử tải lên 1 bức ảnh ngay nhé! 🚀`,
+        suggestions: ['Tư vấn chọn máy', 'So sánh 2 sản phẩm', 'Săn mã giảm giá hôm nay']
     }
 ];
 

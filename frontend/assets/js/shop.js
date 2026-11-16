@@ -921,16 +921,21 @@ function setupPriceHistogramFilter() {
     if (!panel || !track || panel._u024Bound) return;
     panel._u024Bound = true;
 
-    if (window.innerWidth <= 768) {
-        panel.hidden = true;
-        toggleBtn?.setAttribute('aria-expanded', 'false');
-    }
+    // Mặc định thu gọn Biểu đồ giá trên cả Desktop & Mobile để giao diện danh mục gọn gàng, chỉ bung ra khi bấm nút
+    panel.hidden = true;
+    toggleBtn?.setAttribute('aria-expanded', 'false');
 
     toggleBtn?.addEventListener('click', () => {
         const nextOpen = panel.hidden;
         panel.hidden = !nextOpen;
         toggleBtn.setAttribute('aria-expanded', String(nextOpen));
-        if (nextOpen) syncPriceHistogramUI();
+        toggleBtn.classList.toggle('active', nextOpen);
+        if (nextOpen) {
+            panel.classList.remove('u024-open-anim');
+            void panel.offsetWidth;
+            panel.classList.add('u024-open-anim');
+            syncPriceHistogramUI();
+        }
     });
 
     const STEP = 2;
@@ -1065,17 +1070,7 @@ function updateHeaderCategoryState() {
         button.classList.toggle('active', isActive);
         button.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
-    document.querySelectorAll('.header-category-list').forEach(listEl => {
-        if (!listEl._u039Bound) {
-            listEl._u039Bound = true;
-            listEl.querySelectorAll('a, button').forEach(btn => {
-                btn.addEventListener('pointerenter', () => syncListSlidingPill(listEl, btn));
-            });
-            listEl.addEventListener('pointerleave', () => syncListSlidingPill(listEl, null));
-            window.addEventListener('resize', () => syncListSlidingPill(listEl, null), { passive: true });
-        }
-        syncListSlidingPill(listEl, null);
-    });
+    document.querySelectorAll('.header-category-list .u039-pill-item').forEach(el => el.remove());
 }
 
 function setCategory(category, options = {}) {
@@ -1108,6 +1103,16 @@ function setCategory(category, options = {}) {
     renderBrandFilter();
     renderFacetedSpecBar();
     renderProducts();
+
+    // Hiệu ứng chuyển tiếp mượt mà khi đổi danh mục
+    const filterHub = document.querySelector('.catalog-filter-hub');
+    const prodSections = document.getElementById('productSections');
+    [filterHub, prodSections].forEach(el => {
+        if (!el) return;
+        el.classList.remove('cat-switch-animate');
+        void el.offsetWidth;
+        el.classList.add('cat-switch-animate');
+    });
 
     if (options.scroll !== false) {
         document.getElementById('catalogStart')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1816,6 +1821,9 @@ function setupCategoryDragScroll(navEl) {
 
     setTimeout(updateArrows, 60);
     setTimeout(updateArrows, 350);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(updateArrows).catch(() => {});
+    }
 }
 
 function getSavedShoppingAddress() {
@@ -3361,8 +3369,9 @@ function syncActiveFilterChipsAndBreadcrumbs(count = null) {
 
     const hasActiveFilters = isCategoryFiltered || isPriceFiltered || isBrandFiltered || isStockFiltered || isSearchFiltered || isFacetsFiltered;
 
-    // 1. Thu nhỏ Hero thành banner mỏng khi có bộ lọc hoạt động
+    // 1. Ẩn gọn Hero Carousel khi đang lọc danh mục/sản phẩm để tránh dải cắt ngang bị lỗi
     if (hero) {
+        hero.hidden = hasActiveFilters;
         hero.classList.toggle('hero-compact', hasActiveFilters);
     }
 

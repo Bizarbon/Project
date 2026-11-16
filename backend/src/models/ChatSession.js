@@ -29,6 +29,14 @@ const messageSubSchema = new mongoose.Schema({
     intent: {
         type: String,
         default: ''
+    },
+    visualDevices: {
+        type: Array,
+        default: []
+    },
+    ragSources: {
+        type: Array,
+        default: []
     }
 }, { _id: false });
 
@@ -71,6 +79,23 @@ const chatSessionSchema = new mongoose.Schema({
     budgetRange: {
         type: String,
         default: ''
+    },
+    rollingSummary: {
+        type: String,
+        default: ''
+    },
+    memoryProfile: {
+        preferredBrands: { type: [String], default: [] },
+        dislikedBrands: { type: [String], default: [] },
+        ownedDevices: { type: [String], default: [] },
+        occupationOrRole: { type: String, default: '' },
+        keyPriorities: { type: [String], default: [] },
+        budgetMin: { type: Number, default: 0 },
+        budgetMax: { type: Number, default: 0 },
+        budgetStrict: { type: Boolean, default: false },
+        lastVisualDevices: { type: Array, default: [] },
+        discussedProducts: { type: Array, default: [] },
+        turnCount: { type: Number, default: 0 }
     },
     status: {
         type: String,

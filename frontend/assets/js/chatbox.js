@@ -7,20 +7,25 @@
     let consultationContext = {};
     const starterSuggestions = [
         '✨ Tư vấn chọn máy',
+        '📊 Laptop cho Kế toán',
+        '👨‍🏫 Máy cho Giáo viên',
+        '🩺 iPad học Y khoa',
+        '💼 Máy cho dân Sales / BĐS',
+        '✈️ Combo đi công tác',
+        '📏 Laptop 14" hay 15.6"?',
+        '📱 Pro gọn tay hay Pro Max?',
+        '🕹️ PS5 hay Switch gia đình?',
+        '👁️ Điện thoại bảo vệ mắt',
+        '💸 Đợi sale lễ hay mua ngay?',
+        '💔 Máy vỡ màn cứu dữ liệu',
         '📦 Tra cứu đơn hàng',
         '💳 Tính trả góp 0%',
         '🎁 Combo phụ kiện tiết kiệm',
         '🔍 Kiểm tra seal & IMEI',
         '🛡️ Bảo hành rơi vỡ 1 đổi 1',
-        '⚡ Sạc chéo hãng có sao không?',
-        '✈️ Pin dự phòng lên máy bay',
-        '🎥 Livestream không tối màn',
-        '⌨️ Bàn phím cơ văn phòng êm',
         '🔄 Thu cũ đổi mới lên đời',
         '🎨 Đồ họa: Mac hay Windows?',
-        '📍 Địa chỉ showroom',
         '🔥 Săn mã giảm giá',
-        '📱 Máy mới vs Like New 99%',
         '🎧 Tai nghe chống ồn ANC',
         '🎮 Máy chơi mượt Genshin'
     ];
@@ -37,11 +42,49 @@
         return '';
     }
 
+    function getOrCreateChatSessionId() {
+        try {
+            let sid = localStorage.getItem('ai_chat_session_id');
+            if (!sid) {
+                sid = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+                localStorage.setItem('ai_chat_session_id', sid);
+            }
+            return sid;
+        } catch (_) {
+            return 'sess_fallback_' + Date.now().toString(36);
+        }
+    }
+
+    function persistLongTermMemorySnapshot(ctx) {
+        if (!ctx || typeof ctx !== 'object') return;
+        try {
+            if (ctx.memoryProfile) {
+                localStorage.setItem('ai_chat_memory_profile', JSON.stringify(ctx.memoryProfile));
+            }
+            if (typeof ctx.rollingSummary === 'string' && ctx.rollingSummary) {
+                localStorage.setItem('ai_chat_rolling_summary', ctx.rollingSummary);
+            }
+        } catch (_) { }
+    }
+
+    function hydrateLongTermMemorySnapshot() {
+        try {
+            const rawProfile = localStorage.getItem('ai_chat_memory_profile');
+            if (rawProfile && !consultationContext.memoryProfile) {
+                consultationContext.memoryProfile = JSON.parse(rawProfile);
+            }
+            const rawSummary = localStorage.getItem('ai_chat_rolling_summary');
+            if (rawSummary && !consultationContext.rollingSummary) {
+                consultationContext.rollingSummary = rawSummary;
+            }
+        } catch (_) { }
+    }
+
     function ensureStylesheet() {
         if (!document.querySelector('link[data-ai-chat-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/chatbox.css?v=20261109-nearest-v1`;
+            link.href = `${root}assets/css/chatbox.css?v=20261116-ai-rag-v1`;
             link.dataset.aiChatStyle = 'true';
             document.head.appendChild(link);
         }
@@ -331,8 +374,6 @@
                     </div>
                     <div class="ai-chat-header-actions" aria-label="Tác vụ cửa sổ chat">
                         <button class="ai-chat-reset" type="button" aria-label="Làm mới đoạn chat" title="Làm mới đoạn chat">↺</button>
-                        <button class="ai-chat-minimize" type="button" aria-label="Thu nhỏ chat" title="Thu nhỏ">─</button>
-                        <a class="ai-chat-expand" href="${root}pages/ai/assistant.html" aria-label="Mở giao diện AI đầy đủ" title="Mở giao diện AI đầy đủ">↗</a>
                         <button class="ai-chat-voice" type="button" aria-label="Bật đọc câu trả lời" aria-pressed="false" title="Đọc câu trả lời bằng giọng nói">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m2-9a9 9 0 0 1 0 12"/>
@@ -348,7 +389,7 @@
                     <button type="button" class="ai-suggestions-arrow ai-suggestions-next" aria-label="Cuộn gợi ý sang phải" hidden>›</button>
                 </nav>
                 <form class="ai-chat-form" id="aiChatForm" role="search">
-                    <button class="ai-chat-camera" id="aiChatCameraBtn" type="button" aria-label="Tìm kiếm sản phẩm bằng hình ảnh" title="Gửi ảnh để AI tìm sản phẩm">
+                    <button class="ai-chat-camera" id="aiChatCameraBtn" type="button" aria-label="Tìm kiếm sản phẩm bằng hình ảnh" title="Gửi ảnh, kéo thả hoặc dán (Ctrl+V) để AI tìm sản phẩm">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                     </button>
                     <input type="file" id="aiChatCameraInput" accept="image/*" style="display:none" aria-hidden="true">
@@ -696,12 +737,12 @@
                         sessionStorage.setItem('appliedCoupon', JSON.stringify({ code, discount, discountAmount: discount, value: discount, type: 'fixed', minOrderValue: minOrder, name: `Mã Trợ Giá Độc Quyền ${code}` }));
                         localStorage.setItem('checkout_coupon', code);
                         if (navigator.clipboard && navigator.clipboard.writeText) {
-                            navigator.clipboard.writeText(code).catch(() => {});
+                            navigator.clipboard.writeText(code).catch(() => { });
                         }
                         if (typeof window.showToast === 'function') {
                             window.showToast(`🎉 Đã kích hoạt mã ${code} (-${Number(discount).toLocaleString('vi-VN')} đ) vào phiên mua của bạn!`);
                         }
-                    } catch (_) {}
+                    } catch (_) { }
                 }
                 onClick(txt);
             });
@@ -1425,6 +1466,9 @@
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers.Authorization = `Bearer ${token}`;
 
+        const sessionId = getOrCreateChatSessionId();
+        hydrateLongTermMemorySnapshot();
+
         const urlParams = new URLSearchParams(window.location.search);
         const pageCategory = urlParams.get('category') || '';
         const pageProductId = window.location.pathname.includes('product.html') ? (urlParams.get('id') || '') : '';
@@ -1433,6 +1477,8 @@
             const hasActiveConversationScope = Boolean(
                 requestContext.productType
                 || requestContext.stage === 'qualifying_needs'
+                || requestContext.stage === 'visual_not_in_catalog'
+                || requestContext.pendingBrandSuggestion
                 || requestContext.currentIntent === 'qualifying_needs'
                 || requestContext.currentIntent === 'clarify_needs'
             );
@@ -1454,7 +1500,7 @@
         const response = await fetch(`${apiUrl}/chat`, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ message, context: requestContext })
+            body: JSON.stringify({ message, sessionId, context: requestContext })
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.message || 'Chatbot chưa phản hồi được.');
@@ -1481,6 +1527,7 @@
         let recognizedText = '';
         let recognitionSilenceTimer = null;
         consultationContext = {};
+        hydrateLongTermMemorySnapshot();
         let chatHistory = [];
         let voiceEnabled = localStorage.getItem('chatVoiceEnabled') === 'true';
         let reengagementTimer = null;
@@ -1800,6 +1847,178 @@
             micButton.title = 'Trình duyệt này chưa hỗ trợ nhận dạng giọng nói';
         }
 
+        async function compressImageForVisualSearch(file) {
+            const readRawDataUrl = () => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(String(reader.result || ''));
+                reader.onerror = () => reject(new Error('Không thể đọc dữ liệu ảnh.'));
+                reader.readAsDataURL(file);
+            });
+
+            const rawDataUrl = await readRawDataUrl();
+            if (!file || file.type === 'image/gif' || file.size <= 350 * 1024) {
+                return rawDataUrl;
+            }
+
+            try {
+                const img = await new Promise((resolve, reject) => {
+                    const imageEl = new Image();
+                    imageEl.onload = () => resolve(imageEl);
+                    imageEl.onerror = () => reject(new Error('decode_failed'));
+                    imageEl.src = rawDataUrl;
+                });
+                const maxDim = 1280;
+                const width = img.naturalWidth || img.width || 0;
+                const height = img.naturalHeight || img.height || 0;
+                if (!width || !height) return rawDataUrl;
+
+                const scale = Math.min(1, maxDim / Math.max(width, height));
+                const targetW = Math.max(1, Math.round(width * scale));
+                const targetH = Math.max(1, Math.round(height * scale));
+                const canvas = document.createElement('canvas');
+                canvas.width = targetW;
+                canvas.height = targetH;
+                const ctx2d = canvas.getContext('2d');
+                if (!ctx2d) return rawDataUrl;
+                ctx2d.drawImage(img, 0, 0, targetW, targetH);
+                const compressed = canvas.toDataURL('image/jpeg', 0.85);
+                return (compressed && compressed.length < rawDataUrl.length) ? compressed : rawDataUrl;
+            } catch (_) {
+                return rawDataUrl;
+            }
+        }
+
+        function renderVisualDetectedBadges(targetBody, devices) {
+            if (!Array.isArray(devices) || devices.length === 0) return;
+            const listEl = document.createElement('ul');
+            listEl.className = 'ai-visual-devices-list';
+            listEl.setAttribute('aria-label', 'Thiết bị AI nhận diện từ ảnh');
+            devices.slice(0, 6).forEach((d) => {
+                const li = document.createElement('li');
+                li.className = 'ai-visual-device-tag';
+                const label = d.modelGuess || d.name || d.category || 'Thiết bị';
+                const brandText = d.brand ? `${d.brand} · ` : '';
+                li.textContent = `📷 ${brandText}${label}`;
+                listEl.appendChild(li);
+            });
+            targetBody.appendChild(listEl);
+        }
+
+        async function performVisualSearch(file) {
+            if (!file) return;
+            openChat(false);
+            cancelReengagement();
+
+            const base64Data = await compressImageForVisualSearch(file);
+            const hintText = (input?.value || '').trim();
+            if (input && hintText) input.value = '';
+
+            const imgMsg = document.createElement('article');
+            imgMsg.className = 'ai-message user';
+            const bubble = document.createElement('section');
+            bubble.className = 'ai-bubble';
+            const figure = document.createElement('figure');
+            figure.className = 'ai-visual-preview';
+            const previewImg = document.createElement('img');
+            previewImg.src = base64Data;
+            previewImg.alt = 'Ảnh sản phẩm tải lên để AI tìm kiếm';
+            const caption = document.createElement('figcaption');
+            caption.textContent = hintText ? `[Tìm ảnh] ${hintText}` : '[Tìm sản phẩm từ hình ảnh]';
+            figure.appendChild(previewImg);
+            figure.appendChild(caption);
+            bubble.appendChild(figure);
+            imgMsg.appendChild(bubble);
+            body.appendChild(imgMsg);
+            scrollToBottom(body);
+
+            const userVisualLog = hintText || `[Tìm kiếm bằng hình ảnh: ${file.name || 'ảnh tải lên'}]`;
+            chatHistory.push({ role: 'user', text: userVisualLog });
+            saveSession();
+
+            const typing = appendMessage(body, 'ai ai-typing', 'AI Gemini đang quan sát ảnh và tìm thiết bị phù hợp...');
+            panel.dataset.state = 'loading';
+            window.TechMascot?.setState('thinking');
+
+            try {
+                const token = localStorage.getItem('token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers.Authorization = `Bearer ${token}`;
+
+                const res = await fetch(`${apiUrl}/chat/visual-search`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        sessionId: getOrCreateChatSessionId(),
+                        image: base64Data,
+                        filename: file.name || 'uploaded_image.jpg',
+                        hint: hintText,
+                        context: consultationContext
+                    })
+                });
+                const visualResult = await res.json();
+                typing.remove();
+                panel.dataset.state = '';
+
+                if (!res.ok) throw new Error(visualResult.message || 'Không thể nhận diện hình ảnh');
+
+                if (visualResult.context && typeof visualResult.context === 'object') {
+                    consultationContext = { ...consultationContext, ...visualResult.context };
+                    persistLongTermMemorySnapshot(consultationContext);
+                }
+
+                window.TechMascot?.onReplyStart?.();
+
+                if (!visualResult.isTech) {
+                    const honestMsg = visualResult.reply || 'Ảnh này chưa phát hiện thiết bị công nghệ thuộc danh mục cửa hàng. Bạn vui lòng gửi ảnh chụp rõ thiết bị hơn hoặc gõ tên máy vào ô chat nhé!';
+                    streamAIMessage(body, honestMsg, () => {
+                        const fallbackSug = visualResult.suggestions || ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Mã giảm giá hôm nay'];
+                        chatHistory.push({ role: 'ai', text: honestMsg, suggestions: fallbackSug });
+                        saveSession();
+                        renderSuggestions(suggestionsBar, fallbackSug, send);
+                        scrollToBottom(body);
+                    });
+                    return;
+                }
+
+                const detected = visualResult.detectedItem || 'Thiết bị công nghệ';
+                const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!`;
+                const nextSuggestions = visualResult.suggestions || [
+                    visualResult.products?.length >= 2 ? 'So sánh 2 máy vừa rồi' : null,
+                    'Tính trả góp 0%',
+                    'Mã giảm giá hôm nay'
+                ].filter(Boolean);
+
+                streamAIMessage(body, reply, () => {
+                    if (Array.isArray(visualResult.detectedDevices) && visualResult.detectedDevices.length > 0) {
+                        renderVisualDetectedBadges(body, visualResult.detectedDevices);
+                    }
+                    if (visualResult.products?.length === 1) {
+                        renderInteractiveProductCard(body, visualResult.products[0]);
+                        recordUserShoppingInterest(visualResult.products[0].category, visualResult.products[0].name);
+                    } else if (visualResult.products?.length > 1) {
+                        renderChatProducts(body, visualResult.products);
+                        recordUserShoppingInterest(visualResult.products[0]?.category, visualResult.products[0]?.name);
+                    }
+                    chatHistory.push({
+                        role: 'ai',
+                        text: reply,
+                        products: visualResult.products || [],
+                        suggestions: nextSuggestions
+                    });
+                    saveSession();
+                    renderSuggestions(suggestionsBar, nextSuggestions, send);
+                    scrollToBottom(body);
+                });
+            } catch (err) {
+                typing.remove();
+                panel.dataset.state = '';
+                const errReply = err?.message || 'Rất tiếc, AI chưa thể xử lý hình ảnh lúc này. Bạn thử chụp rõ hơn hoặc nhắn tên thiết bị để em tìm giúp nhé!';
+                appendMessage(body, 'ai', errReply);
+                chatHistory.push({ role: 'ai', text: errReply });
+                saveSession();
+            }
+        }
+
         if (cameraButton && cameraInput) {
             cameraButton.addEventListener('click', () => {
                 cameraInput.click();
@@ -1807,58 +2026,24 @@
 
             cameraInput.addEventListener('change', async (e) => {
                 const file = e.target.files?.[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = async () => {
-                    const base64Data = reader.result;
-                    const imgMsg = document.createElement('article');
-                    imgMsg.className = 'ai-message user';
-                    imgMsg.innerHTML = `<section class="ai-bubble"><div style="max-width:180px; border-radius:8px; overflow:hidden;"><img src="${base64Data}" alt="Ảnh tải lên" style="width:100%; display:block;"></div><p style="margin-top:4px; font-size:0.8rem;">[Tìm sản phẩm từ hình ảnh]</p></section>`;
-                    body.appendChild(imgMsg);
-                    scrollToBottom(body);
-
-                    const typing = appendMessage(body, 'ai ai-typing', 'AI đang phân tích nhận diện thiết bị công nghệ...');
-                    try {
-                        const hintText = (input?.value || '').trim();
-                        const res = await fetch(`${apiUrl}/chat/visual-search`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ image: base64Data, filename: file.name, hint: hintText })
-                        });
-                        const visualResult = await res.json();
-                        typing.remove();
-
-                        if (!res.ok) throw new Error(visualResult.message || 'Không thể nhận diện hình ảnh');
-
-                        if (!visualResult.isTech) {
-                            const msg = visualResult.reply || 'Ảnh này chưa cho thấy thiết bị thuộc danh mục cửa hàng hỗ trợ (như điện thoại, laptop, tablet, tai nghe, phụ kiện công nghệ...). Bạn vui lòng gửi ảnh chụp rõ nét hơn của thiết bị cần tìm nhé!';
-                            streamAIMessage(body, msg, () => {
-                                scrollToBottom(body);
-                            });
-                            return;
-                        }
-
-                        const detected = visualResult.detectedItem || 'Thiết bị công nghệ';
-                        const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn là **${detected}**!\n${visualResult.description || ''}\nDưới đây là các sản phẩm tương thích chính hãng tốt nhất tại cửa hàng:`;
-
-                        streamAIMessage(body, reply, () => {
-                            if (visualResult.products?.length === 1) {
-                                renderInteractiveProductCard(body, visualResult.products[0]);
-                                recordUserShoppingInterest(visualResult.products[0].category, visualResult.products[0].name);
-                            } else if (visualResult.products?.length > 1) {
-                                renderChatProducts(body, visualResult.products);
-                                recordUserShoppingInterest(visualResult.products[0]?.category, visualResult.products[0]?.name);
-                            }
-                            scrollToBottom(body);
-                        });
-                    } catch (err) {
-                        typing.remove();
-                        appendMessage(body, 'ai', 'Rất tiếc, AI chưa thể nhận diện rõ thiết bị trong ảnh này. Bạn hãy thử chụp góc rõ hơn hoặc gửi ảnh thiết bị công nghệ khác nhé!');
-                    }
-                };
-                reader.readAsDataURL(file);
                 cameraInput.value = '';
+                if (file) {
+                    await performVisualSearch(file);
+                }
+            });
+        }
+
+        if (input) {
+            input.addEventListener('paste', async (e) => {
+                const items = Array.from(e.clipboardData?.items || []);
+                const imageItem = items.find(it => it.type && it.type.startsWith('image/'));
+                if (imageItem) {
+                    const pastedFile = imageItem.getAsFile();
+                    if (pastedFile) {
+                        e.preventDefault();
+                        await performVisualSearch(pastedFile);
+                    }
+                }
             });
         }
 
@@ -2302,7 +2487,13 @@
             window.TechMascot?.setState('thinking');
 
             try {
-                consultationContext.conversationHistory = chatHistory.slice(-7, -1).filter(item => item && item.text && !item.proactive).map(item => ({ role: item.role === 'user' ? 'user' : 'assistant', text: String(item.text).slice(0, 320) }));
+                consultationContext.conversationHistory = chatHistory
+                    .slice(-21, -1)
+                    .filter(item => item && item.text && !item.proactive)
+                    .map(item => ({
+                        role: item.role === 'user' ? 'user' : 'assistant',
+                        text: String(item.text).slice(0, 900)
+                    }));
                 const data = await askAssistant(message, consultationContext);
                 if (data.context && typeof data.context === 'object') {
                     if (!data.notFound) {
@@ -2310,7 +2501,11 @@
                         delete consultationContext.uncarriedBrand;
                         delete consultationContext.stage;
                     }
+                    if (!data.context.pendingBrandSuggestion) {
+                        delete consultationContext.pendingBrandSuggestion;
+                    }
                     consultationContext = { ...consultationContext, ...data.context };
+                    persistLongTermMemorySnapshot(consultationContext);
                     if (!data.context.brand) {
                         consultationContext.brand = '';
                     }
@@ -2627,7 +2822,7 @@
                         e.dataTransfer.setData('application/json', JSON.stringify(productData));
                         e.dataTransfer.setData('text/plain', `Tư vấn chi tiết cho tôi về ${productData.name}`);
                         e.dataTransfer.effectAllowed = 'copy';
-                    } catch (err) {}
+                    } catch (err) { }
 
                     if (chat.classList.contains('open')) {
                         dropzone?.classList.add('is-active');
@@ -2691,7 +2886,7 @@
                 }
             });
 
-            panel.addEventListener('drop', (e) => {
+            panel.addEventListener('drop', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 dragCounter = 0;
@@ -2702,7 +2897,7 @@
                 try {
                     const raw = e.dataTransfer.getData('application/json');
                     if (raw) productData = JSON.parse(raw);
-                } catch (err) {}
+                } catch (err) { }
 
                 if (!productData && window.__draggedProduct) {
                     productData = window.__draggedProduct;
@@ -2712,37 +2907,7 @@
                 if (!productData && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                     const file = e.dataTransfer.files[0];
                     if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = async () => {
-                            const base64Data = reader.result;
-                            const imgMsg = document.createElement('article');
-                            imgMsg.className = 'ai-message user';
-                            imgMsg.innerHTML = `<section class="ai-bubble"><div style="max-width:180px; border-radius:8px; overflow:hidden;"><img src="${base64Data}" alt="Ảnh tải lên" style="width:100%; display:block;"></div><p style="margin-top:4px; font-size:0.8rem;">[Tìm sản phẩm từ hình ảnh]</p></section>`;
-                            body.appendChild(imgMsg);
-                            scrollToBottom(body);
-
-                            const typing = appendMessage(body, 'ai ai-typing', 'AI đang phân tích nhận diện thiết bị công nghệ...');
-                            try {
-                                const res = await fetch(`${apiUrl}/chat/visual-search`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ image: base64Data, filename: file.name, hint: '' })
-                                });
-                                const visualResult = await res.json();
-                                typing.remove();
-                                if (!res.ok) throw new Error(visualResult.message || 'Không thể nhận diện hình ảnh');
-                                const reply = visualResult.reply || `✨ AI đã nhận diện hình ảnh của bạn!`;
-                                streamAIMessage(body, reply, () => {
-                                    if (visualResult.products && visualResult.products.length) {
-                                        renderChatProducts(body, visualResult.products);
-                                    }
-                                });
-                            } catch (err) {
-                                typing.remove();
-                                appendMessage(body, 'ai', err.message || 'Không thể nhận diện ảnh lúc này.');
-                            }
-                        };
-                        reader.readAsDataURL(file);
+                        await performVisualSearch(file);
                         return;
                     }
                 }
@@ -2772,13 +2937,24 @@
                 voiceMediaStream = null;
                 micButton.classList.remove('voice-session-active', 'listening');
             }
+            const previousSessionId = getOrCreateChatSessionId();
+            fetch(`${apiUrl}/chat/reset`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: previousSessionId })
+            }).catch(() => {});
+
             sessionStorage.removeItem('ai_chat_history');
             sessionStorage.removeItem('ai_chat_context');
             sessionStorage.removeItem('ai_chat_just_redirected_category');
             sessionStorage.removeItem('ai_chat_just_redirected_name');
             try {
                 localStorage.removeItem('ai_shopping_profile');
+                localStorage.removeItem('ai_chat_memory_profile');
+                localStorage.removeItem('ai_chat_rolling_summary');
+                localStorage.removeItem('ai_chat_session_id');
             } catch (e) { }
+            getOrCreateChatSessionId();
             chatHistory = [];
             consultationContext = {};
             body.innerHTML = '';

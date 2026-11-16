@@ -197,35 +197,10 @@ function setupCategoryDragScroll(navEl) {
 
     setTimeout(updateArrows, 60);
     setTimeout(updateArrows, 350);
-
-    /* Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 */
-    let pillItem = list.querySelector('.u039-pill-item');
-    if (!pillItem) {
-        pillItem = document.createElement('li');
-        pillItem.className = 'u039-pill-item';
-        pillItem.setAttribute('aria-hidden', 'true');
-        pillItem.setAttribute('role', 'presentation');
-        list.prepend(pillItem);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(updateArrows).catch(() => {});
     }
-    function syncHeaderPill(targetEl) {
-        const activeBtn = targetEl || list.querySelector('a.active, button.active, [aria-current="page"]');
-        if (!activeBtn || !pillItem) {
-            if (pillItem) pillItem.style.setProperty('--pill-o', '0');
-            return;
-        }
-        const itemLi = activeBtn.closest('li') || activeBtn;
-        pillItem.style.setProperty('--x', `${itemLi.offsetLeft}px`);
-        pillItem.style.setProperty('--y', `${itemLi.offsetTop}px`);
-        pillItem.style.setProperty('--w', `${itemLi.offsetWidth}px`);
-        pillItem.style.setProperty('--h', `${itemLi.offsetHeight}px`);
-        pillItem.style.setProperty('--pill-o', '1');
-    }
-    list.querySelectorAll('a, button').forEach(btn => {
-        btn.addEventListener('pointerenter', () => syncHeaderPill(btn));
-    });
-    list.addEventListener('pointerleave', () => syncHeaderPill(null));
-    window.addEventListener('resize', () => syncHeaderPill(null), { passive: true });
-    setTimeout(() => syncHeaderPill(null), 80);
+    list.querySelectorAll('.u039-pill-item').forEach(el => el.remove());
 }
 window.setupCategoryDragScroll = setupCategoryDragScroll;
 

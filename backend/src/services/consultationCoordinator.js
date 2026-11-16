@@ -7,6 +7,7 @@
 const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
 const aiModelService = require('./aiModelService');
+const ragService = require('./ragService');
 const { matchSmartAnswer } = require('./storeKnowledgeAndChitChat');
 const nlu = require('./nlu');
 const config = nlu.config || require('./nlu/config');
@@ -2239,9 +2240,10 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
 
         // Nếu khách đã cung cấp cả ngân sách lẫn nhu cầu sử dụng, chuyển thẳng sang phân tích đánh đổi chuyên sâu
         if (budget > 0 && useCase) {
+            const normalizedBrand = (brand && brand !== 'Tất cả thương hiệu') ? brand : '';
             return await handleRecommendWithTradeOffs({
                 category: productType.category,
-                brand,
+                brand: normalizedBrand,
                 budget,
                 budgetMin: budgetInfo?.min || (budgetType === 'min' ? budget : null),
                 budgetMax: budgetInfo?.max || (budgetType === 'max' ? budget : null),
@@ -2254,7 +2256,7 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
                     ...context,
                     category: productType.category,
                     productType: productType.key,
-                    brand,
+                    brand: normalizedBrand,
                     budget,
                     budgetMin: budgetInfo?.min || (budgetType === 'min' ? budget : null),
                     budgetMax: budgetInfo?.max || (budgetType === 'max' ? budget : null),
@@ -2883,6 +2885,7 @@ async function handleRecommendWithTradeOffs({
     userProficiency = 'intermediate',
     context = {}
 }) {
+    const safeBrand = brand === 'Tất cả thương hiệu' ? '' : brand;
     // Xây dựng điều kiện lọc sản phẩm
     const query = {
         category,
@@ -2896,20 +2899,29 @@ async function handleRecommendWithTradeOffs({
         query.name = { $not: /\bloa\b|speaker/i };
     }
 
-    if (brand) {
-        query.brand = new RegExp(escapeRegex(brand), 'i');
+    if (safeBrand) {
+        query.brand = new RegExp(escapeRegex(safeBrand), 'i');
     }
 
-    if (eliminatedBrands && eliminatedBrands.length > 0) {
-        query.brand = { $nin: eliminatedBrands };
+    const msgNormForElim = normalizeText(context.currentMessage || '');
+    const honorMemoryDislike = /\b(tranh|nho|nhung gi|khong thich|loai)\b/i.test(msgNormForElim);
+    const effectiveEliminatedBrands = Array.from(new Set([
+        ...(eliminatedBrands || []),
+        ...(honorMemoryDislike ? (context.memoryProfile?.dislikedBrands || []) : [])
+    ])).filter(b => b && (!safeBrand || String(b).toLowerCase() !== String(safeBrand).toLowerCase()));
+
+    if (effectiveEliminatedBrands.length > 0) {
+        query.brand = { $nin: effectiveEliminatedBrands };
     }
 
-    const effectiveBudget = budgetMin || budgetMax || budget || 0;
+    const effectiveBudget = budget || budgetMax || budgetMin || 0;
     const effectiveType = budgetType !== 'unspecified' ? budgetType : (budgetMin && !budgetMax ? 'min' : (budgetMax ? 'max' : 'exact'));
 
     if (effectiveType === 'min' || (budgetMin > 0 && !budgetMax)) {
         const minVal = budgetMin || budget;
         query.price = { $gte: minVal };
+    } else if (isHardBudget && effectiveBudget > 0 && effectiveType !== 'range') {
+        query.price = { $lte: effectiveBudget };
     } else if (budgetMin && budgetMax) {
         query.price = { $gte: budgetMin, $lte: budgetMax };
     } else if (effectiveBudget > 0) {
@@ -2931,10 +2943,10 @@ async function handleRecommendWithTradeOffs({
             category,
             active: { $ne: false },
             stock: { $gt: 0 },
-            ...(eliminatedBrands.length ? { brand: { $nin: eliminatedBrands } } : {})
+            ...(effectiveEliminatedBrands.length ? { brand: { $nin: effectiveEliminatedBrands } } : {})
         };
-        if (brand) {
-            const brandPool = await Product.find({ ...queryPool, brand: new RegExp(escapeRegex(brand), 'i') });
+        if (safeBrand) {
+            const brandPool = await Product.find({ ...queryPool, brand: new RegExp(escapeRegex(safeBrand), 'i') });
             if (brandPool.length) {
                 brandPool.sort((a, b) => Math.abs(a.price - effectiveBudget) - Math.abs(b.price - effectiveBudget));
                 lowestInCat = brandPool[0];
@@ -2971,7 +2983,7 @@ async function handleRecommendWithTradeOffs({
             }[category] || 'mẫu sản phẩm';
             const categoryItemNounCap = categoryItemNoun.charAt(0).toUpperCase() + categoryItemNoun.slice(1);
 
-            const brandScope = brand ? ` của thương hiệu **${brand}**` : '';
+            const brandScope = safeBrand ? ` của thương hiệu **${safeBrand}**` : '';
             const reply = `Dạ hiện tại cửa hàng chuyên phân phối **100% sản phẩm mới chính hãng** kèm bảo hành 12 - 24 tháng. 🙏\n\n` +
                 `Trong danh mục **${category}**${brandScope}, mức ngân sách dự kiến **${money(effectiveBudget)}** của bạn hiện thấp hơn mức giá của ${categoryItemNoun} có giá tốt nhất tại kho.\n` +
                 `Em xin phép **hiển thị ngay trên trang ${categoryItemNoun} có giá gần nhất và tiết kiệm nhất** để bạn dễ quan sát nhé:\n` +
@@ -3157,7 +3169,7 @@ async function handleRecommendWithTradeOffs({
     } else if (effectiveBudget > 0) {
         budgetText = `ngân sách **dưới ${money(budgetMax || effectiveBudget)}**`;
     }
-    let brandText = brand ? `thương hiệu **${brand}**` : '';
+    let brandText = safeBrand ? `thương hiệu **${safeBrand}**` : '';
     let criteriaText = [brandText, budgetText].filter(Boolean).join(' ');
 
     const defaultReply = `Dạ dựa trên nhu cầu **${useCase || 'sử dụng'}** ${criteriaText ? `với ${criteriaText}, ` : ''}em xin đề xuất **${selected.length} phương án tối ưu nhất** tại kho của shop kèm phân tích điểm được và điểm đánh đổi để bạn dễ dàng lựa chọn:\n\n` +
@@ -3165,11 +3177,33 @@ async function handleRecommendWithTradeOffs({
         `${conditionalConclusion}\n\n` +
         `👉 Bạn đang nghiêng về phương án nào hơn, hoặc bạn muốn em so sánh chi tiết hơn về điểm nào giữa các mẫu máy này không ạ? 😊`;
 
+    let enrichedContext = context;
+    try {
+        const rag = await ragService.retrieveRagContext({
+            query: context.currentMessage || `${category || ''} ${useCase || ''} ${brand || ''}`.trim(),
+            category,
+            brand,
+            budget: effectiveBudget || budgetMax || budget || 0,
+            eliminatedBrands: eliminatedBrands || context.eliminatedBrands || [],
+            memoryProfile: context.memoryProfile,
+            preloadedProducts: selected,
+            limitProducts: selected.length,
+            limitArticles: 2
+        });
+        if (rag && rag.ragEvidenceText) {
+            enrichedContext = {
+                ...context,
+                ragEvidenceText: rag.ragEvidenceText,
+                ragSources: rag.ragSources
+            };
+        }
+    } catch (_) { }
+
     const grounded = await aiModelService.generateGroundedConsultation({
         userMessage: context.currentMessage || '',
         dialogueAct: 'recommend',
         verifiedProducts: selected,
-        context,
+        context: enrichedContext,
         fallbackText: defaultReply
     });
 
@@ -3391,14 +3425,14 @@ async function handleContextualFollowUp(message, context = {}) {
             const downPay = Math.round(lowest.price * 0.3);
             const installmentMonth = Math.round((lowest.price - downPay) / 12);
             const priceSaving = minCurrentPrice < Infinity ? minCurrentPrice - lowest.price : 0;
-            const savingText = priceSaving > 0 ? ` (Tiết kiệm thêm **${money(priceSaving)}** so với mức giá trước đó)` : '';
+            const savingText = priceSaving > 0 ? ` (tiết kiệm thêm **${money(priceSaving)}** so với mức giá trước đó)` : '';
 
             const listText = affordableProducts.map((p, idx) => {
                 const s = p.specs || {};
                 const specHighlights = [s.cpu && `Chip ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.battery && `Pin ${s.battery}`, s.camera && `Camera ${s.camera}`].filter(Boolean).slice(0, 2).join(' • ');
-                return `${idx + 1}. 💡 **${p.name}** — Giá: **${money(p.price)}**${minCurrentPrice < Infinity && minCurrentPrice > p.price ? ` *(Tiết kiệm ${money(minCurrentPrice - p.price)})*` : ''}\n` +
+                return `${idx + 1}. 💡 **${p.name}** — Giá: **${money(p.price)}**${minCurrentPrice < Infinity && minCurrentPrice > p.price ? ` *(tiết kiệm ${money(minCurrentPrice - p.price)})*` : ''}\n` +
                     `   • **Ưu điểm tối ưu:** ${specHighlights || 'Vận hành ổn định, chính hãng 100%'}.\n` +
-                    `   • **Hỗ trợ:** Bảo hành ${p.warranty || '12 tháng'}, trả góp 0% chỉ từ ~${money(Math.round(p.price * 0.7 / 12))}/tháng.`;
+                    `   • **Hỗ trợ:** Bảo hành ${p.warranty || '12 tháng'}, Trả góp 0% chỉ từ ~${money(Math.round(p.price * 0.7 / 12))}/tháng.`;
             }).join('\n\n');
 
             const reply = `Dạ em hoàn toàn thấu hiểu băn khoăn về ngân sách của bạn! Để tối ưu tài chính tốt nhất cho bạn${savingText}, cửa hàng có các phương án giá kinh tế hơn sẵn hàng tại kho:\n\n` +
@@ -3675,11 +3709,30 @@ async function buildComparisonResponse(p1, p2, context = {}) {
         `👉 Bạn thấy mẫu máy nào phù hợp với thói quen sử dụng của bạn hơn để em hỗ trợ bạn đặt hàng ngay nhé?`;
 
     const defaultReply = `${tableMarkdown}\n\n${analysis}`;
+    let enrichedCompareContext = context;
+    try {
+        const rag = await ragService.retrieveRagContext({
+            query: context.currentMessage || `so sánh ${p1.name} và ${p2.name}`,
+            category: p1.category || context.category || '',
+            memoryProfile: context.memoryProfile,
+            preloadedProducts: [p1, p2],
+            limitProducts: 2,
+            limitArticles: 2
+        });
+        if (rag && rag.ragEvidenceText) {
+            enrichedCompareContext = {
+                ...context,
+                ragEvidenceText: rag.ragEvidenceText,
+                ragSources: rag.ragSources
+            };
+        }
+    } catch (_) { }
+
     const grounded = await aiModelService.generateGroundedConsultation({
         userMessage: context.currentMessage || 'so sánh hai máy vừa rồi',
         dialogueAct: 'compare',
         verifiedProducts: [p1, p2],
-        context,
+        context: enrichedCompareContext,
         fallbackText: defaultReply
     });
 
@@ -4525,6 +4578,11 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         return buildPresenceCheckResponse(message, prev);
     }
 
+    // 0a-visual. Nếu khách hỏi tiếp về kết quả tìm kiếm bằng hình ảnh vừa gửi ("trong ảnh", "món nãy", "ảnh vừa gửi")
+    if (isVisualFollowUpQuery(message, prev)) {
+        return await handleVisualFollowUp(message, prev);
+    }
+
     // 0a-stylus. Kiểm tra câu hỏi về "tặng kèm bút là sao", "máy tính bảng tặng kèm bút là sao", bút cảm ứng trong hộp
     if (isTabletStylusQuery(message, prev)) {
         return await handleTabletStylusExplanation(message, prev);
@@ -4626,7 +4684,6 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     const hasConjunction = /\b(?:va|voi|vs|hay|hoac)\b/i.test(text);
     const earlyComparingIntent = (
         hasComparisonKeywords ||
-        (hasConjunction && !isDeepConsultationRequest) ||
         ((prev.stage === 'awaiting_comparison_products' || prev.currentIntent === 'compare_products') && (hasComparisonKeywords || hasConjunction))
     );
 
@@ -4681,7 +4738,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     if (brandComparison) return brandComparison;
 
     const matchedProducts = await findAllMatchingProductsInCatalog(message);
-    const isComparingIntent = earlyComparingIntent;
+    const isComparingIntent = earlyComparingIntent || (hasConjunction && !isDeepConsultationRequest && matchedProducts.length >= 2);
 
     if (matchedProducts.length >= 2 && String(matchedProducts[0]._id) !== String(matchedProducts[1]._id) && isComparingIntent) {
         return await buildComparisonResponse(matchedProducts[0], matchedProducts[1], prev);
@@ -4940,7 +4997,88 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
 }
 
 /**
- * Xử lý các câu hỏi vui, toán học, chit-chat hoặc các câu hỏi khó/lạ mà AI chưa hiểu rõ
+ * Phát hiện câu hỏi nối tiếp về hình ảnh Visual Search vừa gửi
+ */
+function isVisualFollowUpQuery(message, prev = {}) {
+    const hasVisualCtx = Array.isArray(prev.lastVisualDevices) && prev.lastVisualDevices.length > 0;
+    if (!hasVisualCtx) return false;
+    const norm = normalizeText(message);
+    return /\b(trong anh|hinh nay|anh nay|anh vua|hinh vua|vua gui|anh tren|mon trong anh|may trong anh|thiet bi trong anh|bang anh|tu anh|qua anh|vua chup|vua tai len|hinh anh nay)\b/i.test(norm);
+}
+
+/**
+ * Xử lý câu hỏi tiếp nối về thiết bị khách hàng vừa tìm kiếm bằng hình ảnh
+ */
+async function handleVisualFollowUp(message, context = {}) {
+    const devices = Array.isArray(context.lastVisualDevices) ? context.lastVisualDevices : [];
+    const lastProducts = Array.isArray(context.lastProducts) ? context.lastProducts : [];
+    const deviceSummary = devices
+        .map((d, idx) => `${idx + 1}. ${d.label || d.modelGuess || d.category || 'Thiết bị'} (${d.brand || 'Đa hãng'})`)
+        .join('\n');
+
+    let rag = { products: lastProducts, articles: [], coupons: [], ragEvidenceText: '', ragSources: null };
+    try {
+        rag = await ragService.retrieveRagContext({
+            query: `${message} ${devices.map((d) => `${d.brand || ''} ${d.modelGuess || d.category || ''}`).join(' ')}`,
+            memoryProfile: context.memoryProfile,
+            preloadedProducts: lastProducts,
+            limitProducts: Math.max(4, lastProducts.length || 3),
+            limitArticles: 2
+        });
+    } catch (_) { }
+
+    const products = (lastProducts.length > 0 ? lastProducts : rag.products).slice(0, 6);
+    const fallbackLines = [
+        `Dạ dựa trên hình ảnh bạn vừa gửi, AI đã ghi nhận **${devices.length} thiết bị**:\n${deviceSummary}`
+    ];
+    if (products.length > 0) {
+        fallbackLines.push(
+            `Các mẫu đang sẵn hàng phù hợp nhất tại shop:\n` +
+            products.slice(0, 4).map((p, i) => `• **${i + 1}. ${p.name}** — ${money(p.price)} (${p.brand || 'Chính hãng'})`).join('\n')
+        );
+    }
+    fallbackLines.push(`👉 Bạn muốn em tư vấn chi tiết hơn, so sánh hay tính trả góp 0% cho thiết bị nào trong ảnh ạ?`);
+    const fallbackText = fallbackLines.join('\n\n');
+
+    const aiResult = await aiModelService.generateGroundedConsultation({
+        userMessage: message,
+        dialogueAct: 'rag_consultative',
+        verifiedProducts: products,
+        context: {
+            ...context,
+            ragEvidenceText: [
+                devices.length ? `Thiet bi AI nhan dien trong anh gan nhat:\n${deviceSummary}` : '',
+                rag.ragEvidenceText || ''
+            ].filter(Boolean).join('\n\n')
+        },
+        fallbackText
+    });
+
+    return {
+        reply: aiResult.reply || fallbackText,
+        products,
+        suggestions: [
+            products.length >= 2 ? 'So sánh 2 máy vừa rồi' : null,
+            products[0] ? `Xem chi tiết ${products[0].name}` : null,
+            'Tính trả góp 0%',
+            'Mã giảm giá hôm nay'
+        ].filter(Boolean),
+        context: {
+            ...context,
+            lastProducts: products,
+            stage: 'visual_followup'
+        },
+        meta: {
+            provider: aiResult.provider,
+            model: aiResult.model,
+            isFallback: aiResult.isFallback,
+            ragSources: rag.ragSources || null
+        }
+    };
+}
+
+/**
+ * Xử lý các câu hỏi vui, toán học, chit-chat hoặc câu hỏi tư vấn mở với Hybrid Multi-Source RAG + Gemini 3.x
  */
 async function handleConversationalOrUnclearQuery(message, context = {}) {
     const norm = normalizeText(message);
@@ -4965,49 +5103,122 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
         }
     }
 
-    // 2. Phân loại câu hỏi đùa / hỏi vui / tâm sự đời thường / câu hỏi khó
+    // 2. Kiểm tra bộ tri thức bán hàng + kịch bản tư vấn người thật
     let fallbackText = deterministicMathReply;
     let customSuggestions = null;
+    let isMatchedSmartRule = false;
 
     if (!fallbackText) {
         const smart = matchSmartAnswer(message);
         if (smart) {
             fallbackText = smart.reply;
             customSuggestions = smart.suggestions;
+            isMatchedSmartRule = true;
         }
     }
 
+    const isHumorOrChitChat = /\b(vui khong|buon|chan|met|khoe khong|an com chua|ngu chua|hat|ke chuyen|nguoi yeu|may tuoi|ten gi|ai tao ra|troi dep|troi mua|xinh khong|yeu khong|co nguoi yeu)\b/i.test(norm);
+
+    // 3. Truy xuất Hybrid Multi-Source RAG (KnowledgeArticles + Products + Reviews + Coupons)
+    let rag = { articles: [], products: [], coupons: [], reviews: [], ragEvidenceText: '', ragSources: null };
+    if (!deterministicMathReply) {
+        try {
+            rag = await ragService.retrieveRagContext({
+                query: cleanMsg,
+                category: context.category || '',
+                brand: context.brand || '',
+                budget: context.budget || 0,
+                eliminatedBrands: context.eliminatedBrands || [],
+                memoryProfile: context.memoryProfile,
+                limitProducts: 3,
+                limitArticles: 3
+            });
+        } catch (_) { }
+    }
+
+    const enrichedContext = {
+        ...context,
+        ragEvidenceText: rag.ragEvidenceText || context.ragEvidenceText || ''
+    };
+
+    const isSeekingProductAdvice = !isHumorOrChitChat && !deterministicMathReply && (
+        /\b(tu van|goi y|nen mua|chon|phu hop|mau nao|may nao|san pham|dong nao|combo|tai nghe|dong ho|laptop|dien thoai|tablet|phu kien|sac|pin|man hinh|ban phim|chuot)\b/i.test(norm) ||
+        (rag.products.length > 0 && !isMatchedSmartRule && cleanMsg.length >= 10)
+    );
+
     if (!fallbackText) {
-        const isHumorOrChitChat = /\b(vui khong|buon|chan|met|khoe khong|an com chua|ngu chua|hat|ke chuyen|nguoi yeu|may tuoi|ten gi|ai tao ra|troi dep|troi mua|xinh khong|yeu khong|co nguoi yeu)\b/i.test(norm);
         if (isHumorOrChitChat) {
             fallbackText = `Dạ gặp được bạn ghé thăm cửa hàng là em thấy rất vui và tràn đầy năng lượng rồi nè! 😊\n\nEm là Trợ lý AI công nghệ luôn sẵn sàng đồng hành cùng bạn. Hôm nay bạn đang có hứng thú ngắm nghía thiết bị nào để phục vụ công việc, học tập hay giải trí không? Cứ chia sẻ với em nhé!`;
+        } else if (rag.articles.length > 0 || rag.coupons.length > 0 || rag.products.length > 0) {
+            const parts = [];
+            if (rag.articles[0]) {
+                parts.push(`📚 **Thông tin hữu ích về "${rag.articles[0].title}":**\n${rag.articles[0].answer}`);
+            }
+            if (rag.products.length > 0 && isSeekingProductAdvice) {
+                parts.push(
+                    `✨ **Gợi ý sản phẩm liên quan đang sẵn hàng:**\n` +
+                    rag.products.slice(0, 3).map((p, idx) => `• **${idx + 1}. ${p.name}** — ${money(p.price)}`).join('\n')
+                );
+            }
+            if (rag.coupons.length > 0 && /\b(ma|giam gia|voucher|khuyen mai|uu dai)\b/i.test(norm)) {
+                parts.push(
+                    `🎟️ **Mã ưu đãi đang áp dụng:** ` +
+                    rag.coupons.map((c) => `**${c.code}**`).join(', ')
+                );
+            }
+            fallbackText = parts.length > 0
+                ? parts.join('\n\n')
+                : `Dạ câu này em chưa hiểu rõ ý bạn lắm nè 😅\n\nBạn có thể cho em biết thêm bạn đang quan tâm dòng máy nào (Laptop, Điện thoại, Tablet, Tai nghe, Đồng hồ, Phụ kiện...) hoặc mức ngân sách dự kiến để em tư vấn chuẩn xác hơn nhé!`;
         } else {
-            // Câu hỏi khó, triết lý, lạ hoặc chưa rõ ý
             fallbackText = `Dạ câu này em chưa hiểu rõ ý bạn lắm nè 😅\n\nBạn có thể diễn đạt rõ hơn một chút được không, ví dụ như bạn đang cần tìm loại sản phẩm nào (Laptop, Điện thoại, Tablet, Tai nghe, Phụ kiện...), mức ngân sách khoảng bao nhiêu hoặc cần hỗ trợ về tính năng gì để em tư vấn chuẩn xác nhất nhé!`;
         }
     }
 
-    // 3. Tận dụng mô hình AI (Gemini) để trả lời tự nhiên, hóm hỉnh như con người
-    const aiResult = await aiModelService.generateConversationalResponse({
-        userMessage: message,
-        context,
-        fallbackText
-    });
+    // 4. Tận dụng Gemini 3.x + RAG Evidence + Multi-Turn Memory để trả lời tự nhiên, có chiều sâu như chuyên viên tư vấn thật
+    const useRagConsultative = !isHumorOrChitChat && !deterministicMathReply &&
+        (rag.articles.length > 0 || rag.coupons.length > 0 || (isSeekingProductAdvice && rag.products.length > 0) || isMatchedSmartRule);
+
+    const aiResult = useRagConsultative
+        ? await aiModelService.generateGroundedConsultation({
+            userMessage: cleanMsg,
+            dialogueAct: 'rag_consultative',
+            verifiedProducts: isSeekingProductAdvice ? rag.products.slice(0, 3) : [],
+            context: enrichedContext,
+            fallbackText
+        })
+        : await aiModelService.generateConversationalResponse({
+            userMessage: cleanMsg,
+            context: enrichedContext,
+            fallbackText
+        });
+
+    const returnedProducts = isSeekingProductAdvice ? rag.products.slice(0, 3) : [];
+    const nextContext = returnedProducts.length > 0
+        ? { ...context, lastProducts: returnedProducts }
+        : context;
 
     return {
         reply: aiResult.reply || fallbackText,
-        products: [],
-        suggestions: customSuggestions || [
-            'Tư vấn Laptop sinh viên',
-            'Tư vấn Điện thoại chụp ảnh',
-            'Xem máy tính bảng học tập',
-            'Săn mã giảm giá hôm nay'
-        ],
-        context,
+        products: returnedProducts,
+        suggestions: customSuggestions || (returnedProducts[0]
+            ? [
+                `Xem chi tiết ${returnedProducts[0].name}`,
+                'Tính trả góp 0%',
+                'Mã giảm giá hôm nay',
+                'Tư vấn thêm nhu cầu của tôi'
+            ]
+            : [
+                'Tư vấn Laptop sinh viên',
+                'Tư vấn Điện thoại chụp ảnh',
+                'Chính sách bảo hành & đổi trả',
+                'Săn mã giảm giá hôm nay'
+            ]),
+        context: nextContext,
         meta: {
             provider: aiResult.provider,
             model: aiResult.model,
-            isFallback: aiResult.isFallback
+            isFallback: aiResult.isFallback,
+            ragSources: rag.ragSources || null
         }
     };
 }

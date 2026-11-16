@@ -9,7 +9,13 @@ const ChatSession = require('../models/ChatSession');
 const KnowledgeArticle = require('../models/KnowledgeArticle');
 const { findKnowledgeArticle } = require('../services/knowledgeService');
 const { matchSmartAnswer } = require('../services/storeKnowledgeAndChitChat');
+const aiModelService = require('../services/aiModelService');
+const ragService = require('../services/ragService');
+const memoryService = require('../services/memoryService');
 const { optionalAuth, protect, admin } = require('../middleware/auth');
+
+// Seed curated FAQ / policy / consultation articles into MongoDB if empty
+ragService.ensureKnowledgeBaseSeeded().catch(() => {});
 const { recommendProducts } = require('../utils/recommendations');
 const {
     coordinateConsultation,
@@ -453,80 +459,54 @@ async function buildProductFilter(text) {
 }
 
 /**
- * Tích hợp Google Gemini API với AbortSignal timeout 10s, Multi-Model Failover & Catalog-Grounded Prompt
+ * Tích hợp Google Gemini 3.x API với Multi-Model Failover, Native Multi-Turn History & Catalog-Grounded Prompt
  */
-async function askGeminiIfConfigured(systemPrompt, userPrompt) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
+async function askGeminiIfConfigured(systemPrompt, userPrompt, context = {}) {
+    if (!aiModelService.isApiKeyConfigured()) {
         console.log('[Gemini AI] Chưa cấu hình GEMINI_API_KEY. Hệ thống tự động kích hoạt Deterministic Knowledge Engine (Catalog-Grounded Heuristic).');
         return null;
     }
 
-    const preferredModel = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
-    const modelsToTry = [preferredModel, 'gemini-flash-lite-latest', 'gemini-flash-latest'];
+    const res = await aiModelService.callGeminiText({
+        systemInstruction: systemPrompt,
+        history: Array.isArray(context?.conversationHistory) ? context.conversationHistory : [],
+        userPrompt: `${userPrompt}\nHãy trả lời bằng tiếng Việt tự nhiên, trung thực với thông số và giá trong catalog cung cấp, không suy đoán hoặc bịa thông số ngoài danh mục.`,
+        temperature: 0.35,
+        maxOutputTokens: 1200
+    });
 
-    for (const model of modelsToTry) {
-        try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-            const body = {
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [{ text: `${systemPrompt}\n\nNgười dùng: "${userPrompt}"\nHãy trả lời bằng tiếng Việt tự nhiên, trung thực với thông số và giá trong catalog cung cấp, không suy đoán hoặc bịa thông số ngoài danh mục:` }]
-                    }
-                ],
-                generationConfig: {
-                    temperature: 0.35,
-                    maxOutputTokens: 1024
-                }
-            };
-
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-                signal: AbortSignal.timeout(10000)
-            });
-
-            if (!res.ok) {
-                console.warn(`[Gemini API] Model ${model} returned status: ${res.status}. Trying next...`);
-                continue;
-            }
-
-            const data = await res.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text && text.trim()) return text.trim();
-        } catch (err) {
-            console.warn(`[Gemini API] Model ${model} call error (${err.message}). Trying next...`);
-        }
-    }
-
-    return null;
+    return (res && !res.isFallback && res.text) ? res.text : null;
 }
 
 /**
- * Trò chuyện tự nhiên mở (Open-ended Chit-chat & Smart Assistance)
- * Trả lời thông minh, thân thiện các câu hỏi xã giao, toán học, hỏi vui mà không bao giờ spam hay lặp lại.
+ * Trò chuyện tự nhiên mở (Open-ended Chit-chat, RAG-Grounded Smart Assistance & Multi-turn Memory)
  */
 async function askGeminiOpenChat(message, context = {}) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return null;
+    if (!aiModelService.isApiKeyConfigured()) return null;
 
-    const systemPrompt = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ cửa hàng. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối không dùng từ TechEcommerce trong lời thoại.
-THÔNG TIN VỀ CỬA HÀNG:
-• Showroom: 78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh (Mở cửa 08:30 – 21:30 hàng ngày).
-• Hotline tư vấn & kỹ thuật: 0842.331.606 | Zalo: https://zalo.me/0842331606.
-• Cam kết: 100% hàng mới chính hãng nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12 - 24 tháng.
-• Dịch vụ: Xuất hóa đơn VAT điện tử công ty, Thu cũ đổi mới trợ giá đến 2.000.000 đ, Trả góp 0% qua thẻ tín dụng và qua CCCD gắn chip (không cần thẻ). Đồng kiểm mở hộp khi nhận hàng. Giao hỏa tốc 2 giờ nội thành.
+    let enrichedContext = context || {};
+    try {
+        if (!enrichedContext.ragEvidenceText) {
+            const rag = await ragService.retrieveRagContext({
+                query: message,
+                category: enrichedContext.category || '',
+                memoryProfile: enrichedContext.memoryProfile,
+                limitProducts: 3,
+                limitArticles: 2
+            });
+            if (rag && rag.ragEvidenceText) {
+                enrichedContext = { ...enrichedContext, ragEvidenceText: rag.ragEvidenceText };
+            }
+        }
+    } catch (_) { }
 
-NGUYÊN TẮC TRẢ LỜI GIỐNG NGƯỜI THẬT:
-1. Giao tiếp cực kỳ tự nhiên, hóm hỉnh, ấm áp và gần gũi như một người bạn hoặc chuyên viên tư vấn công nghệ trẻ trung, am hiểu tâm lý. Tuyệt đối KHÔNG trả lời máy móc, lặp lại hay spam bán hàng gượng gạo.
-2. Khi khách hỏi vui, đố mẹo, hỏi toán, hỏi thăm đời thường (ăn cơm chưa, mệt mỏi, thời tiết, người yêu, cà phê hay trà sữa...): Hãy đối đáp thông minh, dí dỏm, thấu hiểu cảm xúc của khách, sau đó có thể khéo léo dẫn dắt hoặc mở lời sẵn sàng hỗ trợ nếu khách có nhu cầu.
-3. Khi khách hỏi mẹo công nghệ (sạc qua đêm, dán cường lực, laptop nóng, chụp màn hình...): Giải thích ngắn gọn, dễ hiểu, thực tế, kèm mẹo hữu ích.
-4. Quy tắc xưng hô nhất quán: Luôn xưng là "em" và gọi khách là "bạn". Tuyệt đối KHÔNG tự xưng "mình", "tụi mình", "chúng mình".
-5. Giữ câu trả lời ngắn gọn, súc tích (khoảng 2 - 4 câu), có thể kèm emoji phù hợp.`;
+    const res = await aiModelService.generateConversationalResponse({
+        userMessage: message,
+        context: enrichedContext,
+        fallbackText: ''
+    });
 
-    return await askGeminiIfConfigured(systemPrompt, message);
+    return (res && !res.isFallback && res.reply) ? res.reply : null;
 }
 
 /**
@@ -1163,7 +1143,7 @@ YÊU CẦU BẮT BUỘC:
 5. Hướng dẫn khách có thể bấm "+ Giỏ" ngay trên thẻ sản phẩm hoặc hỏi về trả góp 0%.
 6. Cuối phản hồi, hãy chủ động hỏi khách còn phân vân gì về các mẫu trên không.`;
 
-    const geminiReply = await askGeminiIfConfigured(systemPrompt, message || `Tư vấn ${category} ${budget ? money(budget) : ''} cho ${useCase}, ưu tiên ${priority}`);
+    const geminiReply = await askGeminiIfConfigured(systemPrompt, message || `Tư vấn ${category} ${budget ? money(budget) : ''} cho ${useCase}, ưu tiên ${priority}`, previousContext);
 
     const newContext = {
         ...previousContext,
@@ -1817,22 +1797,54 @@ async function answerPolicyQuestion(message) {
         return null;
     }
 
-    // Ưu tiên tri thức chính sách nâng cao, kịch bản tư vấn người thật, mẹo công nghệ & đối đáp đời thường
-    const smart = matchSmartAnswer(message);
-    if (smart) return smart;
-
-    // Không xử lý chính sách cửa hàng thuần túy nếu câu hỏi đang tìm/tư vấn sản phẩm cụ thể theo ngân sách
+    // Tuyệt đối không để policy/FAQ cướp luồng của tìm kiếm model cụ thể, so sánh, loại trừ hãng hoặc tìm theo ngân sách
+    const isCompareOrExclusionOrStockLookup = /\b(so sanh|con hang|gia bao nhieu|khong thich|loai hang|dat qua|may thu hai|may dau tien)\b/i.test(text);
+    const hasExplicitPolicySignal = /\b(bao hanh|doi tra|hoan tien|hoan tra|vat|hoa don|giao hang|van chuyen|ship|showroom|dia chi|dong kiem|kiem tra hang|vo nuoc|roi vo|applecare|chinh sach|thanh toan|uy tin|chinh hang|vna|imei|seal|may bay|sac du phong|b2b|doanh nghiep|goi qua|tang qua)\b/i.test(text);
     const hasExplicitBudget = Boolean(extractBudget(message));
-    const hasProductConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim may|mua may|laptop|dien thoai|tai nghe|dong ho|may choi game|ban phim|chuot|sac)\b/i.test(text);
-    if (hasExplicitBudget || (hasProductConsultation && /\b(tu van|tim|mua|gia|duoi|tam|tren)\b/i.test(text))) {
+    const hasProductConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim may|mua may|laptop|dien thoai|tai nghe|dong ho|may choi game|ban phim|chuot|macbook|iphone|ipad|galaxy|rog)\b/i.test(text);
+
+    if (isCompareOrExclusionOrStockLookup && !hasExplicitPolicySignal) {
+        return null;
+    }
+    if ((hasExplicitBudget || (hasProductConsultation && /\b(tu van|tim|mua|gia|duoi|tam|tren|chinh hang|hoc|choi)\b/i.test(text))) && !hasExplicitPolicySignal) {
         return null;
     }
 
-    try {
-        const article = await findKnowledgeArticle(message, { type: 'policy' });
-        if (article?.answer) return article.answer;
-    } catch (error) {
-        console.warn('KnowledgeBase lookup skipped:', error.message);
+    // Ưu tiên tri thức chính sách nâng cao, kịch bản tư vấn người thật, mẹo công nghệ & đối đáp đời thường
+    const smart = matchSmartAnswer(message);
+    if (smart) {
+        if (smart.category && (!Array.isArray(smart.products) || smart.products.length === 0)) {
+            try {
+                const matchedProducts = await Product.find({
+                    category: smart.category,
+                    active: { $ne: false },
+                    stock: { $gt: 0 }
+                })
+                    .sort({ featured: -1, rating: -1, soldCount: -1 })
+                    .limit(3)
+                    .lean();
+                if (matchedProducts.length > 0) {
+                    smart.products = matchedProducts;
+                    smart.context = {
+                        ...(smart.context || {}),
+                        category: smart.category,
+                        lastProducts: matchedProducts
+                    };
+                }
+            } catch (err) {
+                console.warn('Smart answer product attachment skipped:', err.message);
+            }
+        }
+        return smart;
+    }
+
+    if (hasExplicitPolicySignal) {
+        try {
+            const article = await findKnowledgeArticle(message, { type: 'policy' });
+            if (article?.answer) return article.answer;
+        } catch (error) {
+            console.warn('KnowledgeBase lookup skipped:', error.message);
+        }
     }
 
     // 1. Địa chỉ showroom / Cửa hàng xem máy trực tiếp
@@ -2085,17 +2097,19 @@ async function answerBundleBargainQuestion(message, context = {}) {
         const isLaptop = targetProduct.category === 'Laptop' || /macbook|laptop|vivobook|legion|strix/i.test(targetProduct.name);
         const isPhone = targetProduct.category === 'Điện thoại' || /iphone|galaxy|oppo|xiaomi|poco/i.test(targetProduct.name);
 
+        const isTrueAccessory = (p) => String(p._id) !== String(targetProduct._id) && p.price <= 3000000 && !/osmo pocket|camera/i.test(p.name);
+
         let priorityAccs = [];
         if (isTablet) {
-            priorityAccs = allActive.filter(p => String(p._id) !== String(targetProduct._id) && /bút|but|sạc|sac|anker|tai nghe/i.test(p.name));
+            priorityAccs = allActive.filter(p => isTrueAccessory(p) && /bút|but|sạc|sac|anker|tai nghe/i.test(p.name));
         } else if (isLaptop) {
-            priorityAccs = allActive.filter(p => String(p._id) !== String(targetProduct._id) && /chuột|chuot|logitech|hub|balo|bàn phím/i.test(p.name));
+            priorityAccs = allActive.filter(p => isTrueAccessory(p) && /chuột|chuot|logitech|hub|balo|bàn phím/i.test(p.name));
         } else if (isPhone) {
-            priorityAccs = allActive.filter(p => String(p._id) !== String(targetProduct._id) && /sạc|sac|anker|earpods|tai nghe|pin sạc|cáp/i.test(p.name));
+            priorityAccs = allActive.filter(p => isTrueAccessory(p) && /sạc|sac|anker|earpods|tai nghe|pin sạc|cáp/i.test(p.name));
         }
 
         let accessories = priorityAccs.length >= 2 ? priorityAccs : allActive.filter(p =>
-            String(p._id) !== String(targetProduct._id) && (
+            isTrueAccessory(p) && (
                 p.category === 'Phụ kiện' ||
                 p.category === 'Tai nghe' ||
                 /chuột|tai nghe|sạc|cáp|balo|bàn phím|hub/i.test(p.name)
@@ -2324,17 +2338,20 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const message = String(req.body.message || '').trim();
         if (!message) return res.status(400).json({ message: 'Vui lòng nhập nội dung cần tư vấn.' });
 
+        // Hydrate 3-Tier Memory (20-turn window + rollingSummary + persistent memoryProfile) from ChatSession
+        const hydratedContext = await memoryService.hydrateContextWithSessionMemory(req, req.body.context || {});
+
         // NLU Pre-Guardrails check: Chặn ngay prompt injection và khiếu nại (Giai đoạn A)
         if (process.env.NLU_PIPELINE !== 'off') {
             try {
-                const nluResult = nlu.processInput(message, req.body.context);
+                const nluResult = nlu.processInput(message, hydratedContext);
                 const preGuard = nlu.applyPreGuardrails({
                     nluResult,
                     rawMessage: message,
-                    context: req.body.context
+                    context: hydratedContext
                 });
                 if (preGuard && preGuard.intercepted) {
-                    recordConversation(req, message, preGuard.response).catch(e => console.warn('recordConversation error:', e.message));
+                    await memoryService.persistConversationTurn(req, message, preGuard.response, hydratedContext).catch(e => console.warn('persistConversationTurn error:', e.message));
                     return res.json(preGuard.response);
                 }
             } catch (err) {
@@ -2343,7 +2360,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         }
 
         const text = normalizeText(message);
-        const context = req.body.context || {};
+        const context = hydratedContext;
         const isInConversationFlow = Boolean(
             context.stage ||
             context.category ||
@@ -2353,10 +2370,11 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         );
 
         let response;
-        const specialAdvisor = await handleBudgetAndSpecialAdvisorQueries(message, req.body.context);
+        const specialAdvisor = await handleBudgetAndSpecialAdvisorQueries(message, hydratedContext);
         const policyAnswer = await answerPolicyQuestion(message);
-        const gameCapability = await evaluateGameOrTaskCapability(message, req.body.context);
-        const isBargainOrBundle = [
+        const gameCapability = await evaluateGameOrTaskCapability(message, hydratedContext);
+        const isCorporateB2bInquiry = /\b(vat|hoa don do|xuat hoa don|cong ty|doanh nghiep|b2b|so luong lon)\b/i.test(text);
+        const isBargainOrBundle = !isCorporateB2bInquiry && ([
             'bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem',
             'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot',
             'co giam them', 'combo phu kien', 'co khuyen mai kem', 'bot khong shop', 'co bot khong', 'bot gia khong',
@@ -2365,15 +2383,79 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             'co chiet khau khong', 'mua 2 cai co giam khong', 'mua nhieu co giam khong', 'co gia si khong', 'bot duoc khong'
         ].some(k => hasWordOrPhrase(text, k)) ||
         /\b(bot|giam|fix|chiet khau)\s+(them\s+|duoc\s+|nua\s+|chut\s+)?(\d+\s*(k|tr|trieu)|chut|it|ti|nua|them)?\b/i.test(text) ||
-        (context?.stage === 'bundle_bargain' && /\b(chot|lay|dong y|ok|oke|duoc khong|nua khong|giam nua|bot nua)\b/i.test(text));
+        (context?.stage === 'bundle_bargain' && /\b(chot|lay|dong y|ok|oke|duoc khong|nua khong|giam nua|bot nua)\b/i.test(text)));
 
         const smallTalk = detectGreetingOrSmallTalk(text);
-        if (isPresenceCheckOrGreeting(message)) {
-            response = buildPresenceCheckResponse(message, req.body.context);
-        } else if (isTabletStylusQuery(message, req.body.context)) {
-            response = await handleTabletStylusExplanation(message, req.body.context);
+        const pendingVisualBrand = hydratedContext?.stage === 'visual_not_in_catalog' ? hydratedContext.pendingBrandSuggestion : null;
+        const isAffirmativeVisualFollow = Boolean(pendingVisualBrand) && (
+            /^(co|co a|ok|oke|okie|vang|da|dong y|yes|uh|u|duoc|chac chan|tham khao|cho xem|xem luon|xem thu|gui xem)[!.,?\s]*$/i.test(text) ||
+            (/\b(co|xem|tham khao|gui)\b/i.test(text) && /\b(cung thuong hieu|cung hang|san pham|mau khac|apple|samsung|oppo|xiaomi|sony|asus|dell|lenovo|hp|acer|logitech|jbl|garmin|marshall)\b/i.test(text) && !/\bkhong muon\b/i.test(text))
+        );
+        const isDeclineVisualFollow = Boolean(pendingVisualBrand) && (
+            /^(khong|ko|khum|thoi|bo qua|thoi a|khong can)[!.,?\s]*$/i.test(text) ||
+            (/\b(khong|thoi)\b/i.test(text) && /\b(hang khac|mau khac|thuong hieu khac)\b/i.test(text))
+        );
+
+        if (isAffirmativeVisualFollow) {
+            const activeCatalog = await Product.find({ active: { $ne: false }, stock: { $gt: 0 } }).lean();
+            const targetBrand = pendingVisualBrand.brand || '';
+            const targetCat = pendingVisualBrand.category || '';
+            const brandList = targetBrand ? getSameBrandCatalogProducts(targetBrand, targetCat, activeCatalog) : [];
+            const fallbackCatList = (!brandList.length && targetCat)
+                ? activeCatalog.filter(p => (p.category || '').toLowerCase() === targetCat.toLowerCase())
+                    .sort((a, b) => (Number(b.rating || 0) - Number(a.rating || 0)) || (Number(b.soldCount || 0) - Number(a.soldCount || 0)))
+                    .slice(0, 6)
+                : activeCatalog.sort((a, b) => Number(b.soldCount || 0) - Number(a.soldCount || 0)).slice(0, 6);
+            const finalProducts = brandList.length > 0 ? brandList : fallbackCatList;
+
+            const productBulletLines = finalProducts.slice(0, 5).map((p, idx) =>
+                `${idx + 1}. 🌟 **${p.name}** — **${money(p.price)}** (${p.category || 'Chính hãng'})`
+            ).join('\n');
+
+            const replyText = brandList.length > 0
+                ? `Dạ dưới đây là **${brandList.length} sản phẩm chính hãng cùng thương hiệu ${targetBrand}** hiện đang sẵn hàng trên website để bạn tham khảo ạ:\n\n${productBulletLines}\n\n👉 Bạn ưng mẫu nào nhất để em tư vấn chi tiết cấu hình hoặc so sánh 2 mẫu giúp bạn nhé! 😊`
+                : `Dạ hiện tại website chưa phân phối thương hiệu **${targetBrand || 'này'}**, em xin gợi ý **${finalProducts.length} mẫu ${targetCat || 'nổi bật'}** từ các hãng phổ biến đang có sẵn:\n\n${productBulletLines}\n\n👉 Bạn thấy mẫu nào phù hợp để em tư vấn thêm cho mình ạ?`;
+
+            response = {
+                reply: replyText,
+                products: finalProducts,
+                suggestions: [
+                    finalProducts.length >= 2 ? 'So sánh 2 máy vừa rồi' : null,
+                    finalProducts[0] ? `Xem chi tiết ${finalProducts[0].name}` : null,
+                    'Tính trả góp 0%',
+                    'Mã giảm giá hôm nay'
+                ].filter(Boolean),
+                context: {
+                    ...hydratedContext,
+                    category: finalProducts[0]?.category || targetCat || hydratedContext.category || '',
+                    brand: brandList.length > 0 ? targetBrand : '',
+                    lastProducts: finalProducts,
+                    stage: 'visual_brand_alternatives',
+                    pendingBrandSuggestion: null
+                }
+            };
+        } else if (isDeclineVisualFollow) {
+            response = {
+                reply: `Dạ vâng ạ! Bạn đang muốn tìm sản phẩm của **thương hiệu nào** khác hoặc trong **tầm ngân sách khoảng bao nhiêu** để em gợi ý mẫu chính xác nhất cho bạn nè? 😊`,
+                products: [],
+                suggestions: [
+                    'Tư vấn Điện thoại chụp ảnh',
+                    'Tư vấn Laptop mỏng nhẹ',
+                    'Xem sản phẩm Samsung',
+                    'Mã giảm giá hôm nay'
+                ],
+                context: {
+                    ...hydratedContext,
+                    stage: 'conversational',
+                    pendingBrandSuggestion: null
+                }
+            };
+        } else if (isPresenceCheckOrGreeting(message)) {
+            response = buildPresenceCheckResponse(message, hydratedContext);
+        } else if (isTabletStylusQuery(message, hydratedContext)) {
+            response = await handleTabletStylusExplanation(message, hydratedContext);
         } else if (isBargainOrBundle) {
-            response = await answerBundleBargainQuestion(message, req.body.context);
+            response = await answerBundleBargainQuestion(message, hydratedContext);
             if (!response) {
                 response = await answerVoucherQuestion();
             }
@@ -2382,20 +2464,20 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
                 reply: typeof policyAnswer === 'string' ? policyAnswer : policyAnswer.reply,
                 products: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.products)) ? policyAnswer.products : [],
                 suggestions: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.suggestions)) ? policyAnswer.suggestions : ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay'],
-                context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...(req.body.context || {}), ...policyAnswer.context } : { ...(req.body.context || {}), stage: 'policy' }
+                context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...hydratedContext, ...policyAnswer.context } : { ...hydratedContext, stage: 'policy' }
             };
         } else if (smallTalk) {
             response = smallTalk;
         } else if (specialAdvisor) {
             response = specialAdvisor;
-        } else if (await handleActionExecution(message, req.body.context)) {
-            response = await handleActionExecution(message, req.body.context);
+        } else if (await handleActionExecution(message, hydratedContext)) {
+            response = await handleActionExecution(message, hydratedContext);
         } else if (gameCapability) {
             response = gameCapability;
         } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => hasWordOrPhrase(text, k))) {
             response = await answerVoucherQuestion();
         } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => hasWordOrPhrase(text, k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => hasWordOrPhrase(text, k))) {
-            response = await answerInstallmentQuestion(message, req.body.context?.lastProducts);
+            response = await answerInstallmentQuestion(message, hydratedContext?.lastProducts);
         } else if (
             ['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi', 'don cua em', 'kiem tra don', 'tra cuu don', 'kiem tra hang da den dau', 'khi nao giao'].some(k => hasWordOrPhrase(text, k)) ||
             /(?:tra cuu|kiem tra|check|trang thai|tinh trang)?\s*(?:don|order|ma don|van don)\s*#?\d{1,8}\b/i.test(text) ||
@@ -2404,21 +2486,41 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         ) {
             response = await answerOrderQuestion(req, message);
         } else {
-            response = await coordinateConsultation({ message, user: req.user, context: req.body.context });
+            response = await coordinateConsultation({ message, user: req.user, context: hydratedContext });
             if (!response || !response.reply) {
-                const openReply = await askGeminiOpenChat(message, req.body.context);
+                const openReply = await askGeminiOpenChat(message, hydratedContext);
                 if (openReply) {
                     response = {
                         reply: openReply,
                         suggestions: response?.suggestions?.length ? response.suggestions : ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Mã giảm giá hôm nay'],
-                        context: { ...(req.body.context || {}), stage: 'conversational' }
+                        context: { ...hydratedContext, stage: 'conversational' }
                     };
                 }
             }
         }
 
-        // Record conversation history asynchronously
-        recordConversation(req, message, response).catch(e => console.warn('recordConversation error:', e.message));
+        // Persist conversation turn, rollingSummary, and long-term user memoryProfile synchronously before returning
+        const savedMemoryProfile = await memoryService.persistConversationTurn(
+            req,
+            message,
+            response,
+            hydratedContext,
+            {
+                intent: response?.context?.currentIntent || response?.status || '',
+                category: response?.context?.category || hydratedContext.category || '',
+                budget: response?.context?.budget || hydratedContext.budget || '',
+                ragSources: response?.meta?.ragSources || null
+            }
+        );
+
+        if (response && typeof response === 'object') {
+            response.context = {
+                ...(hydratedContext || {}),
+                ...(response.context || {}),
+                sessionKey: hydratedContext.sessionKey || req.body.sessionId || '',
+                memoryProfile: savedMemoryProfile || response?.context?.memoryProfile || hydratedContext.memoryProfile
+            };
+        }
 
         return res.json(response);
     } catch (error) {
@@ -2446,12 +2548,211 @@ function normalizeVisualCategory(cat) {
 /**
  * 📷 Visual AI Search: Tìm kiếm sản phẩm bằng hình ảnh - Hỗ trợ NHIỀU thiết bị trong 1 ảnh
  */
+function scoreVisualProductMatch(product, device, normCat) {
+    if (!product) return -1;
+    const pName = normalizeText(product.name || '');
+    const pBrand = normalizeText(product.brand || '');
+    const pCat = product.category || '';
+    const pTags = normalizeText(Array.isArray(product.tags) ? product.tags.join(' ') : '');
+    const pDesc = normalizeText(product.description || '');
+    const combined = `${pName} ${pBrand} ${pTags} ${pDesc}`;
+
+    let score = 0;
+    if (normCat) {
+        if (pCat.toLowerCase() === normCat.toLowerCase()) score += 80;
+        else score -= 35; // Penalize wrong category heavily when category is clearly known
+    }
+
+    const dBrand = normalizeText(device.brand || '');
+    if (dBrand) {
+        if (pBrand === dBrand || pName.includes(dBrand)) score += 50;
+    }
+
+    const dModel = normalizeText(device.modelGuess || device.name || '');
+    if (dModel) {
+        const stopTokens = new Set(['the', 'and', 'cho', 'voi', 'with', 'cua', 'thiet', 'bi', 'cong', 'nghe', 'thong', 'minh', 'may', 'tinh', 'dien', 'thoai', 'tai', 'nghe', 'dong', 'ho', 'phu', 'kien', 'choi', 'game', 'smartphone', 'laptop', 'tablet', 'headphone', 'watch', 'smartwatch', 'pro', 'plus', 'ultra']);
+        const tokens = dModel.split(/\s+/).filter(w => w.length >= 2 && !stopTokens.has(w));
+        for (const tok of tokens) {
+            if (pName.includes(tok)) score += tok.length >= 4 ? 45 : 28;
+            else if (pTags.includes(tok)) score += 20;
+            else if (pDesc.includes(tok)) score += 10;
+        }
+        // Extra boost for exact model family matches
+        if (dModel.includes('iphone') && pName.includes('iphone')) score += 60;
+        if (dModel.includes('macbook') && pName.includes('macbook')) score += 60;
+        if (dModel.includes('ipad') && pName.includes('ipad')) score += 60;
+        if ((dModel.includes('apple watch') || (dBrand === 'apple' && normCat === 'Đồng hồ thông minh')) && pName.includes('apple watch')) score += 60;
+        if (dModel.includes('airpods') && pName.includes('airpods')) score += 60;
+        if (dModel.includes('galaxy') && pName.includes('galaxy')) score += 50;
+        if (dModel.includes('switch') && pName.includes('switch')) score += 55;
+        if ((dModel.includes('ps5') || dModel.includes('playstation')) && pName.includes('playstation')) score += 55;
+    }
+
+    if (Array.isArray(device.keywords)) {
+        for (const kw of device.keywords) {
+            const normKw = normalizeText(kw);
+            if (normKw && normKw.length >= 2 && combined.includes(normKw)) {
+                score += pName.includes(normKw) ? 25 : 12;
+            }
+        }
+    }
+
+    score += Math.min(8, Number(product.rating || 4.5));
+    score += (Number(product.stock || 0) > 0 ? 5 : -20);
+    return score;
+}
+
+/**
+ * Kiểm tra xem thiết bị AI nhận diện có THỰC SỰ tồn tại trên website hay không (tránh ghép nhầm iPhone 8 / Concept gập thành iPhone 17).
+ */
+function findExactCatalogMatchesForDevice(device, normCat, activeCatalog = []) {
+    if (!device || !Array.isArray(activeCatalog) || !activeCatalog.length) return [];
+
+    const dBrand = normalizeText(device.brand || '');
+    const isGenericBrand = !dBrand || ['da hang', 'unknown', 'khong ro', 'generic', 'multiple'].includes(dBrand);
+    const dModel = normalizeText(device.modelGuess || device.name || '');
+
+    // B1: Nếu biết thương hiệu nhưng website không có bất kỳ sản phẩm nào thuộc hãng đó -> không có trên web
+    if (!isGenericBrand) {
+        const brandExistsInCatalog = activeCatalog.some(p => {
+            const pb = normalizeText(p.brand || '');
+            const pn = normalizeText(p.name || '');
+            return pb === dBrand || pb.includes(dBrand) || pn.includes(dBrand);
+        });
+        if (!brandExistsInCatalog) return [];
+    }
+
+    // B2: Nếu là bản concept / prototype / render tương lai -> website chưa có
+    if (/\b(concept|prototype|render|tuong lai|sample)\b/i.test(dModel)) {
+        return [];
+    }
+
+    // B3: Tách đặc trưng kiểu dáng (màn hình gập)
+    const isFoldQuery = /\b(fold|foldable|gap)\b/i.test(dModel);
+    const isFlipQuery = /\b(flip)\b/i.test(dModel);
+
+    // B4: Tách mã thế hệ / số hiệu model quan trọng (bỏ qua dung lượng GB/TB và kích thước inch/mm)
+    const cleanedModel = dModel
+        .replace(/\b\d+\s*(gb|tb|mah|wh|w|hz|mm|inch)\b/gi, ' ')
+        .replace(/\b20\d{2}\b/g, ' ');
+
+    const genTokens = [];
+    const slashTokens = cleanedModel.match(/\bm[1-5](?:\s*\/\s*m[1-5])+\b/gi) || [];
+    slashTokens.forEach(st => {
+        st.split('/').forEach(part => {
+            const tok = part.trim();
+            if (tok) genTokens.push(tok);
+        });
+    });
+
+    const singleNumMatches = cleanedModel.match(/\b(?:s2\d|a\d{2,3}|m[1-5]|z\s*fold\s*\d+|z\s*flip\s*\d+|xm\d|[1-9]|1[0-9]|20)\b/gi) || [];
+    singleNumMatches.forEach(tok => {
+        const cleanTok = tok.trim();
+        if (cleanTok && !genTokens.includes(cleanTok)) {
+            genTokens.push(cleanTok);
+        }
+    });
+
+    // Các biến thể đặc thù tên hậu tố/tiền tố dễ phân biệt trong từng dòng
+    const strictSubLineTokens = [
+        'macbook pro', 'macbook air', 'airpods max', 'watch ultra', 'ipad mini',
+        'pixel', 'switch', 'playstation', 'ps5', 'portal', 'rog ally', 'legion go',
+        'major', 'minor', 'mx master', 'mx keys', 'g502', 'g304', 'osmo', 'forerunner',
+        'earpods', 'flip', 'charge'
+    ];
+    const matchedSubLines = strictSubLineTokens.filter(sub => dModel.includes(sub));
+
+    const brandCatPool = activeCatalog.filter(p => {
+        if (normCat && String(p.category || '').toLowerCase() !== normCat.toLowerCase()) return false;
+        if (!isGenericBrand) {
+            const pb = normalizeText(p.brand || '');
+            const pn = normalizeText(p.name || '');
+            if (!(pb === dBrand || pb.includes(dBrand) || pn.includes(dBrand))) return false;
+        }
+        return true;
+    });
+
+    if (!brandCatPool.length) return [];
+
+    const exactMatches = brandCatPool.filter(p => {
+        const pName = normalizeText(p.name || '');
+        const pTags = normalizeText(Array.isArray(p.tags) ? p.tags.join(' ') : '');
+        const pHaystack = `${pName} ${pTags}`;
+
+        if (isFoldQuery && !/\b(fold|gap)\b/i.test(pHaystack)) return false;
+        if (isFlipQuery && !/\bflip\b/i.test(pHaystack)) return false;
+
+        // Nếu AI chỉ ra sub-line rõ ràng (MacBook Pro, AirPods Max, Watch Ultra, iPad mini, v.v.)
+        for (const sub of matchedSubLines) {
+            if (sub === 'macbook pro' && !(pName.includes('macbook') && /\bpro\b/i.test(pName))) return false;
+            else if (sub === 'airpods max' && !(pName.includes('airpods') && /\bmax\b/i.test(pName))) return false;
+            else if (sub === 'watch ultra' && !(pName.includes('watch') && /\bultra\b/i.test(pName))) return false;
+            else if (sub === 'ipad mini' && !(pName.includes('ipad') && /\bmini\b/i.test(pName))) return false;
+            else if (sub === 'playstation' || sub === 'ps5') {
+                if (!(pName.includes('playstation') || pName.includes('ps5'))) return false;
+            } else if (!pName.includes(sub)) {
+                return false;
+            }
+        }
+
+        // Bắt buộc khớp ít nhất 1 số thế hệ nếu model AI nhận diện có chỉ rõ đời máy (VD: iPhone 8 -> không thể khớp iPhone 16/17)
+        if (genTokens.length > 0) {
+            const hasGenMatch = genTokens.some(tok => {
+                const esc = escapeRegex(tok.replace(/\s+/g, '\\s*'));
+                return new RegExp(`(?:^|[^a-z0-9])${esc}(?:[^a-z0-9]|$)`, 'i').test(pName);
+            });
+            if (!hasGenMatch) return false;
+        }
+
+        // Kiểm tra thêm 'plus' nếu là đời máy dòng Plus (như iPhone 8 Plus / Galaxy S25 Plus)
+        if (/\bplus\b/i.test(cleanedModel) && !/\bplus\b/i.test(pName)) {
+            return false;
+        }
+
+        return true;
+    });
+
+    return exactMatches
+        .map(prod => ({ product: prod, score: scoreVisualProductMatch(prod, device, normCat) }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .map(item => item.product);
+}
+
+/**
+ * Lấy danh sách sản phẩm cùng thương hiệu có trên website (ưu tiên cùng danh mục trước).
+ */
+function getSameBrandCatalogProducts(brandRaw, normCat, activeCatalog = []) {
+    const bNorm = normalizeText(brandRaw || '');
+    if (!bNorm || !Array.isArray(activeCatalog)) return [];
+
+    const sameBrand = activeCatalog.filter(p => {
+        if (Number(p.stock || 0) <= 0) return false;
+        const pb = normalizeText(p.brand || '');
+        const pn = normalizeText(p.name || '');
+        return pb === bNorm || pb.includes(bNorm) || pn.includes(bNorm);
+    });
+
+    sameBrand.sort((a, b) => {
+        const aCatMatch = normCat && String(a.category || '').toLowerCase() === normCat.toLowerCase() ? 1 : 0;
+        const bCatMatch = normCat && String(b.category || '').toLowerCase() === normCat.toLowerCase() ? 1 : 0;
+        if (bCatMatch !== aCatMatch) return bCatMatch - aCatMatch;
+        return (Number(b.featured ? 1 : 0) - Number(a.featured ? 1 : 0)) ||
+            (Number(b.rating || 0) - Number(a.rating || 0)) ||
+            (Number(b.soldCount || 0) - Number(a.soldCount || 0));
+    });
+
+    return sameBrand.slice(0, 6);
+}
+
 router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
     try {
         const { image, filename = '', hint = '' } = req.body;
         if (!image) {
             return res.status(400).json({ message: 'Vui lòng cung cấp hình ảnh sản phẩm cần tìm.' });
         }
+
+        const hydratedContext = await memoryService.hydrateContextWithSessionMemory(req, req.body.context || {});
 
         let mimeType = 'image/jpeg';
         let base64Data = image;
@@ -2471,324 +2772,434 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
             return res.status(400).json({ success: false, isTech: false, status: 'too_large', message: 'Dung lượng ảnh vượt quá giới hạn cho phép (tối đa 10MB).' });
         }
 
+        const rawHintText = normalizeText(`${filename} ${hint}`);
+        const nonTechHintTerms = [
+            'tree', 'cay canh', 'cay xanh', 'forest', 'rung', 'flower', 'hoa', 'nature', 'thien nhien', 'thiennhien',
+            'sky', 'bau troi', 'dog', 'cat', 'food', 'mon an', 'sunset', 'hoang hon', 'scenery', 'landscape', 'san vuon', 'plant'
+        ];
+        const decodedByteLen = Buffer.from(base64Data, 'base64').length;
+        const looksLikeExplicitNonTechDummy = decodedByteLen < 120 && nonTechHintTerms.some(term => rawHintText.includes(term));
+
         let isTechDevice = false;
         let detectionStatus = 'non_tech';
         let detectedDevices = [];
         let classificationReason = '';
+        let sceneDescription = '';
+        let helpfulSuggestion = '';
+        let modelUsed = 'heuristic';
 
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (apiKey) {
-            try {
-                const model = process.env.GEMINI_MODEL || 'gemini-3-flash-preview';
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                const prompt = `Bạn là hệ thống AI phân loại thiết bị công nghệ của cửa hàng (chuyên: Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh, Phụ kiện, Máy chơi game).
+        if (looksLikeExplicitNonTechDummy) {
+            isTechDevice = false;
+            detectionStatus = 'non_tech';
+            classificationReason = 'Ảnh thiên nhiên / cây cối, không chứa thiết bị công nghệ.';
+        } else {
+            // Gọi Gemini 3.x Vision với failover chain nhiều model mới đã kiểm chứng
+            const visionRes = await aiModelService.analyzeProductImage({ base64Data, mimeType, hint });
+            if (visionRes && visionRes.ok && visionRes.parsed) {
+                const parsed = visionRes.parsed;
+                modelUsed = visionRes.model || modelUsed;
+                sceneDescription = parsed.sceneDescription || '';
+                helpfulSuggestion = parsed.helpfulSuggestion || '';
 
-Nhiệm vụ: Phân tích KỸ CÀNG bức ảnh. Liệt kê TẤT CẢ thiết bị công nghệ bạn nhìn thấy.
-
-Quy tắc:
-- Nếu ảnh chứa thiết bị công nghệ/phụ kiện điện tử: status "matched", liệt kê đầy đủ trong mảng "devices"
-- Nếu ảnh chỉ chứa cây cối, thiên nhiên, thức ăn, quần áo, xe cộ, đồ gia dụng: status "non_tech"
-- Nếu ảnh quá mờ, tối, bị che khuất: status "unclear"
-- BẮT BUỘC "category" phải là 1 trong 7 danh mục: "Điện thoại", "Laptop", "Tablet", "Tai nghe", "Đồng hồ thông minh", "Phụ kiện", "Máy chơi game"
-
-Trả về JSON thuần:
-{
-  "status": "matched" | "non_tech" | "unclear",
-  "devices": [
-    {
-      "name": "tên thiết bị cụ thể",
-      "category": "Điện thoại | Laptop | Tablet | Tai nghe | Đồng hồ thông minh | Phụ kiện | Máy chơi game",
-      "brand": "Apple | Samsung | Logitech | Sony | ASUS | Dell | Nintendo | v.v.",
-      "keywords": ["keyword1", "keyword2"]
-    }
-  ],
-  "reason": "lý do nếu non_tech hoặc unclear"
-}`;
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 12000);
-
-                const body = {
-                    contents: [{
-                        role: 'user',
-                        parts: [
-                            { text: prompt },
-                            { inline_data: { mime_type: mimeType, data: base64Data } }
-                        ]
-                    }],
-                    generationConfig: {
-                        response_mime_type: 'application/json',
-                        temperature: 0.1,
-                        maxOutputTokens: 2048,
-                        thinkingConfig: { thinkingBudget: 0 }
-                    }
-                };
-
-                const gemRes = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body),
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                if (gemRes.ok) {
-                    const gemData = await gemRes.json();
-                    let text = gemData?.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) {
-                        try {
-                            text = text.trim();
-                            if (text.startsWith('```')) {
-                                text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
-                            }
-                            const parsed = JSON.parse(text);
-                            if (parsed.status === 'matched' && Array.isArray(parsed.devices) && parsed.devices.length > 0) {
-                                isTechDevice = true;
-                                detectionStatus = 'matched';
-                                detectedDevices = parsed.devices.filter(d => d && d.name);
-                            } else if (parsed.status === 'unclear') {
-                                isTechDevice = false;
-                                detectionStatus = 'unclear';
-                                classificationReason = parsed.reason || 'Ảnh mờ hoặc không nhận biết được vật thể.';
-                            } else {
-                                isTechDevice = false;
-                                detectionStatus = 'non_tech';
-                                classificationReason = parsed.reason || 'Ảnh không chứa thiết bị công nghệ.';
-                            }
-                        } catch (e) {
-                            console.warn('[Visual Search] Parse JSON error:', e);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.warn('[Visual Search] Gemini vision error:', err.message);
-            }
-        }
-
-        // Heuristic fallback nếu Gemini không chạy hoặc trả về lỗi
-        if (detectedDevices.length === 0 && detectionStatus === 'non_tech' && !classificationReason) {
-            const raw = (filename + ' ' + hint).toLowerCase();
-            const nonTechTerms = ['tree', 'cay', 'forest', 'rung', 'flower', 'hoa', 'nature', 'thiennhien', 'sky', 'troi', 'dog', 'cho', 'cat', 'meo', 'food', 'monan', 'sunset', 'hoanghon', 'scenery', 'landscape'];
-            const hasNonTech = nonTechTerms.some(term => raw.includes(term));
-
-            if (!hasNonTech) {
-                const candidates = [];
-                const hasApple = raw.includes('apple') || raw.includes('iphone') || raw.includes('ios');
-                const hasWatch = raw.includes('watch') || raw.includes('dong ho') || raw.includes('smartwatch');
-                const hasTablet = raw.includes('ipad') || raw.includes('tablet') || raw.includes('pencil') || raw.includes('but');
-                const hasPhone = raw.includes('iphone') || raw.includes('phone') || raw.includes('dien thoai') || raw.includes('galaxy') || raw.includes('samsung');
-                const hasLaptop = raw.includes('laptop') || raw.includes('macbook') || raw.includes('asus') || raw.includes('dell') || raw.includes('lenovo');
-                const hasAudio = raw.includes('headphone') || raw.includes('tai nghe') || raw.includes('airpods') || raw.includes('sony') || raw.includes('headset');
-                const hasGaming = raw.includes('gaming') || raw.includes('game') || raw.includes('playstation') || raw.includes('ps5') || raw.includes('nintendo') || raw.includes('switch');
-                const hasAccessories = raw.includes('logitech') || raw.includes('chuot') || raw.includes('mouse') || raw.includes('ban phim') || raw.includes('keyboard') || raw.includes('sac');
-
-                if (hasGaming) {
-                    candidates.push({
-                        name: raw.includes('switch') ? 'Nintendo Switch OLED' : 'PlayStation 5 Slim',
-                        category: 'Máy chơi game',
-                        brand: raw.includes('switch') ? 'Nintendo' : 'Sony',
-                        keywords: ['PlayStation 5', 'Nintendo Switch', 'máy chơi game']
-                    });
-                }
-                if (hasPhone || hasApple) {
-                    candidates.push({
-                        name: raw.includes('samsung') ? 'Samsung Galaxy' : 'iPhone 17 Pro Max / iPhone 16',
-                        category: 'Điện thoại',
-                        brand: raw.includes('samsung') ? 'Samsung' : 'Apple',
-                        keywords: raw.includes('samsung') ? ['Galaxy', 'Samsung'] : ['iPhone 17', 'iPhone 16']
-                    });
-                }
-                if (hasWatch || (hasApple && (raw.includes('watch') || raw.includes('combo') || raw.includes('setup')))) {
-                    candidates.push({
-                        name: raw.includes('garmin') ? 'Garmin Watch' : (raw.includes('galaxy') ? 'Galaxy Watch' : 'Apple Watch Series'),
-                        category: 'Đồng hồ thông minh',
-                        brand: raw.includes('garmin') ? 'Garmin' : (raw.includes('galaxy') ? 'Samsung' : 'Apple'),
-                        keywords: ['Apple Watch', 'smartwatch', 'đồng hồ']
-                    });
-                }
-                if (hasTablet || (hasApple && (raw.includes('ipad') || raw.includes('pencil')))) {
-                    candidates.push({
-                        name: raw.includes('matepad') ? 'Huawei MatePad' : 'iPad Pro / iPad Air',
-                        category: 'Tablet',
-                        brand: raw.includes('matepad') ? 'Huawei' : 'Apple',
-                        keywords: ['iPad', 'Apple Pencil', 'tablet']
-                    });
-                }
-                if (hasLaptop) {
-                    candidates.push({
-                        name: raw.includes('macbook') ? 'MacBook Pro / Air M3' : 'Laptop',
-                        category: 'Laptop',
-                        brand: raw.includes('macbook') ? 'Apple' : '',
-                        keywords: ['MacBook', 'laptop']
-                    });
-                }
-                if (hasAudio) {
-                    candidates.push({
-                        name: raw.includes('airpods') ? 'Apple AirPods Pro 2' : 'Tai nghe chụp tai Sony / Marshall',
-                        category: 'Tai nghe',
-                        brand: raw.includes('airpods') ? 'Apple' : 'Sony',
-                        keywords: ['AirPods', 'tai nghe', 'Sony WH']
-                    });
-                }
-                if (hasAccessories) {
-                    candidates.push({
-                        name: raw.includes('logitech') ? 'Logitech MX Master' : 'Phụ kiện công nghệ',
-                        category: 'Phụ kiện',
-                        brand: raw.includes('logitech') ? 'Logitech' : '',
-                        keywords: ['chuột', 'bàn phím', 'sạc']
-                    });
-                }
-
-                if (candidates.length > 0) {
+                if (parsed.status === 'matched' && Array.isArray(parsed.devices) && parsed.devices.length > 0) {
                     isTechDevice = true;
                     detectionStatus = 'matched';
-                    detectedDevices = candidates;
+                    detectedDevices = parsed.devices;
+                } else if (parsed.status === 'unclear') {
+                    isTechDevice = false;
+                    detectionStatus = 'unclear';
+                    classificationReason = parsed.sceneDescription || 'Ảnh chụp chưa đủ rõ nét để nhận diện model thiết bị.';
                 } else {
-                    isTechDevice = true;
-                    detectionStatus = 'matched';
-                    detectedDevices = [
-                        {
-                            name: 'Điện thoại thông minh Smartphone',
+                    isTechDevice = false;
+                    detectionStatus = 'non_tech';
+                    classificationReason = parsed.sceneDescription || 'Ảnh không chứa thiết bị công nghệ.';
+                }
+            } else {
+                // Vision API unavailable hoặc ảnh lỗi: chỉ phân tích theo tên file/hint rõ ràng, TUYỆT ĐỐI không bịa 3 sản phẩm giả
+                const hasExplicitNonTechHint = nonTechHintTerms.some(term => rawHintText.includes(term));
+                if (hasExplicitNonTechHint) {
+                    isTechDevice = false;
+                    detectionStatus = 'non_tech';
+                    classificationReason = 'Ảnh không chứa thiết bị công nghệ.';
+                } else {
+                    const candidates = [];
+                    if (/\b(ps5|playstation|nintendo|switch|rog ally|claw|may choi game)\b/i.test(rawHintText)) {
+                        candidates.push({
+                            name: rawHintText.includes('switch') ? 'Nintendo Switch OLED' : 'PlayStation 5 Slim',
+                            modelGuess: rawHintText.includes('switch') ? 'Nintendo Switch' : 'PlayStation 5',
+                            category: 'Máy chơi game',
+                            brand: rawHintText.includes('switch') ? 'Nintendo' : 'Sony',
+                            keywords: ['PlayStation 5', 'Nintendo Switch']
+                        });
+                    }
+                    if (/\b(iphone|samsung|galaxy|dien thoai|smartphone)\b/i.test(rawHintText)) {
+                        candidates.push({
+                            name: rawHintText.includes('samsung') || rawHintText.includes('galaxy') ? 'Samsung Galaxy' : 'Apple iPhone',
+                            modelGuess: rawHintText.includes('samsung') ? 'Galaxy S' : 'iPhone',
                             category: 'Điện thoại',
-                            brand: 'Apple',
-                            keywords: ['iPhone 17', 'iPhone 16', 'Galaxy']
-                        },
-                        {
-                            name: 'Laptop & Máy tính xách tay',
+                            brand: rawHintText.includes('samsung') || rawHintText.includes('galaxy') ? 'Samsung' : 'Apple',
+                            keywords: rawHintText.includes('samsung') ? ['Galaxy', 'Samsung'] : ['iPhone 17', 'iPhone 16']
+                        });
+                    }
+                    if (/\b(apple watch|watch|smartwatch|dong ho)\b/i.test(rawHintText)) {
+                        candidates.push({
+                            name: 'Đồng hồ thông minh',
+                            modelGuess: rawHintText.includes('garmin') ? 'Garmin' : 'Apple Watch',
+                            category: 'Đồng hồ thông minh',
+                            brand: rawHintText.includes('garmin') ? 'Garmin' : (rawHintText.includes('galaxy') ? 'Samsung' : 'Apple'),
+                            keywords: ['Apple Watch', 'smartwatch']
+                        });
+                    }
+                    if (/\b(ipad|tablet|may tinh bang|matepad)\b/i.test(rawHintText)) {
+                        candidates.push({
+                            name: rawHintText.includes('matepad') ? 'Huawei MatePad' : 'Apple iPad',
+                            modelGuess: rawHintText.includes('matepad') ? 'MatePad' : 'iPad',
+                            category: 'Tablet',
+                            brand: rawHintText.includes('matepad') ? 'Huawei' : 'Apple',
+                            keywords: ['iPad', 'tablet']
+                        });
+                    }
+                    if (/\b(macbook|laptop|asus|dell|lenovo|msi|hp|acer)\b/i.test(rawHintText)) {
+                        candidates.push({
+                            name: rawHintText.includes('macbook') ? 'Apple MacBook' : 'Laptop',
+                            modelGuess: rawHintText.includes('macbook') ? 'MacBook' : 'Laptop',
                             category: 'Laptop',
-                            brand: 'Apple',
+                            brand: rawHintText.includes('macbook') ? 'Apple' : '',
                             keywords: ['MacBook', 'Laptop']
-                        },
-                        {
-                            name: 'Tai nghe & Âm thanh chất lượng cao',
+                        });
+                    }
+                    if (/\b(airpods|tai nghe|headphone|sony wh|marshall|earbuds)\b/i.test(rawHintText)) {
+                        candidates.push({
+                            name: rawHintText.includes('airpods') ? 'Apple AirPods' : 'Tai nghe Bluetooth',
+                            modelGuess: rawHintText.includes('airpods') ? 'AirPods' : 'Sony WH',
                             category: 'Tai nghe',
-                            brand: 'Sony',
+                            brand: rawHintText.includes('airpods') ? 'Apple' : 'Sony',
                             keywords: ['AirPods', 'Sony WH']
-                        }
-                    ];
+                        });
+                    }
+
+                    if (candidates.length > 0) {
+                        isTechDevice = true;
+                        detectionStatus = 'matched';
+                        detectedDevices = candidates;
+                    } else {
+                        isTechDevice = false;
+                        detectionStatus = 'unclear';
+                        classificationReason = 'Hệ thống nhận diện hình ảnh tạm thời không thể đọc chi tiết sản phẩm trong ảnh này.';
+                    }
                 }
             }
         }
 
-        // Case: Non-tech or Unclear - politely notify and provide top popular products
+        // Trường hợp ảnh KHÔNG phải thiết bị công nghệ hoặc ảnh mờ/khó nhận diện -> Trả lời trung thực, KHÔNG bịa sản phẩm
         if (!isTechDevice) {
-            const popularProducts = await Product.find({ active: { $ne: false } })
-                .sort({ rating: -1, soldCount: -1 })
-                .limit(4);
+            const isUnclear = detectionStatus === 'unclear';
+            const honestReply = isUnclear
+                ? `📷 **AI Visual Search:** ${classificationReason || 'Ảnh chưa đủ rõ nét hoặc vật thể bị che khuất để nhận diện chính xác.'}\n\n${helpfulSuggestion || 'Bạn hãy thử chụp lại góc sáng rõ hơn, đặt thiết bị vào giữa khung hình hoặc gõ tên sản phẩm vào ô chat để em hỗ trợ ngay nhé!'}`
+                : `📷 **AI Visual Search:** ${sceneDescription ? `${sceneDescription}\n\n` : ''}Ảnh này **chưa phát hiện** thiết bị công nghệ mà cửa hàng đang kinh doanh.\n\n${helpfulSuggestion || 'Bạn có thể tải ảnh chụp Điện thoại, Laptop, Tablet, Tai nghe, Đồng hồ thông minh hoặc Phụ kiện để em tìm sản phẩm chính xác cho bạn nhé!'}`;
 
-            return res.json({
+            const nonTechPayload = {
                 success: true,
                 isTech: false,
                 status: detectionStatus,
+                modelUsed,
+                sceneDescription,
                 detectedItem: null,
                 detectedCategory: null,
                 detectedBrand: null,
-                description: detectionStatus === 'unclear'
-                    ? 'Ảnh chụp chưa đủ rõ nét hoặc vật thể bị che khuất để nhận diện chính xác.'
-                    : (classificationReason || 'Ảnh chưa cho thấy rõ thiết bị công nghệ trong hệ thống cửa hàng.'),
-                reply: detectionStatus === 'unclear'
-                    ? 'Ảnh chưa đủ rõ nét để nhận diện chính xác model. Cửa hàng gợi ý các sản phẩm công nghệ bán chạy hàng đầu dành cho bạn:'
-                    : 'Ảnh này chưa cho thấy thiết bị công nghệ của cửa hàng. Bạn có thể tham khảo các sản phẩm thịnh hành tại cửa hàng:',
-                products: popularProducts,
-                suggestions: ['Điện thoại', 'Laptop & MacBook', 'Tai nghe & Âm thanh', 'Phụ kiện máy tính']
-            });
-        }
-
-        // Case: Tech device(s) detected -> Multi-pass search
-        let allProducts = [];
-
-        for (const device of detectedDevices) {
-            const normCat = normalizeVisualCategory(device.category);
-            const searchConditions = [];
-
-            if (device.name) {
-                const words = device.name.split(/\s+/).filter(w => w.length > 2 && !['the', 'and', 'cho', 'voi', 'with', 'của'].includes(w.toLowerCase()));
-                words.forEach(w => {
-                    searchConditions.push({ name: new RegExp(escapeRegex(w), 'i') });
-                    searchConditions.push({ tags: new RegExp(escapeRegex(w), 'i') });
-                });
-            }
-            if (Array.isArray(device.keywords)) {
-                device.keywords.forEach(kw => {
-                    if (kw && kw.length > 2) {
-                        searchConditions.push({ name: new RegExp(escapeRegex(kw), 'i') });
-                        searchConditions.push({ tags: new RegExp(escapeRegex(kw), 'i') });
-                    }
-                });
-            }
-            if (device.brand) {
-                searchConditions.push({ brand: new RegExp(escapeRegex(device.brand), 'i') });
-            }
-
-            let deviceProducts = [];
-
-            // Pass 1: Match conditions AND normalized category
-            if (searchConditions.length > 0 && normCat) {
-                deviceProducts = await Product.find({
-                    active: { $ne: false },
-                    category: new RegExp(escapeRegex(normCat), 'i'),
-                    $or: searchConditions
-                }).sort({ rating: -1, soldCount: -1 }).limit(4);
-            }
-
-            // Pass 2: If no match in category, search across ALL categories
-            if (!deviceProducts.length && searchConditions.length > 0) {
-                deviceProducts = await Product.find({
-                    active: { $ne: false },
-                    $or: searchConditions
-                }).sort({ rating: -1, soldCount: -1 }).limit(4);
-            }
-
-            // Pass 3: If still no match, fallback to top products in normalized category
-            if (!deviceProducts.length && normCat) {
-                deviceProducts = await Product.find({
-                    category: new RegExp(escapeRegex(normCat), 'i'),
-                    active: { $ne: false }
-                }).sort({ rating: -1, soldCount: -1 }).limit(4);
-            }
-
-            // Merge, no duplicates
-            deviceProducts.forEach(p => {
-                if (!allProducts.some(ex => String(ex._id) === String(p._id))) {
-                    allProducts.push(p);
+                detectedDevices: [],
+                description: classificationReason || sceneDescription || 'Ảnh không chứa thiết bị công nghệ.',
+                reply: honestReply,
+                products: [],
+                suggestions: [
+                    'Tư vấn Điện thoại chụp ảnh đẹp',
+                    'Tư vấn Laptop mỏng nhẹ',
+                    'Xem Tai nghe & Smartwatch',
+                    'Mã giảm giá hôm nay'
+                ],
+                context: {
+                    ...hydratedContext,
+                    lastVisualDevices: [],
+                    stage: `visual_${detectionStatus}`
                 }
-            });
+            };
+
+            await memoryService.persistConversationTurn(
+                req,
+                hint || `[Tìm kiếm bằng hình ảnh${filename ? `: ${filename}` : ''}]`,
+                nonTechPayload,
+                hydratedContext,
+                { isImage: true, imageUrl: filename || 'uploaded_image', intent: `visual_${detectionStatus}` }
+            ).catch(() => {});
+
+            return res.json(nonTechPayload);
         }
 
-        // Pass 4: Global catalog fallback if all specific device searches yielded 0
-        if (allProducts.length === 0) {
-            allProducts = await Product.find({ active: { $ne: false } })
-                .sort({ rating: -1, soldCount: -1 })
-                .limit(6);
+        // Trường hợp NHẬN DIỆN ĐÚNG thiết bị công nghệ -> Đối chiếu chặt chẽ xem website có kinh doanh đúng mẫu này không
+        const activeCatalog = await Product.find({ active: { $ne: false } }).lean();
+        const bucketsPerDevice = [];
+        const missingDevices = [];
+
+        for (const device of detectedDevices.slice(0, 6)) {
+            const normCat = normalizeVisualCategory(device.category);
+            device.category = normCat || device.category || '';
+
+            const exactMatches = findExactCatalogMatchesForDevice(device, normCat, activeCatalog);
+            if (exactMatches.length > 0) {
+                bucketsPerDevice.push(exactMatches);
+            } else {
+                missingDevices.push(device);
+            }
         }
 
-        allProducts = allProducts.slice(0, 8);
+        // Round-robin merge cho các thiết bị khớp thật trong catalog website
+        const allProducts = [];
+        const seenIds = new Set();
+        const maxPerRound = Math.max(0, ...bucketsPerDevice.map(b => b.length));
+        for (let round = 0; round < maxPerRound && allProducts.length < 8; round++) {
+            for (const bucket of bucketsPerDevice) {
+                if (round < bucket.length && allProducts.length < 8) {
+                    const p = bucket[round];
+                    const pid = String(p._id);
+                    if (!seenIds.has(pid)) {
+                        seenIds.add(pid);
+                        allProducts.push(p);
+                    }
+                }
+            }
+        }
 
         const primaryDevice = detectedDevices[0] || {};
         const isMultiDevice = detectedDevices.length > 1;
+        const deviceLines = detectedDevices.map((d, i) => {
+            const label = d.modelGuess || d.name || d.category || 'Thiết bị công nghệ';
+            const metaParts = [d.brand, d.category].filter(Boolean).join(' · ');
+            return `${i + 1}. **${label}**${metaParts ? ` (${metaParts})` : ''}`;
+        });
 
         const deviceListText = isMultiDevice
-            ? `AI nhận diện **${detectedDevices.length} thiết bị** trong ảnh:\n${detectedDevices.map((d, i) => `  ${i + 1}. ${d.name}${d.brand ? ' (' + d.brand + ')' : ''}`).join('\n')}`
-            : `AI nhận diện: **${primaryDevice.name}** (${primaryDevice.brand ? primaryDevice.brand + ' · ' : ''}${primaryDevice.category || 'Thiết bị công nghệ'})`;
+            ? `AI nhận diện **${detectedDevices.length} thiết bị** trong ảnh:\n${deviceLines.join('\n')}`
+            : `AI nhận diện: **${primaryDevice.modelGuess || primaryDevice.name}** (${[primaryDevice.brand, primaryDevice.category].filter(Boolean).join(' · ') || 'Thiết bị công nghệ'})`;
 
-        const replyMessage = `📷 **KẾT QUẢ TÌM KIẾM BẰNG HÌNH ẢNH (AI VISUAL SEARCH)**\n\n• ${deviceListText}\n• Đã tìm thấy **${allProducts.length} sản phẩm tương tự** tại cửa hàng:`;
+        const introLine = sceneDescription ? `• ${sceneDescription}\n` : '';
 
-        return res.json({
+        // CASE B: AI nhận diện được thiết bị công nghệ nhưng TRONG WEBSITE KHÔNG CÓ mẫu này
+        if (allProducts.length === 0) {
+            const targetMissing = missingDevices[0] || primaryDevice;
+            const targetBrand = String(targetMissing.brand || primaryDevice.brand || '').trim();
+            const targetCat = normalizeVisualCategory(targetMissing.category || primaryDevice.category || '');
+            const missingNames = Array.from(new Set(
+                detectedDevices.map(d => d.modelGuess || d.name).filter(Boolean)
+            )).join(', ') || 'mẫu thiết bị này';
+
+            const sameBrandProducts = targetBrand
+                ? getSameBrandCatalogProducts(targetBrand, targetCat, activeCatalog)
+                : [];
+
+            const hasSameBrand = sameBrandProducts.length > 0;
+            const sampleNames = sameBrandProducts.slice(0, 3).map(p => p.name).join(', ');
+
+            const notInCatalogReply = hasSameBrand
+                ? `📷 **KẾT QUẢ NHẬN DIỆN HÌNH ẢNH (AI VISUAL SEARCH)**\n\n${introLine}• ${deviceListText}\n\n❌ Hiện tại trong website **không có sản phẩm ${missingNames}** này ạ.\n👉 **Bạn có muốn tham khảo các sản phẩm cùng thương hiệu ${targetBrand} hiện đang sẵn hàng tại website không?** *(Ví dụ: ${sampleNames}...)*`
+                : `📷 **KẾT QUẢ NHẬN DIỆN HÌNH ẢNH (AI VISUAL SEARCH)**\n\n${introLine}• ${deviceListText}\n\n❌ Hiện tại trong website **không có sản phẩm ${missingNames}** này${targetBrand ? ` và cũng chưa phân phối thương hiệu **${targetBrand}**` : ''} ạ.\n👉 **Bạn có muốn tham khảo các sản phẩm ${targetCat || 'công nghệ'} cùng phân khúc từ các thương hiệu đang có tại website không?**`;
+
+            const pendingBrandSuggestion = {
+                brand: targetBrand,
+                category: targetCat,
+                missingNames,
+                hasSameBrand
+            };
+
+            const nextSuggestions = hasSameBrand
+                ? [
+                    `Có, xem sản phẩm ${targetBrand}`,
+                    targetCat ? `Xem ${targetCat} ${targetBrand} mới nhất` : null,
+                    'Không, tìm hãng khác',
+                    'Tư vấn theo ngân sách'
+                ].filter(Boolean)
+                : [
+                    targetCat ? `Xem ${targetCat} đang có sẵn` : 'Tư vấn sản phẩm nổi bật',
+                    'Xem sản phẩm Apple',
+                    'Xem sản phẩm Samsung',
+                    'Tư vấn theo ngân sách'
+                ];
+
+            const notInCatalogCtx = {
+                ...hydratedContext,
+                category: targetCat || hydratedContext.category || '',
+                brand: targetBrand || '',
+                lastProducts: [],
+                lastVisualDevices: detectedDevices,
+                stage: 'visual_not_in_catalog',
+                currentIntent: 'visual_not_in_catalog',
+                pendingBrandSuggestion
+            };
+
+            const notInCatalogResponse = {
+                success: true,
+                isTech: true,
+                notInCatalog: true,
+                status: 'not_in_catalog',
+                sameBrandAvailable: hasSameBrand,
+                sameBrandCount: sameBrandProducts.length,
+                modelUsed,
+                sceneDescription,
+                detectedItem: primaryDevice.modelGuess || primaryDevice.name || '',
+                detectedCategory: targetCat,
+                detectedBrand: targetBrand,
+                detectedDevices,
+                description: deviceListText,
+                reply: notInCatalogReply,
+                products: [],
+                suggestions: nextSuggestions,
+                context: notInCatalogCtx
+            };
+
+            const savedProfile = await memoryService.persistConversationTurn(
+                req,
+                hint || `[Tìm kiếm bằng hình ảnh${filename ? `: ${filename}` : ''}]`,
+                notInCatalogResponse,
+                hydratedContext,
+                {
+                    isImage: true,
+                    imageUrl: filename || 'uploaded_image',
+                    intent: 'visual_not_in_catalog',
+                    category: notInCatalogCtx.category,
+                    visualDevices: detectedDevices
+                }
+            );
+            notInCatalogResponse.context.memoryProfile = savedProfile || notInCatalogCtx.memoryProfile;
+
+            return res.json(notInCatalogResponse);
+        }
+
+        // CASE A: Có sản phẩm khớp trong website (kèm ghi chú minh bạch nếu có món phụ trong ảnh chưa có trên web)
+        const missingNote = missingDevices.length > 0
+            ? `\n• ⚠️ Lưu ý: Hiện website chưa kinh doanh mẫu **${missingDevices.map(d => d.modelGuess || d.name).filter(Boolean).join(', ')}** (bạn có thể nhắn nếu muốn xem thêm mẫu cùng hãng khác).`
+            : '';
+
+        const replyMessage = `📷 **KẾT QUẢ TÌM KIẾM BẰNG HÌNH ẢNH (AI VISUAL SEARCH)**\n\n${introLine}• ${deviceListText}${missingNote}\n• Đã ghép được **${allProducts.length} sản phẩm phù hợp nhất** đang sẵn hàng tại cửa hàng:`;
+
+        const updatedVisualContext = {
+            ...hydratedContext,
+            category: allProducts[0]?.category || primaryDevice.category || hydratedContext.category || '',
+            lastProducts: allProducts,
+            lastVisualDevices: detectedDevices,
+            stage: 'visual_search',
+            currentIntent: 'visual_search',
+            pendingBrandSuggestion: null
+        };
+
+        const smartSuggestions = [
+            allProducts.length >= 2 ? 'So sánh 2 máy vừa rồi' : null,
+            allProducts[0] ? `Xem chi tiết ${allProducts[0].name}` : null,
+            isMultiDevice ? 'Combo thiết bị trong ảnh có ưu đãi gì?' : 'Tính trả góp 0%',
+            'Mã giảm giá hôm nay'
+        ].filter(Boolean);
+
+        const visualResponse = {
             success: true,
             isTech: true,
+            notInCatalog: false,
             status: 'matched',
-            detectedItem: primaryDevice.name || '',
+            modelUsed,
+            sceneDescription,
+            detectedItem: primaryDevice.modelGuess || primaryDevice.name || '',
             detectedCategory: primaryDevice.category || '',
             detectedBrand: primaryDevice.brand || '',
             detectedDevices,
             description: deviceListText,
             reply: replyMessage,
             products: allProducts,
-            suggestions: ['Thêm vào giỏ', 'So sánh giá', 'Xem khuyến mãi']
-        });
+            suggestions: smartSuggestions,
+            context: updatedVisualContext
+        };
+
+        const savedProfile = await memoryService.persistConversationTurn(
+            req,
+            hint || `[Tìm kiếm bằng hình ảnh${filename ? `: ${filename}` : ''}]`,
+            visualResponse,
+            hydratedContext,
+            {
+                isImage: true,
+                imageUrl: filename || 'uploaded_image',
+                intent: 'visual_search',
+                category: updatedVisualContext.category,
+                visualDevices: detectedDevices
+            }
+        );
+
+        visualResponse.context.memoryProfile = savedProfile || updatedVisualContext.memoryProfile;
+        return res.json(visualResponse);
     } catch (err) {
         console.error('Visual Search error:', err);
         return res.status(500).json({ success: false, isTech: false, status: 'error', message: 'Không thể xử lý hình ảnh lúc này. Vui lòng thử lại sau.' });
+    }
+});
+
+// ==========================================
+// SESSION MEMORY RESTORE & RESET ENDPOINTS
+// ==========================================
+
+router.get('/memory', optionalAuth, async (req, res) => {
+    try {
+        const sessionKey = memoryService.resolveSessionKey(req);
+        const session = await ChatSession.findOne({ sessionKey }).lean();
+        if (!session) {
+            return res.json({
+                sessionKey,
+                exists: false,
+                rollingSummary: '',
+                memoryProfile: {},
+                recentMessages: []
+            });
+        }
+        return res.json({
+            sessionKey,
+            exists: true,
+            rollingSummary: session.rollingSummary || '',
+            memoryProfile: session.memoryProfile || {},
+            interestedCategory: session.interestedCategory || '',
+            budgetRange: session.budgetRange || '',
+            recentMessages: Array.isArray(session.messages) ? session.messages.slice(-20) : []
+        });
+    } catch (err) {
+        return res.status(500).json({ message: 'Không thể đọc bộ nhớ hội thoại.' });
+    }
+});
+
+router.post('/reset', optionalAuth, async (req, res) => {
+    try {
+        const sessionKey = memoryService.resolveSessionKey(req);
+        await ChatSession.findOneAndUpdate(
+            { sessionKey },
+            {
+                $set: {
+                    messages: [],
+                    rollingSummary: '',
+                    intentSummary: '',
+                    interestedCategory: '',
+                    budgetRange: '',
+                    memoryProfile: {
+                        preferredBrands: [],
+                        dislikedBrands: [],
+                        ownedDevices: [],
+                        occupationOrRole: '',
+                        keyPriorities: [],
+                        budgetMin: 0,
+                        budgetMax: 0,
+                        budgetStrict: false,
+                        lastVisualDevices: [],
+                        discussedProducts: [],
+                        turnCount: 0
+                    },
+                    updatedAt: new Date()
+                }
+            }
+        );
+        return res.json({ success: true, sessionKey });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'Không thể đặt lại phiên hội thoại.' });
     }
 });
 

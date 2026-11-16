@@ -4540,3 +4540,133 @@ html[data-theme='light'] .product-spec-line,
 body.light-mode .product-spec-line {
     color: #64748b !important;
 }
+
+/* ============================================================================
+   MOBILE FLASH SALE SHOWCASE RESPONSIVE FIX (2 CARDS PER ROW, NO WASTED PADDING)
+   ============================================================================ */
+@media (max-width: 768px) {
+    .flash-sale-showcase {
+        padding: 12px 10px !important;
+        margin: 0.75rem 0 1.15rem !important;
+        border-radius: 14px !important;
+    }
+
+    .flash-sale-banner-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+    }
+
+    .flash-sale-title-group {
+        width: 100% !important;
+        justify-content: center !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+    }
+
+    .flash-sale-flame-icon {
+        font-size: 1.25rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    .flash-sale-heading {
+        font-size: 1.02rem !important;
+        white-space: nowrap !important;
+        line-height: 1.2 !important;
+    }
+
+    .flash-sale-discount-tag {
+        font-size: 0.65rem !important;
+        padding: 2px 7px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+
+    .flash-sale-timer-box {
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 6px !important;
+    }
+
+    .flash-sale-timer-caption {
+        font-size: 0.78rem !important;
+    }
+
+    .timer-box {
+        min-width: 28px !important;
+        height: 28px !important;
+        font-size: 0.84rem !important;
+    }
+
+    .flash-sale-deals-container {
+        padding: 0.65rem 0 0.2rem !important;
+    }
+
+    .flash-sale-carousel-wrapper {
+        padding: 0 2px !important;
+    }
+
+    .flash-sale-track {
+        gap: 8px !important;
+        padding: 4px 2px 8px !important;
+    }
+
+    .flash-deal-card {
+        flex: 0 0 calc(50% - 4px) !important;
+        width: calc(50% - 4px) !important;
+        min-width: calc(50% - 4px) !important;
+        padding: 8px !important;
+        border-radius: 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .flash-deal-thumb-wrap {
+        height: 100px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .flash-deal-brand {
+        font-size: 0.62rem !important;
+    }
+
+    .flash-deal-title {
+        font-size: 0.76rem !important;
+        line-height: 1.3 !important;
+        height: 2.6em !important;
+        margin-bottom: 4px !important;
+    }
+
+    .flash-deal-price-line {
+        gap: 4px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .flash-deal-current {
+        font-size: 0.86rem !important;
+    }
+
+    .flash-deal-original {
+        font-size: 0.66rem !important;
+    }
+
+    .flash-deal-stock-text {
+        font-size: 0.64rem !important;
+    }
+
+    .flash-nav-btn {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 1.1rem !important;
+        opacity: 0.9 !important;
+    }
+
+    .flash-nav-prev {
+        left: 0 !important;
+    }
+
+    .flash-nav-next {
+        right: 0 !important;
+    }
+}
+
