@@ -409,6 +409,43 @@ const STORE_POLICY_RULES = [
             `• Nếu bạn cần tra cứu gấp tiến độ giao hàng hỏa tốc, đổi địa chỉ nhận hoặc cần xuất hóa đơn công ty bổ sung, bạn chỉ cần đọc Số điện thoại đặt hàng cho hotline **0842.331.606** để nhân viên hỗ trợ ngay lập tức ạ!\n\n` +
             `👉 Bạn có muốn em hỗ trợ thêm thông tin gì về việc mua sắm hay kiểm tra đơn hàng không ạ? 😊`,
         suggestions: ['Xem Lịch sử mua hàng', 'Chính sách bảo hành 1 đổi 1', 'Đổi địa chỉ nhận hàng', 'Hotline 0842.331.606']
+    },
+
+    // 1.19 Hậu mãi vệ sinh máy, kiểm tra pin & hỗ trợ kỹ thuật TeamViewer/UltraViewer trọn đời
+    {
+        id: 'service_after_sales_cleaning_and_remote_support',
+        patterns: [
+            /(sau khi mua|mua may|mua laptop|mua xong|ben shop).*(ve sinh|tra keo|kiem tra pin|ultraviewer|teamviewer|cai lai win|loi phan mem)/i,
+            /(ve sinh|tra keo|kiem tra pin|ultraviewer|teamviewer|cai lai win|loi phan mem).*(sau khi mua|co ho tro|co tinh phi|co mien phi|tu xa|khong)/i,
+            /(ho tro ky thuat|sua loi phan mem|hau mai).*(nhu the nao|tron doi|bao lau)/i
+        ],
+        keywords: [
+            've sinh laptop mien phi khong', 'co ho tro teamviewer tu xa khong', 'hau mai sau khi mua may',
+            'cai win cai phan mem mien phi'
+        ],
+        reply: `Dạ mua máy tại cửa hàng em là được đồng hành kỹ thuật **XUYÊN SUỐT VÒNG ĐỜI MÁY** chứ không phải giao xong là hết trách nhiệm đâu ạ! 🛠️💙\n\n` +
+            `• 💻 **Hỗ trợ phần mềm trọn đời MIỄN PHÍ:** Cài lại Windows/macOS, Office, bộ gõ, cập nhật driver hay xử lý lỗi phần mềm từ xa cực nhanh qua **UltraViewer / TeamViewer** bất kể bạn ở tỉnh nào.\n` +
+            `• 🧹 **Tại Showroom 78 Nguyễn Văn Khối, Gò Vấp:** Bất cứ lúc nào ghé ngang, kỹ thuật viên đều hỗ trợ vệ sinh bụi màn hình – bàn phím, kiểm tra độ chai pin & tối ưu hệ thống miễn phí hoàn toàn.\n\n` +
+            `👉 Bạn đang quan tâm dòng máy nào hay cần hỗ trợ cài đặt gì cho thiết bị hiện tại không để em giúp ngay nhé! 😊`,
+        suggestions: ['Tư vấn Laptop bền bỉ', 'Địa chỉ Showroom Gò Vấp', 'Hotline kỹ thuật 0842.331.606']
+    },
+
+    // 1.20 Đổi quà tặng trong 30 ngày nếu người nhận không hợp màu/thích mẫu khác
+    {
+        id: 'advice_gift_exchange_sealed_within_30_days',
+        patterns: [
+            /(mua tang|lam qua|tang sinh nhat|tang nguoi yeu|tang sep|qua tang).*(khong thich|khong hop|doi mau|doi may|doi sang)/i,
+            /(neu nguoi nhan khong ung|muon doi qua tang|khong hop mau).*(co doi duoc khong|doi|sao)/i
+        ],
+        keywords: [
+            'mua tang khong thich co doi duoc khong', 'mua qua tang muon doi mau khac',
+            'chua khui seal co doi duoc khong'
+        ],
+        reply: `Dạ bạn chu đáo quá! Nhiều anh/chị mua máy làm quà sinh nhật hoặc tặng người thương cũng hay lo lỡ người nhận thích màu khác hoặc muốn đổi dung lượng cao hơn: 🎁✨\n\n` +
+            `• 🔄 **ĐỔI LINH HOẠT TRONG 30 NGÀY (Nguyên Seal):** Miễn là hộp máy còn nguyên seal chưa kích hoạt kèm hóa đơn/SĐT mua hàng, người nhận có thể mang qua đổi **màu sắc khác, dung lượng lớn hơn hoặc dòng máy khác** (ngang giá hoặc bù chênh lệch, hoàn toàn KHÔNG trừ phí khấu hao!).\n` +
+            `• 🎀 **Gói quà & Thiệp chúc miễn phí:** Bên em hỗ trợ bọc hộp quà lịch sự, giữ nguyên seal hãng bên trong và viết thiệp chúc giúp bạn luôn nha!\n\n` +
+            `👉 Bạn đang tính tặng món công nghệ gì và cho ai để em gợi ý mẫu sang – tinh tế – dễ ưng nhất ạ! 😊`,
+        suggestions: ['Quà tặng dưới 10 triệu', 'Quà tặng sang trọng Apple', 'Đặt giữ hàng 24h']
     }
 ];
 
@@ -640,6 +677,62 @@ const OBJECTION_RULES = [
             `• 🪪 **Kích hoạt VNeID mức độ 2 & Danh bạ, iCloud/Google Photos:** Đồng bộ sang máy mới nguyên vẹn như chưa từng đổi máy.\n\n` +
             `👉 Dù bạn ghé Showroom hay nhận hàng tại nhà (hỗ trợ Video Call 1-1), bên em đều đồng hành cài đặt xong xuôi 100% bạn mới yên tâm sử dụng nhé! 😊`,
         suggestions: ['Tư vấn Thu cũ đổi mới', 'Xem iPhone chính hãng', 'Xem Samsung Galaxy mới', 'Hotline 0842.331.606']
+    },
+
+    // 2.12 Khách muốn giữ máy màu yêu thích đến chiều/mai ghé showroom xem (không cần cọc)
+    {
+        id: 'objection_need_quick_hold_or_reserve_decision',
+        patterns: [
+            /(giu may|dat giu|giu ho|giu giup).*(chieu|mai|toi|qua xem|khong coc|can coc)/i,
+            /(qua showroom|ra cua hang).*(chieu nay|ngay mai|cuoi tuan).*(con may|giu cho)/i
+        ],
+        keywords: [
+            'giu giup minh 1 may', 'dat giu may co can dat coc khong', 'giu may den chieu',
+            'giu mau do toi chieu qua lay'
+        ],
+        reply: `Dạ được quá đi chứ ạ! Cửa hàng hỗ trợ **ĐẶT GIỮ MÁY TRONG 24 GIỜ HOÀN TOÀN MIỄN PHÍ — KHÔNG CẦN ĐẶT CỌC** luôn nha bạn ơi! 😊🛍️\n\n` +
+            `• 📦 Bên em sẽ niêm phong riêng 1 hộp **nguyên seal đúng màu sắc và dung lượng** bạn chọn tại quầy Showroom (**78 Nguyễn Văn Khối, Gò Vấp**) để bạn yên tâm ghé trải nghiệm.\n` +
+            `• 🔍 Khi bạn tới quầy (từ **08:30 – 21:30** hàng ngày), nhân viên sẽ cùng bạn kiểm tra ngoại quan, check IMEI chính hãng trên hệ thống Apple/Samsung/ASUS trước khi thanh toán; nếu xem trực tiếp chưa ưng cũng không hề mất bất kỳ chi phí nào!\n\n` +
+            `👉 Bạn nhắn em **tên máy, màu bạn thích và giờ dự kiến ghé** (hoặc gọi nhanh hotline **0842.331.606**) để em cất sẵn vào ngăn giữ hàng cho bạn ngay nhé! ✨`,
+        suggestions: ['Đặt giữ hàng 24h', 'Địa chỉ Showroom Gò Vấp', 'Hotline 0842.331.606']
+    },
+
+    // 2.13 Khách lo từng mua chỗ khác bị lỗi khó bảo hành
+    {
+        id: 'objection_fear_after_sales_defect_repeat',
+        patterns: [
+            /(truoc|lan truoc|cho khac|ngai).*(bi loi|dung vai ngay loi|dun day bao hanh|khong bao hanh|hanh kho)/i,
+            /(so mua ve|lo mua ve).*(bi loi|loi phan cung|kho doi|mat thoi gian bao hanh)/i
+        ],
+        keywords: [
+            'so mua ve bi loi kho bao hanh', 'cho khac dun day bao hanh', 'so bi loi giong cho cu',
+            'bao hanh ben shop co nhanh khong'
+        ],
+        reply: `Dạ em thật sự đồng cảm với trải nghiệm không vui đó của bạn ở nơi khác ạ! Không ai bỏ số tiền lớn ra mà lại muốn phải chạy đi chạy lại chờ bảo hành hết. 🤝🛡️\n\n` +
+            `Tại cửa hàng bên em, quyền lợi bảo vệ khách hàng được ghi rõ bằng văn bản ngay trên hóa đơn:\n` +
+            `• 🔄 **Lỗi phần cứng là ĐỔI THÂN MÁY MỚI NGUYÊN SEAL trong 30 ngày đầu** — KHÔNG sửa chữa chắp vá, KHÔNG đùn đẩy lỗi cho khách.\n` +
+            `• 🏛️ **Bảo hành chính hãng 12–24 tháng** trực tiếp tại trung tâm ủy quyền của hãng toàn quốc, hoặc bạn gửi lại quầy bên em xử lý trọn gói.\n` +
+            `• 🚚 **Khách ở xa được miễn phí ship 2 chiều** khi cần gửi kiểm tra/bảo hành; cho mượn máy dự phòng nếu xử lý quá 3 ngày làm việc!\n\n` +
+            `👉 Trước khi giao hoặc nhận tại quầy, kỹ thuật viên đều hỗ trợ bạn test kỹ màn hình, loa, mic, pin và IMEI chính hãng ngay tại chỗ nên bạn hoàn toàn an tâm nhé! 😊`,
+        suggestions: ['Chính sách bảo hành 1 đổi 1', 'Kiểm tra seal & IMEI', 'Tư vấn chọn máy bền bỉ']
+    },
+
+    // 2.14 Khách cần mua máy gấp trong ngày / hỏng máy trước giờ họp / trước chuyến bay
+    {
+        id: 'service_same_day_urgent_need',
+        patterns: [
+            /(can gap|lay gap|giao gap|ship gap|hu may dot xuat).*(hom nay|ngay bay gio|1 tieng|2 tieng|truoc gio bay|di cong tac)/i,
+            /(co giao ngay trong ngay|qua lay lien duoc khong|bao lau nhan duoc may)/i
+        ],
+        keywords: [
+            'can may gap hom nay', 'giao gap trong 2h', 'qua lay lien duoc khong',
+            'hu may can mua ngay'
+        ],
+        reply: `Dạ có ngay luôn ạ! Bên em hiểu khi máy hư đột xuất ngay trước buổi họp hay chuyến bay là cực kỳ gấp gáp! ⚡🚀\n\n` +
+            `• 🛵 **Giao hỏa tốc nội thành TP.HCM trong 2 giờ:** Lên đơn xong nhân viên ưu tiên xuất kho, đóng gói & gọi tài xế giao thẳng tận tay bạn, hỗ trợ đồng kiểm mở hộp và chuyển dữ liệu qua Video Call nếu bạn cần gấp.\n` +
+            `• 🏪 **Ghé quầy nhận ngay sau 10 phút:** Tại Showroom **78 Nguyễn Văn Khối, Gò Vấp** (08:30 – 21:30), bạn gọi trước hotline **0842.331.606** để kỹ thuật chuẩn bị sẵn máy + cài đặt trước, tới nơi nhận dùng được ngay không phải chờ đợi!\n\n` +
+            `👉 Bạn đang cần gấp mẫu máy nào và giao về khu vực quận nào để em check tồn kho sẵn tại quầy ngay cho bạn nha! 😊`,
+        suggestions: ['Giao hỏa tốc 2H hôm nay', 'Đặt giữ lấy ngay tại quầy', 'Hotline 0842.331.606']
     }
 ];
 
@@ -2305,6 +2398,8 @@ const HARDWARE_AND_SOFTWARE_RULES = [
         id: 'advice_zalo_banking_data_migration',
         patterns: [
             /(chuyen du lieu|doi may|len doi may).*(zalo|app ngan hang|banking|anh|danh ba|tin nhan|co mat khong)/i,
+            /(ho tro|co|shop|chuyen|sao luu|copy).*(zalo|danh ba|tin nhan|du lieu|anh).*(may cu|may moi|sang|cho)/i,
+            /(zalo).*(danh ba|du lieu|may cu|may moi|tin nhan)/i,
             /(zalo|tin nhan zalo).*(co bi mat khong|sao luu the nao|chuyen sang may moi)/i,
             /(app ngan hang|banking|sinh trac hoc).*(doi may co dung duoc khong|cai the nao)/i
         ],
@@ -3711,6 +3806,99 @@ const HARDWARE_AND_SOFTWARE_RULES = [
             `3. ⌨️ **Nhấn ` + '`Ctrl + V`' + ` (Dán ảnh trực tiếp)** từ ảnh chụp màn hình ngay vào ô nhập chữ!\n\n` +
             `✨ **Khả năng thông minh của AI Vision 3.x:** Có thể nhận diện **NHIỀU thiết bị trong cùng 1 bức ảnh** (ví dụ: ảnh bàn làm việc có cả MacBook, iPhone và Apple Watch), phân loại chính xác thương hiệu/dòng máy và khớp ngay các sản phẩm tương ứng kèm giá bán trong kho của cửa hàng! Bạn thử tải lên 1 bức ảnh ngay nhé! 🚀`,
         suggestions: ['Tư vấn chọn máy', 'So sánh 2 sản phẩm', 'Săn mã giảm giá hôm nay']
+    },
+
+    // 3.128 Tư vấn laptop nhỏ gọn bỏ vừa cốp xe Vision/Lead/balo nhỏ & lưu ý bảo quản cốp xe
+    {
+        id: 'advice_small_scooter_trunk_compact_laptop',
+        patterns: [
+            /(cop xe|vision|lead|sh|tay ga|balo nho|tui xach nho).*(laptop|macbook|may nao|bo vua|de vua)/i,
+            /(laptop|macbook).*(bo vua cop xe|nho nhe bo cop|de trong cop xe)/i
+        ],
+        keywords: [
+            'laptop bo vua cop xe vision', 'laptop nho gon de cop xe', 'co nen de laptop trong cop xe may'
+        ],
+        reply: `Dạ câu hỏi cực kỳ thực tế luôn ạ! Với cốp xe tay ga (như Vision, Lead, Grande) hoặc túi xách nhỏ đi làm/đi học mỗi ngày, bạn nên chọn **màn hình 13.3 – 14 inch** trọng lượng chỉ khoảng **1.1 – 1.38 kg** là bỏ vừa gọn gàng luôn:\n\n` +
+            `• 💻 **Laptop mỏng nhẹ vừa cốp & balo nhỏ:** MacBook Air M2/M3 13.6 inch (~1.24 kg), ASUS Zenbook 14 OLED (~1.2 kg), Dell XPS 13 hoặc Lenovo IdeaPad Slim 3 14 inch.\n\n` +
+            `⚠️ **MẸO KỸ THUẬT VIÊN DẶN RIÊNG CHO BẠN:**\n` +
+            `• Tuyệt đối **NHỚ TẮT NGUỒN HẲN (Shut Down)** trước khi bỏ laptop vào cốp xe, KHÔNG chỉ gập màn hình (Sleep) vì nhiều máy Windows tự bật lại gây ủ nhiệt hỏng pin & màn hình!\n` +
+            `• Bọc thêm **túi chống sốc dày dặn** để tránh rung xóc ảnh hưởng bản lề khi chạy qua gờ giảm tốc.\n\n` +
+            `👉 Bạn dự kiến tầm ngân sách khoảng bao nhiêu (ví dụ dưới 15tr hay 20–25tr) để em lọc đúng mấy mẫu mỏng nhẹ vừa túi vừa cốp cho bạn nha! 😊`,
+        suggestions: ['Laptop mỏng nhẹ dưới 15 triệu', 'Xem MacBook Air M2 / M3', 'Xem ASUS Zenbook 14 OLED']
+    },
+
+    // 3.129 Nâng cấp RAM/SSD Laptop: Ultrabook hàn chết LPDDR5 vs Laptop Gaming/Văn phòng có khe nâng
+    {
+        id: 'guide_laptop_ram_upgrade_soldered_vs_slot',
+        excludeIf: (norm) => /\b(macbook|vivobook|zenbook|nitro|tuf|loq|legion|inspiron|vostro|thinkpad)\b/i.test(norm),
+        patterns: [
+            /(laptop|may tinh).*(nang cap ram|nang ram|them ram|han chet|thay o cung|nang cap ssd|khe ram)/i,
+            /(ram 8gb|ram 16gb).*(sau nay nang duoc khong|co nang cap duoc khong|han chet khong)/i
+        ],
+        keywords: [
+            'laptop nao nang cap ram duoc', 'nang cap ram laptop sau nay duoc khong',
+            'laptop mong nhe co han chet ram khong', 'macbook co nang cap ram duoc khong'
+        ],
+        reply: `Dạ đây là điều cực kỳ nên kiểm tra trước khi mua laptop để dùng bền 4–5 năm đấy ạ! 🔧💻\n\n` +
+            `• 🔒 **Dòng Ultrabook siêu mỏng nhẹ (RAM hàn chết trên main — KHÔNG nâng được sau mua):** MacBook Air M2/M3, ASUS Zenbook 14 OLED, Acer Swift Go 14, Dell XPS 13, Surface Laptop Go 3. Vì vậy với nhóm này bên em thường chọn sẵn cấu hình **16GB RAM** để dùng thoải mái lâu dài.\n` +
+            `• 🚀 **Dòng Gaming & Văn phòng phổ thông (Nâng cấp RAM / SSD dễ dàng):** Acer Nitro V 15, ASUS TUF Gaming A16, Lenovo LOQ, Legion 5, HP Victus 15, ASUS Vivobook 15, Dell Inspiron 15/Vostro đều hỗ trợ nâng cấp SSD NVMe và/hoặc khe RAM rất linh hoạt.\n\n` +
+            `👉 Bạn đang nhắm mẫu máy nào hoặc tầm giá bao nhiêu để em kiểm tra chính xác khả năng nâng cấp của đúng model đó nhé! 😊`,
+        suggestions: ['Laptop 16GB RAM dưới 15 triệu', 'Tư vấn MacBook Air M2/M3', 'Tư vấn Laptop Gaming RTX']
+    },
+
+    // 3.130 MacBook Air M2 vs M3 xuất nhiều màn hình ngoài
+    {
+        id: 'guide_macbook_m2_vs_m3_external_monitors',
+        excludeIf: (norm) => /\b(so sanh|gia bao nhieu|con hang)\b/i.test(norm),
+        patterns: [
+            /(macbook|air m2|air m3|mac air).*(xuat duoc may man hinh|2 man hinh|man hinh roi|man hinh ngoai|gap nap)/i
+        ],
+        keywords: [
+            'macbook air m2 xuat duoc may man hinh', 'macbook air m3 xuat 2 man hinh duoc khong',
+            'macbook xuat 2 man hinh ngoai'
+        ],
+        reply: `Dạ khác biệt lớn nhất cho dân code, thiết kế & văn phòng thích gắn nhiều màn hình rời nằm ở đúng điểm này nè bạn ơi: 🖥️🖥️\n\n` +
+            `• **MacBook Air M2 (23.490.000 đ):** Hỗ trợ xuất tối đa **1 màn hình ngoài** (độ phân giải lên tới 6K@60Hz) cùng với màn hình tích hợp của máy.\n` +
+            `• **MacBook Air M3 (31.990.000 đ):** Nâng cấp hỗ trợ xuất tối đa **2 màn hình ngoài cùng lúc** (1 màn 6K + 1 màn 5K) **khi bạn gập nắp máy lại** (Clamshell Mode)!\n` +
+            `• 💡 Ngoài ra cả hai máy đều chỉ có 2 cổng Thunderbolt / USB-C nên rất nên kèm 1 **Hub Ugreen USB-C 5-in-1 (280.000 đ)** để cắm HDMI 4K + USB tiện lợi.\n\n` +
+            `👉 Bạn dự kiến dùng 1 hay 2 màn hình rời để em tư vấn chọn **Air M2** (tiết kiệm 8.5tr) hay **Air M3** hợp lý nhất ạ! 😊`,
+        suggestions: ['Xem MacBook Air M2', 'Xem MacBook Air M3', 'Xem Hub Ugreen 5-in-1']
+    },
+
+    // 3.131 Huawei MatePad 11.5 S PaperMatte cài Google Play (GBox) & Ghi chú
+    {
+        id: 'guide_huawei_matepad_google_apps',
+        excludeIf: (norm) => /\b(matepad|11\.5)\b/i.test(norm),
+        patterns: [
+            /(may tinh bang huawei|tablet huawei|harmonyos).*(co dung duoc google|ch play|youtube|google drive|gbox|chong choi)/i
+        ],
+        keywords: [
+            'tablet huawei co dung duoc google khong', 'harmonyos co cai duoc app google khong'
+        ],
+        reply: `Dạ về máy tính bảng Huawei (như **Huawei MatePad 11.5 S PaperMatte 13.490.000 đ kèm bàn phím**), em xin chia sẻ thật để bạn dễ quyết định ạ: 📲✍️\n\n` +
+            `• ⚠️ **Về Google Mobile Services:** Do dùng HarmonyOS nên máy **không cài sẵn CH Play mặc định**. Tuy nhiên, bạn chỉ mất 2 phút cài **GBox / Aurora Store** là vẫn dùng bình thường các app phổ biến như **YouTube, Google Drive, Docs, Gmail, Google Meet, Zoom** (bên em hỗ trợ cài sẵn miễn phí tại quầy/từ xa).\n` +
+            `• 🌟 **Điểm sáng vượt trội:** Màn hình nhám **PaperMatte 144Hz** chống chói lóa dưới đèn phòng học/ngoài trời, cảm giác viết vẽ giống giấy thật và tặng sẵn bàn phím.\n\n` +
+            `👉 Nếu bạn muốn có sẵn CH Play / App Store nguyên bản khỏi cần cài thêm, mình tham khảo **iPad Gen 10**, **Xiaomi Poco Pad** hoặc **HONOR Pad 10** cũng rất mượt luôn ạ! 😊`,
+        suggestions: ['Xem Huawei MatePad 11.5 S', 'Xem iPad Gen 10', 'Xem HONOR Pad 10']
+    },
+
+    // 3.132 Lưu ý tai nghe EarPods Lightning vs iPhone 15/16/17 USB-C
+    {
+        id: 'compatibility_iphone_earpods_lightning_usbc',
+        excludeIf: (norm) => /\bearpods\b/i.test(norm) && !/\b(15|16|17|usb-c|type c)\b/i.test(norm),
+        patterns: [
+            /(tai nghe co day|earpods|chan lightning).*(iphone 15|iphone 16|iphone 17|type c|usb c|cam duoc khong)/i,
+            /(iphone 15|iphone 16|iphone 17).*(dung tai nghe day|earpods lightning)/i
+        ],
+        keywords: [
+            'earpods lightning cam duoc iphone 15 khong', 'iphone 16 cam duoc tai nghe lightning khong'
+        ],
+        reply: `Dạ câu này rất nhiều khách hay nhầm nên em lưu ý kỹ giúp bạn trước khi đặt mua nhé! 🎧⚠️\n\n` +
+            `• ❌ **Apple EarPods Lightning (499.000 đ)** sử dụng đầu cắm **Lightning**, nên **CHỈ cắm trực tiếp được với iPhone 14 series trở xuống** (11, 12, 13, 14).\n` +
+            `• 🔄 **iPhone 15, iPhone 16 và iPhone 17 series** đã chuyển toàn bộ sang cổng **USB-C (Type-C)** nên KHÔNG cắm vừa chân Lightning trực tiếp.\n` +
+            `• 💡 Nếu bạn đang dùng iPhone 15/16/17, giải pháp tiện nhất là chọn tai nghe Bluetooth không dây (như **JBL Wave Beam 1.29M**, **Marshall Minor IV 2.89M**, **AirPods Pro 2 USB-C 5.49M**) để khỏi vướng dây ạ!\n\n` +
+            `👉 Bạn đang dùng iPhone đời nào để em tư vấn đúng mẫu cắm/kết nối chuẩn nhất nhé! 😊`,
+        suggestions: ['Xem Tai nghe không dây dưới 3 triệu', 'Xem AirPods Pro 2 USB-C', 'Xem Apple EarPods Lightning']
     }
 ];
 

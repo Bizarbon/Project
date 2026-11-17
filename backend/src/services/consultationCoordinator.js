@@ -660,7 +660,11 @@ const KNOWN_UNSUPPORTED_ITEMS = [
     { keywords: ['quat dien', 'quat khong canh', 'quat may', 'quat hoi nuoc'], name: 'quạt điện' },
     { keywords: ['ban gaming', 'ghe gaming', 'ghe cong thai hoc', 'ban nang ha'], name: 'bàn / ghế gaming' },
     { keywords: ['flycam', 'drone'], name: 'flycam / drone' },
-    { keywords: ['xe dien', 'xe dap', 'xe may'], name: 'xe / phương tiện di chuyển' },
+    {
+        keywords: ['xe dien', 'xe dap', 'xe may'],
+        excludeIf: (normText) => /\b(cop xe|bo vua|de vua|mang theo|di xe)\b/.test(normText),
+        name: 'xe / phương tiện di chuyển'
+    },
     { keywords: ['quan ao', 'giay dep', 'quan jean', 'ao thun', 'vi da', 'tui xach', 'my pham', 'son moi', 'nuoc hoa'], name: 'thời trang & mỹ phẩm' },
     { keywords: ['dong ho treo tuong', 'dong ho bao thuc', 'dong ho qua lac', 'dong ho de ban'], name: 'đồng hồ treo tường / để bàn' }
 ];
@@ -1160,12 +1164,24 @@ function isPriceObjection(text) {
     return isCheaperRequest(text);
 }
 
+function stripOwnedDeviceClauseForPurchaseIntent(rawMsg = '') {
+    return String(rawMsg || '').replace(
+        /(?:mình|tôi|em|minh|toi|hiện tại|hien tai)?\s*(?:đang dùng|dang dung|đang xài|dang xai|đã có|da co|có sẵn|co san)\s+[^,.;!?]+(?:,|\s+(?:nhưng|nhung|muốn|muon|cần|can|tìm|tim|giờ|gio|nay|tặng|tang)\b)/gi,
+        ' '
+    ).replace(/\s+/g, ' ').trim();
+}
+
 function isOldDeviceDiagnosis(text) {
     const norm = normalizeText(text);
+    // Bỏ qua nếu khách chỉ hỏi chuyển dữ liệu / thu cũ đổi mới mà không hỏi về máy cũ bị chậm hay nâng cấp phần cứng
+    if (/\b(chuyen du lieu|chuyen zalo|sao luu|move to ios|danh ba|thu cu|doi moi|trade in|ban may cu)\b/i.test(norm) &&
+        !/\b(chay cham|bi lag|bi do|nang cap|ram|ssd|hdd)\b/i.test(norm)) {
+        return false;
+    }
     return [
         'may cu', 'laptop cu', 'core i5 the he 8', 'core i5 gen 8', 'doi 8', 'doi 7', 'doi 6', 'doi 9', 'doi 10',
         'chay cham', 'bi lag', 'bi do', 'nang cap hay mua moi', 'co nen mua may moi', 'co nen doi may', 'nang ram hay', 'thay ssd'
-    ].some(k => norm.includes(k));
+    ].some(k => hasWordOrPhrase(norm, k));
 }
 
 // -------------------------------------------------------------
@@ -1197,6 +1213,7 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['z fold7', 'z fold 7', 'galaxy z fold7', 'galaxy z fold 7', 'samsung z fold7', 'samsung z fold 7', 'fold7', 'fold 7'], match: /z fold7/i },
     { terms: ['s26 ultra', 's26ultra', 'galaxy s26 ultra', 'samsung s26 ultra', 'samsung galaxy s26 ultra'], match: /s26 ultra/i },
     { terms: ['s25 ultra', 's25ultra', 'galaxy s25 ultra', 'samsung s25 ultra', 'samsung galaxy s25 ultra'], match: /s25 ultra/i },
+    { terms: ['s24 ultra', 's24ultra', 'galaxy s24 ultra', 'samsung s24 ultra', 'samsung galaxy s24 ultra'], match: /s24 ultra/i },
     { terms: ['s25 plus', 's25plus', 's25+', 'galaxy s25 plus', 'samsung s25 plus', 'samsung galaxy s25 plus'], match: /s25 plus|s25\+/i },
     { terms: ['s25', 'galaxy s25', 'samsung s25'], match: /s25 ultra/i },
     { terms: ['galaxy a55', 'samsung a55', 'a55 5g', 'a55'], match: /a55/i },
@@ -1252,6 +1269,7 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['dell xps 13', 'dell xps', 'xps 13'], match: /xps 13/i },
     { terms: ['envy 16', 'hp envy'], match: /envy 16/i },
     { terms: ['victus 15', 'hp victus'], match: /victus 15/i },
+    { terms: ['hp 15s', '15s-fq5229tu', 'fq5229tu'], match: /15s-fq5229tu/i },
     { terms: ['hp pavilion 14', 'hp pavilion'], match: /pavilion/i },
     { terms: ['surface laptop go 3', 'surface laptop'], match: /surface laptop go 3/i },
 
@@ -1300,16 +1318,28 @@ const PRODUCT_EXACT_ALIASES = [
     { terms: ['charge 5', 'jbl charge 5'], match: /charge 5/i },
     { terms: ['tour pro 2', 'jbl tour pro 2'], match: /tour pro 2/i },
     { terms: ['wave beam', 'jbl wave beam'], match: /wave beam/i },
+    { terms: ['inzone h3', 'sony inzone', 'inzone'], match: /inzone h3/i },
 
-    // --- Accessories ---
-    { terms: ['osmo pocket 3', 'pocket 3'], match: /osmo pocket 3/i },
-    { terms: ['osmo mobile 6'], match: /osmo mobile 6/i },
-    { terms: ['dji mic 2'], match: /dji mic 2/i },
+    // --- Accessories & Peripherals (Full Catalog Coverage) ---
+    { terms: ['osmo pocket 3', 'pocket 3', 'dji pocket 3'], match: /osmo pocket 3/i },
+    { terms: ['osmo mobile 6', 'mobile 6'], match: /osmo mobile 6/i },
+    { terms: ['dji mic 2', 'mic 2'], match: /dji mic 2/i },
     { terms: ['mx master 3s', 'mx master'], match: /mx master 3s/i },
     { terms: ['g502 hero', 'g502'], match: /g502/i },
+    { terms: ['g304 lightspeed', 'logitech g304', 'g304'], match: /g304/i },
+    { terms: ['arc mouse', 'microsoft arc', 'microsoft arc mouse'], match: /arc mouse/i },
     { terms: ['mx keys s', 'mx keys'], match: /mx keys s/i },
     { terms: ['g413 se', 'g413'], match: /g413/i },
-    { terms: ['apple pencil pro', 'pencil pro'], match: /pencil pro/i }
+    { terms: ['apple pencil pro', 'pencil pro'], match: /pencil pro/i },
+    { terms: ['anker a1695', 'a1695', 'anker 165w', 'anker 25000'], match: /anker a1695/i },
+    { terms: ['anker prime 100w', 'anker prime', 'a2688', 'cu sac anker 100w'], match: /anker prime 100w/i },
+    { terms: ['baseus bipow', 'bipow'], match: /bipow/i },
+    { terms: ['baseus blade hd', 'baseus blade', 'blade hd'], match: /blade hd/i },
+    { terms: ['powercombo', 'powercombo tower', 'thap sac baseus', 'tram sac baseus'], match: /powercombo/i },
+    { terms: ['ugreen pb721', 'pb721', 'ugreen nexode', 'ugreen 130w'], match: /pb721|nexode/i },
+    { terms: ['ugreen cm478', 'cm478', 'hub ugreen', 'ugreen 5 in 1'], match: /cm478|5 in 1/i },
+    { terms: ['dualsense', 'tay cam dualsense', 'tay cam ps5'], match: /dualsense/i },
+    { terms: ['dareu h101x', 'h101x', 'tay cam dareu'], match: /h101x/i }
 ];
 
 function getCoreProductModel(name) {
@@ -1333,20 +1363,32 @@ async function findAllMatchingProductsInCatalog(message) {
         .filter(product => product.name && norm.includes(normalizeText(product.name)))
         .sort((a, b) => (b.name || '').length - (a.name || '').length);
 
-    // Kiểm tra bảng alias ánh xạ trực tiếp các model phổ biến
-    const aliasMatches = [];
+    // Kiểm tra bảng alias ánh xạ trực tiếp các model phổ biến (sắp xếp theo vị trí xuất hiện đầu tiên làm chủ ngữ câu)
+    const aliasMatchedEntries = [];
     for (const alias of PRODUCT_EXACT_ALIASES) {
-        if (alias.terms.some(term => {
+        let bestIdx = Infinity;
+        let bestLen = 0;
+        for (const term of alias.terms) {
             const escaped = escapeRegex(term);
             const regex = new RegExp(`(^|\\s|[.,!?;:()"])${escaped}($|\\s|[.,!?;:()"])`, 'i');
-            return regex.test(norm);
-        })) {
+            const m = regex.exec(norm);
+            if (m) {
+                const matchPos = m.index + (m[1] ? m[1].length : 0);
+                if (matchPos < bestIdx || (matchPos === bestIdx && term.length > bestLen)) {
+                    bestIdx = matchPos;
+                    bestLen = term.length;
+                }
+            }
+        }
+        if (bestLen > 0) {
             const p = await Product.findOne({ active: { $ne: false }, name: alias.match });
-            if (p) {
-                if (!aliasMatches.some(item => String(item._id) === String(p._id))) aliasMatches.push(p);
+            if (p && !aliasMatchedEntries.some(item => String(item.product._id) === String(p._id))) {
+                aliasMatchedEntries.push({ product: p, firstIdx: bestIdx, termLen: bestLen });
             }
         }
     }
+    aliasMatchedEntries.sort((a, b) => (a.firstIdx - b.firstIdx) || (b.termLen - a.termLen));
+    const aliasMatches = aliasMatchedEntries.map(e => e.product);
 
     if (directNameMatches.length >= 2) return directNameMatches;
     if (aliasMatches.length >= 2) return aliasMatches;
@@ -1535,13 +1577,15 @@ async function handleExactProductLookup(product, context = {}, userMessage = '')
     const keySpecs = [
         s.cpu ? `• Vi xử lý (CPU): **${s.cpu}**` : null,
         s.ram ? `• Bộ nhớ RAM: **${s.ram}**` : null,
-        s.storage ? `• Ổ cứng: **${s.storage}**` : null,
+        s.storage ? `• Ổ cứng / Bộ nhớ: **${s.storage}**` : null,
         s.screen ? `• Màn hình: **${s.screen}**` : null,
-        s.battery ? `• Pin: **${s.battery}**` : null,
         s.camera ? `• Camera: **${s.camera}**` : null,
         s.gpu ? `• Đồ họa (GPU): **${s.gpu}**` : null,
-        s.weight ? `• Trọng lượng: **${s.weight}**` : null
-    ].filter(Boolean).slice(0, 5).join('\n');
+        s.battery ? `• Pin & Sạc: **${s.battery}**` : null,
+        s.connectivity ? `• Kết nối: **${s.connectivity}**` : null,
+        s.weight ? `• Trọng lượng: **${s.weight}**` : null,
+        s.os ? `• Hệ điều hành: **${s.os}**` : null
+    ].filter(Boolean).slice(0, 7).join('\n') || (product.description ? `• ${product.description}` : '• Sản phẩm chính hãng nguyên seal');
 
     const warrantyInfo = (!product.warranty || product.warranty === 'Không bảo hành' || product.warranty === 'Chưa có thông tin')
         ? 'Bảo hành chính hãng 12 - 24 tháng, lỗi 1 đổi 1 trong 30 ngày đầu'
@@ -1556,18 +1600,39 @@ async function handleExactProductLookup(product, context = {}, userMessage = '')
         `${stockStatus}\n` +
         `• 🛡️ **Bảo hành:** ${warrantyInfo}\n` +
         `• 💳 **Trả góp 0%:** Chỉ từ **${money(installmentEstimate)}/tháng** (duyệt hồ sơ CCCD 15 phút)\n\n` +
-        `📋 **Cấu hình nổi bật:**\n${keySpecs}\n\n` +
+        `📋 **Thông số & Điểm nổi bật:**\n${keySpecs}${product.description && keySpecs.includes('• Vi xử lý') ? `\n• ✨ ${product.description}` : ''}\n\n` +
         `👉 Bạn có muốn em hỗ trợ **thêm sản phẩm này vào giỏ hàng**, tính chi tiết bảng trả góp 0%, hay so sánh với mẫu máy tương đương không ạ?`;
 
     const queryText = userMessage || context.currentMessage || `Tư vấn chi tiết về sản phẩm ${product.name}`;
+    const qNorm = normalizeText(queryText);
+    const isSimplePriceOrStockLookup = /^(?:xem(?:\s+chi\s+tiet)?\s+)?[a-z0-9\s.-]+$/i.test(qNorm) &&
+        !/\b(co\s+duoc\s+khong|duoc\s+khong|tuong\s+thich|may\s+bay|xach\s+tay|doc\s+lap|nang\s+cap|man\s+hinh\s+ngoai|o\s+dia|chong\s+nuoc|khang\s+nuoc|gbox|google|con\s+lan|vong\s+quay|switch|pin\s+bao\s+lau|sac\s+bao\s+lau|bao\s+nhieu|ket\s+noi|may\s+may|ngoi\s+but|sac\s+nguoc|day\s+dai|nang|trong\s+luong)\b/i.test(qNorm);
+    const isSpecificQuestion = !isSimplePriceOrStockLookup && (
+        queryText.includes('?') ||
+        /\b(co\s+duoc|duoc\s+khong|mang\s+len|may\s+bay|xach\s+tay|tuong\s+thich|dung\s+cho|cam\s+duoc|doc\s+lap|can\s+co|nang\s+cap|ram|ssd|xuat\s+duoc|man\s+hinh\s+ngoai|o\s+dia|chong\s+nuoc|khang\s+nuoc|google|gbox|con\s+lan|vong\s+quay|switch|dpi|pin\s+bao|sac\s+bao|sac\s+nguoc|ket\s+noi\s+may|bao\s+nhieu|co\s+ho\s+tro|ho\s+tro\s+khong|tai\s+sao|co\s+nen|co\s+on|co\s+bi)\b/i.test(qNorm)
+    );
+
+    let exactRag = { ragEvidenceText: '', ragSources: null };
+    try {
+        exactRag = await ragService.retrieveRagContext({
+            query: `${queryText} ${product.name} ${product.brand || ''}`,
+            category: product.category,
+            memoryProfile: context.memoryProfile,
+            preloadedProducts: [product],
+            limitProducts: 1,
+            limitArticles: 3
+        });
+    } catch (_) { }
+
     const grounded = await aiModelService.generateGroundedConsultation({
         userMessage: queryText,
-        dialogueAct: 'exact_lookup',
+        dialogueAct: isSpecificQuestion ? 'product_qa' : 'exact_lookup',
         verifiedProducts: [product],
         context: {
             ...context,
             category: product.category,
-            brand: product.brand
+            brand: product.brand,
+            ragEvidenceText: exactRag.ragEvidenceText || ''
         },
         fallbackText: defaultReply
     });
@@ -1588,12 +1653,13 @@ async function handleExactProductLookup(product, context = {}, userMessage = '')
             brand: product.brand,
             missingSlots: [],
             lastProducts: [product],
-            currentIntent: 'exact_lookup'
+            currentIntent: isSpecificQuestion ? 'product_qa' : 'exact_lookup'
         },
         meta: {
             provider: grounded.provider,
             model: grounded.model,
-            isFallback: grounded.isFallback
+            isFallback: grounded.isFallback,
+            ragSources: exactRag.ragSources || null
         }
     };
 }
@@ -1717,7 +1783,8 @@ async function handleDeepProductConsultation(product, context = {}, userMessage 
 }
 
 function detectProductType(text) {
-    const norm = normalizeText(text);
+    const focusText = stripOwnedDeviceClauseForPurchaseIntent(text) || text;
+    const norm = normalizeText(focusText);
     const isPetMouse = /hamster|bach|lang|thu cung|nuoi|long|chuong|bo u/i.test(norm);
     const isMousePad = /lot chuot|lót chuột|pad chuot|pad chuột|ban di chuot|bàn di chuột|mouse ?pad|deskmat|mieng lot chuot|tam lot chuot|tham lot chuot/i.test(norm);
     const isWatchBattery = /pin dong ho|pin đồng hồ|thay pin dong ho|thay pin đồng hồ|pin cuc ao|pin cúc áo|cr2032|cr2025/i.test(norm);
@@ -1730,7 +1797,7 @@ function detectProductType(text) {
         if ((type.key === 'smartwatch' || type.key === 'apple_watch') && isWatchBattery) return false;
         if ((type.key === 'phone' || type.key === 'iphone' || type.key === 'galaxy') && (isCaseOrScreen || isRepair)) return false;
         if ((type.key === 'laptop' || type.key === 'macbook' || type.key === 'rog') && (isRepair || isPcPart)) return false;
-        return type.aliases.some(alias => hasWordOrPhrase(text, alias));
+        return type.aliases.some(alias => hasWordOrPhrase(focusText, alias));
     }) || null;
 }
 
@@ -1966,12 +2033,13 @@ async function handleCatalogProductTypeQuery(message, context = {}, forcedProduc
 
     const previousQualification = isExplicitReset ? {} : (context.qualification || {});
 
-    const budgetInfo = extractBudgetInfo(message);
-    const extractedBudget = budgetInfo?.amount || extractBudget(message);
+    const purchaseFocusMsg = stripOwnedDeviceClauseForPurchaseIntent(message) || message;
+    const budgetInfo = extractBudgetInfo(purchaseFocusMsg);
+    const extractedBudget = budgetInfo?.amount || extractBudget(purchaseFocusMsg);
     const budget = extractedBudget || (isExplicitReset ? 0 : (previousQualification.budget || context.budget || 0));
     const budgetType = budgetInfo?.type || context.budgetType || 'unspecified';
 
-    const brand = productType.brand || extractBrandPreference(message) || (isExplicitReset ? '' : (previousQualification.brand || context.brand || ''));
+    const brand = productType.brand || extractBrandPreference(purchaseFocusMsg) || (isExplicitReset ? '' : (previousQualification.brand || context.brand || ''));
     const directUseCase = /van phong|luot web|word|excel|hoc tap|sinh vien|văn phòng|lướt web|học tập|sinh viên/i.test(normalizedMessage + ' ' + message)
         ? 'làm việc văn phòng / học tập'
         : /lap trinh|code|docker|cntt|cong nghe thong tin|ide/.test(normalizedMessage)
@@ -3065,6 +3133,16 @@ async function handleRecommendWithTradeOffs({
     // Tìm kiếm trong database
     let candidates = await Product.find(query).sort(effectiveType === 'min' ? { rating: -1, soldCount: -1, price: 1 } : { rating: -1, soldCount: -1 });
 
+    // Nếu ngân sách dạng xấp xỉ ("tầm 15 củ") mà dải ±15% trống, nới lên ≤ +18% và chọn máy gần mục tiêu nhất trước
+    if (!candidates.length && effectiveType === 'approx' && effectiveBudget > 0) {
+        const relaxedQuery = { ...query, price: { $lte: Math.round(effectiveBudget * 1.18) } };
+        const relaxedCandidates = await Product.find(relaxedQuery);
+        if (relaxedCandidates.length) {
+            relaxedCandidates.sort((a, b) => Math.abs(a.price - effectiveBudget) - Math.abs(b.price - effectiveBudget));
+            candidates = relaxedCandidates;
+        }
+    }
+
     // Nếu lọc ngân sách không có máy nào trong kho
     if (!candidates.length && effectiveBudget > 0) {
         let lowestInCat = null;
@@ -3089,10 +3167,15 @@ async function handleRecommendWithTradeOffs({
             }
         }
 
-        if (lowestInCat) {
+        // Nếu sản phẩm gần nhất thực tế rẻ hơn/nằm trong ngân sách (VD dải "tầm X" bị khuyết ở giữa), chuyển sang gợi ý trực tiếp thay vì báo vượt ngân sách
+        if (lowestInCat && lowestInCat.price <= effectiveBudget && effectiveType !== 'min' && effectiveType !== 'range') {
+            candidates = [lowestInCat];
+        } else if (lowestInCat) {
             const downPay = Math.round(lowestInCat.price * 0.3);
             const monthlyInst = Math.round((lowestInCat.price * 0.7) / 12);
-            const diff = lowestInCat.price - effectiveBudget;
+            const diff = Math.abs(lowestInCat.price - effectiveBudget);
+            const budgetComparisonText = lowestInCat.price >= effectiveBudget ? 'thấp hơn' : 'chưa có model khớp khít khoảng giữa';
+            const diffPrefix = lowestInCat.price >= effectiveBudget ? '+' : '-';
 
             let alternativeAdvice = '';
             if (category === 'Laptop') {
@@ -3114,9 +3197,9 @@ async function handleRecommendWithTradeOffs({
 
             const brandScope = safeBrand ? ` của thương hiệu **${safeBrand}**` : '';
             const reply = `Dạ hiện tại cửa hàng chuyên phân phối **100% sản phẩm mới chính hãng** kèm bảo hành 12 - 24 tháng. 🙏\n\n` +
-                `Trong danh mục **${category}**${brandScope}, mức ngân sách dự kiến **${money(effectiveBudget)}** của bạn hiện thấp hơn mức giá của ${categoryItemNoun} có giá tốt nhất tại kho.\n` +
+                `Trong danh mục **${category}**${brandScope}, mức ngân sách dự kiến **${money(effectiveBudget)}** của bạn hiện ${budgetComparisonText} mức giá của ${categoryItemNoun} gần nhất tại kho.\n` +
                 `Em xin phép **hiển thị ngay trên trang ${categoryItemNoun} có giá gần nhất và tiết kiệm nhất** để bạn dễ quan sát nhé:\n` +
-                `⭐ **${lowestInCat.name}** - Giá: **${money(lowestInCat.price)}** (chênh lệch khoảng +${money(diff)} so với dự kiến của bạn).\n\n` +
+                `⭐ **${lowestInCat.name}** - Giá: **${money(lowestInCat.price)}** (chênh lệch khoảng ${diffPrefix}${money(diff)} so với dự kiến của bạn).\n\n` +
                 `Để hỗ trợ bạn sở hữu thiết bị tốt nhất mà không bị áp lực tài chính, cửa hàng có 3 giải pháp:\n` +
                 `1. 💳 **Trả góp 0% lãi suất:** Bạn chỉ cần trả trước 30% (${money(downPay)}), số tiền còn lại chia góp chỉ khoảng **${money(monthlyInst)}/tháng** (duyệt hồ sơ online 15 phút chỉ cần CCCD).\n` +
                 `2. 🎟️ **Áp voucher giảm giá:** Kiểm tra mã giảm giá đang kích hoạt hôm nay để trừ trực tiếp vào đơn hàng.\n` +
@@ -3145,14 +3228,14 @@ async function handleRecommendWithTradeOffs({
                     currentIntent: 'out_of_budget_scope'
                 }
             };
+        } else {
+            return {
+                reply: `Dạ hiện tại cửa hàng chưa có sản phẩm nào trong danh mục **${category}** ở mức ngân sách **${money(effectiveBudget)}** ạ. Mức giá các dòng sản phẩm chính hãng tại kho hiện bắt đầu từ phân khúc cao hơn. Bạn có thể cân nhắc chuyển sang hình thức **Trả góp 0%** hoặc tham khảo các danh mục sản phẩm khác nhé! 😊`,
+                products: [],
+                suggestions: ['Tính trả góp 0%', 'Săn mã giảm giá', 'Tư vấn danh mục khác'],
+                context: { ...context, category, budget: effectiveBudget, budgetMin, budgetMax, budgetType: effectiveType }
+            };
         }
-
-        return {
-            reply: `Dạ hiện tại cửa hàng chưa có sản phẩm nào trong danh mục **${category}** ở mức ngân sách **${money(effectiveBudget)}** ạ. Mức giá các dòng sản phẩm chính hãng tại kho hiện bắt đầu từ phân khúc cao hơn. Bạn có thể cân nhắc chuyển sang hình thức **Trả góp 0%** hoặc tham khảo các danh mục sản phẩm khác nhé! 😊`,
-            products: [],
-            suggestions: ['Tính trả góp 0%', 'Săn mã giảm giá', 'Tư vấn danh mục khác'],
-            context: { ...context, category, budget: effectiveBudget, budgetMin, budgetMax, budgetType: effectiveType }
-        };
     }
 
     // Ưu tiên chọn 2 - 3 sản phẩm đại diện các phương án đánh đổi khác nhau
@@ -3479,13 +3562,17 @@ async function handleContextualFollowUp(message, context = {}) {
     }
 
     // B. Người dùng phản hồi về ngân sách theo ngữ cảnh ("20 triệu thôi", "dưới 20tr thôi", "10tr", "trên 20tr")
+    // Chỉ xử lý ở nhánh follow-up khi phiên đang có sẵn danh mục hoặc danh sách sản phẩm vừa xem;
+    // câu hỏi mới có từ lóng / ẩn ý ("đeo tập gym tầm 3 củ", "bỏ vừa cốp xe Vision tầm 15 củ") phải đi xuống Bước 6 để AI NLU nhận đúng danh mục.
     const budgetInfo = extractBudgetInfo(message);
     const newBudget = budgetInfo?.amount || extractBudget(message);
     const catInMsg = inferCategory(message);
-    const brandInMsg = extractBrandMention(message);
+    const focusMsg = stripOwnedDeviceClauseForPurchaseIntent(message) || message;
+    const brandInMsg = extractBrandMention(focusMsg);
+    const hasActiveCategoryOrProducts = Boolean(context.category || (Array.isArray(lastProducts) && lastProducts.length > 0));
 
     // Nếu tin nhắn có nhắc đến danh mục mới hoặc thương hiệu mới -> Để luồng chính (Step 4 & 5) xử lý chuẩn xác!
-    if (newBudget && !catInMsg && !brandInMsg) {
+    if (newBudget && !catInMsg && !brandInMsg && hasActiveCategoryOrProducts) {
         const isHard = isHardBudgetLimit(message) || norm.includes('thoi');
         const category = context.category || 'Điện thoại';
         const brand = context.brand || '';
@@ -3725,9 +3812,13 @@ async function handleContextualFollowUp(message, context = {}) {
         }
     }
 
-    // F. Người dùng hỏi sâu về sản phẩm đang xem / vừa được gợi ý ("máy này pin bao lâu", "nó có tác dụng gì", "mấy loại này có gì tốt", "ưu nhược điểm", "sản phẩm này có gì tốt", "tại sao tôi nên mua")
-    const isDeepProductQuestion = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|thiet bi nay|em nay|chu nay|pin|sac|man hinh|camera|chup anh|quay phim|choi game|gaming|nong|tan nhiet|nang|mong|nhe|ben|code|lap trinh|do hoa|render|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|tai sao toi nen mua|dung duoc gi|co gi tot|co gi hay|co gi noi bat|tai sao|vi sao|ly do|co nen|co dang|tac dung|cong dung|chuc nang|tinh nang|lam duoc gi|dung de lam gi|co tac dung gi)\b/i.test(norm);
-    if (lastProducts.length > 0 && isDeepProductQuestion && !catInMsg && !brandInMsg && context.stage !== 'qualifying_needs') {
+    // F. Người dùng hỏi sâu về sản phẩm đang xem / vừa được gợi ý ("máy này pin bao lâu", "chuột này con lăn bao nhiêu vòng", "nó mang lên máy bay được không")
+    const isDeepProductQuestion = /\b(may nay|may do|con nay|con do|mau nay|mau do|chiec nay|chiec do|cai nay|cai do|san pham nay|thiet bi nay|em nay|em do|chu nay|cua no|no co|chuot nay|ban phim nay|tai nghe nay|dong ho nay|pin|sac|sac bao lau|sac nguoc|man hinh|man hinh ngoai|xuat man hinh|camera|chup anh|quay phim|choi game|gaming|nong|tan nhiet|nang|nang bao nhieu|trong luong|kich thuoc|day dai|mong|nhe|ben|do ben|tuoi tho|code|lap trinh|do hoa|render|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|tai sao toi nen mua|dung duoc gi|co gi tot|co gi hay|co gi noi bat|tai sao|vi sao|ly do|co nen|co dang|tac dung|cong dung|chuc nang|tinh nang|lam duoc gi|dung de lam gi|co tac dung gi|con lan|banh xe|scroll|vong quay|lan duoc|bao nhieu vong|switch|nut bam|click|trieu lan|dpi|ips|polling|tan so quet|hz|cam bien|sensor|feet|led|rgb|macro|cong ket noi|hdmi|usb|usb-c|type c|lightning|thunderbolt|nang cap|ram toi da|o cung|o dia|dia game|khang nuoc|chong nuoc|chong on|anc|tuong thich|su dung duoc bao|dung duoc bao|may bay|xach tay|ky gui|doc lap|remote play|ngoi but|hot swap|keycap|gbox|google play|papermatte|multipoint|da thiet bi|thay pin|gap gon)\b/i.test(norm);
+    const sameCategoryOrNone = !catInMsg || lastProducts.some(p => p && p.category === catInMsg);
+    const sameBrandOrNone = !brandInMsg || lastProducts.some(p => p && p.brand && p.brand.toLowerCase() === brandInMsg.name.toLowerCase());
+    const hasExplicitNewSearchVerb = /\b(tu van (?:mua|chon|them)|tim mua|doi sang|chuyen sang|gioi thieu them)\b/i.test(norm);
+
+    if (lastProducts.length > 0 && isDeepProductQuestion && sameCategoryOrNone && sameBrandOrNone && !hasExplicitNewSearchVerb && context.stage !== 'qualifying_needs') {
         const productIds = lastProducts.slice(0, 3).map(item => item?._id || item).filter(Boolean);
         const verifiedDocs = await Product.find({ _id: { $in: productIds }, active: { $ne: false } });
         if (verifiedDocs.length > 0) {
@@ -3735,6 +3826,28 @@ async function handleContextualFollowUp(message, context = {}) {
             const s = primary.specs || {};
             const isWhyOrStrengths = /\b(tai sao|vi sao|ly do|co gi tot|co gi hay|co gi noi bat|uu diem|co nen mua|nen mua khong|co dang)\b/i.test(norm);
             const isSmartWatchOrBand = primary.category === 'Đồng hồ thông minh' || /band|watch|dong ho|vong đeo tay/i.test(primary.name);
+            const specSummaryParts = [
+                s.cpu && `Vi xử lý ${s.cpu}`,
+                s.ram && `RAM ${s.ram}`,
+                s.storage && `Bộ nhớ ${s.storage}`,
+                s.screen && `Màn hình ${s.screen}`,
+                s.battery && `Pin ${s.battery}`,
+                s.connectivity && `Kết nối ${s.connectivity}`,
+                s.weight && `Trọng lượng ${s.weight}`
+            ].filter(Boolean);
+            const fallbackSpecLine = specSummaryParts.join(' • ') || primary.description || 'Thông số tiêu chuẩn chính hãng';
+
+            let qaRag = { ragEvidenceText: '', ragSources: null };
+            try {
+                qaRag = await ragService.retrieveRagContext({
+                    query: `${message} ${primary.name} ${primary.brand || ''}`,
+                    category: primary.category,
+                    memoryProfile: context.memoryProfile,
+                    preloadedProducts: verifiedDocs,
+                    limitProducts: verifiedDocs.length,
+                    limitArticles: 3
+                });
+            } catch (_) { }
 
             let fallbackQa;
             if (isSmartWatchOrBand && /\b(tac dung|cong dung|dung duoc gi|lam duoc gi|tinh nang|chuc nang|co gi tot|co nen mua)\b/i.test(norm)) {
@@ -3746,15 +3859,15 @@ async function handleContextualFollowUp(message, context = {}) {
                     `👉 Đây là thiết bị rất đáng mua để theo dõi sức khỏe mỗi ngày! Bạn có muốn em hỗ trợ thêm vào giỏ hàng hoặc tư vấn màu sắc sẵn hàng không ạ? 😊`;
             } else if (isWhyOrStrengths) {
                 fallbackQa = `Dạ về lý do bạn rất nên cân nhắc sở hữu **${primary.name}** (Giá ưu đãi: **${money(primary.price)}**):\n\n` +
-                    `1. 🚀 **Hiệu năng & Trải nghiệm thực tế:** ${[s.cpu && `Trang bị ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.storage && `Bộ nhớ ${s.storage}`, s.screen && `Màn hình ${s.screen}`].filter(Boolean).join(', ') || 'Cấu hình tiêu chuẩn chính hãng'}, vận hành cực kỳ mượt mà, phản hồi nhạy bén và phục vụ tốt nhu cầu trong 3 - 5 năm tới.\n` +
-                    `2. 🔋 **Độ bền & Tính cơ động:** ${s.battery ? `Thời lượng pin ${s.battery}` : 'Thời lượng pin bền bỉ cả ngày dài'}, ${s.weight ? `trọng lượng gọn nhẹ chỉ ${s.weight}` : 'thiết kế hiện đại, cao cấp'} thuận tiện mang theo học tập và làm việc.\n` +
+                    `1. 🚀 **Hiệu năng & Trải nghiệm thực tế:** ${fallbackSpecLine}, vận hành cực kỳ mượt mà, phản hồi nhạy bén và phục vụ tốt nhu cầu trong nhiều năm.\n` +
+                    `2. 🔋 **Độ bền & Điểm nổi bật:** ${primary.description || 'Thiết kế chính hãng hoàn thiện cao, bền bỉ'}.\n` +
                     `3. 🛡️ **Quyền lợi mua sắm tại cửa hàng:** Đảm bảo 100% chính hãng, bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày đầu), hỗ trợ trả góp 0% chỉ từ ~${money(Math.round(primary.price * 0.7 / 12))}/tháng.\n\n` +
                     `👉 Nhìn chung, đây là mẫu máy rất đáng tiền trong phân khúc! Bạn có muốn em tư vấn thêm về màu sắc sẵn hàng hoặc tính bảng trả góp chi tiết không ạ?`;
             } else {
-                fallbackQa = `Dạ về thắc mắc của bạn đối với **${primary.name}** (Giá: **${money(primary.price)}**):\n\n` +
-                    `• **Cấu hình thực tế:** ${[s.cpu && `Vi xử lý ${s.cpu}`, s.ram && `RAM ${s.ram}`, s.storage && `Bộ nhớ ${s.storage}`, s.screen && `Màn hình ${s.screen}`, s.battery && `Pin ${s.battery}`].filter(Boolean).join(' • ') || 'Cấu hình chính hãng tiêu chuẩn'}.\n` +
-                    `• **Đánh giá sử dụng:** Máy đáp ứng mượt mà các tác vụ học tập, làm việc và giải trí hàng ngày với độ bền cao, bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày).\n\n` +
-                    `👉 Bạn có muốn em tính chi tiết bảng trả góp 0% hoặc hỗ trợ đặt mua mẫu **${primary.name}** này ngay không ạ?`;
+                fallbackQa = `Dạ về câu hỏi của bạn đối với **${primary.name}** (Giá: **${money(primary.price)}**):\n\n` +
+                    `• **Thông tin hãng & Thông số thực tế:** ${fallbackSpecLine}.${primary.description && specSummaryParts.length > 0 ? ` ${primary.description}` : ''}\n` +
+                    `• **Độ bền & Bảo hành chính hãng:** Đối với các chi tiết cơ học phụ không được nhà sản xuất công bố định mức cố định theo số vòng/lần, sản phẩm vẫn được thiết kế theo tiêu chuẩn độ bền nhiều năm của ${primary.brand || 'hãng'}, đi kèm bảo hành chính hãng ${primary.warranty || '12 - 24 tháng'} (lỗi 1 đổi 1 trong 30 ngày đầu).\n\n` +
+                    `👉 Bạn có muốn em kiểm tra thêm thông số nào khác hoặc hỗ trợ đặt mua/giữ máy tại showroom không ạ?`;
             }
 
             const groundedQa = await aiModelService.generateGroundedConsultation({
@@ -3763,7 +3876,8 @@ async function handleContextualFollowUp(message, context = {}) {
                 verifiedProducts: verifiedDocs,
                 context: {
                     ...context,
-                    currentMessage: message
+                    currentMessage: message,
+                    ragEvidenceText: qaRag.ragEvidenceText || ''
                 },
                 fallbackText: fallbackQa
             });
@@ -3785,7 +3899,8 @@ async function handleContextualFollowUp(message, context = {}) {
                 meta: {
                     provider: groundedQa.provider,
                     model: groundedQa.model,
-                    isFallback: groundedQa.isFallback
+                    isFallback: groundedQa.isFallback,
+                    ragSources: qaRag.ragSources || null
                 }
             };
         }
@@ -4078,7 +4193,7 @@ async function handleFeatureOrFormFactorQuery(message, category, prev = {}) {
             const reply = `Dạ chào bạn! Nếu bạn thích sự ổn định tuyệt đối, không có độ trễ và không phải lo sạc pin của dòng **Tai nghe có dây**, cửa hàng có sẵn các mẫu chính hãng nổi bật:\n\n` +
                 `${displayList}\n\n` +
                 `1. **Apple EarPods Lightning MWTY3ZA/A (499.000 đ):** Lựa chọn kinh tế nhất, đàm thoại to rõ, cổng Lightning chuẩn cho iPhone/iPad.\n` +
-                `2. **Sony Inzone H3 (2.490.000 đ):** Dòng chụp tai Gaming chuyên nghiệp với âm thanh không gian 360 Spatial Sound và mic đàm thoại khử tạp âm.\n\n` +
+                `2. **Sony Inzone H3 (1.790.000 đ):** Dòng chụp tai Gaming chuyên nghiệp với âm thanh không gian 360 Spatial Sound và mic đàm thoại khử tạp âm.\n\n` +
                 `👉 Bạn đang dùng thiết bị cổng cắm nào (Lightning, Type-C hay Jack 3.5mm) để em chọn mẫu chuẩn xác nhất cho bạn nhé! 😊`;
 
             return {
@@ -4394,8 +4509,9 @@ async function handleFeatureOrFormFactorQuery(message, category, prev = {}) {
         }
     }
 
-    // 5. Phân loại ĐỒNG HỒ THÔNG MINH: Sức khỏe & GPS / Nghe gọi & Pin trâu
-    if (cat === 'Đồng hồ thông minh' || (!cat && /\b(suc khoe|gps|the thao|chay bo|do tim|nghe goi|thong bao|pin trau)\b/i.test(norm))) {
+    // 5. Phân loại ĐỒNG HỒ THÔNG MINH: Sức khỏe & GPS / Nghe gọi & Pin trâu (loại trừ câu hỏi tai nghe/âm thanh)
+    const isAudioQuery = /\b(nghe|nhac|am thanh|chong on|anc|em tai|nhet tai|ear|buds|bass|am luong|deo tai)\b/i.test(norm);
+    if (cat === 'Đồng hồ thông minh' || (!cat && !isAudioQuery && /\b(suc khoe|gps|the thao|chay bo|do tim|nghe goi|thong bao)\b/i.test(norm))) {
         const isHealth = /\b(suc khoe|gps|the thao|chay bo|do tim|tap luyen|nhip tim|spo2)\b/i.test(norm);
         const isCall = /\b(nghe goi|thong bao|pin trau|pin lau|thoi trang|sang trong)\b/i.test(norm);
 
@@ -4718,7 +4834,8 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     }
 
     // 0. Kiểm tra mặt hàng ngoài phạm vi kinh doanh (máy đọc sách, tivi, máy ảnh độc lập...)
-    const unsupportedItem = checkUnsupportedProduct(message);
+    const purchaseFocusMsg = stripOwnedDeviceClauseForPurchaseIntent(message) || message;
+    const unsupportedItem = checkUnsupportedProduct(purchaseFocusMsg);
     if (unsupportedItem) {
         return buildOutOfCatalogResponse(unsupportedItem, message);
     }
@@ -4777,6 +4894,13 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     if (!isContextualFollowUpSignal && !hasExplicitBudget) {
         const smartAnswer = matchSmartAnswer(message);
         if (smartAnswer) {
+            // Nếu khách đang hỏi đích danh 1 model cụ thể trong catalog (VD: "Anker A1695 mang lên máy bay...", "JBL Charge 5 chống nước...",
+            // "MacBook Air M3 xuất 2 màn hình..."), nhường cho Bước 2b (Exact Lookup + product_qa + Hybrid RAG) trả lời kèm thẻ sản phẩm thực tế!
+            const skuMatchesForGuard = await findAllMatchingProductsInCatalog(purchaseFocusMsg);
+            const isStrictOrderOrStoreFaq = smartAnswer.group === 'store_policy' && /\b(policy_shipping|policy_cod|policy_warranty|policy_store_address|policy_vat)\b/i.test(smartAnswer.intent || '');
+            if (skuMatchesForGuard.length >= 1 && !isStrictOrderOrStoreFaq) {
+                // Fall through to exact product consultation with RAG + live product card
+            } else {
             const isGenericWelcome = smartAnswer.intent === 'advice_consultation_welcome_stepper';
             if (!isGenericWelcome || (!hasExplicitProductQuery && !isConsultationSearch)) {
                 let attachedProducts = prev.lastProducts || [];
@@ -4797,6 +4921,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
                     context: { ...prev, ...smartAnswer.context },
                     meta: { provider: 'store_knowledge_engine', isFallback: false, model: 'none' }
                 };
+            }
             }
         }
     }
@@ -4847,7 +4972,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     }
 
     // Explicit model names must be resolved before brand-level comparison.
-    const earlyMatchedProducts = await findAllMatchingProductsInCatalog(message);
+    const earlyMatchedProducts = await findAllMatchingProductsInCatalog(purchaseFocusMsg);
 
     if (earlyComparingIntent && earlyMatchedProducts.length >= 2 && String(earlyMatchedProducts[0]._id) !== String(earlyMatchedProducts[1]._id)) {
         return await buildComparisonResponse(earlyMatchedProducts[0], earlyMatchedProducts[1], {
@@ -4876,7 +5001,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     const brandComparison = await resolveBrandComparison(message, prev);
     if (brandComparison) return brandComparison;
 
-    const matchedProducts = await findAllMatchingProductsInCatalog(message);
+    const matchedProducts = await findAllMatchingProductsInCatalog(purchaseFocusMsg);
     const isComparingIntent = earlyComparingIntent || (hasConjunction && !isDeepConsultationRequest && matchedProducts.length >= 2);
 
     if (matchedProducts.length >= 2 && String(matchedProducts[0]._id) !== String(matchedProducts[1]._id) && isComparingIntent) {
@@ -4936,7 +5061,23 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
         prev.lastProducts = [];
     }
 
-    if (requestedProductType && !extractBudget(message) && (requestedProductType.key !== prev.productType || (isExplicitConsultationRestart && !extractBudget(message) && !extractQualificationUseCase(message) && !extractBrandPreference(message)))) {
+    const hasDeepQuestionSignal = /\b(may nay|may do|con nay|con do|mau nay|mau do|chiec nay|chiec do|cai nay|cai do|san pham nay|thiet bi nay|em nay|em do|chu nay|cua no|no co|chuot nay|ban phim nay|tai nghe nay|dong ho nay|tai sao|vi sao|ly do|co nen|co dang|co gi tot|co gi hay|co gi noi bat|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|do ben|tuoi tho|phu hop|co nen mua|nen mua khong|tai sao nen mua|dung duoc gi|choi game|pin|sac bao lau|sac nguoc|camera|man hinh|man hinh ngoai|xuat man hinh|cau hinh|tac dung|cong dung|chuc nang|lam duoc gi|dung de lam gi|co tac dung gi|tinh nang|tinh nang gi|tang kem|kem but|kem ban phim|kem theo|la sao|nghia la sao|la gi|la nhu the nao|the nao|con lan|banh xe|scroll|vong quay|lan duoc|bao nhieu vong|switch|nut bam|click|trieu lan|dpi|ips|polling|tan so quet|hz|cam bien|sensor|feet|led|rgb|trong luong|kich thuoc|nang bao nhieu|day dai|nang cap|ram toi da|o dia|dia game|khang nuoc|chong nuoc|chong on|anc|su dung duoc bao|may bay|xach tay|doc lap|remote play|ngoi but|hot swap|keycap|gbox|google play|papermatte|multipoint|da thiet bi|thay pin|lightning|usb-c)\b/i.test(text);
+    const isBudgetCorrection = /\b(tren\s+\d+|tren\s+\d+tr|tren\s+\d+\s+trieu|tim\s+tren|bao\s+la\s+tren|noi\s+la\s+tren|goi\s+y\s+duoi|cai\s+nay\s+la\s+duoi)\b/i.test(text) || (text.includes('tren') && text.includes('20') && (text.includes('ma') || text.includes('sao') || text.includes('duoi')));
+    const isFollowUpAboutActiveProducts = Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
+        (/may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text) || isCheaperRequest(text) || isBudgetCorrection || extractOrdinalReference(message) || extractEliminatedBrand(message) || hasDeepQuestionSignal);
+
+    // Ưu tiên kiểm tra câu hỏi nối tiếp về chính sản phẩm vừa xem (kể cả khi khách lặp lại danh từ như "con lăn chuột của nó")
+    // TRƯỚC khi xét nhảy loại sản phẩm mới ở bước requestedProductType!
+    if (isFollowUpAboutActiveProducts && !isExplicitConsultationRestart) {
+        const activeFollowUpFirst = await handleContextualFollowUp(message, prev);
+        if (activeFollowUpFirst) return activeFollowUpFirst;
+    }
+
+    const isSameCatAsActiveProduct = Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 && requestedProductType &&
+        prev.lastProducts.some(p => p && p.category === requestedProductType.category) &&
+        /\b(cua no|con nay|mau nay|chiec nay|cai nay|nay|do|vua roi|tren)\b/i.test(text);
+
+    if (requestedProductType && !extractBudget(message) && !isSameCatAsActiveProduct && (requestedProductType.key !== prev.productType || (isExplicitConsultationRestart && !extractBudget(message) && !extractQualificationUseCase(message) && !extractBrandPreference(message)))) {
         const switchedContext = {
             pageCategory: prev.pageCategory,
             category: requestedProductType.category,
@@ -4987,10 +5128,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
 
     // Tiếp tục thu thập nhu cầu qua nhiều lượt. Nếu khách gọi đúng tên model ở
     // trên, nhánh exact lookup đã ưu tiên trả sản phẩm ngay lập tức.
-    const hasDeepQuestionSignal = /\b(may nay|con nay|mau nay|chiec nay|san pham nay|thiet bi nay|em nay|chu nay|tai sao|vi sao|ly do|co nen|co dang|co gi tot|co gi hay|co gi noi bat|uu diem|nhuoc diem|danh gia|review|tot khong|on khong|muot khong|ben khong|phu hop|co nen mua|nen mua khong|tai sao nen mua|dung duoc gi|choi game|pin|camera|man hinh|cau hinh|tac dung|cong dung|chuc nang|lam duoc gi|dung de lam gi|co tac dung gi|tinh nang|tinh nang gi|tang kem|kem but|kem ban phim|kem theo|la sao|nghia la sao|la gi|la nhu the nao|the nao)\b/i.test(text);
-    const isBudgetCorrection = /\b(tren\s+\d+|tren\s+\d+tr|tren\s+\d+\s+trieu|tim\s+tren|bao\s+la\s+tren|noi\s+la\s+tren|goi\s+y\s+duoi|cai\s+nay\s+la\s+duoi)\b/i.test(text) || (text.includes('tren') && text.includes('20') && (text.includes('ma') || text.includes('sao') || text.includes('duoi')));
-    if (Array.isArray(prev.lastProducts) && prev.lastProducts.length > 0 &&
-        (/may thu|mau thu|so sanh|dat qua|re qua|gia cao|may vua roi|mau vua roi/i.test(text) || isCheaperRequest(text) || isBudgetCorrection || extractOrdinalReference(message) || extractEliminatedBrand(message) || hasDeepQuestionSignal)) {
+    if (isFollowUpAboutActiveProducts) {
         const earlyContextualResponse = await handleContextualFollowUp(message, prev);
         if (earlyContextualResponse) return earlyContextualResponse;
     }
@@ -5019,7 +5157,7 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     }
 
     // 4. PHÂN TÍCH THƯƠNG HIỆU & DANH MỤC
-    const brandMention = extractBrandMention(message);
+    const brandMention = extractBrandMention(purchaseFocusMsg);
     const categoryInMessage = inferCategory(message);
     const budgetInfo = extractBudgetInfo(message);
     const explicitBudgetInMsg = budgetInfo?.amount || extractBudget(message);
@@ -5062,7 +5200,11 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     }
 
     // 4b. Kiểm tra câu hỏi theo tính năng / kiểu dáng / form-factor ("không dây", "chống ồn", "có dây", "chụp tai"...)
-    const featureConsultation = await handleFeatureOrFormFactorQuery(message, currentCategory, prev);
+    // Chỉ chạy showcase cứng khi khách KHÔNG nêu ngân sách cụ thể; nếu có ngân sách (VD "pin trâu 7 củ", "nghe êm 3 củ"),
+    // đi tiếp xuống Bước 6 để Lọc giá chuẩn + AI NLU + Hybrid RAG tư vấn đúng tầm tiền!
+    const featureConsultation = !explicitBudgetInMsg
+        ? await handleFeatureOrFormFactorQuery(message, currentCategory, prev)
+        : null;
     if (featureConsultation) {
         return featureConsultation;
     }
@@ -5106,21 +5248,36 @@ async function _coordinateConsultationCore({ message, user = null, context = {} 
     };
 
     // 6. YÊU CẦU CỐT LÕI: KHI KHÁCH HÀNG MUỐN NGÂN SÁCH TRONG TẦM GIÁ -> MỚI NHẢY RA ĐỂ TƯ VẤN KHÁCH HÀNG
-    // "còn khi khách hàng muốn ngân sách trong tầm giá thì mới nhảy ra để tư vấn khách hàng"
+    // Nếu khách đã nêu ngân sách nhưng chưa nêu rõ từ khóa danh mục (VD: "đeo chạy bộ 3 củ", "bỏ vừa cốp xe 15 củ"),
+    // dùng LLM NLU xác định chính xác danh mục thay vì đoán cứng sang Điện thoại!
     if (newBudget > 0 || (budgetMin && budgetMin > 0)) {
+        let resolvedContext = updatedContext;
+        if (!category) {
+            try {
+                const quickNlu = await aiModelService.understandCustomerQuery({
+                    message,
+                    context: updatedContext,
+                    history: updatedContext.conversationHistory || []
+                });
+                if (quickNlu) {
+                    resolvedContext = applySemanticNluToContext(updatedContext, quickNlu);
+                }
+            } catch (_) { }
+        }
+
         return await handleRecommendWithTradeOffs({
-            category: category || 'Điện thoại',
-            brand,
+            category: resolvedContext.category || 'Điện thoại',
+            brand: resolvedContext.brand || brand,
             budget: newBudget,
             budgetMin,
             budgetMax,
             budgetType,
             isHardBudget: isHard,
-            useCase,
+            useCase: resolvedContext.useCase || useCase,
             major,
-            eliminatedBrands: eliminated,
+            eliminatedBrands: resolvedContext.eliminatedBrands || eliminated,
             userProficiency,
-            context: updatedContext
+            context: resolvedContext
         });
     }
 
@@ -5217,6 +5374,36 @@ async function handleVisualFollowUp(message, context = {}) {
 }
 
 /**
+ * Hợp nhất kết quả phân tích ngữ nghĩa từ Gemini NLU vào ngữ cảnh & Memory Profile
+ */
+function applySemanticNluToContext(baseCtx = {}, nluData = null) {
+    if (!nluData || typeof nluData !== 'object') return { ...(baseCtx || {}) };
+    const mergedExcluded = Array.from(new Set([
+        ...(Array.isArray(baseCtx.eliminatedBrands) ? baseCtx.eliminatedBrands : []),
+        ...(nluData.excludedBrand ? [nluData.excludedBrand] : [])
+    ])).filter(Boolean);
+
+    const prevMem = baseCtx.memoryProfile || {};
+    return {
+        ...baseCtx,
+        category: baseCtx.category || nluData.category || '',
+        brand: baseCtx.brand || nluData.brand || '',
+        budget: baseCtx.budget || nluData.budgetVnd || 0,
+        budgetType: nluData.budgetVnd > 0 ? (nluData.budgetType || 'flexible') : (baseCtx.budgetType || 'unspecified'),
+        useCase: baseCtx.useCase || nluData.useCase || '',
+        eliminatedBrands: mergedExcluded,
+        memoryProfile: {
+            ...prevMem,
+            ...(nluData.buyingFor ? { buyingFor: nluData.buyingFor } : {}),
+            ...(nluData.paymentPreference ? { preferredPaymentMethod: nluData.paymentPreference } : {}),
+            ...(nluData.customerMood && nluData.customerMood !== 'normal' ? { customerMood: nluData.customerMood } : {}),
+            ...(nluData.objection ? { objectionsRaised: Array.from(new Set([...(prevMem.objectionsRaised || []), nluData.objection])).slice(-6) } : {}),
+            ...(nluData.priorities?.length ? { keyPriorities: Array.from(new Set([...(prevMem.keyPriorities || []), ...nluData.priorities])).slice(-8) } : {})
+        }
+    };
+}
+
+/**
  * Xử lý các câu hỏi vui, toán học, chit-chat hoặc câu hỏi tư vấn mở với Hybrid Multi-Source RAG + Gemini 3.x
  */
 async function handleConversationalOrUnclearQuery(message, context = {}) {
@@ -5286,29 +5473,117 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
 
     const isHumorOrChitChat = /\b(vui khong|buon|chan|met|khoe khong|an com chua|ngu chua|hat|ke chuyen|nguoi yeu|may tuoi|ten gi|ai tao ra|troi dep|troi mua|xinh khong|yeu khong|co nguoi yeu)\b/i.test(norm);
 
+    // 2b. Phân tích ngữ nghĩa sâu bằng Gemini NLU tốc độ cao cho các câu hỏi đời thường / tiếng lóng / nối tiếp ngữ cảnh
+    let nluAi = null;
+    let workingContext = { ...(context || {}) };
+    if (!deterministicMathReply && !isMatchedSmartRule && !isHumorOrChitChat) {
+        try {
+            nluAi = await aiModelService.understandCustomerQuery({
+                message: cleanMsg,
+                context: workingContext,
+                history: workingContext.conversationHistory || []
+            });
+        } catch (_) {
+            nluAi = null;
+        }
+    }
+
+    if (nluAi) {
+        workingContext = applySemanticNluToContext(workingContext, nluAi);
+
+        // NLU nhận diện khách hỏi tiếp về sản phẩm vừa xem ("con đầu", "mẫu thứ 2", "cái con lăn của nó...")
+        if (nluAi.referencedProductIndex >= 1 && Array.isArray(workingContext.lastProducts) && workingContext.lastProducts.length > 0) {
+            const refItem = workingContext.lastProducts[nluAi.referencedProductIndex - 1];
+            if (refItem) {
+                const refId = refItem._id || refItem.id || refItem;
+                const fullRefProd = refId ? await Product.findById(refId).catch(() => null) : null;
+                const resolvedProd = fullRefProd || (typeof refItem === 'object' ? refItem : null);
+                if (resolvedProd && resolvedProd.name) {
+                    if (nluAi.intent === 'product_qa') {
+                        let refRag = { ragEvidenceText: '', ragSources: null };
+                        try {
+                            refRag = await ragService.retrieveRagContext({
+                                query: `${cleanMsg} ${resolvedProd.name} ${resolvedProd.brand || ''}`,
+                                category: resolvedProd.category,
+                                memoryProfile: workingContext.memoryProfile,
+                                preloadedProducts: [resolvedProd],
+                                limitProducts: 1,
+                                limitArticles: 3
+                            });
+                        } catch (_) { }
+                        const qaFallback = `Dạ về thắc mắc của bạn đối với **${resolvedProd.name}** (Giá: **${money(resolvedProd.price)}**): ${resolvedProd.description || 'Sản phẩm chính hãng nguyên seal'}. Bảo hành ${resolvedProd.warranty || '12 tháng chính hãng, lỗi 1 đổi 1 trong 30 ngày'}.`;
+                        const qaRes = await aiModelService.generateGroundedConsultation({
+                            userMessage: cleanMsg,
+                            dialogueAct: 'product_qa',
+                            verifiedProducts: [resolvedProd],
+                            context: { ...workingContext, ragEvidenceText: refRag.ragEvidenceText || '' },
+                            fallbackText: qaFallback
+                        });
+                        return {
+                            reply: qaRes.reply,
+                            products: [resolvedProd],
+                            suggestions: [`Thêm ${resolvedProd.name.slice(0, 20)} vào giỏ`, 'Tính trả góp 0%', 'So sánh với máy khác', 'Săn mã giảm giá'],
+                            context: { ...workingContext, lastProducts: [resolvedProd], currentIntent: 'product_qa' },
+                            meta: { provider: qaRes.provider, model: qaRes.model, isFallback: qaRes.isFallback, ragSources: refRag.ragSources || null }
+                        };
+                    }
+                    return await handleDeepProductConsultation(resolvedProd, workingContext, cleanMsg);
+                }
+            }
+        }
+
+        // NLU bóc tách được nhu cầu mua máy + ngân sách cụ thể (kể cả tiếng lóng "15 củ", "7m", "5 xị")
+        if ((nluAi.intent === 'recommend' || nluAi.intent === 'installment') && nluAi.budgetVnd >= 500000) {
+            return await handleRecommendWithTradeOffs({
+                category: workingContext.category || nluAi.category || 'Điện thoại',
+                brand: workingContext.brand || nluAi.brand || '',
+                budget: nluAi.budgetVnd,
+                budgetType: nluAi.budgetType || 'flexible',
+                isHardBudget: nluAi.budgetType === 'hard',
+                useCase: workingContext.useCase || nluAi.useCase || nluAi.priorities.join(', '),
+                eliminatedBrands: workingContext.eliminatedBrands || [],
+                userProficiency: workingContext.techProficiency || 'intermediate',
+                context: workingContext
+            });
+        }
+    }
+
     // 3. Truy xuất Hybrid Multi-Source RAG (KnowledgeArticles + Products + Reviews + Coupons)
+    const semanticQuery = nluAi?.rewrittenSearchQuery
+        ? `${cleanMsg} ${nluAi.rewrittenSearchQuery}`
+        : cleanMsg;
+    const isRefProductQa = (nluAi?.intent === 'product_qa' || nluAi?.referencedProductIndex >= 1) && Array.isArray(workingContext.lastProducts) && workingContext.lastProducts.length > 0;
     let rag = { articles: [], products: [], coupons: [], reviews: [], ragEvidenceText: '', ragSources: null };
     if (!deterministicMathReply) {
         try {
             rag = await ragService.retrieveRagContext({
-                query: cleanMsg,
-                category: context.category || '',
-                brand: context.brand || '',
-                budget: context.budget || 0,
-                eliminatedBrands: context.eliminatedBrands || [],
-                memoryProfile: context.memoryProfile,
-                limitProducts: 3,
+                query: semanticQuery,
+                category: workingContext.category || nluAi?.category || '',
+                brand: workingContext.brand || nluAi?.brand || '',
+                budget: workingContext.budget || nluAi?.budgetVnd || 0,
+                eliminatedBrands: workingContext.eliminatedBrands || [],
+                memoryProfile: workingContext.memoryProfile,
+                preloadedProducts: isRefProductQa ? workingContext.lastProducts : [],
+                limitProducts: 4,
                 limitArticles: 3
             });
         } catch (_) { }
     }
 
+    // Nếu NLU xác định khách muốn tìm theo danh mục + nhu cầu rõ ràng nhưng chưa nói ngân sách và RAG tìm được sản phẩm khớp ngữ cảnh
+    if (nluAi && nluAi.intent === 'recommend' && nluAi.category && !nluAi.budgetVnd && rag.products.length === 0) {
+        return await handleClarifyNeeds(nluAi.category, workingContext, workingContext.techProficiency || 'intermediate');
+    }
+
     const enrichedContext = {
-        ...context,
-        ragEvidenceText: rag.ragEvidenceText || context.ragEvidenceText || ''
+        ...workingContext,
+        ragEvidenceText: rag.ragEvidenceText || workingContext.ragEvidenceText || ''
     };
 
     const isSeekingProductAdvice = !isHumorOrChitChat && !deterministicMathReply && (
+        nluAi?.intent === 'recommend' ||
+        nluAi?.intent === 'product_qa' ||
+        nluAi?.intent === 'compatibility' ||
         /\b(tu van|goi y|nen mua|chon|phu hop|mau nao|may nao|san pham|dong nao|combo|tai nghe|dong ho|laptop|dien thoai|tablet|phu kien|sac|pin|man hinh|ban phim|chuot)\b/i.test(norm) ||
         (rag.products.length > 0 && !isMatchedSmartRule && cleanMsg.length >= 10)
     );
@@ -5341,28 +5616,36 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
         }
     }
 
-    // 4. Tận dụng Gemini 3.x + RAG Evidence + Multi-Turn Memory để trả lời tự nhiên, có chiều sâu như chuyên viên tư vấn thật
+    // 4. Khi đã có kết quả toán học chính xác tuyệt đối thì giữ nguyên đáp án (không để LLM đoán sai thứ tự phép tính);
+    // ngược lại tận dụng Gemini 3.x + RAG Evidence + Multi-Turn Memory để trả lời tự nhiên như chuyên viên thật
     const useRagConsultative = !isHumorOrChitChat && !deterministicMathReply &&
-        (rag.articles.length > 0 || rag.coupons.length > 0 || (isSeekingProductAdvice && rag.products.length > 0) || isMatchedSmartRule);
+        (rag.articles.length > 0 || rag.coupons.length > 0 || (isSeekingProductAdvice && rag.products.length > 0) || isMatchedSmartRule || Boolean(nluAi && nluAi.intent !== 'chit_chat'));
 
-    const aiResult = useRagConsultative
-        ? await aiModelService.generateGroundedConsultation({
-            userMessage: cleanMsg,
-            dialogueAct: 'rag_consultative',
-            verifiedProducts: isSeekingProductAdvice ? rag.products.slice(0, 3) : [],
-            context: enrichedContext,
-            fallbackText
-        })
-        : await aiModelService.generateConversationalResponse({
-            userMessage: cleanMsg,
-            context: enrichedContext,
-            fallbackText
-        });
+    const aiResult = deterministicMathReply
+        ? {
+            reply: deterministicMathReply,
+            provider: 'deterministic_math_engine',
+            isFallback: false,
+            model: 'none'
+        }
+        : useRagConsultative
+            ? await aiModelService.generateGroundedConsultation({
+                userMessage: cleanMsg,
+                dialogueAct: nluAi?.intent === 'product_qa' ? 'product_qa' : 'rag_consultative',
+                verifiedProducts: isSeekingProductAdvice ? rag.products.slice(0, 3) : [],
+                context: enrichedContext,
+                fallbackText
+            })
+            : await aiModelService.generateConversationalResponse({
+                userMessage: cleanMsg,
+                context: enrichedContext,
+                fallbackText
+            });
 
     const returnedProducts = isSeekingProductAdvice ? rag.products.slice(0, 3) : [];
     const nextContext = returnedProducts.length > 0
-        ? { ...context, lastProducts: returnedProducts }
-        : context;
+        ? { ...workingContext, lastProducts: returnedProducts }
+        : workingContext;
 
     return {
         reply: aiResult.reply || fallbackText,
@@ -5384,6 +5667,7 @@ async function handleConversationalOrUnclearQuery(message, context = {}) {
         meta: {
             provider: aiResult.provider,
             model: aiResult.model,
+            nluModel: nluAi?.model || 'rule',
             isFallback: aiResult.isFallback,
             ragSources: rag.ragSources || null
         }

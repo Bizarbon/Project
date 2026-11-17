@@ -4169,19 +4169,26 @@ function syncCouponUI() {
     const pillCode = document.getElementById('u230PillCode');
     const pillDisc = document.getElementById('u230PillDiscount');
     const tickets = document.querySelectorAll('#u298TicketsList .u298-ticket');
+    const hasCartItems = currentCartSubtotal() > 0;
 
-    if (appliedCoupon && appliedCoupon.code) {
-        if (pill) pill.hidden = false;
+    if (hasCartItems && appliedCoupon && appliedCoupon.code) {
+        if (pill) {
+            pill.hidden = false;
+            pill.style.display = 'flex';
+        }
         if (pillCode) pillCode.textContent = appliedCoupon.code;
         if (pillDisc) pillDisc.textContent = `-${fmt(appliedCoupon.discountAmount)}`;
     } else {
-        if (pill) pill.hidden = true;
+        if (pill) {
+            pill.hidden = true;
+            pill.style.display = 'none';
+        }
     }
 
     tickets.forEach(ticket => {
-        const code = ticket.getAttribute('data-coupon');
+        const code = ticket.getAttribute('data-coupon') || ticket.getAttribute('data-coupon-code');
         const btn = ticket.querySelector('.u298-tear-btn');
-        const isApplied = Boolean(appliedCoupon && appliedCoupon.code === code);
+        const isApplied = Boolean(hasCartItems && appliedCoupon && appliedCoupon.code === code);
         ticket.classList.toggle('is-got', isApplied);
         if (btn) {
             const lbl = btn.querySelector('.u298-btn-txt');

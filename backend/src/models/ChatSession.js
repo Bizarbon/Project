@@ -89,13 +89,19 @@ const chatSessionSchema = new mongoose.Schema({
         dislikedBrands: { type: [String], default: [] },
         ownedDevices: { type: [String], default: [] },
         occupationOrRole: { type: String, default: '' },
+        buyingFor: { type: String, default: '' },
+        preferredPaymentMethod: { type: String, default: '' },
+        customerMood: { type: String, default: '' },
+        objectionsRaised: { type: [String], default: [] },
         keyPriorities: { type: [String], default: [] },
+        shortlistedProducts: { type: Array, default: [] },
         budgetMin: { type: Number, default: 0 },
         budgetMax: { type: Number, default: 0 },
         budgetStrict: { type: Boolean, default: false },
         lastVisualDevices: { type: Array, default: [] },
         discussedProducts: { type: Array, default: [] },
-        turnCount: { type: Number, default: 0 }
+        turnCount: { type: Number, default: 0 },
+        recurringVisitCount: { type: Number, default: 1 }
     },
     status: {
         type: String,

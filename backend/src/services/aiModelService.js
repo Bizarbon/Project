@@ -29,22 +29,31 @@ const DEFAULT_MODEL = ENV_MODEL && !DEPRECATED_MODELS.has(ENV_MODEL) ? ENV_MODEL
 const TEXT_CHAT_MODELS = Array.from(new Set([
     DEFAULT_MODEL,
     'gemini-3-flash-preview',
-    'gemini-3.6-flash',
-    'gemini-3.5-flash',
     'gemini-3.1-flash-lite-preview',
+    'gemini-3.1-flash-lite',
     'gemini-flash-lite-latest',
-    'gemini-3.5-flash-lite'
+    'gemini-3.5-flash-lite',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash'
+].filter(m => m && !DEPRECATED_MODELS.has(m))));
+
+const NLU_MODELS = Array.from(new Set([
+    'gemini-3.1-flash-lite-preview',
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-3-flash-preview'
 ].filter(m => m && !DEPRECATED_MODELS.has(m))));
 
 const VISION_MODELS = Array.from(new Set([
     'gemini-3-flash-preview',
     'gemini-3.1-flash-lite-preview',
-    'gemini-3.5-flash',
-    'gemini-3.6-flash',
-    'gemini-flash-lite-latest'
-]));
+    'gemini-3.1-flash-lite',
+    'gemini-flash-lite-latest',
+    'gemini-3.5-flash-lite'
+].filter(m => m && !DEPRECATED_MODELS.has(m))));
 
 const REQUEST_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 12000);
+const NLU_TIMEOUT_MS = Number(process.env.GEMINI_NLU_TIMEOUT_MS || 4500);
 const VISION_TIMEOUT_MS = Number(process.env.GEMINI_VISION_TIMEOUT_MS || 15000);
 const MAX_HISTORY_TURNS = 20;
 
@@ -69,25 +78,56 @@ function isModelAvailable(modelName) {
     return false;
 }
 
-function markModelCooldown(modelName, status) {
-    // 404: model ngừng hỗ trợ -> khóa 30 phút; 429: quota -> khóa 90s; 400: bad param -> khóa 10m; timeout/network -> 20s
+function markModelCooldown(modelName, status, errorMsg = '') {
+    // 404: model ngừng hỗ trợ -> 30m; 429 daily quota -> 15m; 429 RPM -> 90s; 400 -> 10m; timeout/network -> 20s
     let durationMs = 20 * 1000;
     if (status === 404) durationMs = 30 * 60 * 1000;
     else if (status === 400) durationMs = 10 * 60 * 1000;
-    else if (status === 429) durationMs = 90 * 1000;
+    else if (status === 429) {
+        const isDailyQuota = /per\s*day|daily|limit:\s*20/i.test(String(errorMsg || ''));
+        durationMs = isDailyQuota ? 15 * 60 * 1000 : 90 * 1000;
+    }
     modelCooldownUntil.set(modelName, Date.now() + durationMs);
+}
+
+function extractGeminiResponseText(data) {
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    return parts
+        .filter(p => !p.thought)
+        .map(p => p.text || '')
+        .join('')
+        .trim();
+}
+
+function buildGenerationConfigForModel(modelName, { temperature, maxOutputTokens, responseMimeType }) {
+    const cfg = {
+        temperature,
+        topP: 0.9,
+        maxOutputTokens
+    };
+    if (responseMimeType) {
+        cfg.responseMimeType = responseMimeType;
+    }
+    // Áp dụng thinkingLevel minimal cho model 3-flash để phản hồi nhanh, không bị ăn hết token trả lời
+    if (/gemini-3(?:\.\d+)?-flash(?:-preview)?$/i.test(modelName) && !/lite/i.test(modelName)) {
+        cfg.thinkingConfig = { thinkingLevel: 'minimal' };
+    }
+    return cfg;
 }
 
 function getAiServiceStatus() {
     const hasKey = isApiKeyConfigured();
     const activeModels = TEXT_CHAT_MODELS.filter(isModelAvailable);
+    const activeNluModels = NLU_MODELS.filter(isModelAvailable);
     const activeVisionModels = VISION_MODELS.filter(isModelAvailable);
     return {
         configured: hasKey,
         provider: hasKey ? 'gemini' : 'deterministic_engine',
         model: hasKey ? (activeModels[0] || DEFAULT_MODEL) : 'none',
+        nluModel: hasKey ? (activeNluModels[0] || NLU_MODELS[0]) : 'none',
         visionModel: hasKey ? (activeVisionModels[0] || VISION_MODELS[0]) : 'none',
         candidateModels: TEXT_CHAT_MODELS,
+        nluModels: NLU_MODELS,
         visionModels: VISION_MODELS,
         maxHistoryTurns: MAX_HISTORY_TURNS,
         timeoutMs: REQUEST_TIMEOUT_MS
@@ -195,6 +235,18 @@ function formatLongTermMemoryBlock(context = {}) {
     if (profile.occupationOrRole) {
         parts.push(`• Nghề nghiệp / Đối tượng khách hàng: ${profile.occupationOrRole}`);
     }
+    if (profile.buyingFor) {
+        parts.push(`• Người sử dụng cuối / Mục đích mua: ${profile.buyingFor}`);
+    }
+    if (profile.preferredPaymentMethod) {
+        parts.push(`• Hình thức thanh toán quan tâm: ${profile.preferredPaymentMethod}`);
+    }
+    if (profile.customerMood) {
+        parts.push(`• Tâm lý / Trạng thái khách hiện tại: ${profile.customerMood}`);
+    }
+    if (Array.isArray(profile.objectionsRaised) && profile.objectionsRaised.length > 0) {
+        parts.push(`• Rào cản / Băn khoăn khách đã nêu trước đó: ${profile.objectionsRaised.join('; ')} (Lưu ý giải tỏa khéo léo, tận tâm)`);
+    }
     if (Array.isArray(profile.ownedDevices) && profile.ownedDevices.length > 0) {
         parts.push(`• Thiết bị khách đang sở hữu: ${profile.ownedDevices.join(', ')} (Ưu tiên tư vấn hệ sinh thái đồng bộ & tương thích)`);
     }
@@ -211,6 +263,9 @@ function formatLongTermMemoryBlock(context = {}) {
     if (Array.isArray(profile.keyPriorities) && profile.keyPriorities.length > 0) {
         parts.push(`• Tiêu chí ưu tiên xuyên suốt phiên chat: ${profile.keyPriorities.join(', ')}`);
     }
+    if (Array.isArray(profile.shortlistedProducts) && profile.shortlistedProducts.length > 0) {
+        parts.push(`• Mẫu khách từng ưng ý / đưa vào cân nhắc: ${profile.shortlistedProducts.map(s => s.name).filter(Boolean).join(', ')}`);
+    }
     const visualDevices = context.lastVisualDevices || profile.lastVisualDevices;
     if (Array.isArray(visualDevices) && visualDevices.length > 0) {
         parts.push(`• Thiết bị trong ảnh khách vừa gửi tìm kiếm: ${visualDevices.map(d => `${d.name}${d.brand ? ` (${d.brand})` : ''}`).join(', ')}`);
@@ -218,6 +273,9 @@ function formatLongTermMemoryBlock(context = {}) {
     if (Array.isArray(context.lastProducts) && context.lastProducts.length > 0) {
         const names = context.lastProducts.slice(0, 5).map((p, idx) => `#${idx + 1}: ${p.name || p}`).join(' | ');
         parts.push(`• Sản phẩm vừa hiển thị/đề cập ngay trước đó: ${names}`);
+    }
+    if (Number(profile.recurringVisitCount || 1) > 1) {
+        parts.push(`• Khách hàng thân thiết quay lại (lần #${profile.recurringVisitCount}) — chào đón ấm áp, liền mạch!`);
     }
 
     return parts.length > 0 ? parts.join('\n') : 'Chưa có thông tin bộ nhớ dài hạn trước đó.';
@@ -231,7 +289,8 @@ async function callGeminiText({
     history = [],
     userPrompt = '',
     temperature = 0.35,
-    maxOutputTokens = 2048,
+    maxOutputTokens = 2800,
+    responseMimeType = '',
     candidateModels = TEXT_CHAT_MODELS,
     timeoutMs = REQUEST_TIMEOUT_MS
 }) {
@@ -248,11 +307,11 @@ async function callGeminiText({
         try {
             const payload = {
                 contents,
-                generationConfig: {
+                generationConfig: buildGenerationConfigForModel(currentModel, {
                     temperature,
-                    topP: 0.9,
-                    maxOutputTokens
-                }
+                    maxOutputTokens,
+                    responseMimeType
+                })
             };
             if (systemInstruction && systemInstruction.trim()) {
                 payload.system_instruction = {
@@ -260,18 +319,34 @@ async function callGeminiText({
                 };
             }
 
-            const response = await axios.post(
-                `${GEMINI_API_URL}/${currentModel}:generateContent?key=${apiKey}`,
-                payload,
-                {
-                    timeout: timeoutMs,
-                    headers: { 'Content-Type': 'application/json' }
+            let response;
+            try {
+                response = await axios.post(
+                    `${GEMINI_API_URL}/${currentModel}:generateContent?key=${apiKey}`,
+                    payload,
+                    {
+                        timeout: timeoutMs,
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                );
+            } catch (firstErr) {
+                // Nếu endpoint 400 do thinkingConfig, thử lại 1 lần bỏ thinkingConfig
+                if (firstErr.response?.status === 400 && payload.generationConfig.thinkingConfig) {
+                    delete payload.generationConfig.thinkingConfig;
+                    response = await axios.post(
+                        `${GEMINI_API_URL}/${currentModel}:generateContent?key=${apiKey}`,
+                        payload,
+                        {
+                            timeout: timeoutMs,
+                            headers: { 'Content-Type': 'application/json' }
+                        }
+                    );
+                } else {
+                    throw firstErr;
                 }
-            );
+            }
 
-            const parts = response.data?.candidates?.[0]?.content?.parts || [];
-            const generatedText = parts.map(p => p.text || '').join('').trim();
-
+            const generatedText = extractGeminiResponseText(response.data);
             if (generatedText) {
                 return {
                     text: generatedText,
@@ -282,8 +357,9 @@ async function callGeminiText({
             }
         } catch (err) {
             const status = err.response?.status;
-            markModelCooldown(currentModel, status);
-            console.warn(`[aiModelService] Model ${currentModel} failed (status=${status || 'timeout'}): ${err.message}`);
+            const errMsg = err.response?.data?.error?.message || err.message;
+            markModelCooldown(currentModel, status, errMsg);
+            console.warn(`[aiModelService] Model ${currentModel} failed (status=${status || 'timeout'}): ${errMsg}`);
         }
     }
 
@@ -293,6 +369,98 @@ async function callGeminiText({
         model: modelsToTry[0] || DEFAULT_MODEL,
         isFallback: true
     };
+}
+
+/**
+ * Phân tích ngữ nghĩa câu hỏi tự nhiên bằng LLM tốc độ cao (Gemini 3.1 Flash-Lite)
+ * Hiểu ngôn ngữ đời thường, tiếng lóng Việt ("củ", "xị", "bỏ cốp xe", "con thứ 2", "màu đen còn không")
+ */
+async function understandCustomerQuery({ message, context = {}, history = [] }) {
+    if (!isApiKeyConfigured() || !message || String(message).trim().length < 2) {
+        return null;
+    }
+
+    const memoryBlock = formatLongTermMemoryBlock(context);
+    const lastProductsSummary = Array.isArray(context.lastProducts) && context.lastProducts.length > 0
+        ? context.lastProducts.slice(0, 5).map((p, i) => `#${i + 1}: ${p.name} (${p.category || ''}, ${Number(p.price || 0).toLocaleString('vi-VN')}đ)`).join('\n')
+        : 'Không có';
+
+    const systemInstruction = `Bạn là bộ phân tích ngữ nghĩa NLU cho Trợ lý bán hàng cửa hàng công nghệ Việt Nam (7 danh mục chuẩn: "Điện thoại", "Laptop", "Tablet", "Tai nghe", "Đồng hồ thông minh", "Phụ kiện", "Máy chơi game").
+Nhiệm vụ: Đọc câu hỏi của khách hàng + bộ nhớ + các sản phẩm vừa hiển thị để hiểu chính xác khách đang muốn gì và trả về DUY NHẤT 1 object JSON hợp lệ (không thêm markdown).
+Quy tắc:
+- Quy đổi tiếng Việt tự nhiên/lóng: "củ"/"củ rưỡi"/"tr"/"m" -> triệu VND (1 củ = 1000000), "xị" -> trăm nghìn (5 xị = 500000).
+- Nếu khách hỏi nối tiếp về sản phẩm vừa xem ("con đầu", "mẫu 2", "cái đó", "màu khác", "pin trâu không?"), đặt "referencedProductIndex" (1..5).
+- "rewrittenSearchQuery": viết chuỗi từ khóa tìm kiếm giàu ngữ nghĩa (VD: "đi grab ngoài trời nắng" -> "điện thoại màn hình sáng pin trâu 5000mAh", "nhẹ bỏ cốp xe" -> "laptop 13 14 inch mỏng nhẹ").
+- Nếu là "objection"/"hesitation" (ngại đắt, so sánh sàn TMĐT, về hỏi gia đình, lo hàng lỗi), đặt đúng intent để tư vấn viên xử lý khéo léo.`;
+
+    const userPrompt = `[NGỮ CẢNH BỘ NHỚ]:
+${memoryBlock}
+- Danh mục đang mở: ${context.category || context.pageCategory || 'Tất cả'}
+
+[SẢN PHẨM VỪA HIỂN THỊ]:
+${lastProductsSummary}
+
+[TIN NHẮN KHÁCH HÀNG]:
+"${String(message).slice(0, 500)}"
+
+Trả về đúng JSON schema:
+{
+  "intent": "recommend|compare|product_qa|objection|installment|trade_in|policy_service|compatibility|hesitation|chit_chat|clarify",
+  "category": "Điện thoại|Laptop|Tablet|Tai nghe|Đồng hồ thông minh|Phụ kiện|Máy chơi game|",
+  "brand": "",
+  "excludedBrand": "",
+  "budgetVnd": 0,
+  "budgetType": "hard|flexible|unspecified",
+  "useCase": "",
+  "priorities": [],
+  "buyingFor": "",
+  "paymentPreference": "",
+  "objection": "",
+  "referencedProductIndex": 0,
+  "rewrittenSearchQuery": "",
+  "customerMood": "normal|hesitant|price_sensitive|urgent|curious|grateful"
+}`;
+
+    const res = await callGeminiText({
+        systemInstruction,
+        history: (history || []).slice(-6),
+        userPrompt,
+        temperature: 0.1,
+        maxOutputTokens: 500,
+        responseMimeType: 'application/json',
+        candidateModels: NLU_MODELS,
+        timeoutMs: NLU_TIMEOUT_MS
+    });
+
+    if (!res || !res.text) return null;
+    try {
+        const cleanJson = res.text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+        const match = cleanJson.match(/\{[\s\S]*\}/);
+        if (!match) return null;
+        const parsed = JSON.parse(match[0]);
+        if (!parsed || typeof parsed !== 'object') return null;
+
+        const validCategories = new Set(['Điện thoại', 'Laptop', 'Tablet', 'Tai nghe', 'Đồng hồ thông minh', 'Phụ kiện', 'Máy chơi game']);
+        return {
+            model: res.model,
+            intent: String(parsed.intent || 'recommend').trim(),
+            category: validCategories.has(parsed.category) ? parsed.category : '',
+            brand: String(parsed.brand || '').trim(),
+            excludedBrand: String(parsed.excludedBrand || '').trim(),
+            budgetVnd: Number.isFinite(Number(parsed.budgetVnd)) && Number(parsed.budgetVnd) >= 100000 ? Math.round(Number(parsed.budgetVnd)) : 0,
+            budgetType: ['hard', 'flexible', 'unspecified'].includes(parsed.budgetType) ? parsed.budgetType : 'unspecified',
+            useCase: String(parsed.useCase || '').trim(),
+            priorities: Array.isArray(parsed.priorities) ? parsed.priorities.map(x => String(x || '').trim()).filter(Boolean).slice(0, 6) : [],
+            buyingFor: String(parsed.buyingFor || '').trim(),
+            paymentPreference: String(parsed.paymentPreference || '').trim(),
+            objection: String(parsed.objection || '').trim(),
+            referencedProductIndex: Number.isInteger(Number(parsed.referencedProductIndex)) ? Number(parsed.referencedProductIndex) : 0,
+            rewrittenSearchQuery: String(parsed.rewrittenSearchQuery || '').trim(),
+            customerMood: String(parsed.customerMood || 'normal').trim()
+        };
+    } catch (_) {
+        return null;
+    }
 }
 
 /**
@@ -427,11 +595,18 @@ async function generateGroundedConsultation({
 - Sau bảng, BẮT BUỘC dùng dòng tiêu đề in hoa:
   🔍 **PHÂN TÍCH ĐÁNH ĐỔI & ĐIỂM KHÁC BIỆT:**
   và đưa ra "**KẾT LUẬN CHỌN MUA RÕ RÀNG**".`;
-    } else if (dialogueAct === 'exact_lookup' || dialogueAct === 'product_qa') {
+    } else if (dialogueAct === 'product_qa') {
+        actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (TRẢ LỜI TRỰC DIỆN CÂU HỎI KỸ THUẬT / ĐỘ BỀN / CHI TIẾT VỀ SẢN PHẨM ĐANG XEM):
+- Trả lời THẲNG và CHÍNH XÁC ngay ở 1–2 câu đầu tiên vào đúng câu hỏi cụ thể của khách hàng ("${userMessage}"), tuyệt đối KHÔNG nói chung chung né câu hỏi hoặc lặp lại nguyên bài giới thiệu quảng cáo dài dòng!
+- Đối chiếu kỹ [DỮ LIỆU CATALOG XÁC MINH] và [DỮ LIỆU TRI THỨC RAG CỬA HÀNG]:
+  + Nếu khách hỏi một thông số kỹ thuật sâu mà nhà sản xuất KHÔNG công bố định mức chính thức bằng con số (ví dụ: số vòng quay tối đa của con lăn chuột, số lần gập/mở chính xác của bản lề laptop phổ thông, số lần cắm rút cổng...), BẮT BUỘC phải nói rõ trung thực rằng nhà sản xuất không công bố định mức con số đó (tuyệt đối KHÔNG tự bịa ra con số), đồng thời giải thích cơ chế cấu tạo thực tế của linh kiện đó và cung cấp các thông số độ bền được hãng công bố liên quan (ví dụ: độ bền switch phím nhấn, chất liệu feet, cảm biến/IPS, độ bền pin sạc, chuẩn kháng nước IP...).
+  + Giải thích dễ hiểu bằng tiếng Việt về tuổi thọ sử dụng thực tế nhiều năm, mẹo giữ bền và chính sách bảo hành chính hãng / lỗi 1 đổi 1 trong 30 ngày tại cửa hàng em.
+- Độ dài súc tích 120–240 từ, kết thúc bằng 1 câu gợi mở thân thiện.`;
+    } else if (dialogueAct === 'exact_lookup') {
         actSpecificInstruction = `NHIỆM VỤ CỤ THỂ (TƯ VẤN CHUYÊN SÂU & THUYẾT PHỤC VỀ SẢN PHẨM):
 - Mở đầu bằng 1 - 2 câu trả lời trực tiếp, tự nhiên và giàu tính thuyết phục vào câu hỏi của khách hàng ("${userMessage}").
 - Tiếp theo, phân tích bằng gạch đầu dòng rõ ràng:
-  + **Ưu điểm & Hiệu năng thực tế**: Chip xử lý, màn hình, RAM, pin mang lại trải nghiệm mượt mà 4 - 5 năm ra sao.
+  + **Ưu điểm & Hiệu năng thực tế**: Chip/cảm biến, màn hình, pin hoặc tính năng cốt lõi mang lại trải nghiệm mượt mà 4 - 5 năm ra sao.
   + **Đối tượng & Nhu cầu phù hợp**: Thích hợp cho ai, công việc/tác vụ gì.
   + **Quyền lợi & Giá trị đầu tư**: Giá bán ưu đãi, trả góp 0%, mã giảm giá (nếu có trong dữ liệu RAG) và bảo hành 1 đổi 1 trong 30 ngày.
   + **Đánh giá khách quan**: Điểm đánh đổi chân thực để khách an tâm quyết định.
@@ -453,17 +628,17 @@ async function generateGroundedConsultation({
 - Phần cuối bắt buộc có tiêu đề "**GỢI Ý QUYẾT ĐỊNH CHO BẠN:**" đưa ra lời khuyên có điều kiện rõ ràng (Nếu ưu tiên A -> Chọn Máy 1; Nếu ưu tiên B -> Chọn Máy 2).`;
     }
 
-    const systemInstruction = `Bạn là Chuyên gia Tư vấn Mua sắm Công nghệ cấp cao (AI Smart Consultant) của hệ thống bán lẻ công nghệ. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em' hoặc 'hệ thống cửa hàng'. Tuyệt đối KHÔNG dùng từ tiếng Anh 'TechEcommerce' trong câu trả lời khách hàng.
+    const systemInstruction = `Bạn là Nhân viên Tư vấn Công nghệ giỏi nghề, tận tâm và giàu kinh nghiệm thực tế đứng tại showroom (AI Senior Store Consultant). Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối KHÔNG dùng từ tiếng Anh 'TechEcommerce' trong câu trả lời khách hàng.
 THÔNG TIN CỐ ĐỊNH CỦA CỬA HÀNG:
 • Showroom: 78 Nguyễn Văn Khối, Quận Gò Vấp, TP.HCM (Mở cửa 08:30 – 21:30 hàng ngày). Hotline/Zalo: 0842.331.606.
-• Cam kết: 100% hàng mới nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12–24 tháng, giao hỏa tốc 2H nội thành, đồng kiểm COD, xuất hóa đơn VAT, trả góp 0% qua thẻ tín dụng hoặc CCCD.
+• Cam kết & Dịch vụ: 100% hàng mới nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12–24 tháng, giao hỏa tốc 2H nội thành, đồng kiểm mở hộp COD, xuất hóa đơn VAT, trả góp 0% qua thẻ tín dụng hoặc CCCD, chuyển dữ liệu Zalo/ảnh & cài app miễn phí, gói quà tặng miễn phí, giữ máy showroom 24h không cọc.
 
 NGUYÊN TẮC CỐT LÕI BẮT BUỘC:
 1. CHỈ ĐƯỢC PHÉP sử dụng tên sản phẩm, giá bán, tồn kho, mã giảm giá và thông số kỹ thuật có trong [DỮ LIỆU CATALOG XÁC MINH] và [DỮ LIỆU TRI THỨC RAG CỬA HÀNG].
 2. TUYỆT ĐỐI KHÔNG tự bịa sản phẩm ngoài danh sách, không bịa mã giảm giá hay thông số sai lệch.
-3. Ghi nhớ và tận dụng triệt để [BỘ NHỚ DÀI HẠN CỦA KHÁCH HÀNG] + lịch sử hội thoại nhiều lượt để hiểu ngữ cảnh ("máy này", "mẫu trên", "con thứ 2", "ảnh vừa gửi", "hãng không thích", "máy đang dùng").
-4. Quy đổi cấu hình sang trải nghiệm thực tế dễ hiểu (FPS game, độ bền 4–5 năm, mỏi mắt, trọng lượng mang đi học/đi làm).
-5. Quy tắc xưng hô nhất quán: Luôn xưng là "em" và gọi khách hàng là "bạn". Tuyệt đối KHÔNG xưng "mình", "tụi mình", "chúng mình".
+3. Tận dụng triệt để [BỘ NHỚ DÀI HẠN CỦA KHÁCH HÀNG] + lịch sử nhiều lượt: nhớ khách mua cho ai (buyingFor), làm nghề gì (occupationOrRole), đang sở hữu máy gì (ownedDevices), từng băn khoăn gì (objectionsRaised), mẫu từng ưng (shortlistedProducts), hãng không thích (dislikedBrands), hoặc hỏi tiếp về "con đầu / mẫu 2 / ảnh vừa gửi". Tuyệt đối KHÔNG tự bịa/gán ghép nghề nghiệp cho khách nếu khách chưa tự nói.
+4. Tư vấn có tâm như nhân viên thực thụ: quy đổi thông số thành lợi ích đời thực (độ sáng đi nắng, trọng lượng bỏ cốp xe/balo, FPS game, độ bền 4–5 năm, chống mỏi mắt), nói thật cả điểm mạnh lẫn đánh đổi, nhắc dịch vụ miễn phí phù hợp hoàn cảnh (chuyển dữ liệu, gói quà, trả góp, hỏa tốc 2H).
+5. Quy tắc xưng hô nhất quán: Luôn xưng là "em" và gọi khách hàng là "bạn" (hoặc "anh/chị" nếu khách tự xưng anh/chị). Tuyệt đối KHÔNG xưng "mình", "tụi mình", "chúng mình".
 6. Trình bày tiếng Việt chuẩn, có emoji tinh tế, in đậm **tên máy**, **giá tiền**, độ dài khoảng 160–340 từ trọn vẹn câu.
 
 ${actSpecificInstruction}`;
@@ -492,7 +667,7 @@ Hãy trả lời chuyên nghiệp, tận tâm, bám sát trí nhớ và dữ li�
         history: context.conversationHistory || [],
         userPrompt,
         temperature: 0.35,
-        maxOutputTokens: 2048
+        maxOutputTokens: 2800
     });
 
     if (aiResult.text) {
@@ -570,18 +745,17 @@ async function generateConversationalResponse({
     const longTermMemoryText = formatLongTermMemoryBlock(context);
     const ragEvidenceText = context.ragEvidenceText || '';
 
-    const systemInstruction = `Bạn là Trợ lý AI Mua sắm thông minh, hóm hỉnh và tận tâm của hệ thống bán lẻ công nghệ. Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối KHÔNG dùng từ 'TechEcommerce' trong câu trả lời khách hàng.
-THÔNG TIN VỀ CỬA HÀNG:
+    const systemInstruction = `Bạn là Nhân viên Tư vấn Công nghệ giỏi nghề, tận tâm và giàu kinh nghiệm thực chiến đứng trực tiếp tại cửa hàng (AI Senior Store Consultant). Luôn gọi cửa hàng bằng tiếng Việt tự nhiên như 'cửa hàng em', 'shop em', 'bên em'. Tuyệt đối KHÔNG dùng từ 'TechEcommerce' trong câu trả lời khách hàng.
+THÔNG TIN CỐ ĐỊNH CỦA CỬA HÀNG:
 • Showroom: 78 Nguyễn Văn Khối, Quận Gò Vấp, TP.HCM (Mở cửa 08:30 – 21:30 hàng ngày). Hotline/Zalo: 0842.331.606.
-• Cam kết: 100% hàng mới chính hãng nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12–24 tháng.
-• Dịch vụ: Hóa đơn VAT doanh nghiệp, Thu cũ đổi mới trợ giá đến 2.000.000 đ, Trả góp 0% qua thẻ tín dụng & CCCD gắn chip, Đồng kiểm COD khi nhận hàng, Giao hỏa tốc 2 giờ nội thành.
+• Cam kết: 100% hàng mới chính hãng nguyên seal (mã VN/A với Apple), lỗi 1 đổi 1 trong 30 ngày, bảo hành chính hãng 12–24 tháng, hỗ trợ chuyển dữ liệu & cài app miễn phí tại quầy hoặc từ xa.
 
-TÍNH CÁCH & NGUYÊN TẮC:
-1. Tự nhiên, ấm áp, duyên dáng như chuyên viên tư vấn thật sự; tuyệt đối không trả lời máy móc hay spam bán hàng.
-2. Khi khách hỏi vui, đố mẹo, hỏi toán, hỏi thăm đời thường: đối đáp thông minh, dí dỏm, thấu hiểu cảm xúc rồi mở lời sẵn sàng giúp nếu cần.
-3. Khi khách hỏi kiến thức/mẹo công nghệ hay câu hỏi tư vấn ngoài mẫu có sẵn: dùng [TRI THỨC RAG] và kiến thức chuyên gia công nghệ giải đáp chuẩn xác, thực tế, dễ hiểu.
-4. Nhớ ngữ cảnh các lượt trước trong [BỘ NHỚ DÀI HẠN] & lịch sử trò chuyện.
-5. Luôn xưng là "em" và gọi khách hàng là "bạn". Không bịa đặt giá bán hay mã giảm giá không có trong dữ liệu. Trả lời súc tích (2–5 câu hoặc gạch đầu dòng ngắn gọn nếu là câu hỏi kỹ thuật).`;
+PHONG CÁCH TƯ VẤN NHƯ NHÂN VIÊN THẬT TẠI QUẦY:
+1. Lắng nghe & thấu hiểu cảm xúc thật của khách hàng từ [BỘ NHỚ DÀI HẠN] (mua tặng ai, từng băn khoăn giá/độ bền, cần gấp, đang dùng máy gì) trước khi tư vấn.
+2. Tư vấn có tâm — nói rõ ưu điểm VÀ điểm cân nhắc để khách thấy đáng tin, tuyệt đối không ép mua hay văn mẫu sáo rỗng.
+3. Chủ động nhắc dịch vụ gia tăng thiết thực khi đúng tình huống (chuyển danh bạ Zalo miễn phí, gói quà tặng kèm thiệp, giữ hàng showroom 24h, trả góp 0% thẻ/CCCD, xuất VAT).
+4. Khi khách hỏi vui, đố mẹo, hỏi toán: đối đáp thông minh, dí dỏm rồi nhẹ nhàng quay lại hỗ trợ nếu khách cần.
+5. Luôn xưng "em", gọi khách là "bạn" (hoặc "anh/chị" nếu khách xưng tương ứng). Chỉ nêu tên máy, giá tiền và mã giảm giá có trong [DỮ LIỆU] / [TRI THỨC RAG]. Trả lời súc tích, dễ đọc.`;
 
     const userPrompt = `[BỘ NHỚ DÀI HẠN]:
 ${longTermMemoryText}
@@ -600,7 +774,7 @@ Hãy phản hồi tự nhiên, thông minh và hữu ích nhất:`;
         history: context.conversationHistory || [],
         userPrompt,
         temperature: 0.65,
-        maxOutputTokens: 1500
+        maxOutputTokens: 2400
     });
 
     if (aiResult.text) {
@@ -622,10 +796,12 @@ Hãy phản hồi tự nhiên, thông minh và hữu ích nhất:`;
 
 module.exports = {
     TEXT_CHAT_MODELS,
+    NLU_MODELS,
     VISION_MODELS,
     MAX_HISTORY_TURNS,
     isApiKeyConfigured,
     callGeminiText,
+    understandCustomerQuery,
     analyzeProductImage,
     generateGroundedConsultation,
     generateConversationalResponse,

@@ -33,7 +33,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>TechEcommerce - Cửa hàng công nghệ</title>
   <link rel="stylesheet" href="assets/css/style.css?v=20261116-modern-cat-v5" />
-  <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261116-mobile-fix-v3" />
+  <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261117-cart-voucher-v4" />
   <link rel="stylesheet" href="assets/css/chatbox.css?v=20261116-mobile-fix-v3" data-ai-chat-style="true" />
   <link rel="stylesheet" href="assets/css/exit-intent.css?v=20261111-v1" />
   <link rel="stylesheet" href="assets/css/mascot.css?v=20261116-mobile-fix-v3" data-tm-mascot-style="true" />
@@ -1019,98 +1019,158 @@
           <!-- Right: Order Summary Card -->
           <aside class="cart-summary-column" aria-label="Tóm tắt đơn hàng">
             <section class="cart-summary-card">
-              <h3 class="cart-summary-heading">Tóm tắt đơn hàng</h3>
+              <header class="cart-summary-header">
+                <h3 class="cart-summary-heading">Tóm tắt đơn hàng</h3>
+                <span class="cart-summary-secure-badge">🔒 Bảo mật</span>
+              </header>
 
               <dl class="cart-price-summary">
                 <div class="cart-price-row">
-                  <dt>Tạm tính:</dt>
+                  <dt>Tạm tính</dt>
                   <dd><strong id="cartSubtotal">0 đ</strong></dd>
                 </div>
-                <div class="cart-price-row" id="cartDiscountRow" style="display: none; color: var(--success);">
-                  <dt>Giảm giá:</dt>
+                <div class="cart-price-row cart-discount-row" id="cartDiscountRow" style="display: none;">
+                  <dt>Giảm giá voucher</dt>
                   <dd><strong id="cartDiscount">-0 đ</strong></dd>
                 </div>
                 <div class="cart-price-row">
-                  <dt>Phí vận chuyển:</dt>
+                  <dt>Phí vận chuyển</dt>
                   <dd><span class="shipping-hint-text" id="cartShippingPreview">Tính ở bước thanh toán</span></dd>
                 </div>
+              </dl>
+
+              <!-- Coupon Code Input & Voucher Selector -->
+              <fieldset class="cart-coupon-fieldset u230-box" id="u230CouponBox">
+                <legend class="sr-only">Mã khuyến mãi</legend>
+                <div class="coupon-header-row">
+                  <label for="couponCode" class="coupon-label">🎟️ Mã giảm giá &amp; Voucher</label>
+                  <span class="coupon-count-badge">4 ưu đãi</span>
+                </div>
+
+                <div class="coupon-input-group u230-rw u230-input-wrap" id="u230InputWrap">
+                  <input id="couponCode" class="u230-in" type="text" placeholder="Nhập mã (VD: TECH10)"
+                    autocomplete="off" />
+                  <button type="button" class="btn-coupon-apply u230-ap u230-apply-btn" id="applyCouponBtn"
+                    onclick="applyCoupon()">
+                    <span class="u230-btn-txt">Áp dụng</span>
+                    <i class="u230-btn-spin" aria-hidden="true"></i>
+                  </button>
+                </div>
+
+                <div class="u230-applied-pill" id="u230AppliedPill" hidden>
+                  <span class="u230-pill-tag" id="u230PillCode">TECH10</span>
+                  <span class="u230-pill-status">Đã áp dụng</span>
+                  <strong class="u230-pill-disc" id="u230PillDiscount">-0 đ</strong>
+                  <button type="button" class="u230-pill-rm" onclick="removeAppliedCoupon()"
+                    aria-label="Gỡ mã giảm giá">×</button>
+                </div>
+
+                <p id="couponHint" class="coupon-hint-text" aria-live="polite"></p>
+
+                <ul class="u298-tickets-list" id="u298TicketsList" aria-label="Danh sách voucher có sẵn">
+                  <li class="u298-ticket" data-coupon="TECH10">
+                    <div class="u298-ticket-main">
+                      <div class="u298-ticket-top">
+                        <span class="u298-code">TECH10</span>
+                        <strong class="u298-off">Giảm 10%</strong>
+                      </div>
+                      <span class="u298-cond">Đơn từ 5Tr · Tối đa 1.5Tr</span>
+                    </div>
+                    <span class="u298-perf" aria-hidden="true"></span>
+                    <div class="u298-ticket-action">
+                      <button type="button" class="u298-tear-btn" onclick="tearAndApplyCoupon('TECH10', this)">
+                        <svg class="u298-check-ico" viewBox="0 0 16 16" aria-hidden="true">
+                          <path d="M3 8.5l3.2 3.2L13 5" />
+                        </svg>
+                        <span class="u298-btn-txt">Lấy mã</span>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="u298-ticket" data-coupon="LAPTOP500">
+                    <div class="u298-ticket-main">
+                      <div class="u298-ticket-top">
+                        <span class="u298-code">LAPTOP500</span>
+                        <strong class="u298-off">Giảm 500K</strong>
+                      </div>
+                      <span class="u298-cond">Áp dụng đơn từ 20Tr</span>
+                    </div>
+                    <span class="u298-perf" aria-hidden="true"></span>
+                    <div class="u298-ticket-action">
+                      <button type="button" class="u298-tear-btn" onclick="tearAndApplyCoupon('LAPTOP500', this)">
+                        <svg class="u298-check-ico" viewBox="0 0 16 16" aria-hidden="true">
+                          <path d="M3 8.5l3.2 3.2L13 5" />
+                        </svg>
+                        <span class="u298-btn-txt">Lấy mã</span>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="u298-ticket" data-coupon="TECHWELCOME">
+                    <div class="u298-ticket-main">
+                      <div class="u298-ticket-top">
+                        <span class="u298-code">TECHWELCOME</span>
+                        <strong class="u298-off">Giảm 100K</strong>
+                      </div>
+                      <span class="u298-cond">Mọi đơn hàng từ 500K</span>
+                    </div>
+                    <span class="u298-perf" aria-hidden="true"></span>
+                    <div class="u298-ticket-action">
+                      <button type="button" class="u298-tear-btn" onclick="tearAndApplyCoupon('TECHWELCOME', this)">
+                        <svg class="u298-check-ico" viewBox="0 0 16 16" aria-hidden="true">
+                          <path d="M3 8.5l3.2 3.2L13 5" />
+                        </svg>
+                        <span class="u298-btn-txt">Lấy mã</span>
+                      </button>
+                    </div>
+                  </li>
+                  <li class="u298-ticket" data-coupon="FREESHIP">
+                    <div class="u298-ticket-main">
+                      <div class="u298-ticket-top">
+                        <span class="u298-code">FREESHIP</span>
+                        <strong class="u298-off">Trợ giá 30K</strong>
+                      </div>
+                      <span class="u298-cond">Phí ship cho đơn từ 1Tr</span>
+                    </div>
+                    <span class="u298-perf" aria-hidden="true"></span>
+                    <div class="u298-ticket-action">
+                      <button type="button" class="u298-tear-btn" onclick="tearAndApplyCoupon('FREESHIP', this)">
+                        <svg class="u298-check-ico" viewBox="0 0 16 16" aria-hidden="true">
+                          <path d="M3 8.5l3.2 3.2L13 5" />
+                        </svg>
+                        <span class="u298-btn-txt">Lấy mã</span>
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              </fieldset>
+
+              <dl class="cart-grand-total-box">
                 <div class="cart-price-row total-row">
-                  <dt>Tổng thanh toán:</dt>
+                  <dt>Tổng thanh toán</dt>
                   <dd><strong class="cart-grand-amount" id="total">0 đ</strong></dd>
                 </div>
               </dl>
 
-              <!-- Coupon Code Input (Lucian #230 & #298) -->
-              <fieldset class="cart-coupon-fieldset u230-box" id="u230CouponBox">
-                <legend class="sr-only">Mã khuyến mãi</legend>
-                <label for="couponCode" class="coupon-label">Mã giảm giá &amp; Voucher</label>
-                <div class="coupon-input-group u230-rw">
-                  <input id="couponCode" class="u230-in" type="text" placeholder="Nhập mã (VD: TECH10)"
-                    autocomplete="off" />
-                  <button type="button" class="btn-coupon-apply u230-ap" id="btnCouponApply"
-                    onclick="applyCoupon()"><span>Áp dụng</span><i aria-hidden="true"></i></button>
-                </div>
-                <div class="u230-applied-pill" id="u230AppliedPill" hidden>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2.2"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M2.5 7.5l3 3 6-6.5" />
-                  </svg>
-                  <span id="u230AppliedLabel">TECH10</span>
-                  <button type="button" class="u230-rm-btn" onclick="removeAppliedCoupon()"
-                    aria-label="Gỡ mã giảm giá">×</button>
-                </div>
-                <p id="couponHint" class="coupon-hint-text" aria-live="polite"></p>
-                <!-- Lucian UX/UI Prompt #298 · Tear-off Discount Coupons -->
-                <div class="u298-tickets-list" id="u298TicketsList" aria-label="Danh sách voucher có sẵn">
-                  <div class="u298-ticket" data-coupon-code="TECH10">
-                    <div class="u298-ticket-main">
-                      <strong>TECH10</strong>
-                      <small>Giảm 10% (Tối đa 1.5Tr · Đơn từ 5Tr)</small>
-                    </div>
-                    <button type="button" class="u298-ticket-stub" onclick="tearAndApplyCoupon('TECH10', this)">
-                      <span>Lấy mã</span>
-                    </button>
-                  </div>
-                  <div class="u298-ticket" data-coupon-code="LAPTOP500">
-                    <div class="u298-ticket-main">
-                      <strong>LAPTOP500</strong>
-                      <small>Giảm 500K (Đơn từ 20Tr)</small>
-                    </div>
-                    <button type="button" class="u298-ticket-stub" onclick="tearAndApplyCoupon('LAPTOP500', this)">
-                      <span>Lấy mã</span>
-                    </button>
-                  </div>
-                  <div class="u298-ticket" data-coupon-code="FREESHIP">
-                    <div class="u298-ticket-main">
-                      <strong>FREESHIP</strong>
-                      <small>Trợ giá 30K vận chuyển (Đơn từ 1Tr)</small>
-                    </div>
-                    <button type="button" class="u298-ticket-stub" onclick="tearAndApplyCoupon('FREESHIP', this)">
-                      <span>Lấy mã</span>
-                    </button>
-                  </div>
-                </div>
-              </fieldset>
-
               <!-- Proceed to Checkout Button -->
-              <button type="button" class="btn-proceed-checkout" id="proceedToCheckoutBtn" onclick="goToCartStep(2)">
-                Tiến hành thanh toán
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </button>
+              <footer class="cart-summary-actions">
+                <button type="button" class="btn-proceed-checkout" id="proceedToCheckoutBtn" onclick="goToCartStep(2)">
+                  Tiến hành thanh toán
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
 
-              <button type="button" class="btn-continue-shopping" onclick="closeCartDrawer()">
-                ← Tiếp tục mua sắm
-              </button>
+                <button type="button" class="btn-continue-shopping" onclick="closeCartDrawer()">
+                  ← Tiếp tục mua sắm
+                </button>
+              </footer>
 
               <!-- Trust badges -->
               <ul class="cart-trust-badges" aria-label="Cam kết cửa hàng">
                 <li><span>🛡️</span> 100% Hàng chính hãng</li>
                 <li><span>⚡</span> Giao nhanh toàn quốc</li>
-                <li><span>🔄</span> Đổi trả trong 7 ngày</li>
+                <li><span>🔄</span> Đổi trả trong 30 ngày</li>
               </ul>
             </section>
           </aside>
@@ -1516,7 +1576,7 @@
     </a>
   </aside>
 
-  <script src="assets/js/shop.js?v=20261116-cat-consult-v4"></script>
+  <script src="assets/js/shop.js?v=20261117-cart-voucher-v1"></script>
   <script src="assets/js/buy-now-sticker.js?v=20261109-playful-cat-v1"></script>
   <script src="assets/js/footer.js?v=20261109-contact-v3"></script>
   <script src="assets/js/mascot.js?v=20261109-playful-cat-v1"></script>

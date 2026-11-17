@@ -54,7 +54,7 @@ function extractMemorySignals(message = '', context = {}, response = null) {
     let occupationOrRole = prevProfile.occupationOrRole || '';
     const roleMap = [
         [/ke toan|tai chinh|kiem toan|excel|misa/, 'Kế toán / Tài chính'],
-        [/lap trinh|developer|code|cntt|phan mem|ky su it|machine learning|data science/, 'Lập trình viên / Sinh viên CNTT'],
+        [/\b(lap trinh vien|hoc lap trinh|nganh lap trinh|developer|coder|viet code|cntt|ky su phan mem|nganh phan mem|phat trien phan mem|ky su it|machine learning|data science)\b/, 'Lập trình viên / Sinh viên CNTT'],
         [/giao vien|giang vien|day hoc|giao an|thuyet trinh/, 'Giáo viên / Giảng viên'],
         [/bac si|y khoa|duoc si|benh vien|giai phau/, 'Bác sĩ / Sinh viên Y khoa'],
         [/sales|bat dong san|moi gioi|nhan vien kinh doanh|di gap khach/, 'Kinh doanh / Bất động sản'],
@@ -68,6 +68,55 @@ function extractMemorySignals(message = '', context = {}, response = null) {
             break;
         }
     }
+
+    // Đối tượng mua / Người sử dụng cuối (Quà tặng, bố mẹ, con cái, công ty...)
+    const llmMem = response?.context?.memoryProfile || {};
+    let buyingFor = llmMem.buyingFor || prevProfile.buyingFor || '';
+    const buyingForMap = [
+        [/\b(bo me|ba me|ong ba|phu huynh|nguoi gia|nguoi lon tuoi|me toi|bo toi|ba tui|ma tui)\b/, 'Bố mẹ / Người lớn tuổi'],
+        [/\b(con gai|con trai|cho be|cho con|tre em|hoc sinh tieu hoc|cap 1|cap 2)\b/, 'Con cái / Học sinh nhỏ'],
+        [/\b(nguoi yeu|ban gai|ban trai|vo|chong|ky niem|valentine|8\/3|20\/10)\b/, 'Vợ / Chồng / Người yêu (Quà tặng)'],
+        [/\b(tang sep|doi tac|khach hang|khai truong|qua tang)\b/, 'Quà tặng đối tác / Cấp trên'],
+        [/\b(cong ty|doanh nghiep|nhan vien|b2b|van phong cong ty)\b/, 'Doanh nghiệp / Công ty (B2B)']
+    ];
+    for (const [rx, label] of buyingForMap) {
+        if (rx.test(norm)) {
+            buyingFor = label;
+            break;
+        }
+    }
+
+    // Hình thức thanh toán / tài chính ưu tiên
+    let preferredPaymentMethod = llmMem.preferredPaymentMethod || prevProfile.preferredPaymentMethod || '';
+    if (/\b(cccd|can cuoc|khong can the|tai chinh|fe credit|home credit)\b/.test(norm)) {
+        preferredPaymentMethod = 'Trả góp CCCD gắn chip';
+    } else if (/\b(tra gop|gop 0|the tin dung|credit card)\b/.test(norm)) {
+        preferredPaymentMethod = 'Trả góp 0% thẻ tín dụng';
+    } else if (/\b(hoa don do|vat|mst|chuyen khoan cong ty)\b/.test(norm)) {
+        preferredPaymentMethod = 'Xuất hóa đơn VAT điện tử';
+    } else if (/\b(cod|dong kiem|nhan hang tra tien)\b/.test(norm)) {
+        preferredPaymentMethod = 'COD đồng kiểm mở hộp';
+    }
+
+    // Rào cản / Băn khoăn khách đã nêu để tư vấn viên ghi nhớ giải tỏa khéo léo
+    const objectionMap = [
+        [/\b(hoi vo|hoi chong|hoi ba me|hoi gia dinh|suy nghi them|can nhac)\b/, 'Cần hỏi ý kiến gia đình / suy nghĩ thêm'],
+        [/\b(dat qua|cao qua|vuot ngan sach|ngai gia|re hon|cho khac re)\b/, 'Nhạy cảm giá / So sánh giá nơi khác'],
+        [/\b(so loi|so chai pin|nong may|bao hanh kho|so hang dung)\b/, 'Lo ngại độ bền / bảo hành / nguồn gốc'],
+        [/\b(can gap|giao ngay|hom nay|bay gio|ship gap|chuyen bay)\b/, 'Cần nhận máy gấp trong ngày'],
+        [/\b(chuyen du lieu|zalo|danh ba|cai dat san|khong ranh cai)\b/, 'Cần hỗ trợ cài đặt & chuyển dữ liệu']
+    ];
+    const detectedObjections = [];
+    objectionMap.forEach(([rx, label]) => {
+        if (rx.test(norm)) detectedObjections.push(label);
+    });
+
+    // Tâm lý chung hiện tại của khách
+    let customerMood = prevProfile.customerMood || '';
+    if (/\b(cam on|tuyet voi|gioi qua|nhiet tinh|hay qua|ưng qua|de thuong)\b/.test(norm)) customerMood = 'happy';
+    else if (/\b(gap|nhanh|ngay|lien)\b/.test(norm)) customerMood = 'urgent';
+    else if (/\b(phan van|chua chac|so|ngai|ban khoan|khong biet)\b/.test(norm)) customerMood = 'hesitant';
+    else if (/\b(dat|re|bot|giam|sv|sinh vien|tiet kiem)\b/.test(norm)) customerMood = 'price_sensitive';
 
     // Thiết bị khách đã đang sở hữu (quan trọng để tư vấn đồng bộ hệ sinh thái)
     const ownedDetected = [];
@@ -146,6 +195,23 @@ function extractMemorySignals(message = '', context = {}, response = null) {
         }
     });
 
+    // Sản phẩm khách từng khen / chọn đưa vào danh sách cân nhắc (shortlist)
+    const existingShortlisted = Array.isArray(prevProfile.shortlistedProducts) ? prevProfile.shortlistedProducts : [];
+    const mergedShortlisted = [...existingShortlisted];
+    const isShortlistSignal = /\b(ung|thich|chot|chon con nay|lay con nay|khá ok|on ap|ok ne|duoc day|xem ky con)\b/i.test(norm);
+    const contextFocusedProduct = Array.isArray(context.lastProducts) && context.lastProducts[0] ? context.lastProducts[0] : null;
+    const candidateShortlist = newProducts[0] || contextFocusedProduct;
+    if (isShortlistSignal && candidateShortlist && candidateShortlist.name) {
+        const pid = String(candidateShortlist._id || candidateShortlist.id || '');
+        if (!mergedShortlisted.some(item => String(item.productId || '') === pid || item.name === candidateShortlist.name)) {
+            mergedShortlisted.push({
+                productId: pid,
+                name: candidateShortlist.name,
+                price: Number(candidateShortlist.price || 0)
+            });
+        }
+    }
+
     const lastVisualDevices = Array.isArray(response?.detectedDevices) && response.detectedDevices.length > 0
         ? response.detectedDevices.map(d => ({ name: d.name, category: d.category, brand: d.brand }))
         : (Array.isArray(context.lastVisualDevices) ? context.lastVisualDevices : (prevProfile.lastVisualDevices || []));
@@ -155,13 +221,19 @@ function extractMemorySignals(message = '', context = {}, response = null) {
         dislikedBrands,
         ownedDevices: uniquePush(prevProfile.ownedDevices, ownedDetected, 6),
         occupationOrRole,
-        keyPriorities: uniquePush(prevProfile.keyPriorities, detectedPriorities, 8),
+        buyingFor,
+        preferredPaymentMethod,
+        customerMood: llmMem.customerMood || customerMood,
+        objectionsRaised: uniquePush(prevProfile.objectionsRaised, [...detectedObjections, ...(Array.isArray(llmMem.objectionsRaised) ? llmMem.objectionsRaised : [])], 6),
+        keyPriorities: uniquePush(prevProfile.keyPriorities, [...detectedPriorities, ...(Array.isArray(llmMem.keyPriorities) ? llmMem.keyPriorities : [])], 8),
+        shortlistedProducts: mergedShortlisted.slice(-5),
         budgetMin,
         budgetMax,
         budgetStrict,
         lastVisualDevices,
         discussedProducts: mergedDiscussed.slice(-10),
-        turnCount: Number(prevProfile.turnCount || 0) + 1
+        turnCount: Number(prevProfile.turnCount || 0) + 1,
+        recurringVisitCount: Number(prevProfile.recurringVisitCount || 1)
     };
 }
 
@@ -169,11 +241,11 @@ function extractMemorySignals(message = '', context = {}, response = null) {
  * Nén các lượt hội thoại cũ thành bản tóm tắt gọn nhẹ (Tier 2 Rolling Summary)
  */
 function buildRollingSummary(existingSummary = '', archivedMessages = [], profile = {}) {
-    if (!Array.isArray(archivedMessages) || archivedMessages.length === 0) {
+    if ((!Array.isArray(archivedMessages) || archivedMessages.length === 0) && !profile.occupationOrRole && !profile.buyingFor) {
         return existingSummary || '';
     }
     const highlights = [];
-    archivedMessages.forEach(msg => {
+    (archivedMessages || []).forEach(msg => {
         if (msg.sender === 'user' && msg.text && !msg.text.startsWith('[Nội dung')) {
             const clean = String(msg.text).replace(/\s+/g, ' ').trim().slice(0, 110);
             highlights.push(`Khách hỏi: "${clean}"`);
@@ -183,9 +255,16 @@ function buildRollingSummary(existingSummary = '', archivedMessages = [], profil
         }
     });
 
-    const prefix = profile.occupationOrRole ? `Đối tượng: ${profile.occupationOrRole}. ` : '';
-    const merged = [existingSummary, ...highlights.slice(-4)].filter(Boolean).join(' | ');
-    return `${prefix}${merged}`.slice(-750).trim();
+    const factTags = [
+        profile.occupationOrRole ? `Đối tượng: ${profile.occupationOrRole}` : '',
+        profile.buyingFor ? `Mua cho: ${profile.buyingFor}` : '',
+        profile.preferredPaymentMethod ? `Thanh toán: ${profile.preferredPaymentMethod}` : '',
+        Array.isArray(profile.objectionsRaised) && profile.objectionsRaised.length ? `Băn khoăn: ${profile.objectionsRaised.join(', ')}` : ''
+    ].filter(Boolean).join('. ');
+
+    const body = highlights.slice(-4).join(' | ');
+    const merged = [factTags, existingSummary, body].filter(Boolean).join(' | ');
+    return merged.slice(-850).trim();
 }
 
 /**
@@ -198,6 +277,33 @@ async function hydrateContextWithSessionMemory(req, incomingContext = {}) {
     try {
         const session = await ChatSession.findOne({ sessionKey }).lean();
         if (!session) {
+            // Nếu là thành viên đã đăng nhập mở phiên chat mới, tự động kế thừa hồ sơ dài hạn từ phiên trước đó
+            if (req.user?._id) {
+                const priorSession = await ChatSession.findOne({
+                    customerId: req.user._id,
+                    sessionKey: { $ne: sessionKey }
+                }).sort({ updatedAt: -1 }).lean();
+                if (priorSession?.memoryProfile) {
+                    const inheritedProfile = {
+                        preferredBrands: priorSession.memoryProfile.preferredBrands || [],
+                        dislikedBrands: priorSession.memoryProfile.dislikedBrands || [],
+                        ownedDevices: priorSession.memoryProfile.ownedDevices || [],
+                        occupationOrRole: priorSession.memoryProfile.occupationOrRole || '',
+                        buyingFor: priorSession.memoryProfile.buyingFor || '',
+                        preferredPaymentMethod: priorSession.memoryProfile.preferredPaymentMethod || '',
+                        keyPriorities: priorSession.memoryProfile.keyPriorities || [],
+                        recurringVisitCount: Number(priorSession.memoryProfile.recurringVisitCount || 1) + 1
+                    };
+                    baseCtx.memoryProfile = extractMemorySignals(req.body?.message || '', {
+                        ...baseCtx,
+                        memoryProfile: { ...inheritedProfile, ...(baseCtx.memoryProfile || {}) }
+                    });
+                    if (priorSession.rollingSummary && !baseCtx.rollingSummary) {
+                        baseCtx.rollingSummary = priorSession.rollingSummary;
+                    }
+                    return baseCtx;
+                }
+            }
             baseCtx.memoryProfile = extractMemorySignals(req.body?.message || '', baseCtx);
             return baseCtx;
         }
@@ -223,6 +329,7 @@ async function hydrateContextWithSessionMemory(req, incomingContext = {}) {
             preferredBrands: uniquePush(session.memoryProfile?.preferredBrands, baseCtx.memoryProfile?.preferredBrands, 6),
             dislikedBrands: uniquePush(session.memoryProfile?.dislikedBrands, baseCtx.memoryProfile?.dislikedBrands, 6),
             ownedDevices: uniquePush(session.memoryProfile?.ownedDevices, baseCtx.memoryProfile?.ownedDevices, 6),
+            objectionsRaised: uniquePush(session.memoryProfile?.objectionsRaised, baseCtx.memoryProfile?.objectionsRaised, 6),
             keyPriorities: uniquePush(session.memoryProfile?.keyPriorities, baseCtx.memoryProfile?.keyPriorities, 8)
         };
 
@@ -302,7 +409,7 @@ async function persistConversationTurn(req, userMessage, assistantResponse, hydr
         const nextProfile = extractMemorySignals(userMessage, hydratedContext, assistantResponse);
         session.memoryProfile = nextProfile;
 
-        // Nén Rolling Summary nếu vượt quá 20 tin nhắn (10 lượt)
+        // Cập nhật Rolling Summary sớm ngay khi phiên vượt 10 tin nhắn (5 lượt) và nén khi vượt 24 tin
         if (session.messages.length > 24) {
             const overflowCount = session.messages.length - 20;
             const archived = session.messages.slice(0, overflowCount);
@@ -311,6 +418,8 @@ async function persistConversationTurn(req, userMessage, assistantResponse, hydr
             if (session.messages.length > 60) {
                 session.messages = session.messages.slice(-60);
             }
+        } else if (session.messages.length >= 10 && !session.rollingSummary) {
+            session.rollingSummary = buildRollingSummary('', session.messages.slice(0, -4), nextProfile);
         }
 
         const cat = assistantResponse?.context?.category || extra.category || hydratedContext.category;

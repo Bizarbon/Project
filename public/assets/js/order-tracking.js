@@ -498,137 +498,31 @@ function printCustomerInvoice() {
     const order = loadedOrderData;
     const recipientName = order.recipientName || order.customer?.name || order.customerName || 'Quý Khách';
     const recipientPhone = order.recipientPhone || order.customer?.phone || order.customerPhone || 'N/A';
-    const shippingAddress = order.shippingAddress || 'Nhận tại showroom TechEcommerce';
+    const shippingAddress = order.shippingAddress || 'Nhận tại showroom TechEcommerce (78 Nguyễn Văn Khối, Gò Vấp, TP.HCM)';
     const orderDateFormatted = orderDate(order.orderDate || order.createdAt);
-    const trackingCode = order.trackingNumber || 'CHƯA_TẠO_VẬN_ĐƠN';
     const shippingUnit = order.shippingUnit || 'Giao Hàng Tiêu Chuẩn';
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent('https://techshopvn.vercel.app/pages/account/order-detail.html?id=' + order._id)}`;
+    const qrTargetUrl = `https://techshopvn.vercel.app/pages/account/order-detail.html?id=${order._id}`;
 
-    const itemsRows = (order.products || []).map((item, idx) => {
-        const prodName = item.product?.name || item.productName || 'Sản phẩm công nghệ';
-        const qty = item.quantity || 1;
-        const price = item.price || 0;
-        const total = price * qty;
-        return `
-            <tr>
-                <td style="text-align:center;">${idx + 1}</td>
-                <td><strong>${escapeHTML(prodName)}</strong></td>
-                <td style="text-align:center;">${qty}</td>
-                <td style="text-align:right;">${orderMoney(price)}</td>
-                <td style="text-align:right;"><strong>${orderMoney(total)}</strong></td>
-            </tr>
-        `;
-    }).join('');
+    const invoiceHtml = window.buildTechEcommerceInvoiceHtml({
+        order,
+        mode: 'customer',
+        origin: window.location.origin,
+        recipientName,
+        recipientPhone,
+        shippingAddress,
+        orderDateFormatted,
+        trackingCode: order.trackingNumber,
+        shippingUnit,
+        paymentMethodLabel: ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod || 'COD',
+        paymentStatusLabel: ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus || 'Chưa thanh toán',
+        note: order.note || 'Cho xem hàng trước khi nhận',
+        qrTargetUrl,
+        autoPrint: true
+    });
 
-    const invoiceHtml = `
-        <!DOCTYPE html>
-        <html lang="vi">
-        <head>
-            <meta charset="UTF-8">
-            <title>Hóa đơn điện tử VAT #${order._id}</title>
-            <style>
-                * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-                body { background: #fff; color: #1e293b; padding: 24px; font-size: 13px; line-height: 1.5; }
-                .invoice-box { max-width: 800px; margin: 0 auto; border: 1px solid #cbd5e1; padding: 24px; border-radius: 8px; }
-                .inv-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 16px; }
-                .inv-company h2 { font-size: 15px; color: #1e40af; text-transform: uppercase; margin-bottom: 4px; }
-                .inv-company p { font-size: 12px; color: #475569; }
-                .inv-meta { text-align: right; }
-                .inv-meta h1 { font-size: 17px; color: #0f172a; margin-bottom: 4px; }
-                .inv-meta span { display: block; font-size: 12px; color: #64748b; }
-                .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; background: #f8fafc; padding: 12px; border-radius: 6px; }
-                .inv-grid div h4 { font-size: 12px; text-transform: uppercase; color: #64748b; margin-bottom: 4px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
-                .inv-grid div p { font-size: 12.5px; margin: 2px 0; }
-                .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-                .inv-table th, .inv-table td { border: 1px solid #e2e8f0; padding: 8px 10px; font-size: 12px; }
-                .inv-table th { background: #f1f5f9; color: #334155; text-align: left; }
-                .inv-totals { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-top: 1px dashed #cbd5e1; padding-top: 12px; }
-                .inv-qr { display: flex; align-items: center; gap: 12px; }
-                .inv-qr img { width: 90px; height: 90px; border: 1px solid #e2e8f0; padding: 4px; border-radius: 4px; }
-                .inv-sign { display: grid; grid-template-columns: 1fr 1fr; text-align: center; margin-top: 30px; }
-                .inv-sign h5 { font-size: 12px; color: #334155; margin-bottom: 40px; }
-            </style>
-        </head>
-        <body>
-            <div class="invoice-box">
-                <div class="inv-header">
-                    <div class="inv-company">
-                        <h2>HỆ THỐNG BÁN LẺ CÔNG NGHỆ TECHECOMMERCE</h2>
-                        <p>Trụ sở chính & Showroom: 78 Nguyễn Văn Khối, Quận Gò Vấp, Thành phố Hồ Chí Minh</p>
-                        <p>Hotline: 0842.331.606 | Email: support@techecommerce.vn</p>
-                    </div>
-                    <div class="inv-meta">
-                        <h1>HÓA ĐƠN ĐIỆN TỬ VAT</h1>
-                        <span>Mã đơn: <strong>#${String(order._id).padStart(4, '0')}</strong></span>
-                        <span>Ngày lập: ${orderDateFormatted}</span>
-                    </div>
-                </div>
-
-                <div class="inv-grid">
-                    <div>
-                        <h4>Khách hàng & Nhận hàng</h4>
-                        <p><strong>Người nhận:</strong> ${escapeHTML(recipientName)}</p>
-                        <p><strong>Điện thoại:</strong> ${escapeHTML(recipientPhone)}</p>
-                        <p><strong>Địa chỉ:</strong> ${escapeHTML(shippingAddress)}</p>
-                    </div>
-                    <div>
-                        <h4>Thanh toán & Vận chuyển</h4>
-                        <p><strong>Phương thức:</strong> ${ORDER_PAYMENT_METHODS[order.paymentMethod] || order.paymentMethod || 'COD'}</p>
-                        <p><strong>Trạng thái tiền:</strong> ${ORDER_PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus}</p>
-                        <p><strong>Đơn vị vận chuyển:</strong> ${escapeHTML(shippingUnit)}</p>
-                        <p><strong>Mã vận đơn:</strong> ${escapeHTML(trackingCode)}</p>
-                    </div>
-                </div>
-
-                <table class="inv-table">
-                    <thead>
-                        <tr>
-                            <th style="width:40px; text-align:center;">STT</th>
-                            <th>Tên sản phẩm</th>
-                            <th style="width:60px; text-align:center;">Số lượng</th>
-                            <th style="width:120px; text-align:right;">Đơn giá</th>
-                            <th style="width:130px; text-align:right;">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${itemsRows}
-                    </tbody>
-                </table>
-
-                <div class="inv-totals">
-                    <div class="inv-qr">
-                        <img src="${qrUrl}" alt="Mã QR tra cứu hóa đơn">
-                        <div>
-                            <p style="font-weight:700;">Quét mã tra cứu điện tử</p>
-                            <small style="color:#64748b;">Hóa đơn hợp lệ theo quy chuẩn bán lẻ</small>
-                        </div>
-                    </div>
-                    <div style="text-align:right;">
-                        <p style="font-size:14px; margin-bottom:4px;">Tổng tiền thanh toán:</p>
-                        <h2 style="color:#2563eb; font-size:20px;">${orderMoney(order.totalAmount)}</h2>
-                    </div>
-                </div>
-
-                <div class="inv-sign">
-                    <div>
-                        <h5>NGƯỜI MUA HÀNG</h5>
-                        <p style="color:#94a3b8; font-size:11px;">(Ký, ghi rõ họ tên)</p>
-                    </div>
-                    <div>
-                        <h5>ĐẠI DIỆN TECHECOMMERCE</h5>
-                        <p style="color:#059669; font-weight:700;">ĐÃ KÝ ĐIỆN TỬ HỢP LỆ</p>
-                    </div>
-                </div>
-            </div>
-            <script>
-                window.onload = function() { window.print(); };
-            </script>
-        </body>
-        </html>
-    `;
-
-    const printWin = window.open('', '_blank');
+    const printWin = window.open('', '_blank', 'width=880,height=940,menubar=no,toolbar=no,location=no,status=no');
     if (printWin) {
+        printWin.document.open();
         printWin.document.write(invoiceHtml);
         printWin.document.close();
     } else {

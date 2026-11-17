@@ -284,7 +284,7 @@ function inferCategory(text) {
             'vivobook', 'thinkpad', 'rog strix', 'acer nitro', 'katana', 'ideapad', 'inspiron',
             'may hoc lap trinh', 'may lap trinh', 'lap trinh', 'hoc code', 'hoc it', 'cntt', 'developer',
             'do hoa', 'photoshop', 'illustrator', 'premiere', 'can may', 'mua may', 'doi may', 'may cu',
-            'may mong nhe', 'may nhe', 'pin trau', 'core i3', 'core i5', 'core i7', 'core i9', 'ryzen',
+            'may mong nhe', 'may nhe', 'core i3', 'core i5', 'core i7', 'core i9', 'ryzen',
             'may hoc tap', 'may hoc dai hoc', 'may cho sinh vien', 'hoc dai hoc', 'sinh vien'
         ]],
         ['Điện thoại', [
@@ -867,7 +867,11 @@ async function answerInstallmentQuestion(message, previousProducts = [], context
 async function evaluateGameOrTaskCapability(message, context = {}) {
     const norm = normalizeText(message);
     const hasGameOrTask = /\b(genshin|valorant|lien minh|lol|lmht|fo4|fifa|cs2|csgo|pubg|lien quan|toc chien|gta|cyberpunk|wukong|capcut|premiere|photoshop|blender|autocad|do hoa 3d|render 4k)\b/i.test(norm);
-    const hasCapabilityIntent = /\b(muot khong|choi duoc|chay duoc|on khong|keo duoc|chay noi|co lag|fps|bao nhieu fps|co nong|co muot|edit duoc|dung duoc|render duoc)\b/i.test(norm);
+    const isHardwareSpecQuestion = /\b(con lan|banh xe|scroll|vong quay|lan duoc|switch|nut bam|trieu lan|click|dpi|ips|polling|tan so quet|trong luong|kich thuoc|nang bao nhieu|day dai|sac bao lau|chat lieu|bao nhieu gio|su dung duoc bao nhieu)\b/i.test(norm);
+    if (isHardwareSpecQuestion && !hasGameOrTask) return null;
+
+    const hasCapabilityIntent = /\b(muot khong|choi duoc|chay duoc|on khong|keo duoc|chay noi|co lag|fps|bao nhieu fps|co nong|co muot|edit duoc|render duoc)\b/i.test(norm) ||
+        /\b(?:lam|mo|edit|render)\s+duoc\b/i.test(norm);
 
     if (!hasGameOrTask && !hasCapabilityIntent) return null;
 
@@ -892,8 +896,11 @@ async function evaluateGameOrTaskCapability(message, context = {}) {
         targetProduct = allActive.find(p => String(p._id) === String(candId) || (cand?.name && p.name === cand.name)) || (cand?.name ? cand : null);
     }
 
-    // Nếu không có sản phẩm chỉ định, nhưng khách hỏi chung (ví dụ: "Laptop nào chơi Genshin mượt tầm 15-20 triệu")
+    // Nếu không có sản phẩm chỉ định, chỉ gợi ý laptop gaming khi khách thực sự hỏi về laptop/chơi game/đồ họa
     if (!targetProduct) {
+        if (!hasGameOrTask && !/\b(laptop|macbook|may tinh|choi game|gaming|do hoa|render|3d|fps)\b/i.test(norm)) {
+            return null;
+        }
         const budget = extractBudget(message) || 0;
         const gamingLaptops = allActive.filter(p => p.category === 'Laptop' && (/Nitro|TUF|ROG|Katana|Victus|Gaming/i.test(p.name) || (p.specs?.gpu && !/intel|iris|uhd|radeon 6/i.test(p.specs.gpu))));
         const matched = gamingLaptops.filter(p => budget > 0 ? p.price <= budget * 1.15 : true).slice(0, 3);
@@ -953,7 +960,8 @@ async function evaluateGameOrTaskCapability(message, context = {}) {
             `• 🌟 **Genshin Impact / Honkai Star Rail:** Chơi mượt mà và ổn định, hình ảnh sắc nét.\n` +
             `• 🔋 **Thời lượng pin & nhiệt độ:** Máy kiểm soát nhiệt độ tốt, sạc nhanh giúp nạp lại pin nhanh chóng khi chiến game.`;
     } else {
-        evaluation = `Dạ mẫu **${pName}** sở hữu cấu hình rất tốt trong tầm giá, đáp ứng trơn tru các tác vụ giải trí và công việc hàng ngày của bạn!`;
+        // Phụ kiện / Tai nghe / Smartwatch không dùng câu đánh giá game chung chung; nhường cho coordinateConsultation (product_qa + RAG + Gemini) trả lời trực diện câu hỏi kỹ thuật.
+        return null;
     }
 
     return {
@@ -1900,10 +1908,15 @@ async function answerPolicyQuestion(message) {
 
     // Tuyệt đối không để policy/FAQ cướp luồng của tìm kiếm model cụ thể, so sánh, loại trừ hãng hoặc tìm theo ngân sách
     const isCompareOrExclusionOrStockLookup = /\b(so sanh|con hang|gia bao nhieu|khong thich|loai hang|dat qua|may thu hai|may dau tien)\b/i.test(text);
+    const mentionsSpecificSku = /\b(a1695|a2688|anker prime|baseus blade|baseus bipow|powercombo|pb721|cm478|hub ugreen|ps portal|playstation portal|ps5 slim|switch oled|switch lite|rog ally|legion go|claw 8|pencil pro|gen 10|matepad|surface pro|apple watch|galaxy watch|forerunner|watch fit|smart band|earpods|airpods|1000xm5|ult900n|inzone h3|flip 6|charge 5|tour pro 2|wave beam|major 5|minor iv|g502|g304|mx master|mx keys|g413|arc mouse|osmo pocket|osmo mobile|dji mic|dualsense|h101x|macbook air|zenbook|xps 13|thinkpad|z fold7|s25 ultra|s24 ultra|find x8|magic7|iphone 1[567])\b/i.test(text);
+    const hasStrictStoreOrderPolicy = /\b(dia chi showroom|o dau|gio mo cua|hotline|phi ship|dong kiem|kiem tra hang|doi tra 30 ngay|hoan tien|hoa don vat|b2b|tra gop 0%|khuyen mai|voucher)\b/i.test(text);
     const hasExplicitPolicySignal = /\b(bao hanh|doi tra|hoan tien|hoan tra|vat|hoa don|giao hang|van chuyen|ship|showroom|dia chi|dong kiem|kiem tra hang|vo nuoc|roi vo|applecare|chinh sach|thanh toan|uy tin|chinh hang|vna|imei|seal|may bay|sac du phong|b2b|doanh nghiep|goi qua|tang qua)\b/i.test(text);
     const hasExplicitBudget = Boolean(extractBudget(message));
     const hasProductConsultation = /\b(tu van|gioi thieu|goi y|chon giup|muon mua|can mua|tim mua|tim may|mua may|laptop|dien thoai|tai nghe|dong ho|may choi game|ban phim|chuot|macbook|iphone|ipad|galaxy|rog)\b/i.test(text);
 
+    if (mentionsSpecificSku && !hasStrictStoreOrderPolicy) {
+        return null;
+    }
     if (isCompareOrExclusionOrStockLookup && !hasExplicitPolicySignal) {
         return null;
     }
@@ -2475,7 +2488,8 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const policyAnswer = await answerPolicyQuestion(message);
         const gameCapability = await evaluateGameOrTaskCapability(message, hydratedContext);
         const isCorporateB2bInquiry = /\b(vat|hoa don do|xuat hoa don|cong ty|doanh nghiep|b2b|so luong lon)\b/i.test(text);
-        const isBargainOrBundle = !isCorporateB2bInquiry && ([
+        const isPolicyOrExchangeInquiry = /\b(doi mau|doi may|khong hop|khong thich|co doi duoc|chinh sach|bao hanh|nguyen seal|boc hop|khui hop)\b/i.test(text);
+        const isBargainOrBundle = !isCorporateB2bInquiry && !isPolicyOrExchangeInquiry && ([
             'bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem',
             'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot',
             'co giam them', 'combo phu kien', 'co khuyen mai kem', 'bot khong shop', 'co bot khong', 'bot gia khong',

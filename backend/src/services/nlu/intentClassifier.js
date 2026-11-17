@@ -45,7 +45,12 @@ const PRODUCT_BRAND_MAP = [
  * @returns {string|null}
  */
 function extractBrand(text) {
-    const s = text.toLowerCase();
+    // Bỏ qua vế mô tả thiết bị khách ĐANG SỞ HỮU (VD: "Mình đang dùng iPhone 15, muốn mua...")
+    const strippedOwned = String(text || '').replace(
+        /(?:mình|tôi|em|minh|toi|hiện tại|truoc gio|đang|dang)?\s*(?:đang dùng|dang dung|đang xài|dang xai|đã có|da co|có sẵn|co san|xài|xai)\s+[^,.;!?]+(?:,|\s+(?:nhưng|nhung|muốn|muon|cần|can|tìm|tim|giờ|gio|nay|tặng|tang)\b)/gi,
+        ' '
+    );
+    const s = strippedOwned.toLowerCase();
     
     // 1. Kiểm tra dòng sản phẩm đặc thù suy luận ra thương hiệu
     for (const item of PRODUCT_BRAND_MAP) {
@@ -301,7 +306,8 @@ function classifyIntent(normalizedText, unaccentedText) {
     // Hoặc nhu cầu mua laptop văn phòng không cần card đồ họa rời
     const isTechAdviceQuestion = /nên dán|nen dan|so sánh|so sanh|hay dán|hay dan|tốt hơn|tot hon|hay ppf|hay cường lực|hay cuong luc|có chống vỡ|co chong vo|có chai pin|co chai pin/i.test(text + ' ' + noAcc);
     const isNoDiscreteGpuSpec = /(?:không|ko|k|khong|chẳng|chang|chưa|chua|đâu|dau)\s+(?:cần|can|có|co|xài|xai|dùng|dung)?\s*(?:card\s+rời|card\s+roi|vga)/i.test(text + ' ' + noAcc);
-    if (isTechAdviceQuestion || isNoDiscreteGpuSpec) {
+    const isCarriedInVehicleContext = /\b(cốp xe|cop xe|ba lô|balo|túi xách|tui xach|bỏ vừa|bo vua|để vừa|de vua|mang theo|đi xe|di xe)\b/i.test(text + ' ' + noAcc);
+    if (isTechAdviceQuestion || isNoDiscreteGpuSpec || (outOfCatalogType === 'vehicles' && isCarriedInVehicleContext)) {
         isOutOfCatalog = false;
         outOfCatalogType = null;
     }
@@ -309,7 +315,8 @@ function classifyIntent(normalizedText, unaccentedText) {
     if (!isOutOfCatalog) {
         const outOfCatalogKeywords = [
             /\b(?:tủ lạnh|tu lanh|máy giặt|may giat|điều hòa|dieu hoa|máy lạnh|may lanh|nồi cơm|noi com)\b/i,
-            /\b(?:xe máy|xe may|ô tô|o to|xe đạp|xe dap|vé máy bay|ve may bay|khách sạn|khach san)\b/i,
+            ...(!isCarriedInVehicleContext ? [/\b(?:xe máy|xe may|ô tô|o to|xe đạp|xe dap)\b/i] : []),
+            /\b(?:vé máy bay|ve may bay|khách sạn|khach san)\b/i,
             /\b(?:quần áo|quan ao|giày dép|giay dep|mỹ phẩm|my pham|thức ăn|thuc an|thực phẩm|thuc pham|sách kinh tế|sach kinh te)\b/i
         ];
         if (outOfCatalogKeywords.some(p => p.test(text) || p.test(noAcc))) {
