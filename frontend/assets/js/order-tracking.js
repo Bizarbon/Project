@@ -287,7 +287,7 @@ function renderOrderDetail(order) {
                     ${(order.products || []).map(p => {
                         const pid = p.product?._id || p.product;
                         const pname = p.product?.name || p.productName || 'Sản phẩm';
-                        return pid ? `<a href="../catalog/product.html?id=${pid}#reviews" class="btn-back-list" style="font-size:0.82rem;">Đánh giá: ${escapeHTML(pname)}</a>` : '';
+                        return pid ? `<a href="../catalog/product.html?id=${pid}#reviewsSection" class="btn-back-list" style="font-size:0.82rem;">Đánh giá: ${escapeHTML(pname)}</a>` : '';
                     }).join('')}
                 </div>
             </div>

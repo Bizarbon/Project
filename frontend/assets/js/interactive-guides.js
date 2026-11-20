@@ -236,10 +236,10 @@
         '<h2 class="guide-step-title" id="guideStepTitle">' + escapeHTML(step.title) + '</h2>' +
         '<button type="button" class="guide-btn-close" id="guideCloseBtn" aria-label="Dong huong dan">&times;</button>' +
       '</header>' +
-      '<main class="guide-dialog-body">' +
+      '<section class="guide-dialog-body">' +
         '<p id="guideStepDesc">' + escapeHTML(step.desc) + '</p>' +
-        '<div class="guide-fallback-note" role="note"><strong>Vi tri tren trang:</strong> ' + escapeHTML(step.fallback) + '</div>' +
-      '</main>' +
+        '<div class="guide-fallback-note" role="note"><strong>Vị trí trên trang:</strong> ' + escapeHTML(step.fallback) + '</div>' +
+      '</section>' +
       '<footer class="guide-dialog-footer">' +
         '<button type="button" class="guide-btn guide-btn-skip" id="guideSkipBtn">Bo qua tour</button>' +
         '<div class="guide-nav-group">' +

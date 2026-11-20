@@ -13,7 +13,7 @@ const DEFAULT_STAFF_MEMBERS = [
         id: 1,
         code: 'NV001',
         name: 'Vũ Phi Long',
-        email: 'vuphilong@shopmini.vn',
+        email: 'vuphilong@techecommerce.vn',
         phone: '0912 345 678',
         department: 'Quản trị',
         position: 'Quản trị viên',

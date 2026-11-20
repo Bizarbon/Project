@@ -215,6 +215,11 @@ function setupStorefrontLiveSearch(headerEl, root) {
     if (!form || !input || !dropdown) return;
 
     const apiUrl = (typeof window !== 'undefined' && window.API_URL) ? window.API_URL : (root.includes('techshopvn.vercel.app') ? 'https://techshopvn.vercel.app/api' : 'http://localhost:5000/api');
+    function resolveAssetUrl(src) {
+        if (!src) return `${root}assets/images/product-placeholder.svg`;
+        if (/^(?:https?:|data:|\/)/i.test(src)) return src;
+        return `${root}${src.replace(/^\.?\//, '')}`;
+    }
     function saveRecentSearch(term) {
         if (!term || term.trim().length < 2) return;
         const clean = term.trim();
@@ -398,7 +403,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                 const percent = discount ? Math.round((1 - p.price / p.compareAtPrice) * 100) : 0;
                 return `
                                 <a class="search-featured-card" href="${root}pages/catalog/product.html?id=${p._id}">
-                                    <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" class="search-featured-thumb" loading="lazy" onerror="this.src='${root}assets/images/logo/techecommerce-logo.svg'">
+                                    <img src="${escapeHTML(resolveAssetUrl(p.image))}" alt="${escapeHTML(p.name)}" class="search-featured-thumb" loading="lazy" onerror="this.onerror=null; this.src='${root}assets/images/product-placeholder.svg'">
                                     <div class="search-featured-info">
                                         <strong class="search-featured-title">${escapeHTML(p.name)}</strong>
                                         <div class="search-featured-price-row">
@@ -419,11 +424,20 @@ function setupStorefrontLiveSearch(headerEl, root) {
         html += `
             <div class="live-search-tip-footer">
                 <span>💡 <strong>Mẹo:</strong> Gõ từ 2 ký tự để tìm kiếm tức thì</span>
-                <span>📷 AI Visual Search</span>
+                <button type="button" class="live-search-ai-cam-link" id="btnSharedOpenVisualSearch" style="background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;font-weight:700;">📷 Tìm ảnh bằng AI</button>
             </div>
         `;
 
         dropdown.innerHTML = html;
+
+        dropdown.querySelector('#btnSharedOpenVisualSearch')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            dropdown.hidden = true;
+            const toggle = document.querySelector('.ai-chat-toggle');
+            const panel = document.querySelector('.ai-chat-panel');
+            if (toggle && (!panel || panel.hidden)) toggle.click();
+            setTimeout(() => document.getElementById('aiChatCameraBtn')?.click(), 120);
+        });
 
         // Bind click events
         dropdown.querySelector('#btnClearSearchHistory')?.addEventListener('click', e => {
@@ -464,9 +478,9 @@ function setupStorefrontLiveSearch(headerEl, root) {
                     <span class="live-search-title">🔥 Gợi ý từ khóa thịnh hành</span>
                 </header>
                 <nav class="live-search-trending-chips" aria-label="Từ khóa gợi ý">
-                    ${trendingSearches.map(term => `
-                        <button type="button" class="trending-chip" data-search-term="${escapeHTML(term)}">
-                            <span>🔍</span> ${escapeHTML(term)}
+                    ${trendingList.map(item => `
+                        <button type="button" class="trending-chip" data-search-term="${escapeHTML(item.term)}">
+                            <span>🔍</span> ${escapeHTML(item.term)}
                         </button>
                     `).join('')}
                 </nav>
@@ -488,7 +502,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                         <li class="live-search-item">
                             <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
                                 <figure class="live-search-thumb">
-                                    <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.src='${root}assets/images/logo/techecommerce-logo.svg'">
+                                    <img src="${escapeHTML(resolveAssetUrl(p.image))}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='${root}assets/images/product-placeholder.svg'">
                                 </figure>
                                 <div class="live-search-meta">
                                     <strong class="live-search-name">${highlightMatch(p.name, query)}</strong>
@@ -664,7 +678,7 @@ function setupStorefrontLiveSearch(headerEl, root) {
                                     <li class="live-search-item">
                                         <a class="live-search-link" href="${root}pages/catalog/product.html?id=${p._id}">
                                             <figure class="live-search-thumb">
-                                                <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy">
+                                                <img src="${escapeHTML(resolveAssetUrl(p.image))}" alt="${escapeHTML(p.name)}" loading="lazy" onerror="this.onerror=null; this.src='${root}assets/images/product-placeholder.svg'">
                                             </figure>
                                             <div class="live-search-meta">
                                                 <strong class="live-search-name">${escapeHTML(p.name)}</strong>

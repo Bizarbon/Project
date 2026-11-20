@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const Customer = require('../models/Customer');
-const googleAuthService = require('../services/googleAuthService');
+const googleAuthService = require('../services/auth/googleAuthService');
 const {
     emailEnabled,
     sendPasswordChangedEmail

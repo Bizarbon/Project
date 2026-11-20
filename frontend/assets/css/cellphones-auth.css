@@ -1716,6 +1716,43 @@ html[data-theme="dark"] .u036-rules li.is-ok {
     color: #34d399;
 }
 
+html[data-theme="dark"] .auth-form-subtitle,
+html[data-theme="dark"] .auth-field-help {
+    color: #94a3b8;
+}
+
+html[data-theme="dark"] .auth-divider-cellphones::before,
+html[data-theme="dark"] .auth-divider-cellphones::after {
+    background: rgba(148, 163, 184, 0.28);
+}
+
+html[data-theme="dark"] .auth-divider-cellphones span {
+    background: #1e293b;
+    color: #cbd5e1;
+}
+
+html[data-theme="dark"] .auth-switch-cellphones {
+    color: #cbd5e1;
+}
+
+html[data-theme="dark"] .auth-switch-cellphones a,
+html[data-theme="dark"] .auth-otp-actions .btn-text-action {
+    color: #60a5fa;
+}
+
+html[data-theme="dark"] .auth-success-panel {
+    color: #e2e8f0;
+}
+
+html[data-theme="dark"] .auth-success-panel h2 {
+    color: #f8fafc;
+}
+
+html[data-theme="dark"] .auth-success-panel p,
+html[data-theme="dark"] .zalo-qr-hint {
+    color: #cbd5e1;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .auth-form-card.u062-shake,
     .u025-field.u025-shake .auth-input-wrap-cellphones,

@@ -6,7 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const nlu = require('../../backend/src/services/nlu');
+const nlu = require('../../backend/src/services/ai/nlu');
 
 async function runAllTests() {
     const testCasesPath = path.join(__dirname, 'testCases.json');

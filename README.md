@@ -19,48 +19,78 @@ Website thương mại điện tử chuyên cung cấp thiết bị công nghệ
 
 ```text
 TechEcommerce/
-├── backend/                        # Backend Node.js / Express
+├── backend/                        # Backend Node.js / Express REST API & AI Engine
 │   ├── src/                        # Mã nguồn ứng dụng backend
 │   │   ├── config/                 # Cấu hình kết nối cơ sở dữ liệu (MongoDB)
-│   │   ├── middleware/             # Middleware xác thực JWT và phân quyền
-│   │   ├── models/                 # Mongoose schemas (Product, Order, Customer,...)
-│   │   ├── routes/                 # Express API routes theo từng domain
-│   │   ├── utils/                  # Tiện ích thanh toán, gửi mail, SMS, tính cước
-│   │   └── app.js                  # Cấu hình Express app, middleware & static files
-│   ├── scripts/                    # Scripts khởi tạo dữ liệu mẫu (seed, admin, catalog)
-│   ├── server.js                   # HTTP Server entrypoint khởi chạy listener
+│   │   ├── data/                   # Dữ liệu chuẩn danh mục sản phẩm (uniformCatalog)
+│   │   ├── middleware/             # Middleware xác thực JWT và phân quyền Admin/Staff
+│   │   ├── models/                 # Mongoose schemas (Product, Order, Customer, ChatSession,...)
+│   │   ├── routes/                 # Express REST API routes theo domain (products, orders, chat,...)
+│   │   ├── services/               # Dịch vụ nghiệp vụ phân tách theo domain
+│   │   │   ├── ai/                 # Động cơ AI LLM-First Agentic, 8 Tools, RAG, Memory & NLU
+│   │   │   │   ├── agenticChatService.js
+│   │   │   │   ├── agenticTools.js
+│   │   │   │   ├── aiModelService.js
+│   │   │   │   ├── consultationCoordinator.js
+│   │   │   │   ├── memoryService.js
+│   │   │   │   ├── ragService.js
+│   │   │   │   ├── knowledgeService.js
+│   │   │   │   ├── storeKnowledgeAndChitChat.js
+│   │   │   │   └── nlu/            # Guardrails, phân loại ý định & trích xuất ngân sách
+│   │   │   └── auth/               # Dịch vụ xác thực Google OAuth
+│   │   ├── utils/                  # Tiện ích thanh toán, email, SMS, vận chuyển, trả góp
+│   │   └── app.js                  # Cấu hình Express app, bảo mật Helmet/CORS & static routing
+│   ├── scripts/                    # Scripts khởi tạo & đồng bộ dữ liệu mẫu MongoDB (seed)
+│   ├── server.js                   # HTTP Server entrypoint
 │   ├── .env.example                # Biến môi trường mẫu cho backend
-│   ├── package.json
-│   └── package-lock.json
+│   └── package.json
 │
-├── frontend/                       # Source of Truth cho giao diện web
-│   ├── admin/                      # Trang quản trị (dashboard, đơn hàng, sản phẩm,...)
+├── frontend/                       # Source of Truth cho giao diện web (100% Semantic HTML5)
+│   ├── admin/                      # Trang quản trị (dashboard, đơn hàng, sản phẩm, nhân sự, tài chính)
 │   ├── assets/                     # Tài nguyên tĩnh
-│   │   ├── css/                    # Stylesheets (neo-circuit, cellphones-footer, auth,...)
-│   │   ├── data/                   # Dữ liệu tĩnh phụ trợ
+│   │   ├── css/                    # Stylesheets (neo-circuit, chatbox, ai-assistant, auth,...)
+│   │   ├── data/                   # Dữ liệu địa giới hành chính Việt Nam
 │   │   ├── icons/                  # Biểu tượng vector SVG
-│   │   ├── images/                 # Hình ảnh sản phẩm, banner, đối tác
-│   │   └── js/                     # Logic giao diện (shop, auth, cart, chatbox,...)
-│   ├── pages/                      # Các trang storefront (auth, catalog, checkout, legal)
-│   └── index.html                  # Trang chủ storefront
+│   │   ├── images/                 # Hình ảnh sản phẩm, banner, logo
+│   │   ├── uploads/                # Ảnh sản phẩm tải lên
+│   │   └── js/                     # Logic giao diện (shop, auth, chatbox, ai-assistant, orders,...)
+│   ├── pages/                      # Các trang storefront phân nhóm rõ ràng
+│   │   ├── account/                # Hồ sơ cá nhân, lịch sử & chi tiết đơn hàng
+│   │   ├── ai/                     # Trang Trợ lý AI toàn màn hình (assistant.html)
+│   │   ├── auth/                   # Đăng nhập, đăng ký, OAuth, khôi phục mật khẩu
+│   │   ├── catalog/                # Trang chi tiết sản phẩm (product.html)
+│   │   ├── checkout/               # Giỏ hàng, thanh toán & kết quả giao dịch
+│   │   ├── legal/                  # Chính sách bảo hành, đổi trả, giao hàng, FAQ, trả góp
+│   │   ├── tools/                  # Công cụ phối góc làm việc (setup-builder.html)
+│   │   └── blog.html               # Tin công nghệ & cẩm nang mua sắm
+│   ├── index.html                  # Trang chủ storefront
+│   ├── robots.txt
+│   └── sitemap.xml
 │
-├── public/                         # Build output đồng bộ từ frontend/ (phục vụ Vercel CDN)
-├── docs/                           # Tài liệu kỹ thuật, kiến trúc và ảnh chụp màn hình
-│   └── screenshots/                # Ảnh chụp kiểm thử giao diện
-├── scripts/                        # Scripts phát triển, build và công cụ
-│   ├── prepare-vercel.js           # Đồng bộ frontend sang public khi chạy npm run build
-│   ├── seed-production.ps1         # Script kích hoạt seed dữ liệu trên môi trường deploy
-│   └── tools/                      # Công cụ hỗ trợ crawl, tối ưu ảnh
-│       └── scrapers/               # Bộ công cụ thu thập và kiểm định dữ liệu sản phẩm
+├── public/                         # Build output đồng bộ tự động từ frontend/ (`npm run build`)
+├── tests/                          # Bộ kiểm thử tự động
+│   ├── ai/                         # Kiểm thử Agentic Dual-Mode, Function Calling, Web Search & Cart
+│   └── nlu/                        # Bộ kiểm thử hồi quy NLU 84 test cases (`npm run test:nlu`)
+├── scripts/                        # Scripts build, deploy & phát triển cục bộ
+│   ├── prepare-vercel.js           # Đồng bộ frontend/ -> public/ cho Vercel CDN
+│   ├── seed-production.ps1         # Script seed an toàn cho MongoDB Atlas production
+│   ├── frontend-dev-server.py      # Dev server tĩnh dự phòng
+│   └── tools/                      # Công cụ xử lý ảnh sản phẩm
+├── docs/                           # Tài liệu kỹ thuật, kiến trúc, bảo mật & triển khai
+│   ├── DEPLOYMENT.md
+│   ├── PROJECT_STRUCTURE.md
+│   ├── SECURITY_AI_PAYMENT.md
+│   └── TYPOGRAPHY.md
 │
 ├── .editorconfig
-├── .gitignore                      # Danh sách tệp loại trừ Git chuẩn hóa
-├── AGENTS.md                       # Quy tắc kỹ thuật Frontend Semantic & SEO
-├── README.md                       # Tài liệu hướng dẫn dự án
-├── render.yaml                     # Cấu hình deploy tự động lên Render.com
-├── vercel.json                     # Cấu hình routing và CDN headers cho Vercel
+├── .gitignore
+├── .htmlvalidate.json
+├── AGENTS.md                       # Quy chuẩn Semantic HTML5, SEO & AI Search
+├── README.md
+├── render.yaml                     # Cấu hình deploy Render.com
+├── vercel.json                     # Cấu hình Express runtime & CDN headers Vercel
 ├── server.js                       # Bridge entrypoint phục vụ Vercel Express runtime
-└── package.json                    # Root package scripts điều phối dự án
+└── package.json                    # Root npm scripts điều phối toàn dự án
 ```
 
 ---

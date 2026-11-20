@@ -9,49 +9,75 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Chuyên trang tin tức công nghệ, đánh giá thiết bị, cẩm nang thủ thuật và tư vấn chọn mua điện thoại, laptop, phụ kiện TechEcommerce.">
     <link rel="canonical" href="https://techshopvn.vercel.app/pages/blog.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Blog Tin tức công nghệ &amp; Thủ thuật - TechEcommerce">
+    <meta property="og:description" content="Cập nhật xu hướng thiết bị mới nhất, đánh giá thực tế và hướng dẫn kỹ thuật tại TechEcommerce.">
     <title>Blog Tin tức công nghệ &amp; Thủ thuật - TechEcommerce</title>
-    <link rel="stylesheet" href="../assets/css/style.css?v=prod-20260918-1">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=prod-20260918-1">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261116-modern-cat-v5">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261117-cart-voucher-v5">
     <style>
         .blog-hero-section {
-            padding: 30px 0 20px;
+            padding: 24px 0 20px;
+        }
+        .blog-breadcrumb-ol {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.86rem;
+            color: var(--neo-muted, #64748b);
+        }
+        .blog-breadcrumb-ol a {
+            color: var(--neo-muted, #64748b);
+            text-decoration: none;
+        }
+        .blog-breadcrumb-ol a:hover {
+            color: var(--neo-primary, #2563eb);
+        }
+        .blog-breadcrumb-current {
+            color: var(--neo-text, #0f172a);
+            font-weight: 700;
         }
         .blog-main-title {
-            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-size: clamp(1.9rem, 3.4vw, 2.7rem);
             font-weight: 800;
             margin-bottom: 0.5rem;
-            color: var(--text-main, #ffffff);
+            color: var(--neo-text, #0f172a);
             line-height: 1.2;
         }
         .blog-sub-title {
-            color: var(--text-muted, #94a3b8);
-            font-size: 1.05rem;
-            margin-bottom: 2rem;
+            color: var(--neo-muted, #475569);
+            font-size: 1.02rem;
+            margin-bottom: 1.85rem;
         }
         .blog-featured-card {
             display: grid;
-            grid-template-columns: 1.2fr 1fr;
+            grid-template-columns: 1.15fr 1fr;
             gap: 2rem;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--neo-border, rgba(255, 255, 255, 0.1));
-            border-radius: 16px;
+            background: var(--neo-card-bg, #ffffff);
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 18px;
             overflow: hidden;
-            margin-bottom: 3rem;
-            transition: transform 0.25s ease, border-color 0.25s ease;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
         .blog-featured-card:hover {
             transform: translateY(-4px);
-            border-color: rgba(59, 130, 246, 0.4);
+            border-color: rgba(37, 99, 235, 0.38);
+            box-shadow: 0 16px 38px rgba(37, 99, 235, 0.12);
         }
         .blog-featured-img {
             width: 100%;
             height: 100%;
-            min-height: 320px;
+            min-height: 300px;
             object-fit: cover;
             display: block;
         }
         .blog-featured-body {
-            padding: 2.5rem 2rem;
+            padding: 2.2rem 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -59,33 +85,41 @@
         .blog-category-tag {
             align-self: flex-start;
             padding: 4px 12px;
-            background: rgba(37, 99, 235, 0.2);
-            color: #60a5fa;
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
             border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 0.9rem;
             text-transform: uppercase;
         }
+        html[data-theme='dark'] .blog-category-tag {
+            background: rgba(56, 189, 248, 0.18);
+            color: #38bdf8;
+        }
         .blog-featured-heading {
-            font-size: 1.6rem;
+            font-size: 1.55rem;
             font-weight: 800;
             line-height: 1.3;
-            margin-bottom: 1rem;
-            color: #ffffff;
+            margin-bottom: 0.9rem;
+            color: var(--neo-text, #0f172a);
         }
         .blog-featured-desc {
-            color: #cbd5e1;
+            color: var(--neo-muted, #475569);
             font-size: 0.95rem;
             line-height: 1.6;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.4rem;
         }
         .blog-meta-row {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 16px;
             font-size: 0.85rem;
-            color: #94a3b8;
+            color: var(--neo-muted, #64748b);
+        }
+        .blog-meta-author {
+            color: var(--neo-text, #0f172a);
         }
         .blog-filter-bar {
             display: flex;
@@ -93,9 +127,9 @@
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2.2rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid var(--neo-border, #e2e8f0);
         }
         .blog-tabs {
             display: flex;
@@ -108,9 +142,9 @@
         .blog-tab-btn {
             padding: 8px 18px;
             border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: transparent;
-            color: #cbd5e1;
+            border: 1px solid var(--neo-border, #cbd5e1);
+            background: var(--neo-card-bg, #ffffff);
+            color: var(--neo-muted, #475569);
             font-size: 0.88rem;
             font-weight: 600;
             cursor: pointer;
@@ -118,9 +152,9 @@
         }
         .blog-tab-btn:hover,
         .blog-tab-btn.active {
-            background: #2563eb;
-            color: #ffffff;
-            border-color: #2563eb;
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border-color: #2563eb !important;
         }
         .blog-search-box {
             position: relative;
@@ -129,10 +163,10 @@
         .blog-search-box input {
             width: 100%;
             padding: 9px 16px 9px 36px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--neo-card-bg, #ffffff);
+            border: 1px solid var(--neo-border, #cbd5e1);
             border-radius: 50px;
-            color: #ffffff;
+            color: var(--neo-text, #0f172a);
             font-size: 0.88rem;
             box-sizing: border-box;
         }
@@ -141,28 +175,29 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
+            color: var(--neo-muted, #64748b);
             font-size: 0.85rem;
         }
         .blog-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 1.75rem;
             margin-bottom: 4rem;
         }
         .blog-card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
+            background: var(--neo-card-bg, #ffffff);
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 16px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
             transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
         .blog-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59, 130, 246, 0.4);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(-4px);
+            border-color: rgba(37, 99, 235, 0.4);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
         }
         .blog-card-thumb-wrap {
             width: 100%;
@@ -180,24 +215,24 @@
             transform: scale(1.05);
         }
         .blog-card-body {
-            padding: 1.5rem;
+            padding: 1.4rem;
             display: flex;
             flex-direction: column;
             flex: 1 1 auto;
         }
         .blog-card-title {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--neo-text, #0f172a);
             line-height: 1.4;
-            margin: 0.5rem 0 0.8rem;
+            margin: 0.5rem 0 0.75rem;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
         .blog-card-desc {
-            color: #94a3b8;
+            color: var(--neo-muted, #475569);
             font-size: 0.88rem;
             line-height: 1.5;
             margin-bottom: 1.2rem;
@@ -208,13 +243,18 @@
             flex: 1 1 auto;
         }
         .blog-card-footer {
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 0.9rem;
+            border-top: 1px solid var(--neo-border, #e2e8f0);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.82rem;
-            color: #64748b;
+            color: var(--neo-muted, #64748b);
+        }
+        html[data-theme='dark'] .blog-featured-card,
+        html[data-theme='dark'] .blog-card {
+            background: rgba(15, 23, 42, 0.85);
+            border-color: rgba(255, 255, 255, 0.1);
         }
         @media (max-width: 860px) {
             .blog-featured-card {
@@ -226,46 +266,39 @@
             }
         }
     </style>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "Tin tức công nghệ & Thủ thuật - TechEcommerce",
+        "url": "https://techshopvn.vercel.app/pages/blog.html",
+        "publisher": {
+            "@type": "Organization",
+            "name": "TechEcommerce",
+            "url": "https://techshopvn.vercel.app"
+        }
+    }
+    </script>
 </head>
 
 <body class="blog-storefront-page">
-    <!-- Storefront Global Header -->
-    <header class="storefront-header account-storefront-header">
-        <div class="header-main">
-            <div class="header-shell header-main-inner">
-                <a class="storefront-logo" href="../index.html" aria-label="TechEcommerce - Trang chủ">
-                    <span class="storefront-logo-mark" aria-hidden="true">
-                        <img src="../assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="TechEcommerce" width="40" height="40" class="storefront-logo-img">
-                    </span>
-                    <span class="storefront-logo-text">TechEcommerce</span>
-                </a>
-                <form class="header-search" action="../index.html" method="get" role="search">
-                    <label class="sr-only" for="blogHeaderSearch">Tìm kiếm sản phẩm</label>
-                    <span class="header-search-icon" aria-hidden="true">⌕</span>
-                    <input id="blogHeaderSearch" name="search" type="search" placeholder="Bạn đang tìm sản phẩm gì?">
-                    <button type="submit">Tìm kiếm</button>
-                </form>
-                <div class="header-actions">
-                    <div id="nav-auth-section"></div>
-                    <a class="header-action-btn" href="../index.html?openCart=1">
-                        <span class="header-action-icon" aria-hidden="true">🛒</span>
-                        <span class="header-action-copy"><small>Đơn hàng</small><strong>Giỏ hàng</strong></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-
+    <script>
+        (function(){ try { var t = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', t); } catch(e){} })();
+    </script>
+    <nav class="main-site-nav" aria-label="Điều hướng chính">
+        <p class="legacy-brand"><a href="../index.html">TechEcommerce</a></p>
+    </nav>
     <script src="../assets/js/animations.js"></script>
-    <script src="../assets/js/auth.js?v=prod-20260918-1"></script>
+    <script src="../assets/js/auth.js?v=20261117-v1"></script>
+    <script src="../assets/js/storefront-header.js?v=20261117-v1"></script>
 
     <!-- Main Content Area -->
     <main class="container" style="max-width: 1300px; margin: 0 auto; padding: 24px 20px 60px;">
         <nav aria-label="Đường dẫn trang" style="margin-bottom: 16px;">
-            <ol style="list-style: none; padding: 0; margin: 0; display: flex; gap: 8px; font-size: 0.86rem; color: #94a3b8;">
-                <li><a href="../index.html" style="color: #94a3b8; text-decoration: none;">Trang chủ</a></li>
+            <ol class="blog-breadcrumb-ol">
+                <li><a href="../index.html">Trang chủ</a></li>
                 <li aria-hidden="true">&rsaquo;</li>
-                <li style="color: #ffffff;" aria-current="page">Blog &amp; Tin tức công nghệ</li>
+                <li class="blog-breadcrumb-current" aria-current="page">Blog &amp; Tin tức công nghệ</li>
             </ol>
         </nav>
 
@@ -283,7 +316,7 @@
                     <h2 class="blog-featured-heading" id="featuredTitle">Đánh giá chi tiết Laptop ASUS TUF Gaming A16 FA607: Cỗ máy gaming đáng mua nhất phân khúc</h2>
                     <p class="blog-featured-desc" id="featuredDesc">Sở hữu vi xử lý AMD Ryzen thế hệ mới cùng card đồ họa Radeon mạnh mẽ, ASUS TUF A16 mang lại hiệu năng ổn định vượt bậc cho cả game thủ lẫn người làm sáng tạo nội dung.</p>
                     <div class="blog-meta-row">
-                        <span>✍️ <strong id="featuredAuthor" style="color: #e2e8f0;">Vũ Phi Long</strong></span>
+                        <span>✍️ <strong id="featuredAuthor" class="blog-meta-author">Vũ Phi Long</strong></span>
                         <span>📅 <time id="featuredDate" datetime="2026-07-10">10/07/2026</time></span>
                         <span>👁️ <span id="featuredViews">1.420</span> lượt đọc</span>
                     </div>
@@ -303,6 +336,7 @@
 
             <div class="blog-search-box">
                 <span class="blog-search-icon" aria-hidden="true">🔍</span>
+                <label class="sr-only" for="storefrontBlogSearch">Tìm kiếm bài viết công nghệ</label>
                 <input type="search" id="storefrontBlogSearch" placeholder="Tìm kiếm bài viết..." oninput="handleBlogSearch(this.value)">
             </div>
         </section>

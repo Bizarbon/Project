@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="AI tư vấn khách hàng TechEcommerce hỗ trợ chọn sản phẩm, so sánh cấu hình và giải đáp kỹ thuật.">
     <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="https://techshopvn.vercel.app/pages/ai/assistant.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AI tư vấn khách hàng - TechEcommerce">
+    <meta property="og:description" content="Trợ lý AI thông minh hỗ trợ chọn thiết bị công nghệ, so sánh cấu hình và tra cứu đơn hàng TechEcommerce.">
     <title>AI tư vấn khách hàng - TechEcommerce</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
-    <link rel="stylesheet" href="../../assets/css/ai-assistant.css?v=ai-workspace-20260720-1">
+    <link rel="stylesheet" href="../../assets/css/ai-assistant.css?v=20261120-agentic-cart-v1">
 </head>
 <body>
     <section class="ai-workspace">
@@ -52,7 +56,14 @@
         <main class="ai-main">
             <header class="ai-topbar">
                 <button id="sidebarToggle" class="ai-icon-button mobile-only" type="button" aria-label="Mở menu" aria-expanded="false">☰</button>
-                <p>Mô hình hiện tại: <strong>TechEcommerce Advisor v1</strong></p>
+                <section class="ai-topbar-controls" aria-label="Chế độ và mô hình AI">
+                    <fieldset class="ai-mode-switcher" role="radiogroup" aria-label="Chế độ Trợ lý AI">
+                        <legend class="sr-only">Chọn chế độ Trợ lý AI</legend>
+                        <button type="button" class="ai-mode-btn is-active" role="radio" aria-checked="true" data-chat-mode="tech_advisor">🛒 Chuyên gia Tech</button>
+                        <button type="button" class="ai-mode-btn" role="radio" aria-checked="false" data-chat-mode="open_ai">✨ AI Toàn năng</button>
+                    </fieldset>
+                    <p class="ai-model-badge">Model: <strong id="activeModelName">Gemini 3.5 Flash-Lite</strong></p>
+                </section>
                 <button id="settingsButton" class="ai-icon-button" type="button" aria-label="Cài đặt trợ lý" title="Cài đặt">⚙</button>
             </header>
 
@@ -63,8 +74,9 @@
                 <section id="conversation" class="ai-conversation" aria-live="polite"></section>
                 <form id="assistantForm" class="ai-composer">
                     <label class="sr-only" for="assistantInput">Nhập câu hỏi cần tư vấn</label>
-                    <textarea id="assistantInput" rows="1" maxlength="1000" placeholder="Hỏi về sản phẩm, cấu hình, đơn hàng hoặc bảo hành..." required></textarea>
+                    <textarea id="assistantInput" rows="1" maxlength="2000" placeholder="Hỏi về sản phẩm, cấu hình, tai nghe, đơn hàng hoặc chuyển AI Toàn năng để hỏi bất kỳ điều gì..." required></textarea>
                     <button id="voiceInputButton" class="ai-icon-button" type="button" aria-label="Nhập bằng giọng nói" title="Nhập bằng giọng nói">●</button>
+                    <button id="stopButton" class="ai-stop-button" type="button" aria-label="Dừng tạo phản hồi" title="Dừng tạo phản hồi" hidden>■</button>
                     <button id="sendButton" class="ai-send-button" type="submit" aria-label="Gửi câu hỏi">→</button>
                 </form>
             </section>
@@ -72,7 +84,7 @@
             <section id="historyView" class="ai-view" aria-labelledby="historyHeading" hidden>
                 <header class="view-heading">
                     <span>Lịch sử tư vấn</span>
-                    <h1 id="historyHeading">Các cuộc trò chuyện trước</h1>
+                    <h2 id="historyHeading">Các cuộc trò chuyện trước</h2>
                     <p>Mở lại nội dung đã trao đổi hoặc xóa những phiên bạn không còn cần.</p>
                 </header>
                 <section id="historyList" class="history-list" aria-label="Danh sách lịch sử"></section>
@@ -81,7 +93,7 @@
             <section id="savedView" class="ai-view" aria-labelledby="savedHeading" hidden>
                 <header class="view-heading">
                     <span>Danh sách quan tâm</span>
-                    <h1 id="savedHeading">Sản phẩm đã lưu</h1>
+                    <h2 id="savedHeading">Sản phẩm đã lưu</h2>
                     <p>Xem lại các sản phẩm yêu thích và tiếp tục hỏi AI trước khi lựa chọn.</p>
                 </header>
                 <section id="savedProductList" class="saved-product-grid" aria-label="Danh sách sản phẩm đã lưu"></section>
@@ -90,7 +102,7 @@
             <section id="supportView" class="ai-view" aria-labelledby="supportHeading" hidden>
                 <header class="view-heading">
                     <span>Trung tâm hỗ trợ</span>
-                    <h1 id="supportHeading">Hỗ trợ kỹ thuật</h1>
+                    <h2 id="supportHeading">Hỗ trợ kỹ thuật</h2>
                     <p>Chọn vấn đề đang gặp, AI sẽ hỏi thêm thông tin và hướng dẫn từng bước.</p>
                 </header>
                 <section class="support-topic-grid" aria-label="Chủ đề hỗ trợ">
@@ -125,6 +137,6 @@
         </form>
     </dialog>
 
-    <script src="../../assets/js/ai-assistant.js?v=ai-workspace-20260720-1"></script>
+    <script src="../../assets/js/ai-assistant.js?v=20261120-agentic-cart-v1"></script>
 </body>
 </html>

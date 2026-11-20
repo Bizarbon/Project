@@ -20,11 +20,15 @@
     <meta name="description"
         content="Xem giá bán tốt nhất, video trải nghiệm, thông số kỹ thuật, đánh giá thực tế và ưu đãi trả góp 0% tại TechEcommerce.">
     <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Chi tiết sản phẩm - TechEcommerce">
+    <meta property="og:description" content="Xem thông số kỹ thuật, giá bán chính hãng, ưu đãi trả góp 0% và đánh giá thực tế tại TechEcommerce.">
+    <meta property="og:type" content="product">
+    <meta property="og:url" content="https://techshopvn.vercel.app/pages/catalog/product.html">
     <link rel="canonical" href="https://techshopvn.vercel.app/pages/catalog/product.html">
     <title>Chi tiết sản phẩm - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css?v=20261109-mobile-compact-v2">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261109-mobile-compact-v2">
-    <link rel="stylesheet" href="../../assets/css/product-detail.css?v=20261109-mobile-compact-v2">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261117-audit-fix-v1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261117-audit-fix-v1">
+    <link rel="stylesheet" href="../../assets/css/product-detail.css?v=20261117-audit-fix-v1">
     <link rel="stylesheet" href="../../assets/css/exit-intent.css?v=20261111-v1">
 </head>
 
@@ -430,8 +434,22 @@
                 </div>
 
                 <p class="express-field">
+                    <label for="expressCitySelect">Tỉnh / Thành phố giao hàng <span class="required-star">*</span></label>
+                    <select id="expressCitySelect" name="province">
+                        <option value="79|Hồ Chí Minh">TP. Hồ Chí Minh (Giao nhanh 2H)</option>
+                        <option value="01|Hà Nội">Hà Nội (Giao nhanh nội thành)</option>
+                        <option value="48|Đà Nẵng">TP. Đà Nẵng</option>
+                        <option value="92|Cần Thơ">TP. Cần Thơ</option>
+                        <option value="31|Hải Phòng">TP. Hải Phòng</option>
+                        <option value="75|Đồng Nai">Tỉnh Đồng Nai</option>
+                        <option value="74|Bình Dương">Tỉnh Bình Dương</option>
+                        <option value="00|Tỉnh thành khác">Tỉnh / Thành phố khác</option>
+                    </select>
+                </p>
+
+                <p class="express-field">
                     <label for="expressCustomerAddress">Địa chỉ nhận hàng chi tiết <span class="required-star">*</span></label>
-                    <input type="text" id="expressCustomerAddress" name="address" required placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/Thành..." autocomplete="street-address">
+                    <input type="text" id="expressCustomerAddress" name="address" required placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện..." autocomplete="street-address">
                 </p>
 
                 <p class="express-field">
@@ -451,7 +469,7 @@
                             </span>
                         </label>
                         <label class="express-radio-label">
-                            <input type="radio" name="expressPaymentMethod" value="bank">
+                            <input type="radio" name="expressPaymentMethod" value="bank_transfer">
                             <span class="radio-custom"></span>
                             <span class="radio-text">
                                 <strong>📲 Chuyển khoản QR Siêu Tốc (VNPay / VietQR)</strong>
@@ -495,7 +513,7 @@
             </button>
             <button type="button" class="u061-lb-nav u061-lb-prev prev" id="u061LbPrev" aria-label="Ảnh trước" title="Ảnh trước (←)">‹</button>
             <figure class="u061-lb-stage u061-lb-figure">
-                <img id="u061LbImg" src="" alt="" />
+                <img id="u061LbImg" alt="" />
                 <figcaption class="u061-lb-caption">
                     <div>
                         <small id="u061LbSub">Hình ảnh chính hãng</small>
@@ -508,9 +526,9 @@
         </div>
     </dialog>
 
-    <script src="../../assets/js/product-detail.js?v=20261109-mobile-compact-v2"></script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="../../assets/js/chatbox.js"></script>
+    <script src="../../assets/js/product-detail.js?v=20261117-audit-fix-v1"></script>
+    <script src="../../assets/js/footer.js?v=20261117-audit-fix-v1"></script>
+    <script src="../../assets/js/chatbox.js?v=20261117-audit-fix-v1"></script>
     <script src="../../assets/js/exit-intent.js?v=20261111-v1" defer></script>
 </body>
 

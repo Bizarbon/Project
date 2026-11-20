@@ -5,6 +5,30 @@
     const root = typeof window.getAppBasePath === 'function' ? window.getAppBasePath() : getBasePath();
     const apiUrl = window.API_URL || 'http://localhost:5000/api';
     let consultationContext = {};
+    const CHAT_MODE_STORAGE_KEY = 'ai_chat_mode';
+    const openAiStarterSuggestions = [
+        '💡 Giải thích cảm biến quang vs laser',
+        '🐍 Viết hàm sắp xếp nhanh bằng Python',
+        '🎧 Tai nghe có dây cắm laptop 3.5mm',
+        '✈️ Lên lịch trình du lịch Đà Lạt 3 ngày',
+        '📊 So sánh MacBook Air M2 và M3',
+        '🔥 Săn mã giảm giá hôm nay'
+    ];
+    function getChatMode() {
+        try {
+            const saved = localStorage.getItem(CHAT_MODE_STORAGE_KEY);
+            return saved === 'open_ai' ? 'open_ai' : 'tech_advisor';
+        } catch (_) {
+            return 'tech_advisor';
+        }
+    }
+    function saveChatMode(mode) {
+        const normalized = mode === 'open_ai' ? 'open_ai' : 'tech_advisor';
+        try { localStorage.setItem(CHAT_MODE_STORAGE_KEY, normalized); } catch (_) { }
+        return normalized;
+    }
+    let activeChatMode = getChatMode();
+    let activeStreamAbortController = null;
     const starterSuggestions = [
         '✨ Tư vấn chọn máy',
         '📊 Laptop cho Kế toán',
@@ -84,7 +108,7 @@
         if (!document.querySelector('link[data-ai-chat-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/chatbox.css?v=20261116-mobile-fix-v3`;
+            link.href = `${root}assets/css/chatbox.css?v=20261120-agentic-cart-v1`;
             link.dataset.aiChatStyle = 'true';
             document.head.appendChild(link);
         }
@@ -284,11 +308,23 @@
 
     function formatAIMessage(rawText) {
         if (!rawText) return '';
-        const escaped = escapeHTML(humanizeStoreName(rawText));
+        const normalizedRaw = humanizeStoreName(rawText).replace(/\r\n/g, '\n');
+
+        // Tách riêng các khối code ```lang ... ``` trước khi escape/format Markdown inline
+        const codeBlocks = [];
+        const withPlaceholders = normalizedRaw.replace(/```([a-zA-Z0-9_+#.-]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+            const idx = codeBlocks.length;
+            const cleanLang = (lang || 'code').trim().toLowerCase();
+            const cleanCode = String(code || '').replace(/\n$/, '');
+            codeBlocks.push({ lang: cleanLang, code: cleanCode });
+            return `\n@@CODEBLOCK_${idx}@@\n`;
+        });
+
+        const escaped = escapeHTML(withPlaceholders);
         let formatted = escaped
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`([^`]+)`/g, '<code>$1</code>');
+            .replace(/(^|[^\w*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>')
+            .replace(/`([^`\n]+)`/g, '<code>$1</code>');
 
         const lines = formatted.split('\n');
         const output = [];
@@ -312,6 +348,22 @@
         lines.forEach(line => {
             const trimmed = line.trim();
 
+            const codeMatch = trimmed.match(/^@@CODEBLOCK_(\d+)@@$/);
+            if (codeMatch) {
+                flushList();
+                flushTable();
+                const blk = codeBlocks[Number(codeMatch[1])];
+                if (blk) {
+                    output.push(
+                        `<figure class="ai-code-block">` +
+                        `<figcaption><span class="ai-code-lang">${escapeHTML(blk.lang)}</span><button type="button" class="ai-code-copy-btn" aria-label="Sao chép đoạn mã">Sao chép</button></figcaption>` +
+                        `<pre><code>${escapeHTML(blk.code)}</code></pre>` +
+                        `</figure>`
+                    );
+                }
+                return;
+            }
+
             // Detect markdown table rows
             const isTableLine = trimmed.startsWith('|') && trimmed.includes('|');
             if (isTableLine) {
@@ -323,16 +375,18 @@
             // Flush table when non-table line is encountered
             flushTable();
 
-            if (trimmed.startsWith('• ') || trimmed.startsWith('- ')) {
+            if (trimmed.startsWith('• ') || trimmed.startsWith('- ') || /^\*\s+/.test(trimmed)) {
                 if (!inList) {
                     output.push('<ul class="ai-chat-bullet-list">');
                     inList = true;
                 }
-                output.push(`<li>${trimmed.replace(/^[•-]\s*/, '')}</li>`);
+                output.push(`<li>${trimmed.replace(/^[•\-*]\s*/, '')}</li>`);
             } else {
                 flushList();
                 if (trimmed) {
-                    if (trimmed.startsWith('⚖️')) {
+                    if (/^#{1,4}\s+/.test(trimmed)) {
+                        output.push(`<h4 class="ai-md-heading">${trimmed.replace(/^#{1,4}\s+/, '')}</h4>`);
+                    } else if (trimmed.startsWith('⚖️')) {
                         output.push(`<div class="ai-compare-header"><span class="ai-compare-pill">SO SÁNH MINH BẠCH</span><h4 class="ai-compare-title">${trimmed}</h4></div>`);
                     } else if (trimmed.startsWith('🔍')) {
                         output.push(`<div class="ai-callout ai-callout-tradeoff"><h5 class="ai-callout-title">${trimmed}</h5></div>`);
@@ -368,8 +422,8 @@
                             <span class="ai-status-indicator" aria-hidden="true"></span>
                         </figure>
                         <div class="ai-chat-title-text">
-                            <strong>Trợ lý AI Mua sắm</strong>
-                            <span id="aiChatStatus" role="status">Trực tuyến · Hỗ trợ 24/7</span>
+                            <strong id="aiChatTitleHeading">${activeChatMode === 'open_ai' ? 'Trợ lý AI Toàn năng' : 'Chuyên gia AI Mua sắm'}</strong>
+                            <span id="aiChatStatus" role="status">${activeChatMode === 'open_ai' ? 'Tự do 100% · Hỏi đáp mọi lĩnh vực' : 'Trực tuyến · Tư vấn công nghệ 24/7'}</span>
                         </div>
                     </div>
                     <div class="ai-chat-header-actions" aria-label="Tác vụ cửa sổ chat">
@@ -382,7 +436,12 @@
                         <button class="ai-chat-close" type="button" aria-label="Đóng chat">×</button>
                     </div>
                 </header>
-                <main class="ai-chat-body" id="aiChatBody" role="log" aria-live="polite"></main>
+                <fieldset class="ai-mode-switcher" role="radiogroup" aria-label="Chế độ Trợ lý AI">
+                    <legend class="sr-only">Chọn chế độ hoạt động của Trợ lý AI</legend>
+                    <button type="button" class="ai-mode-btn${activeChatMode === 'tech_advisor' ? ' is-active' : ''}" role="radio" aria-checked="${activeChatMode === 'tech_advisor'}" data-chat-mode="tech_advisor" title="Chuyên gia công nghệ & tư vấn mua sắm chuẩn kho">🛒 Chuyên gia Tech</button>
+                    <button type="button" class="ai-mode-btn${activeChatMode === 'open_ai' ? ' is-active' : ''}" role="radio" aria-checked="${activeChatMode === 'open_ai'}" data-chat-mode="open_ai" title="Trả lời tự do mọi lĩnh vực như ChatGPT / Gemini + tự tra kho khi hỏi mua">✨ AI Toàn năng</button>
+                </fieldset>
+                <section class="ai-chat-body" id="aiChatBody" role="log" aria-live="polite" aria-label="Lịch sử trò chuyện với Trợ lý AI"></section>
                 <nav class="ai-chat-suggestions-nav" id="aiChatSuggestionsNav" aria-label="Gợi ý tác vụ nhanh">
                     <button type="button" class="ai-suggestions-arrow ai-suggestions-prev" aria-label="Cuộn gợi ý sang trái" hidden>‹</button>
                     <div class="ai-chat-suggestions-bar" id="aiChatSuggestions"></div>
@@ -392,7 +451,8 @@
                     <button class="ai-chat-camera" id="aiChatCameraBtn" type="button" aria-label="Tìm kiếm sản phẩm bằng hình ảnh" title="Gửi ảnh, kéo thả hoặc dán (Ctrl+V) để AI tìm sản phẩm">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
                     </button>
-                    <input type="file" id="aiChatCameraInput" accept="image/*" style="display:none" aria-hidden="true">
+                    <label class="sr-only" for="aiChatCameraInput">Tải ảnh sản phẩm để AI nhận diện</label>
+                    <input type="file" id="aiChatCameraInput" accept="image/*" style="display:none">
                     <!-- Lucian UX/UI Prompt #084 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#084 -->
                     <button class="ai-chat-mic u084-mic-btn" type="button" aria-label="Nhập bằng giọng nói" title="Nhập bằng giọng nói">
                         <svg class="u084-mic-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -400,7 +460,9 @@
                         </svg>
                         <span class="u084-voice-dots" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i></span>
                     </button>
-                    <input class="ai-chat-input" id="aiChatInput" type="text" placeholder="Hỏi giá, so sánh, mã giảm giá, trả góp..." autocomplete="off">
+                    <label class="sr-only" for="aiChatInput">Nhập câu hỏi cần AI tư vấn</label>
+                    <input class="ai-chat-input" id="aiChatInput" type="text" placeholder="${activeChatMode === 'open_ai' ? 'Hỏi bất kỳ điều gì: code, học tập, công nghệ, mua sắm...' : 'Hỏi cấu hình, so sánh, tai nghe, mã giảm giá, trả góp...'}" autocomplete="off">
+                    <button class="ai-chat-stop" id="aiChatStopBtn" type="button" aria-label="Dừng tạo phản hồi" title="Dừng tạo phản hồi" hidden>■</button>
                     <button class="ai-chat-send" type="submit" aria-label="Gửi tin nhắn">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-6-6 6 6-6 6"></path>
@@ -1434,6 +1496,108 @@
         return card;
     }
 
+    function handleAddBatchToCart(cartItems = [], openCartAfter = false) {
+        if (!Array.isArray(cartItems) || cartItems.length === 0) return 0;
+        const cartKey = window.auth?.getCartStorageKey?.() || (localStorage.getItem('token') ? 'cart:user' : 'cart:guest');
+        let cart = [];
+        try {
+            cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+            if (!Array.isArray(cart)) cart = [];
+        } catch (_) {
+            cart = [];
+        }
+
+        let addedTotalQty = 0;
+        cartItems.forEach(item => {
+            const pid = Number(item.productId);
+            const qty = Math.max(1, Number(item.quantity) || 1);
+            if (!pid) return;
+            const existing = cart.find(i => String(i.productId) === String(pid) && !i.selectedColor && !i.selectedStorage);
+            if (existing) {
+                existing.quantity = (Number(existing.quantity) || 1) + qty;
+                if (!existing.selectedImage && item.image) existing.selectedImage = item.image;
+                if (!existing.price && item.price) existing.price = Number(item.price);
+            } else {
+                cart.push({
+                    productId: pid,
+                    quantity: qty,
+                    selectedColor: null,
+                    selectedStorage: null,
+                    selectedImage: item.image || '',
+                    price: Number(item.price || 0)
+                });
+            }
+            addedTotalQty += qty;
+        });
+
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        const totalCount = cart.reduce((sum, i) => sum + (Number(i.quantity) || 1), 0);
+        document.querySelectorAll('#headerCartBadge, .header-cart-badge, #bottomNavCartBadge, .cart-count').forEach(badge => {
+            badge.textContent = totalCount;
+            badge.removeAttribute('hidden');
+        });
+        if (typeof window.updateCartCount === 'function') {
+            try { window.updateCartCount(); } catch (_) { }
+        }
+        if (typeof window.updateCartBadge === 'function') {
+            try { window.updateCartBadge(); } catch (_) { }
+        }
+        if (typeof window.renderCart === 'function') {
+            try { window.renderCart(); } catch (_) { }
+        }
+        if (typeof window.showToast === 'function' && addedTotalQty > 0) {
+            window.showToast(`✓ Đã thêm ${addedTotalQty} sản phẩm vào giỏ hàng!`, 'success');
+        }
+        if (openCartAfter && typeof window.openCartDrawer === 'function') {
+            setTimeout(() => window.openCartDrawer(), 350);
+        }
+        return addedTotalQty;
+    }
+
+    function renderBatchCartActionCard(body, data) {
+        if (!data || !Array.isArray(data.cartItems) || data.cartItems.length === 0) return;
+        const card = document.createElement('section');
+        card.className = 'ai-action-card ai-action-cart-batch';
+        card.setAttribute('aria-label', 'Sản phẩm AI vừa thêm vào giỏ hàng');
+
+        const safeImg = (src) => {
+            if (!src) return `${root}assets/images/product-placeholder.svg`;
+            if (/^(?:https?:|data:|\/)/i.test(src)) return src;
+            return `${root}${String(src).replace(/^\.?\//, '')}`;
+        };
+        const totalAmt = Number(data.totalCartAddedAmount || data.cartItems.reduce((s, i) => s + Number(i.price || 0) * Number(i.quantity || 1), 0));
+        const listHtml = data.cartItems.map(item => `
+            <li class="ai-cart-batch-item">
+                <img src="${escapeHTML(safeImg(item.image))}" alt="${escapeHTML(item.name)}" width="44" height="44" onerror="this.onerror=null;this.src='${root}assets/images/product-placeholder.svg'">
+                <article class="ai-cart-batch-meta">
+                    <a href="${root}pages/catalog/product.html?id=${encodeURIComponent(item.productId)}"><strong>${escapeHTML(item.name)}</strong></a>
+                    <small>SL: ${Number(item.quantity || 1)} · <b>${Number(item.price || 0).toLocaleString('vi-VN')} đ</b></small>
+                </article>
+            </li>
+        `).join('');
+
+        card.innerHTML = `
+            <header class="ai-action-badge">✓ Đã thêm ${data.cartItems.length} sản phẩm vào giỏ hàng</header>
+            <ul class="ai-cart-batch-list">${listHtml}</ul>
+            <footer class="ai-cart-batch-footer">
+                <p class="ai-cart-batch-total">Tạm tính vừa thêm: <strong>${totalAmt.toLocaleString('vi-VN')} đ</strong></p>
+                <button type="button" class="ai-action-btn-checkout">🛒 Xem Giỏ Hàng &amp; Thanh Toán Ngay</button>
+            </footer>
+        `;
+        const openBtn = card.querySelector('.ai-action-btn-checkout');
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                if (typeof window.openCartDrawer === 'function') {
+                    window.openCartDrawer();
+                    return;
+                }
+                window.location.href = `${root}index.html?openCart=1`;
+            });
+        }
+        body.appendChild(card);
+        scrollToBottom(body);
+    }
+
     function renderActionCard(body, data) {
         if (!data || !data.product) return;
         const card = document.createElement('section');
@@ -1533,14 +1697,99 @@
             delete requestContext.pageCategory;
         }
 
+        requestContext.chatMode = activeChatMode;
         const response = await fetch(`${apiUrl}/chat`, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ message, sessionId, context: requestContext })
+            body: JSON.stringify({ message, mode: activeChatMode, sessionId, context: requestContext })
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.message || 'Chatbot chưa phản hồi được.');
         return data;
+    }
+
+    async function askAssistantStream(message, context, { onStatus, onDelta, signal } = {}) {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json', Accept: 'text/event-stream' };
+        if (token) headers.Authorization = `Bearer ${token}`;
+
+        const sessionId = getOrCreateChatSessionId();
+        hydrateLongTermMemorySnapshot();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const resolvedCategory = getActiveStorefrontCategory();
+        const pageProductId = window.location.pathname.includes('product.html') ? (urlParams.get('id') || '') : '';
+        const requestContext = {
+            ...(context || {}),
+            chatMode: activeChatMode,
+            ...(pageProductId ? { pageProductId } : {})
+        };
+        if (resolvedCategory) {
+            requestContext.selectedCategory = resolvedCategory;
+            requestContext.pageCategory = resolvedCategory;
+        }
+
+        const response = await fetch(`${apiUrl}/chat/stream`, {
+            method: 'POST',
+            headers,
+            signal,
+            body: JSON.stringify({ message, mode: activeChatMode, sessionId, context: requestContext })
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        if (!response.ok || !response.body || !contentType.includes('text/event-stream')) {
+            return await askAssistant(message, context);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let finalPayload = null;
+        let streamedText = '';
+
+        const processBlock = (block) => {
+            const lines = block.split(/\r?\n/);
+            let evtName = 'message';
+            const dataLines = [];
+            for (const line of lines) {
+                if (line.startsWith('event:')) evtName = line.slice(6).trim();
+                else if (line.startsWith('data:')) dataLines.push(line.slice(5).trim());
+            }
+            if (!dataLines.length) return;
+            let payload = null;
+            try { payload = JSON.parse(dataLines.join('\n')); } catch (_) { return; }
+            if (evtName === 'status' && payload?.text && typeof onStatus === 'function') {
+                onStatus(payload.text);
+            } else if (evtName === 'delta' && payload?.text) {
+                streamedText += payload.text;
+                if (typeof onDelta === 'function') onDelta(payload.text, streamedText);
+            } else if (evtName === 'done') {
+                finalPayload = payload;
+            } else if (evtName === 'error') {
+                throw new Error(payload?.message || 'Chatbot chưa phản hồi được.');
+            }
+        };
+
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const blocks = buffer.split(/\r?\n\r?\n/);
+            buffer = blocks.pop() || '';
+            for (const b of blocks) {
+                if (b.trim()) processBlock(b);
+            }
+        }
+        if (buffer.trim()) processBlock(buffer);
+
+        if (finalPayload) {
+            finalPayload.__streamed = streamedText.length > 0;
+            return finalPayload;
+        }
+        if (streamedText) {
+            return { reply: streamedText, products: [], suggestions: [], context: requestContext, __streamed: true };
+        }
+        return await askAssistant(message, context);
     }
 
     function boot() {
@@ -1552,11 +1801,77 @@
         const panel = chat.querySelector('.ai-chat-panel');
         const input = chat.querySelector('#aiChatInput');
         const sendButton = chat.querySelector('.ai-chat-send');
+        const stopButton = chat.querySelector('#aiChatStopBtn');
         const cameraButton = chat.querySelector('#aiChatCameraBtn');
         const cameraInput = chat.querySelector('#aiChatCameraInput');
         const micButton = chat.querySelector('.ai-chat-mic');
         const voiceButton = chat.querySelector('.ai-chat-voice');
         const status = chat.querySelector('#aiChatStatus');
+        const titleHeading = chat.querySelector('#aiChatTitleHeading');
+        const modeButtons = Array.from(chat.querySelectorAll('.ai-mode-btn[data-chat-mode]'));
+
+        function syncModeUI(nextMode, announce = false) {
+            activeChatMode = saveChatMode(nextMode);
+            consultationContext.chatMode = activeChatMode;
+            modeButtons.forEach(btn => {
+                const isSelected = btn.dataset.chatMode === activeChatMode;
+                btn.classList.toggle('is-active', isSelected);
+                btn.setAttribute('aria-checked', String(isSelected));
+            });
+            if (titleHeading) {
+                titleHeading.textContent = activeChatMode === 'open_ai' ? 'Trợ lý AI Toàn năng' : 'Chuyên gia AI Mua sắm';
+            }
+            if (status) {
+                status.textContent = activeChatMode === 'open_ai'
+                    ? 'Tự do 100% · Hỏi đáp mọi lĩnh vực'
+                    : 'Trực tuyến · Tư vấn công nghệ 24/7';
+            }
+            if (input) {
+                input.placeholder = activeChatMode === 'open_ai'
+                    ? 'Hỏi bất kỳ điều gì: code, học tập, công nghệ, mua sắm...'
+                    : 'Hỏi cấu hình, so sánh, tai nghe, mã giảm giá, trả góp...';
+            }
+            if (chatHistory.length <= 1 && typeof renderSuggestions === 'function') {
+                renderSuggestions(suggestionsBar, activeChatMode === 'open_ai' ? openAiStarterSuggestions : starterSuggestions, send);
+            }
+            if (announce && typeof window.showToast === 'function') {
+                window.showToast(
+                    activeChatMode === 'open_ai'
+                        ? 'Đã chuyển sang chế độ ✨ AI Toàn năng (hỏi đáp tự do mọi lĩnh vực)'
+                        : 'Đã chuyển sang chế độ 🛒 Chuyên gia Công nghệ & Mua sắm',
+                    'info'
+                );
+            }
+        }
+
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.dataset.chatMode !== activeChatMode) {
+                    syncModeUI(btn.dataset.chatMode, true);
+                }
+            });
+        });
+
+        if (stopButton) {
+            stopButton.addEventListener('click', () => {
+                if (activeStreamAbortController) {
+                    activeStreamAbortController.abort();
+                    activeStreamAbortController = null;
+                }
+            });
+        }
+
+        body.addEventListener('click', (event) => {
+            const copyBtn = event.target.closest('.ai-code-copy-btn');
+            if (!copyBtn) return;
+            const codeEl = copyBtn.closest('.ai-code-block')?.querySelector('pre code');
+            if (!codeEl) return;
+            navigator.clipboard?.writeText(codeEl.textContent || '').then(() => {
+                const oldText = copyBtn.textContent;
+                copyBtn.textContent = '✓ Đã chép';
+                setTimeout(() => { copyBtn.textContent = oldText; }, 1600);
+            }).catch(() => {});
+        });
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = SpeechRecognition ? new SpeechRecognition() : null;
@@ -2533,21 +2848,118 @@
 
             const typingText = options.droppedProduct
                 ? `Đang phân tích thông số và ưu đãi cho ${options.droppedProduct.name}...`
-                : 'Đang tìm kiếm thông tin tối ưu...';
+                : (activeChatMode === 'open_ai' ? '✨ AI đang suy luận...' : '🧠 Đang tìm kiếm thông tin tối ưu...');
             const typing = appendMessage(body, 'ai ai-typing', typingText);
             sendButton.disabled = true;
+            if (stopButton) stopButton.hidden = false;
             panel.dataset.state = 'loading';
             window.TechMascot?.setState('thinking');
 
+            let liveArticle = null;
+            let liveBubble = null;
+            let liveStatusEl = null;
+            let liveAccumulated = '';
+            const streamController = new AbortController();
+            activeStreamAbortController = streamController;
+
+            const ensureLiveStreamBubble = () => {
+                if (liveBubble) return liveBubble;
+                typing.remove();
+                liveArticle = document.createElement('article');
+                liveArticle.className = 'ai-message ai u215-msg-pop';
+                liveBubble = document.createElement('section');
+                liveBubble.className = 'ai-bubble u086-stream-bubble';
+                liveArticle.appendChild(liveBubble);
+                body.appendChild(liveArticle);
+                window.TechMascot?.onReplyStart();
+                return liveBubble;
+            };
+
+            const finalizeAssistantReply = (data, replyText) => {
+                chatHistory.push({
+                    role: 'ai',
+                    text: replyText,
+                    vouchers: data.vouchers,
+                    products: data.products,
+                    bundle: data.bundle,
+                    suggestions: data.suggestions
+                });
+                saveSession();
+
+                if (data.vouchers && data.vouchers.length > 0) {
+                    renderVouchers(body, data.vouchers);
+                }
+
+                if (data.bundle) {
+                    renderBundleCard(body, data.bundle);
+                    if (data.bundle.mainProduct) {
+                        recordUserShoppingInterest(data.bundle.mainProduct.category, data.bundle.mainProduct.name);
+                    }
+                } else if (data.products && data.products.length === 1) {
+                    renderInteractiveProductCard(body, data.products[0], data.coupon);
+                    recordUserShoppingInterest(data.products[0].category, data.products[0].name);
+                } else if (data.products && data.products.length > 1) {
+                    renderChatProducts(body, data.products);
+                    recordUserShoppingInterest(data.products[0]?.category, data.products[0]?.name);
+                }
+
+                if (data.action === 'add_to_cart_batch' && Array.isArray(data.cartItems) && data.cartItems.length > 0) {
+                    handleAddBatchToCart(data.cartItems, Boolean(data.openCartAfter));
+                    renderBatchCartActionCard(body, data);
+                } else if (data.action === 'add_to_cart_and_checkout' && data.product) {
+                    handleAddToCart(data.product._id);
+                    if (data.coupon) {
+                        sessionStorage.setItem('appliedCoupon', JSON.stringify(data.coupon));
+                        localStorage.setItem('checkout_coupon', data.coupon.code);
+                    }
+                    renderActionCard(body, data);
+                }
+
+                if (data.action !== 'add_to_cart_batch') {
+                    handleAutoNavigation(message, data);
+                }
+                renderSuggestions(suggestionsBar, data.suggestions, send);
+                scrollToBottom(body);
+                scheduleReengagement();
+                window.TechMascot?.onReplyComplete(replyText.length);
+            };
+
             try {
                 consultationContext.conversationHistory = chatHistory
-                    .slice(-21, -1)
+                    .slice(-29, -1)
                     .filter(item => item && item.text && !item.proactive)
                     .map(item => ({
                         role: item.role === 'user' ? 'user' : 'assistant',
                         text: String(item.text).slice(0, 900)
                     }));
-                const data = await askAssistant(message, consultationContext);
+                const data = await askAssistantStream(message, consultationContext, {
+                    signal: streamController.signal,
+                    onStatus: (statusText) => {
+                        if (!liveBubble) {
+                            const tb = typing.querySelector('.ai-bubble');
+                            if (tb) tb.textContent = statusText;
+                        } else {
+                            if (!liveStatusEl) {
+                                liveStatusEl = document.createElement('p');
+                                liveStatusEl.className = 'ai-stream-status';
+                                liveBubble.prepend(liveStatusEl);
+                            }
+                            liveStatusEl.textContent = statusText;
+                        }
+                        scrollToBottom(body);
+                    },
+                    onDelta: (_, fullSoFar) => {
+                        liveAccumulated = fullSoFar;
+                        const target = ensureLiveStreamBubble();
+                        if (liveStatusEl) {
+                            liveStatusEl.remove();
+                            liveStatusEl = null;
+                        }
+                        target.innerHTML = `${formatAIMessage(liveAccumulated)}<span class="ai-typing-cursor u086-caret" aria-hidden="true"></span>`;
+                        scrollToBottom(body);
+                    }
+                });
+
                 if (data.context && typeof data.context === 'object') {
                     if (!data.notFound) {
                         delete consultationContext.notFound;
@@ -2579,64 +2991,36 @@
                 if (Array.isArray(data.products) && data.products.length > 0) {
                     consultationContext.lastProducts = data.products;
                 }
-                typing.remove();
 
-                const reply = data.reply || 'Mình chưa có câu trả lời phù hợp.';
-                window.TechMascot?.onReplyStart();
-                streamAIMessage(body, reply, () => {
-                    chatHistory.push({
-                        role: 'ai',
-                        text: reply,
-                        vouchers: data.vouchers,
-                        products: data.products,
-                        bundle: data.bundle,
-                        suggestions: data.suggestions
-                    });
-                    saveSession();
-
-                    if (data.vouchers && data.vouchers.length > 0) {
-                        renderVouchers(body, data.vouchers);
-                    }
-
-                    if (data.bundle) {
-                        renderBundleCard(body, data.bundle);
-                        if (data.bundle.mainProduct) {
-                            recordUserShoppingInterest(data.bundle.mainProduct.category, data.bundle.mainProduct.name);
-                        }
-                    } else if (data.products && data.products.length === 1) {
-                        renderInteractiveProductCard(body, data.products[0], data.coupon);
-                        recordUserShoppingInterest(data.products[0].category, data.products[0].name);
-                    } else if (data.products && data.products.length > 1) {
-                        renderChatProducts(body, data.products);
-                        recordUserShoppingInterest(data.products[0]?.category, data.products[0]?.name);
-                    }
-
-                    if (data.action === 'add_to_cart_and_checkout' && data.product) {
-                        handleAddToCart(data.product._id);
-                        if (data.coupon) {
-                            sessionStorage.setItem('appliedCoupon', JSON.stringify(data.coupon));
-                            localStorage.setItem('checkout_coupon', data.coupon.code);
-                        }
-                        renderActionCard(body, data);
-                    }
-
-                    // Tự động chuyển hướng đến danh mục sản phẩm (hoặc chi tiết sản phẩm nếu có yêu cầu đích danh)
-                    handleAutoNavigation(message, data);
-
-                    renderSuggestions(suggestionsBar, data.suggestions, send);
-                    scrollToBottom(body);
-                    scheduleReengagement();
-                    window.TechMascot?.onReplyComplete(reply.length);
-                });
+                const reply = data.reply || liveAccumulated || 'Mình chưa có câu trả lời phù hợp.';
+                if (liveBubble) {
+                    liveBubble.innerHTML = formatAIMessage(reply);
+                    finalizeAssistantReply(data, reply);
+                } else {
+                    typing.remove();
+                    window.TechMascot?.onReplyStart();
+                    streamAIMessage(body, reply, () => finalizeAssistantReply(data, reply));
+                }
 
                 speak(reply);
                 panel.dataset.state = 'success';
             } catch (error) {
                 typing.remove();
-                appendMessage(body, 'ai', error.message || 'Có lỗi xảy ra, bạn thử lại giúp em nhé.');
-                panel.dataset.state = 'error';
-                window.TechMascot?.onReplyError();
+                if (error?.name === 'AbortError') {
+                    if (liveBubble && liveAccumulated) {
+                        liveBubble.innerHTML = formatAIMessage(liveAccumulated);
+                        chatHistory.push({ role: 'ai', text: liveAccumulated });
+                        saveSession();
+                    }
+                    panel.dataset.state = 'default';
+                } else {
+                    appendMessage(body, 'ai', error.message || 'Có lỗi xảy ra, bạn thử lại giúp em nhé.');
+                    panel.dataset.state = 'error';
+                    window.TechMascot?.onReplyError();
+                }
             } finally {
+                activeStreamAbortController = null;
+                if (stopButton) stopButton.hidden = true;
                 sendButton.disabled = false;
                 input.focus();
                 if (options.fromVoice) {

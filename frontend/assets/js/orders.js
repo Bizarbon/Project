@@ -276,11 +276,11 @@ function renderOrdersTable(orders) {
 
         // Products summary
         const productsSummaryHtml = (order.products || []).slice(0, 3).map(item => `
-            <div style="font-size:0.78rem; margin-bottom:2px; color:#e2e8f0;">
+            <div style="font-size:0.78rem; margin-bottom:2px; color:var(--admin-text-main, #0f172a);">
                 <strong>${escapeHTML(item.product?.name || item.productName || 'Sản phẩm')}</strong>
-                <span style="color:#94a3b8;">x${item.quantity}</span>
+                <span style="color:var(--admin-text-muted, #64748b);">x${item.quantity}</span>
             </div>
-        `).join('') + ((order.products || []).length > 3 ? `<div style="font-size:0.74rem; color:#60a5fa;">+${order.products.length - 3} sản phẩm khác...</div>` : '');
+        `).join('') + ((order.products || []).length > 3 ? `<div style="font-size:0.74rem; color:var(--primary, #2563eb);">+${order.products.length - 3} sản phẩm khác...</div>` : '');
 
         // Payment status & method badge
         const payStatusClass = order.paymentStatus === 'paid' ? 'status-completed' : (order.paymentStatus === 'unpaid' ? 'status-pending' : 'status-cancelled');
@@ -351,9 +351,9 @@ function renderOrdersTable(orders) {
         const trackingCode = order.trackingNumber || '';
         const shippingCellHtml = `
             <div style="font-size:0.78rem;">
-                <span class="status-badge" style="background:rgba(255,255,255,0.06); color:#cbd5e1; font-size:0.72rem;">${escapeHTML(shippingStatusText)}</span>
-                ${trackingCode ? `<div style="color:#60a5fa; margin-top:2px; font-family:monospace;">${escapeHTML(trackingCode)}</div>` : ''}
-                ${order.shippingUnit ? `<div style="color:#94a3b8; font-size:0.72rem;">${escapeHTML(order.shippingUnit)}</div>` : ''}
+                <span class="status-badge" style="background:var(--admin-surface, #ffffff); border:1px solid var(--admin-border, #e2e8f0); color:var(--admin-text-main, #334155); font-size:0.72rem;">${escapeHTML(shippingStatusText)}</span>
+                ${trackingCode ? `<div style="color:var(--primary, #2563eb); margin-top:2px; font-family:monospace;">${escapeHTML(trackingCode)}</div>` : ''}
+                ${order.shippingUnit ? `<div style="color:var(--admin-text-muted, #64748b); font-size:0.72rem;">${escapeHTML(order.shippingUnit)}</div>` : ''}
             </div>
         `;
 
@@ -1010,7 +1010,7 @@ function openBulkShipperModal() {
 
     title.textContent = `Phân công shipper cho ${selectedOrderIds.size} đơn hàng`;
     body.innerHTML = `
-        <div style="margin-bottom:14px; color:#cbd5e1; font-size:0.86rem;">
+        <div style="margin-bottom:14px; color:var(--admin-text-muted, #475569); font-size:0.86rem;">
             Chọn shipper phụ trách giao toàn bộ <strong>${selectedOrderIds.size}</strong> đơn đã chọn:
         </div>
         <div class="filter-group">
@@ -1032,7 +1032,7 @@ function openBulkStatusModal() {
 
     title.textContent = `Cập nhật trạng thái cho ${selectedOrderIds.size} đơn hàng`;
     body.innerHTML = `
-        <div style="margin-bottom:14px; color:#cbd5e1; font-size:0.86rem;">
+        <div style="margin-bottom:14px; color:var(--admin-text-muted, #475569); font-size:0.86rem;">
             Chọn trạng thái mới cần áp dụng cho <strong>${selectedOrderIds.size}</strong> đơn đã chọn:
         </div>
         <div class="filter-group">
@@ -1145,7 +1145,7 @@ function buildOrderDetailHtml(order) {
     // Products table rows
     const productsHtml = (order.products || []).map((p, idx) => {
         const prod = p.product || {};
-        const image = (prod.images && prod.images[0]) || '../assets/images/placeholder.png';
+        const image = (prod.images && prod.images[0]) || '../assets/images/product-placeholder.svg';
         const name = p.productName || prod.name || 'Sản phẩm công nghệ';
         const lineTotal = (p.price || 0) * (p.quantity || 1);
 

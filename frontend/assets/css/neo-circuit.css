@@ -4777,6 +4777,7 @@ html[data-theme='dark'] .hero-slide .hero-eyebrow {
     color: #38bdf8;
 }
 
+.hero-slide h1,
 .hero-slide h2 {
     margin: 0 0 1rem;
     font-size: clamp(2rem, 3.8vw, 3.2rem);
@@ -4786,6 +4787,7 @@ html[data-theme='dark'] .hero-slide .hero-eyebrow {
     letter-spacing: -0.02em;
 }
 
+html[data-theme='dark'] .hero-slide h1,
 html[data-theme='dark'] .hero-slide h2 {
     color: #f8fafc;
 }
@@ -5270,6 +5272,7 @@ html[data-theme='dark'] .hero-control {
         font-size: 0.65rem !important;
     }
 
+    .hero-slide h1,
     .hero-slide h2 {
         font-size: 1.02rem !important;
         line-height: 1.22 !important;
@@ -14044,6 +14047,24 @@ html[data-theme='dark'] .builder-sub {
 
 /* Mobile Responsive: 4x2 Category Grid + Full-width Setup Builder Bar */
 @media (max-width: 768px) {
+    .storefront-header {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    nav.header-categories:not(#storefrontCategories) {
+        max-width: 100% !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    nav.header-categories:not(#storefrontCategories) .header-category-list {
+        max-width: 100% !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        box-sizing: border-box !important;
+    }
+
     .header-categories {
         padding: 8px 6px !important;
         border-radius: 14px !important;

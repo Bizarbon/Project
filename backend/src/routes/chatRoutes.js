@@ -7,15 +7,16 @@ const Product = require('../models/Product');
 const Coupon = require('../models/Coupon');
 const ChatSession = require('../models/ChatSession');
 const KnowledgeArticle = require('../models/KnowledgeArticle');
-const { findKnowledgeArticle } = require('../services/knowledgeService');
-const { matchSmartAnswer } = require('../services/storeKnowledgeAndChitChat');
-const aiModelService = require('../services/aiModelService');
-const ragService = require('../services/ragService');
-const memoryService = require('../services/memoryService');
+const { findKnowledgeArticle } = require('../services/ai/knowledgeService');
+const { matchSmartAnswer } = require('../services/ai/storeKnowledgeAndChitChat');
+const aiModelService = require('../services/ai/aiModelService');
+const ragService = require('../services/ai/ragService');
+const memoryService = require('../services/ai/memoryService');
+const agenticChatService = require('../services/ai/agenticChatService');
 const { optionalAuth, protect, admin } = require('../middleware/auth');
 
 // Seed curated FAQ / policy / consultation articles into MongoDB if empty
-ragService.ensureKnowledgeBaseSeeded().catch(() => {});
+ragService.ensureKnowledgeBaseSeeded().catch(() => { });
 const { recommendProducts } = require('../utils/recommendations');
 const {
     coordinateConsultation,
@@ -26,8 +27,8 @@ const {
     buildPresenceCheckResponse,
     isTabletStylusQuery,
     handleTabletStylusExplanation
-} = require('../services/consultationCoordinator');
-const nlu = require('../services/nlu');
+} = require('../services/ai/consultationCoordinator');
+const nlu = require('../services/ai/nlu');
 
 const chatLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
@@ -186,7 +187,7 @@ function detectGreetingOrSmallTalk(text) {
                 '• 🔌 **Phụ kiện & Đồ chơi công nghệ:** Củ sạc nhanh Anker, Hub Ugreen, Gimbal DJI Pocket 3, Chuột & Bàn phím Logitech.\n\n' +
                 '👉 Bạn đang quan tâm đến dòng sản phẩm nào hoặc có mức ngân sách dự kiến bao nhiêu để em tư vấn chi tiết cho bạn nhé! 😊',
             suggestions: ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Tablet & iPad', 'Mã giảm giá hôm nay'],
-            context: { stage: 'asking_category' }
+            context: { stage: 'store_overview', currentIntent: 'store_overview', lastQuestionKey: 'store_overview', category: '' }
         };
     }
 
@@ -768,11 +769,11 @@ async function answerInstallmentQuestion(message, previousProducts = [], context
             const intro = budgetAmt > 0
                 ? (reachesDirectly
                     ? `Dạ với **${money(budgetAmt)}** hiện có, bạn **hoàn toàn có thể mua trả góp** các mẫu **${targetCategory}** chính hãng sau đây theo **2 phương án cực kỳ nhẹ ví**:\n` +
-                      `• 🪪 **Qua CCCD (từ 18 tuổi, không cần thẻ tín dụng):** Trả trước chỉ từ **10%–30%** giá máy -> Với **${money(budgetAmt)}** đủ làm khoản trả trước cho máy tầm giá tới **${money(maxReachCccd10Pct)}**.\n` +
-                      `• 💳 **Qua Thẻ tín dụng 0% lãi suất:** Trả trước **0 đ**, chia góp 12 tháng mỗi tháng chỉ ~**${money(budgetAmt)}** cho máy tới **${money(maxReachCard12M)}**.\n`
+                    `• 🪪 **Qua CCCD (từ 18 tuổi, không cần thẻ tín dụng):** Trả trước chỉ từ **10%–30%** giá máy -> Với **${money(budgetAmt)}** đủ làm khoản trả trước cho máy tầm giá tới **${money(maxReachCccd10Pct)}**.\n` +
+                    `• 💳 **Qua Thẻ tín dụng 0% lãi suất:** Trả trước **0 đ**, chia góp 12 tháng mỗi tháng chỉ ~**${money(budgetAmt)}** cho máy tới **${money(maxReachCard12M)}**.\n`
                     : `Dạ trong danh mục **${targetCategory}**, mẫu chính hãng có giá tốt nhất hiện từ **${money(lowestPrice)}** (${picked[0].name}):\n` +
-                      `• 🪪 **Qua CCCD (trả trước tối thiểu 10%):** Cần trả trước từ **${money(minDown10)}** (bạn có ${money(budgetAmt)}, thêm khoảng ${money(Math.max(0, minDown10 - budgetAmt))} là nhận máy ngay).\n` +
-                      `• 💳 **Qua Thẻ tín dụng 0% lãi suất:** Trả trước **0 đ**, góp 12 tháng chỉ **~${money(card12Low)}/tháng** -> bạn dùng **${money(budgetAmt)}** vẫn sở hữu được ngay ạ!\n`)
+                    `• 🪪 **Qua CCCD (trả trước tối thiểu 10%):** Cần trả trước từ **${money(minDown10)}** (bạn có ${money(budgetAmt)}, thêm khoảng ${money(Math.max(0, minDown10 - budgetAmt))} là nhận máy ngay).\n` +
+                    `• 💳 **Qua Thẻ tín dụng 0% lãi suất:** Trả trước **0 đ**, góp 12 tháng chỉ **~${money(card12Low)}/tháng** -> bạn dùng **${money(budgetAmt)}** vẫn sở hữu được ngay ạ!\n`)
                 : `Dạ cửa hàng hỗ trợ **trả góp 0% qua thẻ tín dụng (trả trước 0đ)** và **trả góp qua CCCD (trả trước 10%–30%, duyệt 15 phút)** cho toàn bộ danh mục **${targetCategory}**. Dưới đây là các mẫu dễ góp hàng tháng nhất:\n`;
 
             const itemsText = picked.map((p, idx) => {
@@ -1055,8 +1056,8 @@ async function answerOrderQuestion(req, message) {
         const rawPhone = order.recipientPhone || order.customerPhone || '';
         const rawName = order.recipientName || order.customerName || 'Quý khách';
         if (rawPhone || rawName) {
-            const phoneShow = isGuestLookup && rawPhone.length >= 7 
-                ? rawPhone.slice(0, 3) + '****' + rawPhone.slice(-3) 
+            const phoneShow = isGuestLookup && rawPhone.length >= 7
+                ? rawPhone.slice(0, 3) + '****' + rawPhone.slice(-3)
                 : rawPhone;
             recipientLine = `\n   • Người nhận: **${rawName}** (${phoneShow})`;
         }
@@ -2452,10 +2453,15 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const message = String(req.body.message || '').trim();
         if (!message) return res.status(400).json({ message: 'Vui lòng nhập nội dung cần tư vấn.' });
 
-        // Hydrate 3-Tier Memory (20-turn window + rollingSummary + persistent memoryProfile) from ChatSession
+        // Hydrate 3-Tier Memory (28-turn window + rollingSummary + persistent memoryProfile) from ChatSession
         const hydratedContext = await memoryService.hydrateContextWithSessionMemory(req, req.body.context || {});
+        const explicitModeRaw = req.body.mode || req.body.context?.chatMode || '';
+        const hasExplicitAgenticMode = Boolean(explicitModeRaw) || hydratedContext.chatMode === 'open_ai';
+        const activeMode = agenticChatService.normalizeMode(explicitModeRaw || hydratedContext.chatMode);
+        hydratedContext.chatMode = activeMode;
 
-        // NLU Pre-Guardrails check: Chặn ngay prompt injection và khiếu nại (Giai đoạn A)
+        // NLU Pre-Guardrails check: Luôn chặn prompt injection/jailbreak ở cả 2 chế độ;
+        // riêng chế độ open_ai không chặn câu cảm thán đời sống bằng rule complaint.
         if (process.env.NLU_PIPELINE !== 'off') {
             try {
                 const nluResult = nlu.processInput(message, hydratedContext);
@@ -2464,8 +2470,10 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
                     rawMessage: message,
                     context: hydratedContext
                 });
-                if (preGuard && preGuard.intercepted) {
-                    await memoryService.persistConversationTurn(req, message, preGuard.response, hydratedContext).catch(e => console.warn('persistConversationTurn error:', e.message));
+                const shouldInterceptGuard = Boolean(preGuard && preGuard.intercepted)
+                    && (activeMode !== 'open_ai' || preGuard.action === 'block_prompt_injection');
+                if (shouldInterceptGuard) {
+                    await memoryService.persistConversationTurn(req, message, preGuard.response, hydratedContext, { chatMode: activeMode }).catch(e => console.warn('persistConversationTurn error:', e.message));
                     return res.json(preGuard.response);
                 }
             } catch (err) {
@@ -2475,6 +2483,47 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
 
         const text = normalizeText(message);
         const context = hydratedContext;
+        const pendingVisualBrandPre = hydratedContext?.stage === 'visual_not_in_catalog' ? hydratedContext.pendingBrandSuggestion : null;
+
+        // LLM-FIRST AGENTIC PIPELINE (Chế độ 1 `open_ai` & Chế độ 2 `tech_advisor`)
+        // Khi client chỉ định chế độ Agentic (chatbox nổi, trang AI Assistant, hoặc API mode=open_ai|tech_advisor),
+        // đi thẳng qua Gemini Native Function Calling + Soft Memory + Agentic Tools — không bị chặn bởi kịch bản cứng!
+        if (hasExplicitAgenticMode && !pendingVisualBrandPre && req.body.engine !== 'legacy') {
+            const agenticRes = await agenticChatService.runAgenticChat({
+                message,
+                mode: activeMode,
+                context: hydratedContext,
+                req,
+                streamFinal: false
+            }).catch(err => {
+                console.warn('[POST /api/chat Agentic fallback]:', err.message);
+                return null;
+            });
+
+            if (agenticRes && agenticRes.reply) {
+                const savedProfile = await memoryService.persistConversationTurn(
+                    req,
+                    message,
+                    agenticRes,
+                    hydratedContext,
+                    {
+                        chatMode: activeMode,
+                        intent: agenticRes?.context?.currentIntent || `agentic_${activeMode}`,
+                        category: agenticRes?.context?.category || '',
+                        budget: agenticRes?.context?.budget || '',
+                        ragSources: agenticRes?.meta?.ragSources || null
+                    }
+                );
+                agenticRes.context = {
+                    ...(hydratedContext || {}),
+                    ...(agenticRes.context || {}),
+                    chatMode: activeMode,
+                    sessionKey: hydratedContext.sessionKey || req.body.sessionId || '',
+                    memoryProfile: savedProfile || agenticRes?.context?.memoryProfile || hydratedContext.memoryProfile
+                };
+                return res.json(agenticRes);
+            }
+        }
         const isInConversationFlow = Boolean(
             context.stage ||
             context.category ||
@@ -2489,7 +2538,8 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
         const gameCapability = await evaluateGameOrTaskCapability(message, hydratedContext);
         const isCorporateB2bInquiry = /\b(vat|hoa don do|xuat hoa don|cong ty|doanh nghiep|b2b|so luong lon)\b/i.test(text);
         const isPolicyOrExchangeInquiry = /\b(doi mau|doi may|khong hop|khong thich|co doi duoc|chinh sach|bao hanh|nguyen seal|boc hop|khui hop)\b/i.test(text);
-        const isBargainOrBundle = !isCorporateB2bInquiry && !isPolicyOrExchangeInquiry && ([
+        const isVoucherCatalogQuery = /\b(ma giam gia|ma voucher|ma code|ma khuyen mai|san ma|voucher nao|ap dung duoc|co khuyen mai gi|nhap ma)\b/i.test(text) && !/\b(bot|mac ca|fix gia|bot gia)\b/i.test(text);
+        const isBargainOrBundle = !isCorporateB2bInquiry && !isPolicyOrExchangeInquiry && !isVoucherCatalogQuery && ([
             'bot khong', 'giam them khong', 'mac ca', 'bot chut', 'giam gia them', 'qua tang', 'combo', 'mua kem',
             'co qua gi khong', 'gia nay la gia cuoi chua', 'co bot duoc khong', 'co uu dai gi them khong', 'xin bot',
             'co giam them', 'combo phu kien', 'co khuyen mai kem', 'bot khong shop', 'co bot khong', 'bot gia khong',
@@ -2497,8 +2547,8 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             'bot them', 'giam them', 'bot nua', 'giam nua', 'bot duoc', 'giam duoc', 'chot luon', 'lay luon',
             'co chiet khau khong', 'mua 2 cai co giam khong', 'mua nhieu co giam khong', 'co gia si khong', 'bot duoc khong'
         ].some(k => hasWordOrPhrase(text, k)) ||
-        /\b(bot|giam|fix|chiet khau)\s+(them\s+|duoc\s+|nua\s+|chut\s+)?(\d+\s*(k|tr|trieu)|chut|it|ti|nua|them)?\b/i.test(text) ||
-        (context?.stage === 'bundle_bargain' && /\b(chot|lay|dong y|ok|oke|duoc khong|nua khong|giam nua|bot nua)\b/i.test(text)));
+            /\b(bot|giam|fix|chiet khau)\s+(?:them\s+|duoc\s+|nua\s+|chut\s+)?(\d+\s*(k|tr|trieu)|chut|it|ti|nua|nhe|di)\b/i.test(text) ||
+            (context?.stage === 'bundle_bargain' && /\b(chot|lay|dong y|ok|oke|duoc khong|nua khong|giam nua|bot nua)\b/i.test(text)));
 
         const smallTalk = detectGreetingOrSmallTalk(text);
         const pendingVisualBrand = hydratedContext?.stage === 'visual_not_in_catalog' ? hydratedContext.pendingBrandSuggestion : null;
@@ -2579,37 +2629,42 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
                 reply: typeof policyAnswer === 'string' ? policyAnswer : policyAnswer.reply,
                 products: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.products)) ? policyAnswer.products : [],
                 suggestions: (typeof policyAnswer === 'object' && Array.isArray(policyAnswer.suggestions)) ? policyAnswer.suggestions : ['Kiểm tra đơn hàng', 'Tư vấn sản phẩm', 'Mã giảm giá hôm nay'],
-                context: (typeof policyAnswer === 'object' && policyAnswer.context) ? { ...hydratedContext, ...policyAnswer.context } : { ...hydratedContext, stage: 'policy' }
+                context: (typeof policyAnswer === 'object' && policyAnswer.context)
+                    ? { ...hydratedContext, lastQuestionKey: 'store_overview', ...policyAnswer.context }
+                    : { ...hydratedContext, stage: 'policy', lastQuestionKey: 'policy_answered' }
             };
         } else if (smallTalk) {
             response = smallTalk;
         } else if (specialAdvisor) {
             response = specialAdvisor;
-        } else if (await handleActionExecution(message, hydratedContext)) {
-            response = await handleActionExecution(message, hydratedContext);
-        } else if (gameCapability) {
-            response = gameCapability;
-        } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => hasWordOrPhrase(text, k))) {
-            response = await answerVoucherQuestion();
-        } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => hasWordOrPhrase(text, k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => hasWordOrPhrase(text, k))) {
-            response = await answerInstallmentQuestion(message, hydratedContext?.lastProducts, hydratedContext);
-        } else if (
-            ['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi', 'don cua em', 'kiem tra don', 'tra cuu don', 'kiem tra hang da den dau', 'khi nao giao'].some(k => hasWordOrPhrase(text, k)) ||
-            /(?:tra cuu|kiem tra|check|trang thai|tinh trang)?\s*(?:don|order|ma don|van don)\s*#?\d{1,8}\b/i.test(text) ||
-            /(?:kiem tra|tra cuu)\s+don\b/i.test(text) ||
-            /(?:don hang|don cua toi|don cua em)\s+(?:sdt\s*)?(?:0|\+84)\d{9,10}\b/i.test(text)
-        ) {
-            response = await answerOrderQuestion(req, message);
         } else {
-            response = await coordinateConsultation({ message, user: req.user, context: hydratedContext });
-            if (!response || !response.reply) {
-                const openReply = await askGeminiOpenChat(message, hydratedContext);
-                if (openReply) {
-                    response = {
-                        reply: openReply,
-                        suggestions: response?.suggestions?.length ? response.suggestions : ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Mã giảm giá hôm nay'],
-                        context: { ...hydratedContext, stage: 'conversational' }
-                    };
+            const actionExecution = await handleActionExecution(message, hydratedContext);
+            if (actionExecution) {
+                response = actionExecution;
+            } else if (gameCapability) {
+                response = gameCapability;
+            } else if (['voucher', 'ma giam gia', 'khuyen mai', 'uu dai', 'ma code', 'giam gia', 'sale', 'co khuyen mai gi'].some(k => hasWordOrPhrase(text, k))) {
+                response = await answerVoucherQuestion();
+            } else if (['tra gop', 'gop 0%', 'lai suat', 'moi thang bao nhieu', 'thu tuc tra gop'].some(k => hasWordOrPhrase(text, k)) && !['may thu hai', 'mau so', 'dat qua', 'so sanh'].some(k => hasWordOrPhrase(text, k))) {
+                response = await answerInstallmentQuestion(message, hydratedContext?.lastProducts, hydratedContext);
+            } else if (
+                ['don hang', 'ma don', 'trang thai don', 'van don', 'giao toi dau', 'don cua toi', 'don cua em', 'kiem tra don', 'tra cuu don', 'kiem tra hang da den dau', 'khi nao giao'].some(k => hasWordOrPhrase(text, k)) ||
+                /(?:tra cuu|kiem tra|check|trang thai|tinh trang)?\s*(?:don|order|ma don|van don)\s*#?\d{1,8}\b/i.test(text) ||
+                /(?:kiem tra|tra cuu)\s+don\b/i.test(text) ||
+                /(?:don hang|don cua toi|don cua em)\s+(?:sdt\s*)?(?:0|\+84)\d{9,10}\b/i.test(text)
+            ) {
+                response = await answerOrderQuestion(req, message);
+            } else {
+                response = await coordinateConsultation({ message, user: req.user, context: hydratedContext });
+                if (!response || !response.reply) {
+                    const openReply = await askGeminiOpenChat(message, hydratedContext);
+                    if (openReply) {
+                        response = {
+                            reply: openReply,
+                            suggestions: response?.suggestions?.length ? response.suggestions : ['Tư vấn Điện thoại', 'Tư vấn Laptop', 'Máy chơi game', 'Mã giảm giá hôm nay'],
+                            context: { ...hydratedContext, stage: 'conversational' }
+                        };
+                    }
                 }
             }
         }
@@ -2622,7 +2677,7 @@ router.post('/', chatLimiter, optionalAuth, async (req, res) => {
             hydratedContext,
             {
                 intent: response?.context?.currentIntent || response?.status || '',
-                category: response?.context?.category || hydratedContext.category || '',
+                category: response?.context?.stage === 'store_overview' ? '' : (response?.context?.category ?? hydratedContext.category ?? ''),
                 budget: response?.context?.budget || hydratedContext.budget || '',
                 ragSources: response?.meta?.ragSources || null
             }
@@ -3045,7 +3100,7 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
                 nonTechPayload,
                 hydratedContext,
                 { isImage: true, imageUrl: filename || 'uploaded_image', intent: `visual_${detectionStatus}` }
-            ).catch(() => {});
+            ).catch(() => { });
 
             return res.json(nonTechPayload);
         }
@@ -3249,6 +3304,144 @@ router.post('/visual-search', chatLimiter, optionalAuth, async (req, res) => {
     } catch (err) {
         console.error('Visual Search error:', err);
         return res.status(500).json({ success: false, isTech: false, status: 'error', message: 'Không thể xử lý hình ảnh lúc này. Vui lòng thử lại sau.' });
+    }
+});
+
+// ==========================================
+// AI SERVICE STATUS & AGENTIC SSE STREAMING
+// ==========================================
+
+router.get('/ai-status', (req, res) => {
+    return res.json(aiModelService.getAiServiceStatus());
+});
+
+router.post('/stream', chatLimiter, optionalAuth, async (req, res) => {
+    const message = String(req.body?.message || '').trim();
+    if (!message) {
+        return res.status(400).json({ message: 'Vui lòng nhập nội dung cần tư vấn.' });
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+    let closed = false;
+    const abortController = new AbortController();
+    res.on('close', () => {
+        if (!res.writableEnded) {
+            closed = true;
+            abortController.abort();
+        }
+    });
+
+    const sendEvent = (eventName, payload) => {
+        if (closed || res.writableEnded) return;
+        try {
+            res.write(`event: ${eventName}\ndata: ${JSON.stringify(payload)}\n\n`);
+        } catch (_) {
+            closed = true;
+        }
+    };
+
+    try {
+        const hydratedContext = await memoryService.hydrateContextWithSessionMemory(req, req.body.context || {});
+        const activeMode = agenticChatService.normalizeMode(req.body.mode || req.body.context?.chatMode || hydratedContext.chatMode);
+        hydratedContext.chatMode = activeMode;
+
+        // Bảo vệ prompt injection / jailbreak
+        if (process.env.NLU_PIPELINE !== 'off') {
+            try {
+                const nluResult = nlu.processInput(message, hydratedContext);
+                const preGuard = nlu.applyPreGuardrails({
+                    nluResult,
+                    rawMessage: message,
+                    context: hydratedContext
+                });
+                const shouldBlock = Boolean(preGuard && preGuard.intercepted)
+                    && (activeMode !== 'open_ai' || preGuard.action === 'block_prompt_injection');
+                if (shouldBlock) {
+                    await memoryService.persistConversationTurn(req, message, preGuard.response, hydratedContext, { chatMode: activeMode }).catch(() => {});
+                    sendEvent('delta', { text: preGuard.response.reply || '' });
+                    sendEvent('done', {
+                        ...preGuard.response,
+                        context: { ...(hydratedContext || {}), ...(preGuard.response.context || {}), chatMode: activeMode },
+                        meta: { provider: 'guardrail', model: 'none', mode: activeMode, isFallback: true }
+                    });
+                    return res.end();
+                }
+            } catch (_) { }
+        }
+
+        let response = await agenticChatService.runAgenticChat({
+            message,
+            mode: activeMode,
+            context: hydratedContext,
+            req,
+            streamFinal: true,
+            signal: abortController.signal,
+            onStatus: (statusText) => sendEvent('status', { text: statusText }),
+            onDelta: (chunkText) => sendEvent('delta', { text: chunkText })
+        }).catch(err => {
+            console.warn('[POST /api/chat/stream Agentic error]:', err.message);
+            return null;
+        });
+
+        // Fallback an toàn về consultationCoordinator nếu Gemini tạm thời mất mạng / hết quota
+        if (!response || (!response.reply && !response.meta?.aborted)) {
+            sendEvent('status', { text: '⚙️ Chuyển sang bộ tư vấn dự phòng...' });
+            const fallbackRes = await coordinateConsultation({ message, user: req.user, context: hydratedContext });
+            response = fallbackRes && fallbackRes.reply
+                ? {
+                    ...fallbackRes,
+                    meta: {
+                        ...(fallbackRes.meta || {}),
+                        mode: activeMode,
+                        engine: 'fallback_coordinator',
+                        isFallback: true
+                    }
+                }
+                : {
+                    reply: 'Dạ hệ thống AI đang tạm bận một chút, bạn vui lòng thử gửi lại sau vài giây hoặc nhắn Zalo/Hotline **0842.331.606** để được hỗ trợ ngay ạ! 😊',
+                    products: [],
+                    suggestions: ['Tư vấn Tai nghe có dây', 'Tư vấn Laptop', 'Mã giảm giá hôm nay'],
+                    context: { ...hydratedContext, chatMode: activeMode },
+                    meta: { provider: 'deterministic_engine', model: 'none', mode: activeMode, isFallback: true }
+                };
+            if (response.reply) {
+                sendEvent('delta', { text: response.reply });
+            }
+        }
+
+        const savedMemoryProfile = await memoryService.persistConversationTurn(
+            req,
+            message,
+            response,
+            hydratedContext,
+            {
+                chatMode: activeMode,
+                intent: response?.context?.currentIntent || `agentic_${activeMode}`,
+                category: response?.context?.category || '',
+                budget: response?.context?.budget || '',
+                ragSources: response?.meta?.ragSources || null
+            }
+        );
+
+        response.context = {
+            ...(hydratedContext || {}),
+            ...(response.context || {}),
+            chatMode: activeMode,
+            sessionKey: hydratedContext.sessionKey || req.body.sessionId || '',
+            memoryProfile: savedMemoryProfile || response?.context?.memoryProfile || hydratedContext.memoryProfile
+        };
+
+        sendEvent('done', response);
+        return res.end();
+    } catch (error) {
+        console.error('Chatbot stream error:', error);
+        sendEvent('error', { message: 'Chatbot đang bận một chút. Bạn thử lại sau nhé.' });
+        return res.end();
     }
 });
 

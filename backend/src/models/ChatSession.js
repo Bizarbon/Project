@@ -76,6 +76,11 @@ const chatSessionSchema = new mongoose.Schema({
         type: String,
         default: 'all'
     },
+    chatMode: {
+        type: String,
+        enum: ['tech_advisor', 'open_ai'],
+        default: 'tech_advisor'
+    },
     budgetRange: {
         type: String,
         default: ''
@@ -94,6 +99,12 @@ const chatSessionSchema = new mongoose.Schema({
         customerMood: { type: String, default: '' },
         objectionsRaised: { type: [String], default: [] },
         keyPriorities: { type: [String], default: [] },
+        connectionPreference: { type: String, default: '' },
+        formFactorPreference: { type: String, default: '' },
+        portRequirements: { type: [String], default: [] },
+        rejectedFeatures: { type: [String], default: [] },
+        preferredColor: { type: String, default: '' },
+        recentTopics: { type: [String], default: [] },
         shortlistedProducts: { type: Array, default: [] },
         budgetMin: { type: Number, default: 0 },
         budgetMax: { type: Number, default: 0 },

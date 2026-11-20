@@ -3905,12 +3905,12 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
 
 .flash-sale-track {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     overflow-x: auto;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
-    padding: 8px 4px 12px;
+    padding: 8px 0 12px;
     scrollbar-width: thin;
     scrollbar-color: rgba(239, 68, 68, 0.3) transparent;
 }
@@ -3929,15 +3929,17 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
 }
 
 .flash-deal-card {
-    flex: 0 0 215px;
-    width: 215px;
-    min-width: 215px;
+    flex: 0 0 calc((100% - 48px) / 5);
+    width: calc((100% - 48px) / 5);
+    min-width: 0;
     scroll-snap-align: start;
     position: relative;
     background: var(--neo-card-bg, #0d1527);
-    border: 1px solid rgba(255, 59, 48, 0.25);
-    border-radius: 12px;
-    padding: 12px;
+    border: 1px solid rgba(255, 59, 48, 0.28);
+    border-radius: 14px;
+    padding: 0;
+    overflow: hidden;
+    box-sizing: border-box;
     cursor: pointer;
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
     display: flex;
@@ -3952,39 +3954,47 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
 
 .flash-deal-badge {
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 0;
+    left: 0;
     background: linear-gradient(135deg, #ff1744, #ff5252);
     color: #ffffff;
     font-size: 0.72rem;
     font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(255, 23, 68, 0.4);
+    line-height: 1.15;
+    padding: 4px 10px;
+    border-radius: 13px 0 10px 0;
+    box-shadow: 0 2px 8px rgba(255, 23, 68, 0.35);
     z-index: 2;
 }
 
 .flash-deal-thumb-wrap {
     width: 100%;
-    height: 125px;
+    height: 148px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin: 0 0 10px 0;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.04);
+    margin: 0;
+    padding: 26px 12px 10px;
+    box-sizing: border-box;
+    border-radius: 13px 13px 0 0;
+    background: #ffffff;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .flash-deal-thumb-wrap img {
-    max-width: 90%;
-    max-height: 90%;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    transition: transform 0.3s ease;
+    object-position: center;
+    transition: transform 0.28s ease;
 }
 
 .flash-deal-card:hover .flash-deal-thumb-wrap img {
-    transform: scale(1.08);
+    transform: scale(1.06);
 }
 
 .flash-deal-body {
@@ -3992,6 +4002,8 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
     flex-direction: column;
     flex: 1;
     min-width: 0;
+    padding: 10px 12px 12px;
+    box-sizing: border-box;
 }
 
 .flash-deal-brand {
@@ -4071,7 +4083,10 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
     transform: translateY(-50%);
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    min-width: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+    border-radius: 50% !important;
     border: 1.5px solid rgba(255, 59, 48, 0.5);
     background: #0f172a;
     color: #ffffff;
@@ -4090,15 +4105,29 @@ html[data-theme="dark"] .theme-toggle.u021-sw-host .u021-stars {
     background: #ef4444;
     color: #ffffff;
     border-color: #ef4444;
-    transform: translateY(-50%) scale(1.1);
+    transform: translateY(-50%) scale(1.08);
 }
 
 .flash-nav-prev {
-    left: 4px;
+    left: 2px;
 }
 
 .flash-nav-next {
-    right: 4px;
+    right: 2px;
+}
+
+@media (max-width: 1120px) {
+    .flash-deal-card {
+        flex: 0 0 calc((100% - 36px) / 4);
+        width: calc((100% - 36px) / 4);
+    }
+}
+
+@media (max-width: 900px) {
+    .flash-deal-card {
+        flex: 0 0 calc((100% - 24px) / 3);
+        width: calc((100% - 24px) / 3);
+    }
 }
 
 /* --- Storefront Filter & Sort Toolbar (Box 2) --- */
@@ -4386,8 +4415,9 @@ body.light-mode .flash-deal-card:hover {
 
 html[data-theme='light'] .flash-deal-thumb-wrap,
 body.light-mode .flash-deal-thumb-wrap {
-    background: #f8fafc !important;
-    border: 1px solid #f1f5f9 !important;
+    background: #ffffff !important;
+    border: none !important;
+    border-bottom: 1px solid #fee2e2 !important;
 }
 
 html[data-theme='light'] .flash-deal-brand,
@@ -4561,24 +4591,24 @@ body.light-mode .product-spec-line {
     .flash-sale-title-group {
         width: 100% !important;
         justify-content: center !important;
-        flex-wrap: nowrap !important;
-        gap: 6px !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
     }
 
     .flash-sale-flame-icon {
-        font-size: 1.25rem !important;
+        font-size: 1.15rem !important;
         flex-shrink: 0 !important;
     }
 
     .flash-sale-heading {
-        font-size: 1.02rem !important;
+        font-size: 0.92rem !important;
         white-space: nowrap !important;
         line-height: 1.2 !important;
     }
 
     .flash-sale-discount-tag {
-        font-size: 0.65rem !important;
-        padding: 2px 7px !important;
+        font-size: 0.62rem !important;
+        padding: 2px 6px !important;
         white-space: nowrap !important;
         flex-shrink: 0 !important;
     }
@@ -4609,21 +4639,33 @@ body.light-mode .product-spec-line {
 
     .flash-sale-track {
         gap: 8px !important;
-        padding: 4px 2px 8px !important;
+        padding: 4px 0 8px !important;
     }
 
     .flash-deal-card {
-        flex: 0 0 calc(50% - 4px) !important;
-        width: calc(50% - 4px) !important;
-        min-width: calc(50% - 4px) !important;
-        padding: 8px !important;
-        border-radius: 10px !important;
+        flex: 0 0 calc((100% - 8px) / 2) !important;
+        width: calc((100% - 8px) / 2) !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
         box-sizing: border-box !important;
     }
 
     .flash-deal-thumb-wrap {
-        height: 100px !important;
-        margin-bottom: 6px !important;
+        height: 120px !important;
+        padding: 22px 8px 8px !important;
+        margin-bottom: 0 !important;
+        border-radius: 11px 11px 0 0 !important;
+    }
+
+    .flash-deal-body {
+        padding: 8px 8px 10px !important;
+    }
+
+    .flash-deal-badge {
+        font-size: 0.66rem !important;
+        padding: 3px 8px !important;
+        border-radius: 11px 0 8px 0 !important;
     }
 
     .flash-deal-brand {
@@ -4655,18 +4697,21 @@ body.light-mode .product-spec-line {
     }
 
     .flash-nav-btn {
+        top: 66px !important;
+        transform: translateY(-50%) !important;
         width: 28px !important;
         height: 28px !important;
-        font-size: 1.1rem !important;
-        opacity: 0.9 !important;
+        border-radius: 50% !important;
+        font-size: 1.05rem !important;
+        opacity: 0.92 !important;
     }
 
     .flash-nav-prev {
-        left: 0 !important;
+        left: 2px !important;
     }
 
     .flash-nav-next {
-        right: 0 !important;
+        right: 2px !important;
     }
 }
 

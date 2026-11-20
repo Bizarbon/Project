@@ -81,6 +81,9 @@
                         <li><a href="${root}pages/account/profile.html">Hồ sơ cá nhân</a></li>
                         <li><a href="${root}pages/legal/promotions.html">Khuyến mãi hot</a></li>
                         <li><a href="${root}pages/legal/installment.html">Trả góp 0%</a></li>
+                        <li><a href="${root}pages/tools/setup-builder.html">Setup Builder 2.5D</a></li>
+                        <li><a href="${root}pages/blog.html">Tin công nghệ</a></li>
+                        <li><a href="${root}pages/ai/assistant.html">Trợ lý AI</a></li>
                         ${adminLinks}
                     </ul>
                 </nav>
@@ -111,7 +114,7 @@
                     </address>
 
                     <section class="cps-newsletter-compact" aria-labelledby="footerNewsletterTitle">
-                        <p class="cps-newsletter-heading" id="footerNewsletterTitle">Giảm 10% đơn đầu tiên khi đăng ký nhận tin</p>
+                        <p class="cps-newsletter-heading" id="footerNewsletterTitle">Nhận ngay mã giảm giá TECHWELCOME 100K &amp; TECH10</p>
                         <form class="cps-compact-form" id="footerNewsletterForm" novalidate>
                             <label class="sr-only" for="footerNewsletterEmail">Email nhận ưu đãi</label>
                             <div class="cps-compact-input-wrap">
@@ -180,7 +183,7 @@
         }
         if (!subscriptions.includes(email)) subscriptions.push(email);
         localStorage.setItem('newsletterSubscriptions', JSON.stringify(subscriptions));
-        newsletterStatus.textContent = 'Đăng ký nhận ưu đãi thành công.';
+        newsletterStatus.textContent = 'Đăng ký thành công! Nhập mã TECHWELCOME (-100K đơn từ 500K) hoặc TECH10 (-10% đơn từ 5Tr) tại giỏ hàng.';
         newsletterStatus.classList.add('is-success');
         newsletterForm.reset();
     });

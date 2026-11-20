@@ -127,7 +127,12 @@ async function loadWishlist() {
             console.warn('Wishlist load error:', e);
         }
     }
-    wishlistIds = new Set(JSON.parse(localStorage.getItem('wishlist') || '[]').map(Number));
+    try {
+        const localWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        wishlistIds = new Set(Array.isArray(localWishlist) ? localWishlist.map(Number) : []);
+    } catch {
+        wishlistIds = new Set();
+    }
 }
 
 /* Lucian UX/UI Prompt #022 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#022 */
@@ -883,14 +888,15 @@ function renderProduct() {
     const metricsContainer = document.getElementById('productHeaderMetrics');
     if (metricsContainer) {
         const ratingVal = Number(product.rating || 5.0).toFixed(1);
-        const reviewCount = product.reviewCount || reviews.length || 68;
-        const soldCount = (product.soldCount || 240).toLocaleString('vi-VN');
+        const reviewCount = Number(product.reviewCount) || reviews.length || 0;
+        const soldCountVal = Number(product.soldCount || 0);
+        const soldBadgeText = soldCountVal > 0 ? `Đã bán ${soldCountVal.toLocaleString('vi-VN')}+` : 'Chính hãng 100%';
         metricsContainer.innerHTML = `
             <a href="#reviewsSection" class="metric-rating-link" title="Xem đánh giá">
                 <span class="metric-rating-stars">★ ${ratingVal}</span>
-                <span>(${reviewCount} đánh giá)</span>
+                <span>${reviewCount > 0 ? `(${reviewCount} đánh giá)` : '(Chưa có đánh giá)'}</span>
             </a>
-            <span class="metric-sold-badge">Đã bán ${soldCount}+</span>
+            <span class="metric-sold-badge">${soldBadgeText}</span>
             <span class="metric-sku">Mã: <strong>${escapeHTML(product.sku || 'TECH-STORE')}</strong></span>
             <span style="color:var(--text-muted)">• Thương hiệu: <strong style="color:var(--text-primary)">${escapeHTML(product.brand || 'Chính hãng')}</strong></span>
         `;
@@ -901,7 +907,8 @@ function renderProduct() {
     const productSchema = document.createElement('script');
     productSchema.type = 'application/ld+json';
     productSchema.dataset.productSchema = 'true';
-    productSchema.textContent = JSON.stringify({
+    const verifiedReviewCount = Number(product.reviewCount) || reviews.length || 0;
+    const schemaData = {
         '@context': 'https://schema.org',
         '@type': 'Product',
         name: product.name,
@@ -916,16 +923,23 @@ function renderProduct() {
             availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
             url: window.location.href,
             itemCondition: 'https://schema.org/NewCondition'
-        },
-        aggregateRating: {
+        }
+    };
+    if (verifiedReviewCount > 0) {
+        schemaData.aggregateRating = {
             '@type': 'AggregateRating',
             ratingValue: Number(product.rating || 5.0),
-            reviewCount: Number(product.reviewCount) || reviews.length || 1
-        }
-    });
+            reviewCount: verifiedReviewCount
+        };
+    }
+    productSchema.textContent = JSON.stringify(schemaData);
     document.head.appendChild(productSchema);
 
     // 5. Render Main 2-Column Showcase (Left: Media + Guarantees + Video | Right: Price + Promo + CTA)
+    const scrollyStoryEl = document.getElementById('productScrollyStory');
+    if (scrollyStoryEl) {
+        scrollyStoryEl.hidden = product.category !== 'Điện thoại';
+    }
     const showcaseContainer = document.getElementById('productShowcase');
     if (showcaseContainer) {
         const monthlyInstallment = fmt(Math.round(product.price / 12));
@@ -1427,7 +1441,7 @@ function recalculateBundleSummary() {
     const origEl = document.getElementById('bundleOriginalTotal');
     const savedEl = document.getElementById('bundleSavedTotal');
     const finalEl = document.getElementById('bundleFinalTotal');
-    const btnSub = document.getElementById('btnBundleSavingsSub');
+    const btnSub = document.getElementById('btnBundleSavingSub');
 
     if (countEl) countEl.textContent = `${totalCount} sản phẩm`;
     if (origEl) origEl.textContent = fmt(totalOriginal);
@@ -1534,10 +1548,10 @@ function renderBundleUI() {
                 </div>
                 <button type="button" class="btn-bundle-buy-all" id="btnBuyBundleAll" onclick="buyBundleCombo()">
                     <span class="btn-bundle-icon" aria-hidden="true">🛒</span>
-                    <div class="btn-bundle-text">
+                    <span class="btn-bundle-text" style="display:flex;flex-direction:column;text-align:left;">
                         <strong>Thêm trọn bộ vào giỏ</strong>
                         <small id="btnBundleSavingSub">Tiết kiệm ngay ${fmt(totalSavings)}</small>
-                    </div>
+                    </span>
                 </button>
             </aside>
         </div>
@@ -1563,9 +1577,20 @@ function buyBundleCombo() {
 
     // 2. Add each checked accessory
     checkedAccessories.forEach(acc => {
-        const existingAcc = cart.find(i => String(i.productId) === String(acc._id));
-        if (existingAcc) existingAcc.quantity += 1;
-        else cart.push({ productId: Number(acc._id), quantity: 1, bundlePrice: acc.discountedPrice });
+        const discountedUnit = Number(acc.discountedPrice || acc.price || 0);
+        const existingAcc = cart.find(i => String(i.productId) === String(acc._id) && !i.selectedColor && !i.selectedStorage);
+        if (existingAcc) {
+            existingAcc.quantity += 1;
+            existingAcc.price = discountedUnit;
+            existingAcc.bundlePrice = discountedUnit;
+        } else {
+            cart.push({
+                productId: Number(acc._id),
+                quantity: 1,
+                price: discountedUnit,
+                bundlePrice: discountedUnit
+            });
+        }
     });
 
     localStorage.setItem(cartKey, JSON.stringify(cart));
@@ -1648,7 +1673,7 @@ function renderReviews() {
     const list = document.getElementById('reviewList');
 
     let avgRating = Number(product.rating || 5.0).toFixed(1);
-    let count = product.reviewCount || reviews.length || 68;
+    let count = Number(product.reviewCount) || reviews.length || 0;
 
     if (reviews && reviews.length > 0) {
         const sum = reviews.reduce((acc, r) => acc + (Number(r.rating) || 5), 0);
@@ -1691,35 +1716,14 @@ function renderReviews() {
     if (!list) return;
 
     if (!reviews.length) {
-        // Fallback default realistic reviews from verified buyers
+        if (totalReviews) {
+            totalReviews.textContent = count > 0
+                ? `Dựa trên ${count} đánh giá đã xác thực`
+                : 'Chưa có đánh giá nào — Hãy là người đầu tiên chia sẻ trải nghiệm!';
+        }
         list.innerHTML = `
-            <article class="review-item-card">
-                <header class="review-item-header">
-                    <div class="review-author-info">
-                        <div class="review-author-avatar">V</div>
-                        <div>
-                            <strong class="review-author-name">Vũ Phi Long</strong>
-                            <span class="review-verified-tag">✓ Đã mua tại TechEcommerce</span>
-                        </div>
-                    </div>
-                    <time class="review-date" datetime="2026-08-15">15/08/2026</time>
-                </header>
-                <div class="review-stars-row">★★★★★</div>
-                <p class="review-comment-text">Máy cầm cực kỳ chắc tay, hoàn thiện cao cấp. Giao hàng 2H rất nhanh, đóng gói cẩn thận nguyên seal. Trải nghiệm rất ưng ý!</p>
-            </article>
-            <article class="review-item-card">
-                <header class="review-item-header">
-                    <div class="review-author-info">
-                        <div class="review-author-avatar">H</div>
-                        <div>
-                            <strong class="review-author-name">Hoàng Minh Quân</strong>
-                            <span class="review-verified-tag">✓ Đã mua tại TechEcommerce</span>
-                        </div>
-                    </div>
-                    <time class="review-date" datetime="2026-07-28">28/07/2026</time>
-                </header>
-                <div class="review-stars-row">★★★★★</div>
-                <p class="review-comment-text">Hiệu năng mượt mà, màn hình sáng đẹp rực rỡ, pin dùng cả ngày thoải mái. Nhân viên tư vấn rất nhiệt tình.</p>
+            <article class="review-item-card review-empty-card">
+                <p class="review-comment-text" style="margin:0;color:var(--text-secondary);">Chưa có đánh giá chi tiết cho sản phẩm này. Sau khi mua hàng và trải nghiệm, bạn có thể để lại nhận xét thực tế ngay tại đây.</p>
             </article>
         `;
         return;
@@ -2139,16 +2143,19 @@ async function submitExpressCheckout() {
             price: unitPrice
         };
 
+        const cityVal = document.getElementById('expressCitySelect')?.value || '79|Hồ Chí Minh';
+        const [shippingProvinceCode, shippingProvince] = cityVal.split('|');
+
         const orderData = {
             products: [orderItem],
             items: [orderItem],
             recipientName: fullName,
             recipientPhone: phone,
             shippingAddress: address,
-            shippingProvinceCode: '79',
-            shippingProvince: 'Hồ Chí Minh',
-            shippingWardCode: '001',
-            shippingWard: 'Phường Bến Nghé',
+            shippingProvinceCode: shippingProvinceCode || '79',
+            shippingProvince: shippingProvince || 'Hồ Chí Minh',
+            shippingWardCode: '',
+            shippingWard: '',
             paymentMethod,
             note: note ? `[Đặt hàng nhanh 2H] ${note}` : '[Đặt hàng nhanh 2H]',
             source: 'express_checkout'
@@ -2163,6 +2170,11 @@ async function submitExpressCheckout() {
         const data = await res.json();
         if (res.ok && (data.success || data.order || data._id || data.id)) {
             const orderId = data.order?._id || data.order?.id || data._id || data.id;
+            if (data.guestAccessToken && orderId) {
+                try {
+                    localStorage.setItem(`guestOrderToken:${orderId}`, data.guestAccessToken);
+                } catch {}
+            }
             closeExpressCheckoutModal();
             showToast('Đặt hàng nhanh thành công! Đang chuyển hướng...', 'success');
             setTimeout(() => {

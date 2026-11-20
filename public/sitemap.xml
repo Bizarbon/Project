@@ -57,6 +57,13 @@
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
+  <!-- Công cụ Setup Builder 2.5D -->
+  <url>
+    <loc>https://techshopvn.vercel.app/pages/tools/setup-builder.html</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
   <!-- Tin tức công nghệ Blog -->
   <url>
     <loc>https://techshopvn.vercel.app/pages/blog.html</loc>

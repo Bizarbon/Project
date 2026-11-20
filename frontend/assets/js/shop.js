@@ -218,7 +218,13 @@ async function loadWishlist() {
             console.error('Wishlist error:', e);
         }
     }
-    const local = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    let local = [];
+    try {
+        local = JSON.parse(localStorage.getItem('wishlist') || '[]');
+        if (!Array.isArray(local)) local = [];
+    } catch {
+        local = [];
+    }
     wishlistIds = new Set(local.map(Number));
 }
 
@@ -653,12 +659,6 @@ function renderBrandFilter() {
                 btn.addEventListener('pointerenter', () => syncListSlidingPill(chipList, btn));
             });
             chipList.onpointerleave = () => syncListSlidingPill(chipList, null);
-            chipList.onclick = (e) => {
-                const btn = e.target.closest('.brand-chip-btn');
-                if (btn && btn.dataset.brand) {
-                    selectBrandFilter(btn.dataset.brand);
-                }
-            };
             setTimeout(() => {
                 syncListSlidingPill(chipList, null);
                 initBrandDragScroll();
@@ -2419,18 +2419,18 @@ function ensureCompareUI() {
                     </header>
                     <div class="compare-table-wrap" id="compareTableWrap"></div>
                     <div class="compare-picker-dialog" id="comparePickerOverlay" style="display: none;" aria-hidden="true" role="dialog" aria-labelledby="pickerModalTitle">
-                        <div class="compare-picker-backdrop" onclick="closeCompareSearchPicker()"></div>
+                        <div class="compare-picker-backdrop"></div>
                         <div class="compare-picker-box">
                             <header class="compare-picker-header">
                                 <div class="compare-picker-title-wrap">
-                                    <h4 id="pickerModalTitle" class="compare-picker-title">Thêm sản phẩm vào so sánh</h4>
+                                    <h3 id="pickerModalTitle" class="compare-picker-title">Thêm sản phẩm vào so sánh</h3>
                                     <span class="compare-picker-count" id="comparePickerRemainingBadge">Còn lại 2 vị trí</span>
                                 </div>
                                 <button type="button" class="compare-picker-close-btn" onclick="closeCompareSearchPicker()" aria-label="Đóng bảng tìm kiếm">×</button>
                             </header>
                             <div class="compare-picker-search-bar">
                                 <svg class="picker-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                <input type="search" id="comparePickerSearchInput" placeholder="Tìm kiếm theo tên sản phẩm, thương hiệu..." oninput="onComparePickerSearch(this.value)" autocomplete="off" />
+                                <input type="search" id="comparePickerSearchInput" placeholder="Tìm kiếm theo tên sản phẩm, thương hiệu..." aria-label="Tìm kiếm sản phẩm để so sánh" oninput="onComparePickerSearch(this.value)" autocomplete="off" />
                             </div>
                             <div class="compare-picker-list" id="comparePickerResults" role="listbox" aria-label="Danh sách sản phẩm có thể thêm"></div>
                         </div>
@@ -3503,8 +3503,11 @@ function syncActiveFilterChipsAndBreadcrumbs(count = null) {
 function scrollFlashSale(direction) {
     const track = document.getElementById('flashSaleTrack');
     if (!track) return;
-    const amount = 230 * 2 * direction;
-    track.scrollBy({ left: amount, behavior: 'smooth' });
+    const firstCard = track.querySelector('.flash-deal-card');
+    const gap = parseFloat(getComputedStyle(track).gap || getComputedStyle(track).columnGap || '12') || 12;
+    const stepCards = window.innerWidth <= 768 ? 1 : 2;
+    const cardStep = firstCard ? (firstCard.getBoundingClientRect().width + gap) : 210;
+    track.scrollBy({ left: cardStep * stepCards * direction, behavior: 'smooth' });
 }
 window.scrollFlashSale = scrollFlashSale;
 
@@ -3515,7 +3518,7 @@ function renderFlashSaleDeals() {
     let pool = allProducts.filter(p => p.stock > 0 && p.compareAtPrice > p.price);
 
     // Lọc Flash Sale theo danh mục đang chọn (nếu khác 'all')
-    const badgeEl = document.querySelector('.flash-sale-badge');
+    const badgeEl = document.querySelector('.flash-sale-heading');
     const hasCategoryFilter = activeCategory && activeCategory !== 'all';
     if (hasCategoryFilter) {
         const catNorm = activeCategory.normalize('NFC').trim().toLowerCase();
@@ -4441,7 +4444,7 @@ function renderCart() {
                 </figure>
                 <div class="cart-item-details">
                     <span class="cart-item-brand">${escapeHTML(item.product.brand || item.product.category)}</span>
-                    <h4 class="cart-item-title">${escapeHTML(item.product.name)}</h4>
+                    <h3 class="cart-item-title">${escapeHTML(item.product.name)}</h3>
                     ${(colorBadge || storageBadge) ? `<div class="cart-item-variant-pills">${colorBadge} ${storageBadge}</div>` : ''}
                     <div class="cart-item-unit-price">${fmt(unitPrice)}</div>
                     ${isMaxStock ? `<p class="cart-item-stock-limit">Đã đạt tối đa tồn kho (${item.product.stock} máy)</p>` : ''}
@@ -4609,10 +4612,20 @@ function closeQuickView() {
 window.closeQuickView = closeQuickView;
 
 function quickViewBuyNow(productId) {
-    addToCart(productId);
+    const product = allProducts.find(p => String(p._id) === String(productId));
+    if (!product || product.stock <= 0) {
+        addToCart(productId);
+        return;
+    }
+    const cartBefore = getCart();
+    if (!cartBefore.some(i => String(i.productId) === String(productId) && !i.selectedColor && !i.selectedStorage)) {
+        addToCart(productId);
+    }
     closeQuickView();
-    goToCartStep(1);
     openCartDrawer();
+    if (getCart().length > 0) {
+        goToCartStep(2);
+    }
 }
 window.quickViewBuyNow = quickViewBuyNow;
 
@@ -4670,7 +4683,8 @@ function checkoutAmount() {
     const cart = getCart();
     const subtotal = cart.reduce((total, item) => {
         const product = allProducts.find(candidate => String(candidate._id) === String(item.productId));
-        return total + Number(product?.price || 0) * Number(item.quantity || 0);
+        const unitPrice = Number(item.price) > 0 ? Number(item.price) : Number(product?.price || 0);
+        return total + unitPrice * Number(item.quantity || 0);
     }, 0);
     const discount = Math.min(Number(appliedCoupon?.discountAmount) || 0, subtotal);
     return Math.max(subtotal - discount, 0) + Number(currentShippingQuote?.fee || 0);
@@ -5121,6 +5135,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (event.key === 'Escape') {
             closeCartDrawer();
             closeQuickView();
+        }
+    });
+    document.getElementById('cartOverlay')?.addEventListener('click', closeCartDrawer);
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('.compare-picker-backdrop')) {
+            closeCompareSearchPicker();
         }
     });
     const qvModal = document.getElementById('quickViewDialog');

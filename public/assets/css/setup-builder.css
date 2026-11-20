@@ -94,7 +94,7 @@ html[data-theme='high-contrast'] .builder-main-title {
 
 @media (max-width: 1024px) {
     .builder-studio-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
@@ -105,6 +105,8 @@ html[data-theme='high-contrast'] .builder-main-title {
     border-radius: var(--radius-xl, 20px);
     padding: 1.75rem;
     position: relative;
+    min-width: 0;
+    max-width: 100%;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
 }
 
@@ -121,8 +123,10 @@ html[data-theme='high-contrast'] .studio-desk-section {
 
 .desk-controls-bar {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--neo-border);
@@ -290,6 +294,23 @@ html[data-theme='high-contrast'] .desk-slot.is-occupied {
 }
 
 @media (max-width: 768px) {
+    .builder-page-container {
+        max-width: 100%;
+        overflow-x: clip;
+        padding: 1rem 0.75rem 3rem;
+    }
+    .studio-desk-section,
+    .studio-inventory-aside,
+    .compatibility-diagnostic-card {
+        min-width: 0;
+        max-width: 100%;
+        padding: 1rem;
+    }
+    .desk-action-buttons,
+    .builder-action-stack {
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
     .virtual-desk-canvas {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
@@ -418,6 +439,8 @@ html[data-theme='high-contrast'] .desk-slot.is-occupied {
     border: 1px solid var(--neo-border);
     border-radius: var(--radius-xl, 20px);
     padding: 1.75rem;
+    min-width: 0;
+    max-width: 100%;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
 }
 
@@ -488,6 +511,8 @@ html[data-theme='high-contrast'] .inv-tab-btn.active {
     border: 1px solid var(--neo-border);
     border-radius: var(--radius-md, 12px);
     padding: 0.85rem;
+    min-width: 0;
+    max-width: 100%;
     display: flex;
     align-items: center;
     gap: 0.85rem;
@@ -527,6 +552,8 @@ html[data-theme='high-contrast'] .inventory-card-item {
 }
 
 .inventory-item-title {
+    display: block;
+    max-width: 100%;
     font-size: 0.88rem;
     font-weight: 700;
     color: var(--neo-text);

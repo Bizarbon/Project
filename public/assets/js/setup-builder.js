@@ -6,144 +6,144 @@
 (function () {
     'use strict';
 
-    // Curated Hardware Database with Real Hardware Specifications
+    // Real MongoDB Product Catalog Mapping + Hardware Compatibility Specs
     const HARDWARE_CATALOG = [
-        // Category: Laptops / PC
+        // Category: Laptops
         {
-            id: 'sb-lap-1',
+            id: 14,
             category: 'laptop',
-            title: 'Apple MacBook Pro 14 inch M3 Pro',
-            specs: '18GB RAM • 512GB SSD • 3x Thunderbolt 4',
-            price: 49990000,
-            image: '../../assets/images/products/macbook-pro-14-m3.jpg',
-            ports: ['Thunderbolt 4 / USB-C', 'HDMI', 'MagSafe 3'],
+            title: 'MacBook Air 13 inch M3 512GB',
+            specs: 'Apple M3 • 16GB Unified • 512GB SSD • Pin 18h',
+            price: 31990000,
+            image: '../../assets/uploads/products/p14-macbook-air-m3-13-inch-2024-8cpu-10gpu-24gb-512gb-sac-70w-ch.png',
+            ports: ['Thunderbolt / USB-C', 'MagSafe 3'],
             powerWattage: 70,
             supportsUsbCDisplay: true
         },
         {
-            id: 'sb-lap-2',
+            id: 16,
             category: 'laptop',
-            title: 'Laptop Gaming ASUS ROG Strix SCAR 16',
-            specs: 'Core i9-14900HX • RTX 4080 • 32GB RAM',
-            price: 64990000,
-            image: '../../assets/images/products/asus-rog-strix-g16.jpg',
+            title: 'Laptop ASUS ROG Strix G16 G614',
+            specs: 'Core i9-14900HX • 32GB DDR5 • 1TB SSD • 240Hz',
+            price: 39990000,
+            image: '../../assets/uploads/products/asus-rog-strix-g16.png',
             ports: ['HDMI 2.1', 'Thunderbolt 4', 'USB-A 3.2'],
             powerWattage: 240,
             supportsUsbCDisplay: true
         },
         {
-            id: 'sb-lap-3',
+            id: 64,
             category: 'laptop',
-            title: 'Laptop ASUS Zenbook 14 OLED UX3405',
-            specs: 'Intel Core Ultra 7 • 16GB RAM • Siêu mỏng nhẹ',
-            price: 26990000,
-            image: '../../assets/images/products/asus-zenbook-14.jpg',
+            title: 'Laptop ASUS Zenbook 14 OLED UX3405MA',
+            specs: 'Core Ultra 7 155H • 16GB • 1TB SSD • 3K OLED 1.2kg',
+            price: 28490000,
+            image: '../../assets/uploads/products/asus-zenbook-14-oled.png',
             ports: ['Thunderbolt 4 / USB-C', 'HDMI 2.1'],
             powerWattage: 65,
             supportsUsbCDisplay: true
         },
 
-        // Category: Monitors
+        // Category: Secondary Screen / Tablet 2-in-1
         {
-            id: 'sb-mon-1',
+            id: 22,
             category: 'monitor',
-            title: 'Màn hình Dell UltraSharp 27 inch 4K (U2723QE)',
-            specs: '4K IPS Black • 90W Type-C Hub • 100% sRGB',
-            price: 13890000,
-            image: '../../assets/images/products/dell-ultrasharp-27.jpg',
-            ports: ['USB-C 90W PD', 'HDMI 2.1', 'DisplayPort 1.4'],
+            title: 'iPad Pro 11 inch M4 Wi-Fi 256GB',
+            specs: 'Apple M4 • Tandem OLED 120Hz • Sidecar Mở rộng Mac',
+            price: 28990000,
+            image: '../../assets/uploads/products/ipad-pro-11-m4.png',
+            ports: ['Thunderbolt / USB 4'],
             requiresHubForUsbC: false,
-            powerDeliveryWatt: 90
+            powerDeliveryWatt: 30
         },
         {
-            id: 'sb-mon-2',
+            id: 25,
             category: 'monitor',
-            title: 'Màn hình Gaming Cong LG UltraGear 34 inch OLED 240Hz',
-            specs: 'WQHD 3440x1440 • 0.03ms • 240Hz Gaming',
-            price: 24990000,
-            image: '../../assets/images/products/lg-ultragear-oled.jpg',
-            ports: ['HDMI 2.1', 'DisplayPort 1.4'],
+            title: 'Samsung Galaxy Tab S9 Ultra 256GB',
+            specs: '14.6" Dynamic AMOLED 2X • Kèm bút S Pen IP68 • DeX',
+            price: 25990000,
+            image: '../../assets/uploads/products/samsung-galaxy-tab-s9-ultra.png',
+            ports: ['USB-C Display Out'],
             requiresHubForUsbC: true,
-            powerDeliveryWatt: 0
+            powerDeliveryWatt: 45
         },
         {
-            id: 'sb-mon-3',
+            id: 98,
             category: 'monitor',
-            title: 'Màn hình Đồ họa Samsung ViewFinity S9 5K 27 inch',
-            specs: '5K 5120x2880 • Thunderbolt 4 • Smart Calibration',
-            price: 21990000,
-            image: '../../assets/images/products/cand-monitor.jpg',
-            ports: ['Thunderbolt 4', 'Mini DisplayPort'],
+            title: 'Microsoft Surface Pro 9 2 Trong 1',
+            specs: 'Core i5-1235U • 13" PixelSense 120Hz • 879g',
+            price: 22990000,
+            image: '../../assets/uploads/products/surface-pro-tablet.png',
+            ports: ['2x Thunderbolt 4 / USB-C'],
             requiresHubForUsbC: false,
-            powerDeliveryWatt: 90
+            powerDeliveryWatt: 65
         },
 
-        // Category: Audio / Speakers
+        // Category: Audio
         {
-            id: 'sb-aud-1',
+            id: 31,
             category: 'audio',
-            title: 'Tai nghe Chống ồn Không dây Sony WH-1000XM5',
-            specs: 'Chống ồn đỉnh cao • LDAC • Pin 30 giờ',
+            title: 'Tai nghe chụp tai Sony WH-1000XM5',
+            specs: 'Chống ồn hàng đầu • LDAC • Pin 30 giờ',
             price: 6990000,
-            image: '../../assets/images/products/sony-wh-1000xm5.jpg',
+            image: '../../assets/uploads/products/sony-wh-1000xm5.png',
             connectionType: 'Bluetooth 5.2 / Jack 3.5mm',
             isWireless: true
         },
         {
-            id: 'sb-aud-2',
+            id: 30,
             category: 'audio',
-            title: 'Tai nghe Apple AirPods Max USB-C',
-            specs: 'Spatial Audio • Chống ồn chủ động ANC • Thiết kế kim loại',
-            price: 12990000,
-            image: '../../assets/images/products/airpods-max.jpg',
-            connectionType: 'Bluetooth 5.3 / USB-C Audio',
+            title: 'Apple AirPods Pro 2 USB-C',
+            specs: 'Chip H2 • Chống ồn chủ động ANC • Spatial Audio',
+            price: 5490000,
+            image: '../../assets/uploads/products/apple-airpods-pro-2.png',
+            connectionType: 'Bluetooth 5.3 / USB-C',
             isWireless: true
         },
         {
-            id: 'sb-aud-3',
+            id: 34,
             category: 'audio',
-            title: 'Loa Để bàn Cao cấp Marshall Major IV Hi-Res',
-            specs: 'Âm thanh nổi vang dội • Bluetooth 5.2 • Cổng AUX',
-            price: 4990000,
-            image: '../../assets/images/products/marshall-major-iv.jpg',
-            connectionType: 'Bluetooth 5.2 / AUX 3.5mm',
+            title: 'Tai nghe Marshall Major 5',
+            specs: 'Pin >100 giờ • Chất âm ấm • Bluetooth 5.3 / 3.5mm',
+            price: 3690000,
+            image: '../../assets/uploads/products/marshall-major-5.png',
+            connectionType: 'Bluetooth 5.3 / Jack 3.5mm',
             isWireless: true
         },
 
-        // Category: Hub & Accessories
+        // Category: Hub, Power & Mice
         {
-            id: 'sb-hub-1',
+            id: 4,
             category: 'hub',
-            title: 'Hub Chuyển Đổi HyperDrive Pro 10-in-1 Dual 4K HDMI',
-            specs: '2x HDMI 4K@60Hz • 100W PD Pass-through • Jack 3.5mm • RJ45',
-            price: 1290000,
-            image: '../../assets/images/products/hyperdrive-hub-10in1.jpg',
-            features: ['HDMI Out', '100W PD Pass-Through', '3.5mm Audio', 'USB 3.0'],
+            title: 'Hub chuyển đổi Ugreen USB-C 5 IN 1 CM478',
+            specs: 'HDMI 4K • 3x USB 3.0 • Mở rộng cổng cho Laptop mỏng nhẹ',
+            price: 280000,
+            image: '../../assets/uploads/products/ugreen-hub-5in1.png',
+            features: ['HDMI Out 4K', 'USB 3.0'],
             wattageSupport: 100,
             hasHdmiOut: true,
-            hasAudioJack: true
+            hasAudioJack: false
         },
         {
-            id: 'sb-hub-2',
+            id: 58,
             category: 'hub',
-            title: 'Củ Sạc Nhanh GaN Anker Prime 100W 3 Cổng',
-            specs: '2x USB-C + 1x USB-A • Chuẩn PD 3.0 • PowerIQ 4.0',
-            price: 1490000,
-            image: '../../assets/images/products/anker-prime-100w.jpg',
+            title: 'Củ sạc nhanh Anker Prime 100W GaN 3 cổng',
+            specs: '2x USB-C + 1x USB-A • 100W PD sạc laptop & điện thoại',
+            price: 1690000,
+            image: '../../assets/uploads/products/anker-prime-100w.png',
             features: ['100W Fast Charge', 'GaN Technology'],
             wattageSupport: 100,
             hasHdmiOut: false,
             hasAudioJack: false
         },
         {
-            id: 'sb-hub-3',
+            id: 46,
             category: 'hub',
-            title: 'Cáp Sạc Nhanh Apple USB-C Đan Dệt Siêu Bền 240W',
-            specs: 'Chuẩn sạc 240W • Vỏ bọc dù chống đứt gãy • Chiều dài 2m',
-            price: 690000,
-            image: '../../assets/images/products/apple-usbc-cable-240w.jpg',
-            features: ['240W Max Power', 'Vỏ đan dù'],
-            wattageSupport: 240,
+            title: 'Chuột không dây Logitech MX Master 3S',
+            specs: 'Cuộn MagSpeed • Kết nối 3 thiết bị • Sạc USB-C 70 ngày',
+            price: 2190000,
+            image: '../../assets/uploads/products/logitech-mx-master-3s.png',
+            features: ['Easy-Switch 3 máy', 'Quiet Clicks'],
+            wattageSupport: 0,
             hasHdmiOut: false,
             hasAudioJack: false
         }
@@ -165,6 +165,30 @@
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
     }
 
+    async function syncLiveCatalogPricing() {
+        try {
+            const apiUrl = window.API_URL || (window.location.hostname.includes('vercel.app') ? 'https://techshopvn.vercel.app/api' : 'http://localhost:5000/api');
+            const res = await fetch(`${apiUrl}/products?limit=150`);
+            if (!res.ok) return;
+            const list = await res.json();
+            const map = new Map((Array.isArray(list) ? list : []).map(p => [Number(p._id), p]));
+            let changed = false;
+            HARDWARE_CATALOG.forEach(item => {
+                const live = map.get(Number(item.id));
+                if (live) {
+                    if (live.price > 0) item.price = Number(live.price);
+                    if (live.name) item.title = live.name;
+                    if (live.image) item.image = /^https?:|^\//i.test(live.image) ? `../..${live.image}` : `../../${live.image}`;
+                    changed = true;
+                }
+            });
+            if (changed) {
+                renderInventoryCards();
+                updateDeskUI();
+            }
+        } catch (_) {}
+    }
+
     // Initialize UI
     function init() {
         renderInventoryTabs();
@@ -172,6 +196,7 @@
         setupDragAndDrop();
         setupDeskActions();
         updateDeskUI();
+        syncLiveCatalogPricing();
     }
 
     // Render Category Filter Tabs
@@ -194,8 +219,8 @@
 
         const filtered = HARDWARE_CATALOG.filter(item => item.category === activeInventoryCategory);
         list.innerHTML = filtered.map(item => `
-            <li class="inventory-card-item" draggable="true" data-item-id="${item.id}" tabindex="0" role="button" aria-label="${item.title}, giá ${fmt(item.price)}">
-                <img src="${item.image}" alt="${item.title}" class="inventory-item-thumb" onerror="this.src='../../assets/images/product-placeholder.svg'">
+            <li class="inventory-card-item" draggable="true" data-item-id="${item.id}">
+                <img src="${item.image}" alt="${item.title}" class="inventory-item-thumb" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg'">
                 <div class="inventory-item-info">
                     <strong class="inventory-item-title">${item.title}</strong>
                     <div class="inventory-item-specs">${item.specs}</div>
@@ -399,8 +424,8 @@
                     type: 'warning',
                     icon: '⚠️',
                     title: 'Cần Hub xuất hình HDMI',
-                    desc: `${monitor.title} yêu cầu cổng HDMI/DisplayPort trong khi ${laptop.title} tối ưu cổng Type-C. Hãy gắn thêm Hub 10-in-1 để xuất hình 4K!`,
-                    action: { text: '+ Thêm Hub Ugreen 10-in-1', targetId: 'sb-hub-1' }
+                    desc: `${monitor.title} hỗ trợ xuất hình USB-C/HDMI nhưng ${laptop.title} ít cổng rời. Hãy gắn thêm Hub Ugreen 5-in-1 để xuất hình 4K mượt mà!`,
+                    action: { text: '+ Thêm Hub Ugreen 5-in-1', targetId: 4 }
                 });
             } else if (monitor.powerDeliveryWatt >= 90) {
                 rules.push({
@@ -474,7 +499,7 @@
         rulesList.querySelectorAll('.btn-rule-quick-fix').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-quick-equip');
-                const targetItem = HARDWARE_CATALOG.find(i => i.id === targetId);
+                const targetItem = HARDWARE_CATALOG.find(i => String(i.id) === String(targetId));
                 if (targetItem) equipItem(targetItem.category, targetItem);
             });
         });
@@ -558,22 +583,29 @@
 
                 if (!activeItems.length) return;
 
-                // Push items to localStorage cart
+                // Push real numeric Product IDs & consistent discount (5% single, 10% for >=2) to cart
                 try {
                     const cartKey = window.auth?.getCartStorageKey?.() || 'cart:guest';
                     const cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
+                    const discountPct = activeItems.length >= 2 ? 10 : 5;
+                    const priceFactor = 1 - discountPct / 100;
 
                     activeItems.forEach(item => {
-                        const existing = cart.find(c => String(c.productId) === String(item.id));
+                        const pid = Number(item.id);
+                        const discountedPrice = Math.round(Number(item.price || 0) * priceFactor);
+                        const selectedImg = String(item.image || '').replace(/^(\.\.\/)+/, '/');
+                        const existing = cart.find(c => Number(c.productId) === pid && !c.selectedColor && !c.selectedStorage);
                         if (existing) {
                             existing.quantity = (existing.quantity || 1) + 1;
+                            if (discountedPrice > 0) existing.price = Math.min(Number(existing.price || discountedPrice), discountedPrice);
                         } else {
                             cart.push({
-                                productId: item.id,
+                                productId: pid,
                                 quantity: 1,
-                                price: Math.round(item.price * 0.9), // 10% Combo discount applied
+                                price: discountedPrice,
+                                selectedImage: selectedImg,
                                 title: item.title,
-                                image: item.image
+                                image: selectedImg
                             });
                         }
                     });
@@ -581,13 +613,12 @@
                     localStorage.setItem(cartKey, JSON.stringify(cart));
                     window.dispatchEvent(new Event('cartUpdated'));
 
-                    // Trigger visual haptic
                     if (typeof window.triggerVisualHaptic === 'function') {
                         window.triggerVisualHaptic('success');
                     }
 
                     if (typeof window.showToast === 'function') {
-                        window.showToast(`🎉 Đã thêm trọn bộ ${activeItems.length} thiết bị vào giỏ hàng với ưu đãi -10%!`, 'success');
+                        window.showToast(`🎉 Đã thêm trọn bộ ${activeItems.length} thiết bị vào giỏ hàng với ưu đãi -${discountPct}%!`, 'success');
                     }
 
                     // Open cart drawer or redirect after 700ms

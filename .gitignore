@@ -28,6 +28,7 @@ Thumbs.db
 .tools/
 .agents/
 .sixth/
+.hallmark/
 
 # Archives & binaries
 *.zip
