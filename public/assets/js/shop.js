@@ -649,7 +649,7 @@ function renderBrandFilter() {
                 </li>
             ` + brands.map(b => `
                 <li>
-                    <button type="button" class="brand-chip-btn ${current === b ? 'active' : ''}" data-brand="${escapeHTML(b)}" onclick="selectBrandFilter('${escapeHTML(b)}')" title="Lọc sản phẩm hãng ${escapeHTML(b)}">
+                    <button type="button" class="brand-chip-btn ${current === b ? 'active' : ''}" data-brand="${escapeHTML(b)}" onclick="selectBrandFilter(this.dataset.brand)" title="Lọc sản phẩm hãng ${escapeHTML(b)}">
                         ${brandSvgLogo(b)}
                         <span class="brand-chip-name">${escapeHTML(b)}</span>
                     </button>
@@ -3659,7 +3659,7 @@ function renderProducts() {
             </section>
             ${showLimit ? `
             <div class="category-expand-row">
-                <button type="button" class="btn-category-expand" onclick="expandCategoryHome('${escapeHTML(category)}')">
+                <button type="button" class="btn-category-expand" onclick="expandCategoryHome(this.closest('[data-category]').dataset.category)">
                     <span>Xem thêm <strong>${remaining}</strong> sản phẩm ${escapeHTML(categoryLabels[category] || category)}</span>
                     <span class="expand-arrow" aria-hidden="true">›</span>
                 </button>
@@ -4451,12 +4451,12 @@ function renderCart() {
                 </div>
                 <div class="cart-item-actions">
                     <div class="cart-stepper">
-                        <button type="button" class="stepper-btn minus" onclick="changeCartItemQty('${escapeHTML(itemKey)}', -1)" aria-label="Giảm">-</button>
+                        <button type="button" class="stepper-btn minus" onclick="changeCartItemQty(this.closest('[data-item-key]').dataset.itemKey, -1)" aria-label="Giảm">-</button>
                         <span class="stepper-val${rollCls}">${item.quantity}</span>
-                        <button type="button" class="stepper-btn plus" onclick="changeCartItemQty('${escapeHTML(itemKey)}', 1)" ${isMaxStock ? 'disabled' : ''} aria-label="Tăng">+</button>
+                        <button type="button" class="stepper-btn plus" onclick="changeCartItemQty(this.closest('[data-item-key]').dataset.itemKey, 1)" ${isMaxStock ? 'disabled' : ''} aria-label="Tăng">+</button>
                     </div>
                     <strong class="cart-item-line-total">${fmt(lineTotal)}</strong>
-                    <button type="button" class="cart-item-remove-btn" onclick="removeCartItem('${escapeHTML(itemKey)}')" aria-label="Xóa ${escapeHTML(item.product.name)}">
+                    <button type="button" class="cart-item-remove-btn" onclick="removeCartItem(this.closest('[data-item-key]').dataset.itemKey)" aria-label="Xóa ${escapeHTML(item.product.name)}">
                         Xóa
                     </button>
                 </div>
@@ -4952,10 +4952,16 @@ async function createOrder() {
 }
 
 function subscribeNewsletter() {
-    const email = document.getElementById('newsletterEmail')?.value || '';
-    if (!email.includes('@')) return alert('Vui lòng nhập email hợp lệ!');
-    alert('Đăng ký nhận ưu đãi thành công!');
-    document.getElementById('newsletterEmail').value = '';
+    const input = document.getElementById('newsletterEmail');
+    const email = String(input?.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return showToast('Vui lòng nhập địa chỉ email hợp lệ!', 'error');
+    }
+    try {
+        localStorage.setItem('techecommerce_newsletter_email', email);
+    } catch (_) { }
+    showToast('Đăng ký nhận ưu đãi thành công! Mã TECHWELCOME đang chờ bạn.', 'success');
+    if (input) input.value = '';
 }
 
 /* Lucian UX/UI Prompt #100 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#100 */
@@ -5092,12 +5098,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             section.hidden = false;
             grid.innerHTML = items.map(item => {
                 const disc = item.compareAtPrice > item.price ? Math.round((1 - item.price / item.compareAtPrice) * 100) : 0;
+                const imgSrc = typeof window.resolveAssetUrl === 'function'
+                    ? window.resolveAssetUrl(item.image || 'assets/images/product-placeholder.svg')
+                    : (item.image || 'assets/images/product-placeholder.svg');
                 return `
                     <article class="recently-viewed-card">
                         <a href="pages/catalog/product.html?id=${encodeURIComponent(item._id)}" class="recent-card-link">
                             <figure class="recent-thumb-fig">
                                 ${disc > 0 ? `<span class="recent-disc-badge">-${disc}%</span>` : ''}
-                                <img src="${escapeHTML(item.image || 'assets/images/product-placeholder.svg')}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg';">
+                                <img src="${escapeHTML(imgSrc)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.onerror=null; this.src='assets/images/product-placeholder.svg';">
                             </figure>
                             <h3 class="recent-prod-name" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</h3>
                             <div class="recent-price-row">

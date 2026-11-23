@@ -33,6 +33,11 @@ body.auth-cellphones-body {
     flex-direction: column;
 }
 
+body.auth-cellphones-body :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--cps-border-focus, #2563eb);
+    outline-offset: 2px;
+}
+
 /* Quick store return nav bar (Minimal, unobtrusive) */
 .auth-top-bar {
     padding: 12px 24px;

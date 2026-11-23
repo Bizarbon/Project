@@ -289,13 +289,17 @@ function renderProductTable() {
 
         const catIcon = getCategoryIcon(product.category);
 
+        const thumbUrl = typeof window.resolveAssetUrl === 'function'
+            ? window.resolveAssetUrl(product.image)
+            : (product.image || '../assets/images/product-placeholder.svg');
+
         return `
             <tr class="fade-in">
                 <td style="font-weight:600;color:var(--text-muted);text-align:center;">${index + 1}</td>
                 <td>
-                    <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}"
+                    <img src="${escapeHTML(thumbUrl)}" alt="${escapeHTML(product.name)}"
                          style="width:50px;height:50px;object-fit:cover;border-radius:8px;border:1px solid var(--border);"
-                         onerror="this.src='https://via.placeholder.com/50?text=N/A'">
+                         onerror="this.onerror=null;this.src='../assets/images/product-placeholder.svg'">
                 </td>
                 <td>
                     <strong>${escapeHTML(product.name)}</strong>
@@ -308,10 +312,10 @@ function renderProductTable() {
                 <td style="font-size:0.78rem;color:var(--text-muted);font-weight:700;"><code>${escapeHTML(product.sku || '—')}</code></td>
                 <td class="td-price">${fmt(product.price)}</td>
                 <td>
-                    <button type="button" 
-                            class="category-badge cat-clickable" 
+                    <button type="button"
+                            class="category-badge cat-clickable"
                             title="Bấm để lọc theo danh mục ${escapeHTML(product.category)}"
-                            onclick="setCategoryFilter('${escapeHTML(product.category)}')">
+                            data-filter-category="${escapeHTML(product.category)}">
                         ${catIcon} ${escapeHTML(product.category)}
                     </button>
                 </td>
@@ -353,7 +357,7 @@ function updateImagePreview() {
 
     const url = input.value.trim();
     if (url) {
-        img.src = url;
+        img.src = typeof window.resolveAssetUrl === 'function' ? window.resolveAssetUrl(url) : url;
         img.style.display = 'block';
         placeholder.style.display = 'none';
     } else {
@@ -486,6 +490,20 @@ async function editProduct(id) {
         document.getElementById('specOs').value = specs.os || '';
         document.getElementById('specGpu').value = specs.gpu || '';
 
+        const hearingFields = document.getElementById('hearingAidAdminFields');
+        if (hearingFields) {
+            hearingFields.hidden = prodCat !== 'Máy trợ thính';
+            const hp = product.hearingAidProfile || {};
+            const mEl = document.getElementById('hearingManufacturer');
+            const rEl = document.getElementById('hearingResponsibleEntity');
+            const vEl = document.getElementById('hearingVerificationStatus');
+            const dEl = document.getElementById('hearingDocumentReference');
+            if (mEl) mEl.value = hp.manufacturer || '';
+            if (rEl) rEl.value = hp.responsibleEntity || '';
+            if (vEl) vEl.value = hp.verificationStatus || 'pending';
+            if (dEl) dEl.value = hp.requiredDocuments?.[0]?.reference || '';
+        }
+
         // Show edit banner
         const editingNotice = document.getElementById('editingNotice');
         if (editingNotice) {
@@ -507,7 +525,15 @@ async function deleteProduct(id) {
     const prod = adminProducts.find(p => String(p._id) === String(id));
     const name = prod?.name ? `"${prod.name}"` : 'sản phẩm này';
     
-    if (!confirm(`Bạn có chắc chắn muốn xóa ${name}?\nSản phẩm sẽ bị xóa vĩnh viễn khỏi danh sách.`)) {
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xóa sản phẩm',
+            message: `Bạn có chắc chắn muốn xóa ${name}? Sản phẩm sẽ bị xóa vĩnh viễn khỏi danh sách.`,
+            confirmLabel: 'Xóa vĩnh viễn',
+            danger: true
+        })
+        : confirm(`Bạn có chắc chắn muốn xóa ${name}?\nSản phẩm sẽ bị xóa vĩnh viễn khỏi danh sách.`);
+    if (!ok) {
         return;
     }
 
@@ -584,8 +610,17 @@ document.addEventListener('DOMContentLoaded', () => {
         form.querySelector('.form-actions')?.before(fieldset);
     }
 
-    // Search input
-    document.getElementById('adminProductSearch')?.addEventListener('input', renderProductTable);
+    // Search input + support ?search= query param from Dashboard low-stock links
+    const searchEl = document.getElementById('adminProductSearch');
+    const urlSearch = (new URLSearchParams(window.location.search).get('search') || '').trim();
+    if (searchEl && urlSearch) searchEl.value = urlSearch;
+    searchEl?.addEventListener('input', renderProductTable);
+
+    // Delegated click handler for category badge filter (prevents inline onclick XSS)
+    document.getElementById('productTable')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-filter-category]');
+        if (btn) setCategoryFilter(btn.getAttribute('data-filter-category') || 'all');
+    });
 
     // Category dropdown filter
     document.getElementById('adminCategoryFilter')?.addEventListener('change', (e) => {

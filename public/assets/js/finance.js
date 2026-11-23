@@ -33,6 +33,43 @@ function getFilterParams() {
     return params.toString() ? '?' + params.toString() : '';
 }
 
+function clearFinancePresetActive() {
+    document.querySelectorAll('.finance-preset-btn').forEach(btn => btn.classList.remove('active'));
+}
+
+function applyFinancePreset(preset, btn) {
+    const fromEl = document.getElementById('filterFrom');
+    const toEl = document.getElementById('filterTo');
+    const now = new Date();
+    const toIso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    clearFinancePresetActive();
+    if (btn) btn.classList.add('active');
+
+    if (preset === 'all') {
+        if (fromEl) fromEl.value = '';
+        if (toEl) toEl.value = '';
+    } else if (preset === 'today') {
+        const today = toIso(now);
+        if (fromEl) fromEl.value = today;
+        if (toEl) toEl.value = today;
+    } else if (preset === '7d') {
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6);
+        if (fromEl) fromEl.value = toIso(start);
+        if (toEl) toEl.value = toIso(now);
+    } else if (preset === 'month') {
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        if (fromEl) fromEl.value = toIso(start);
+        if (toEl) toEl.value = toIso(now);
+    } else if (preset === 'quarter') {
+        const qMonth = Math.floor(now.getMonth() / 3) * 3;
+        const start = new Date(now.getFullYear(), qMonth, 1);
+        if (fromEl) fromEl.value = toIso(start);
+        if (toEl) toEl.value = toIso(now);
+    }
+    loadAll();
+}
+
 function applyFilter() {
     loadAll();
 }
@@ -40,8 +77,13 @@ function applyFilter() {
 function clearFilter() {
     document.getElementById('filterFrom').value = '';
     document.getElementById('filterTo').value = '';
+    clearFinancePresetActive();
+    const allBtn = document.querySelector('.finance-preset-btn[data-preset="all"]');
+    if (allBtn) allBtn.classList.add('active');
     loadAll();
 }
+window.applyFinancePreset = applyFinancePreset;
+window.clearFinancePresetActive = clearFinancePresetActive;
 
 async function loadSummary() {
     try {
@@ -169,7 +211,7 @@ async function loadExpenses() {
             <tr>
                 <td style="color:var(--text-muted)">${index + 1}</td>
                 <td>${new Date(expense.date).toLocaleDateString('vi-VN')}</td>
-                <td><span class="expense-type-badge type-${expense.type}">${typeLabels[expense.type] || expense.type}</span></td>
+                <td><span class="expense-type-badge type-${escapeHTML(expense.type)}">${escapeHTML(typeLabels[expense.type] || expense.type)}</span></td>
                 <td style="color:var(--text-secondary)">${escapeHTML(expense.description || '-')}</td>
                 <td class="td-price">${fmt(expense.amount)}</td>
                 <td><button class="btn-delete btn-sm" onclick="deleteExpense('${expense._id}')">Xóa</button></td>
@@ -211,7 +253,15 @@ async function submitExpense(event) {
 }
 
 async function deleteExpense(id) {
-    if (!confirm('Xóa khoản chi phí này?')) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xóa khoản chi phí',
+            message: 'Bạn có chắc muốn xóa bản ghi chi phí này khỏi báo cáo tài chính?',
+            confirmLabel: 'Xóa chi phí',
+            danger: true
+        })
+        : confirm('Xóa khoản chi phí này?');
+    if (!ok) return;
     try {
         const res = await fetch(`${EP}/${id}`, {
             method: 'DELETE',

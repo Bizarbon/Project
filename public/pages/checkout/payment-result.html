@@ -3,13 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/pages/checkout/payment-result.html">
+    <meta property="og:title" content="Kết quả thanh toán - TechEcommerce">
+    <meta property="og:description" content="Kiểm tra kết quả thanh toán đơn hàng TechEcommerce."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Kiểm tra kết quả thanh toán đơn hàng TechEcommerce.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techshopvn.vercel.app/pages/checkout/payment-result.html">
     <title>Kết quả thanh toán - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261123-pro-v1">
     <style>
         .result-card {
             max-width: 620px;
@@ -28,6 +36,7 @@
             flex-wrap: wrap;
         }
     </style>
+    <script>(function(){try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 
 <body>
@@ -39,8 +48,8 @@
             <li id="nav-auth-section" style="margin-left: auto;"></li>
         </ul>
     </nav>
-    <script src="../../assets/js/auth.js"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/auth.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/storefront-header.js?v=20261123-pro-v1"></script>
 
     <main class="container">
         <section class="result-card">
@@ -71,16 +80,26 @@
                 : `payment.html?orderId=${encodeURIComponent(orderId)}`;
         }
 
-        function renderGatewayResult(paymentStatus) {
-            const confirmed = paymentStatus === 'paid';
+        function renderGatewayResult(paymentStatus, orderObj = null) {
+            const isCodOrder = (orderObj && (orderObj.paymentMethod === 'cod' || orderObj.paymentMethod === 'ShipCOD'))
+                || provider.toLowerCase() === 'cod';
+            const confirmed = paymentStatus === 'paid' || (isCodOrder && status !== 'failed' && paymentStatus !== 'failed');
             const failed = paymentStatus === 'failed';
-            resultIcon.textContent = confirmed ? 'OK' : failed ? '!' : '…';
-            resultTitle.textContent = confirmed
+            resultIcon.innerHTML = confirmed
+                ? '<span style="display:inline-flex;width:68px;height:68px;border-radius:50%;align-items:center;justify-content:center;background:rgba(16,185,129,0.14);color:#10b981;font-size:2rem;font-weight:800;" aria-hidden="true">✓</span>'
+                : failed
+                ? '<span style="display:inline-flex;width:68px;height:68px;border-radius:50%;align-items:center;justify-content:center;background:rgba(239,68,68,0.14);color:#ef4444;font-size:2rem;font-weight:800;" aria-hidden="true">✕</span>'
+                : '<span style="display:inline-flex;width:68px;height:68px;border-radius:50%;align-items:center;justify-content:center;background:rgba(59,130,246,0.14);color:#3b82f6;font-size:1.8rem;" aria-hidden="true">⏳</span>';
+            resultTitle.textContent = isCodOrder && confirmed
+                ? 'Đặt hàng thành công!'
+                : confirmed
                 ? `Thanh toán ${provider.toUpperCase()} thành công`
                 : failed
                 ? `Thanh toán ${provider.toUpperCase()} không thành công`
                 : 'Đang chờ cổng thanh toán xác nhận';
-            resultMessage.textContent = confirmed
+            resultMessage.textContent = isCodOrder && confirmed
+                ? `Đơn hàng #${orderId || ''} đã được tiếp nhận. Bạn sẽ thanh toán khi nhận và kiểm tra hàng tận nơi.`
+                : confirmed
                 ? `Đơn hàng #${orderId} đã được xác nhận thanh toán và chuyển sang xử lý.`
                 : `${message || 'Kết quả đã được tiếp nhận.'}${orderId ? ` Mã đơn #${orderId}.` : ''}`;
         }
@@ -95,13 +114,13 @@
                 const guestToken = localStorage.getItem(`guestOrderToken:${orderId}`) || '';
                 if (!auth.isLoggedIn() && guestToken) headers['x-guest-order-token'] = guestToken;
                 if (!auth.isLoggedIn() && !guestToken) {
-                    renderGatewayResult(status === 'failed' ? 'failed' : 'pending');
+                    renderGatewayResult(status === 'failed' ? 'failed' : (status === 'success' ? 'paid' : 'pending'));
                     return;
                 }
                 const response = await fetch(`${API_URL}/orders/${orderId}`, { headers });
                 const order = await response.json();
                 if (!response.ok) throw new Error(order.message || 'Không kiểm tra được đơn hàng.');
-                renderGatewayResult(order.paymentStatus);
+                renderGatewayResult(order.paymentStatus, order);
             } catch (error) {
                 renderGatewayResult(status === 'failed' ? 'failed' : 'pending');
             }
@@ -109,8 +128,8 @@
 
         verifyPaymentResult();
     </script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="../../assets/js/chatbox.js"></script>
+    <script src="../../assets/js/footer.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/chatbox.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

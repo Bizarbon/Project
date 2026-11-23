@@ -5,12 +5,13 @@ const API_URL = LOCAL_HOSTS.has(window.location.hostname) && STATIC_DEV_PORTS.ha
     : `${window.location.origin}/api`;
 window.API_URL = API_URL;
 window.GOOGLE_CLIENT_ID = window.GOOGLE_CLIENT_ID || '209752916771-2971mlsgd9gbmgpg666ff21e6guf3nb6.apps.googleusercontent.com';
-const ADMIN_CACHE_VERSION = 'v=techecommerce-20260709-2';
 
 (function applySavedTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.dataset.theme = savedTheme;
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    try {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.dataset.theme = savedTheme;
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) { }
 })();
 
 function escapeHTML(value) {
@@ -22,6 +23,229 @@ function escapeHTML(value) {
         "'": '&#039;'
     }[char]));
 }
+window.escapeHTML = escapeHTML;
+
+function resolveAssetUrl(src, fallback = '') {
+    const base = typeof window.getAppBasePath === 'function' ? window.getAppBasePath() : '';
+    const defaultImg = fallback || `${base}assets/images/product-placeholder.svg`;
+    const raw = String(src || '').trim();
+    if (!raw) return defaultImg;
+    if (/^(?:https?:|data:|blob:)/i.test(raw)) return raw;
+    if (raw.startsWith('/')) return `${base}${raw.slice(1)}`;
+    return `${base}${raw.replace(/^\.?\//, '')}`;
+}
+window.resolveAssetUrl = resolveAssetUrl;
+
+function ensureTechDialogStyles() {
+    if (document.getElementById('techUiDialogStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'techUiDialogStyles';
+    style.textContent = `
+        dialog.tech-ui-dialog {
+            margin: auto !important;
+            padding: 0 !important;
+            border: 1px solid var(--admin-border, rgba(148, 163, 184, 0.28)) !important;
+            border-radius: 16px !important;
+            background: var(--admin-surface, var(--neo-surface, #ffffff)) !important;
+            color: var(--admin-text-main, var(--neo-text, #0f172a)) !important;
+            width: min(440px, 92vw) !important;
+            max-width: 92vw !important;
+            box-shadow: 0 24px 64px rgba(2, 6, 23, 0.45) !important;
+            overflow: hidden !important;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        html[data-theme='dark'] dialog.tech-ui-dialog {
+            background: #0f172a !important;
+            color: #f1f5f9 !important;
+            border-color: rgba(148, 163, 184, 0.22) !important;
+        }
+        dialog.tech-ui-dialog::backdrop {
+            background: rgba(2, 6, 23, 0.62);
+            backdrop-filter: blur(4px);
+        }
+        .tech-ui-dialog-form {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0 !important;
+        }
+        .tech-ui-dialog-header {
+            padding: 18px 22px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .tech-ui-dialog-header h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: inherit;
+        }
+        .tech-ui-dialog-body {
+            padding: 4px 22px 18px;
+            font-size: 0.92rem;
+            line-height: 1.55;
+            color: var(--admin-text-muted, #64748b);
+        }
+        html[data-theme='dark'] .tech-ui-dialog-body { color: #cbd5e1; }
+        .tech-ui-dialog-input {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.04);
+            color: inherit;
+            font-size: 0.92rem;
+            box-sizing: border-box;
+        }
+        html[data-theme='dark'] .tech-ui-dialog-input {
+            background: rgba(30, 41, 59, 0.85);
+            color: #f8fafc;
+        }
+        .tech-ui-dialog-footer {
+            padding: 14px 22px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(148, 163, 184, 0.05);
+        }
+        .tech-ui-dialog-btn {
+            padding: 9px 18px !important;
+            border-radius: 10px !important;
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            border: 1px solid transparent !important;
+            width: auto !important;
+            min-height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .tech-ui-dialog-btn.cancel {
+            background: transparent !important;
+            border-color: rgba(148, 163, 184, 0.35) !important;
+            color: inherit !important;
+        }
+        .tech-ui-dialog-btn.confirm {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+            color: #ffffff !important;
+        }
+        .tech-ui-dialog-btn.confirm.danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+            color: #ffffff !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function showConfirmDialog(options = {}) {
+    const opts = typeof options === 'string' ? { message: options } : options;
+    const {
+        title = 'Xác nhận thao tác',
+        message = 'Bạn có chắc chắn muốn tiếp tục?',
+        confirmLabel = 'Xác nhận',
+        cancelLabel = 'Hủy bỏ',
+        danger = false
+    } = opts;
+
+    return new Promise((resolve) => {
+        ensureTechDialogStyles();
+        const dlg = document.createElement('dialog');
+        dlg.className = 'tech-ui-dialog';
+        dlg.setAttribute('aria-modal', 'true');
+        dlg.innerHTML = `
+            <form method="dialog" class="tech-ui-dialog-form">
+                <header class="tech-ui-dialog-header">
+                    <h3>${escapeHTML(title)}</h3>
+                </header>
+                <div class="tech-ui-dialog-body">
+                    <p style="margin:0;">${escapeHTML(message)}</p>
+                </div>
+                <footer class="tech-ui-dialog-footer">
+                    <button type="button" class="tech-ui-dialog-btn cancel" data-act="cancel">${escapeHTML(cancelLabel)}</button>
+                    <button type="submit" class="tech-ui-dialog-btn confirm ${danger ? 'danger' : ''}" data-act="confirm">${escapeHTML(confirmLabel)}</button>
+                </footer>
+            </form>
+        `;
+        document.body.appendChild(dlg);
+        let settled = false;
+        const finish = (val) => {
+            if (settled) return;
+            settled = true;
+            try { if (dlg.open) dlg.close(); } catch (_) { }
+            dlg.remove();
+            resolve(val);
+        };
+        dlg.querySelector('[data-act="cancel"]')?.addEventListener('click', () => finish(false));
+        dlg.querySelector('form')?.addEventListener('submit', (e) => { e.preventDefault(); finish(true); });
+        dlg.addEventListener('cancel', () => finish(false));
+        dlg.addEventListener('click', (e) => { if (e.target === dlg) finish(false); });
+        if (typeof dlg.showModal === 'function') dlg.showModal();
+        else finish(window.confirm(message));
+    });
+}
+window.showConfirmDialog = showConfirmDialog;
+
+function showPromptDialog(options = {}) {
+    const opts = typeof options === 'string' ? { title: options } : options;
+    const {
+        title = 'Nhập thông tin',
+        message = '',
+        placeholder = '',
+        defaultValue = '',
+        confirmLabel = 'Lưu lại',
+        cancelLabel = 'Hủy bỏ'
+    } = opts;
+
+    return new Promise((resolve) => {
+        ensureTechDialogStyles();
+        const dlg = document.createElement('dialog');
+        dlg.className = 'tech-ui-dialog';
+        dlg.setAttribute('aria-modal', 'true');
+        dlg.innerHTML = `
+            <form method="dialog" class="tech-ui-dialog-form">
+                <header class="tech-ui-dialog-header">
+                    <h3>${escapeHTML(title)}</h3>
+                </header>
+                <div class="tech-ui-dialog-body">
+                    ${message ? `<p style="margin:0;">${escapeHTML(message)}</p>` : ''}
+                    <input type="text" class="tech-ui-dialog-input" value="${escapeHTML(defaultValue)}" placeholder="${escapeHTML(placeholder)}" autocomplete="off">
+                </div>
+                <footer class="tech-ui-dialog-footer">
+                    <button type="button" class="tech-ui-dialog-btn cancel" data-act="cancel">${escapeHTML(cancelLabel)}</button>
+                    <button type="submit" class="tech-ui-dialog-btn confirm" data-act="confirm">${escapeHTML(confirmLabel)}</button>
+                </footer>
+            </form>
+        `;
+        document.body.appendChild(dlg);
+        const inputEl = dlg.querySelector('.tech-ui-dialog-input');
+        let settled = false;
+        const finish = (val) => {
+            if (settled) return;
+            settled = true;
+            try { if (dlg.open) dlg.close(); } catch (_) { }
+            dlg.remove();
+            resolve(val);
+        };
+        dlg.querySelector('[data-act="cancel"]')?.addEventListener('click', () => finish(null));
+        dlg.querySelector('form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            finish(inputEl ? inputEl.value : '');
+        });
+        dlg.addEventListener('cancel', () => finish(null));
+        dlg.addEventListener('click', (e) => { if (e.target === dlg) finish(null); });
+        if (typeof dlg.showModal === 'function') {
+            dlg.showModal();
+            setTimeout(() => inputEl?.focus(), 40);
+        } else {
+            finish(window.prompt(message || title, defaultValue));
+        }
+    });
+}
+window.showPromptDialog = showPromptDialog;
 
 function cartStorageKeyForUser(user) {
     const identity = user?.id ?? user?._id ?? user?.username ?? user?.email;
@@ -49,15 +273,6 @@ function mergeStoredCarts(primaryCart, incomingCart) {
     });
     return [...merged.values()];
 }
-
-// Immediate Theme Initialization
-(function initTheme() {
-    try {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.dataset.theme = savedTheme;
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    } catch (e) {}
-})();
 
 const auth = {
     getToken: () => localStorage.getItem('token'),
@@ -716,8 +931,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (window.location.pathname.includes('/admin/')) {
         if (!auth.isLoggedIn() || !auth.isAdmin()) {
-            alert('Bạn không có quyền truy cập trang quản trị!');
-            window.location.href = '../pages/auth/login.html';
+            if (typeof window.showLucianToast === 'function') {
+                window.showLucianToast('Bạn cần tài khoản quản trị để truy cập khu vực này.', 'error');
+            }
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+            window.location.replace(`../pages/auth/login.html?returnUrl=${returnUrl}`);
             return;
         }
         applyAdminPermissions();

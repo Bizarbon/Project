@@ -3,7 +3,7 @@
     window.__aiChatboxLoaded = true;
 
     const root = typeof window.getAppBasePath === 'function' ? window.getAppBasePath() : getBasePath();
-    const apiUrl = window.API_URL || 'http://localhost:5000/api';
+    const apiUrl = window.API_URL || `${window.location.origin}/api`;
     let consultationContext = {};
     const CHAT_MODE_STORAGE_KEY = 'ai_chat_mode';
     const openAiStarterSuggestions = [
@@ -626,7 +626,14 @@
         }
 
         // 2. Dự phòng an toàn cho toàn bộ các trang trên website
-        const cartKey = window.auth?.getCartStorageKey?.() || (localStorage.getItem('token') ? 'cart:user' : 'cart:guest');
+        const cartKey = window.auth?.getCartStorageKey?.() || (() => {
+            try {
+                const u = JSON.parse(localStorage.getItem('user') || 'null');
+                const id = u?.id ?? u?._id ?? u?.username ?? u?.email;
+                if (localStorage.getItem('token') && id) return `cart:user:${String(id)}`;
+            } catch (_) { }
+            return 'cart:guest';
+        })();
         let cart = [];
         try {
             cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
@@ -1001,7 +1008,14 @@
     }
 
     function handleAddToCartWithVariant(productId, quantity = 1, variant = {}, customPrice = null) {
-        const cartKey = window.auth?.getCartStorageKey?.() || (localStorage.getItem('token') ? 'cart:user' : 'cart:guest');
+        const cartKey = window.auth?.getCartStorageKey?.() || (() => {
+            try {
+                const u = JSON.parse(localStorage.getItem('user') || 'null');
+                const id = u?.id ?? u?._id ?? u?.username ?? u?.email;
+                if (localStorage.getItem('token') && id) return `cart:user:${String(id)}`;
+            } catch (_) { }
+            return 'cart:guest';
+        })();
         let cart = [];
         try {
             cart = JSON.parse(localStorage.getItem(cartKey) || '[]');
@@ -1655,7 +1669,14 @@
 
     function handleAddBatchToCart(cartItems = [], openCartAfter = false) {
         if (!Array.isArray(cartItems) || cartItems.length === 0) return 0;
-        const cartKey = window.auth?.getCartStorageKey?.() || (localStorage.getItem('token') ? 'cart:user' : 'cart:guest');
+        const cartKey = window.auth?.getCartStorageKey?.() || (() => {
+            try {
+                const u = JSON.parse(localStorage.getItem('user') || 'null');
+                const id = u?.id ?? u?._id ?? u?.username ?? u?.email;
+                if (localStorage.getItem('token') && id) return `cart:user:${String(id)}`;
+            } catch (_) { }
+            return 'cart:guest';
+        })();
         let cart = [];
         try {
             cart = JSON.parse(localStorage.getItem(cartKey) || '[]');

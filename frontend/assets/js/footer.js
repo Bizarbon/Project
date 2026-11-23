@@ -20,12 +20,17 @@
         : fallbackBasePath();
     const year = new Date().getFullYear();
 
-    // Ensure cellphones-footer.css is loaded
-    if (!document.getElementById('cellphonesFooterCss')) {
+    // Ensure cellphones-footer.css is loaded once (style.css already @imports it)
+    const alreadyLoadedFooterCss = Boolean(
+        document.getElementById('cellphonesFooterCss') ||
+        document.querySelector('link[href*="cellphones-footer.css"]') ||
+        document.querySelector('link[href*="style.css"]')
+    );
+    if (!alreadyLoadedFooterCss) {
         const link = document.createElement('link');
         link.id = 'cellphonesFooterCss';
         link.rel = 'stylesheet';
-        link.href = `${root}assets/css/cellphones-footer.css?v=mobile-footer-20260917-2`;
+        link.href = `${root}assets/css/cellphones-footer.css?v=20261123-pro-v1`;
         document.head.appendChild(link);
     }
 
@@ -65,7 +70,7 @@
                     </section>
 
                     <div class="cps-cert-badge">
-                        <a href="http://online.gov.vn/" target="_blank" rel="noopener nofollow" title="Đã đăng ký Bộ Công Thương">
+                        <a href="https://online.gov.vn/" target="_blank" rel="noopener noreferrer nofollow" title="Đã đăng ký Bộ Công Thương">
                             <img src="${root}assets/images/footer/bocongthuong.png" alt="Đã thông báo Bộ Công Thương" width="104" height="34" loading="lazy">
                         </a>
                     </div>

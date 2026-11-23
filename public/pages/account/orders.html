@@ -4,6 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/pages/account/orders.html">
+    <meta property="og:title" content="Lịch sử mua hàng - TechEcommerce">
+    <meta property="og:description" content="Xem lịch sử mua hàng, theo dõi trạng thái xử lý, bảo hành và vận chuyển đơn hàng chính hãng tại TechEcommerce.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
@@ -11,8 +19,8 @@
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techshopvn.vercel.app/pages/account/orders.html">
     <title>Lịch sử mua hàng - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css?v=prod-20261002-1">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=prod-20261002-1">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261123-pro-v1">
     <style>
         .customer-orders-container {
             max-width: 1200px;
@@ -553,6 +561,7 @@
             }
         }
     </style>
+    <script>(function(){try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 
 <body class="account-page">
@@ -567,8 +576,8 @@
         </ul>
     </nav>
     <script src="../../assets/js/animations.js"></script>
-    <script src="../../assets/js/auth.js?v=prod-20261002-1"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20261002-1"></script>
+    <script src="../../assets/js/auth.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/storefront-header.js?v=20261123-pro-v1"></script>
 
     <main class="customer-orders-container fade-in">
         <!-- Switcher Chế độ xem: Đơn hàng của tôi vs Lịch sử mua hàng -->
@@ -621,7 +630,7 @@
                 <figure class="overview-icon-box shipping" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="1" y="3" width="15" height="13"></rect>
-                        <polygon points="16 8 20 8 23 11 23 16 16 16 8"></polygon>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16"></polygon>
                         <circle cx="5.5" cy="18.5" r="2.5"></circle>
                         <circle cx="18.5" cy="18.5" r="2.5"></circle>
                     </svg>
@@ -664,6 +673,7 @@
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
+                <label class="sr-only" for="orderSearchInput">Tìm kiếm theo mã đơn hàng hoặc tên sản phẩm</label>
                 <input type="search" id="orderSearchInput" class="orders-search-input" placeholder="Tìm theo mã đơn hoặc sản phẩm...">
             </form>
         </section>
@@ -677,9 +687,9 @@
         </section>
     </main>
 
-    <script src="../../assets/js/my-orders.js?v=order-flow-20261002-2"></script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20261002-1"></script>
-    <script src="../../assets/js/chatbox.js"></script>
+    <script src="../../assets/js/my-orders.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/footer.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/chatbox.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

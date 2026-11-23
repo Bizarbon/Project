@@ -4,6 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/admin/dashboard.html">
+    <meta property="og:title" content="Dashboard - Bảng điều khiển quản trị TechEcommerce">
+    <meta property="og:description" content="Bảng điều khiển quản trị TechEcommerce: tổng quan doanh thu, người dùng, sản phẩm, đơn hàng, lối tắt tính năng và cảnh báo tồn kho.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
@@ -15,9 +23,9 @@
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Dashboard - Bảng điều khiển quản trị TechEcommerce</title>
-    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-rbac-modals-20261121-v1">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261123-rv-v2">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=20261123-dash-v3">
 
     <script type="application/ld+json">
     {
@@ -235,56 +243,67 @@
     </header>
 
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/auth.js?v=admin-rbac-20261121-v1"></script>
+    <script src="../assets/js/auth.js?v=20261123-pro-v1"></script>
 
     <!-- Main Content Area -->
     <main class="commerce-dashboard" id="dashboardMain">
-        <header class="commerce-dashboard-header">
-            <section class="dashboard-heading" aria-labelledby="dashboardTitle">
-                <p class="dashboard-eyebrow"><span class="live-dot" aria-hidden="true"></span>Trung tâm điều hành ·
-                    <time id="dashboardClock">--:--</time></p>
-                <h1 id="dashboardTitle">Tổng quan kinh doanh</h1>
-                <p id="dashboardPeriodLabel" class="dashboard-period">Đang tải khoảng thời gian...</p>
-            </section>
-            <form class="dashboard-controls" id="dashboardFilters" aria-label="Bộ lọc thời gian dashboard">
-                <fieldset class="period-pills">
-                    <legend class="sr-only">Khoảng thời gian</legend>
-                    <button type="button" class="period-pill" data-range="today">Hôm nay</button>
-                    <button type="button" class="period-pill" data-range="7d">7 ngày</button>
-                    <button type="button" class="period-pill active" data-range="month" aria-pressed="true">Tháng
-                        này</button>
-                    <button type="button" class="period-pill" data-range="custom">Tùy chọn</button>
-                </fieldset>
-                <fieldset class="custom-date-fields" id="customDateFields" hidden>
-                    <legend class="sr-only">Chọn khoảng ngày</legend>
-                    <label>Từ ngày <input type="date" id="dashboardFrom"></label>
-                    <label>Đến ngày <input type="date" id="dashboardTo"></label>
-                    <button type="submit" class="control-button">Áp dụng</button>
-                </fieldset>
-                <button type="button" id="dashboardRefresh" class="control-button refresh-button"
-                    aria-label="Làm mới dữ liệu">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M20 11a8.1 8.1 0 1 0 2 5.3M20 4v7h-7" />
-                    </svg>
-                    <span>Làm mới</span>
-                </button>
-                <button type="button" id="dashboardThemeToggle" class="control-button theme-button"
-                    aria-label="Chuyển giao diện sáng tối">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-                    </svg>
-                    <span>Giao diện</span>
-                </button>
-            </form>
+        <header class="commerce-dashboard-header executive-command-bar">
+            <div class="command-bar-top">
+                <section class="dashboard-heading" aria-labelledby="dashboardTitle">
+                    <div class="dashboard-eyebrow-row">
+                        <p class="dashboard-eyebrow"><span class="live-dot" aria-hidden="true"></span>Trung tâm điều hành ·
+                            <time id="dashboardClock">--:--</time></p>
+                        <p id="dashboardPeriodLabel" class="dashboard-period-chip">Đang tải khoảng thời gian...</p>
+                    </div>
+                    <h1 id="dashboardTitle">Tổng quan kinh doanh</h1>
+                </section>
+                <form class="dashboard-controls" id="dashboardFilters" aria-label="Bộ lọc thời gian dashboard">
+                    <fieldset class="period-pills">
+                        <legend class="sr-only">Khoảng thời gian</legend>
+                        <button type="button" class="period-pill" data-range="today">Hôm nay</button>
+                        <button type="button" class="period-pill" data-range="7d">7 ngày</button>
+                        <button type="button" class="period-pill active" data-range="month" aria-pressed="true">Tháng này</button>
+                        <button type="button" class="period-pill" data-range="custom">Tùy chọn</button>
+                    </fieldset>
+                    <div class="command-action-group">
+                        <button type="button" id="dashboardRefresh" class="control-button refresh-button"
+                            aria-label="Làm mới dữ liệu" title="Làm mới dữ liệu">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 11a8.1 8.1 0 1 0 2 5.3M20 4v7h-7" />
+                            </svg>
+                            <span>Làm mới</span>
+                        </button>
+                        <button type="button" id="dashboardThemeToggle" class="control-button theme-button"
+                            aria-label="Chuyển giao diện sáng tối" title="Chuyển sáng / tối">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                            </svg>
+                            <span>Giao diện</span>
+                        </button>
+                    </div>
+                    <fieldset class="custom-date-fields" id="customDateFields" hidden>
+                        <legend class="sr-only">Chọn khoảng ngày</legend>
+                        <label>Từ ngày <input type="date" id="dashboardFrom"></label>
+                        <label>Đến ngày <input type="date" id="dashboardTo"></label>
+                        <button type="submit" class="control-button control-button-primary">Áp dụng</button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="command-bar-bottom">
+                <nav class="dashboard-view-tabs" aria-label="Nhóm báo cáo">
+                    <span class="view-tab-indicator" aria-hidden="true"></span>
+                    <button type="button" class="view-tab" data-view="modules">Quản lý</button>
+                    <button type="button" class="view-tab active" data-view="overview" aria-current="page">Tổng quan</button>
+                    <button type="button" class="view-tab" data-view="revenue">Doanh thu</button>
+                    <button type="button" class="view-tab" data-view="orders">Đơn hàng</button>
+                </nav>
+                <div class="command-quick-links" aria-label="Lối tắt quản trị nhanh">
+                    <a href="orders.html" class="command-quick-link">📦 Xử lý đơn</a>
+                    <a href="products.html" class="command-quick-link">➕ Kho sản phẩm</a>
+                    <a href="finance.html" class="command-quick-link">📊 Tài chính</a>
+                </div>
+            </div>
         </header>
-
-        <nav class="dashboard-view-tabs" aria-label="Nhóm báo cáo">
-            <span class="view-tab-indicator" aria-hidden="true"></span>
-            <button type="button" class="view-tab" data-view="modules">Quản lý</button>
-            <button type="button" class="view-tab active" data-view="overview" aria-current="page">Tổng quan</button>
-            <button type="button" class="view-tab" data-view="revenue">Doanh thu</button>
-            <button type="button" class="view-tab" data-view="orders">Đơn hàng</button>
-        </nav>
 
         <p id="dashboardError" class="dashboard-message error" role="alert" hidden></p>
         <section id="dashboardLoading" class="dashboard-loading" aria-live="polite">
@@ -698,8 +717,8 @@
         </article>
     </dialog>
 
-    <script src="../assets/js/dashboard.js?v=commerce-dashboard-20261005-1"></script>
-    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+    <script src="../assets/js/dashboard.js?v=20261123-dash-v3"></script>
+    <script src="../assets/js/footer.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

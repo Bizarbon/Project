@@ -93,7 +93,15 @@ function editCoupon(id) {
 }
 
 async function deleteCoupon(id) {
-    if (!confirm('Bạn có chắc muốn xóa mã giảm giá này?')) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xóa mã giảm giá',
+            message: 'Bạn có chắc chắn muốn xóa mã giảm giá này?',
+            confirmLabel: 'Xóa mã',
+            danger: true
+        })
+        : confirm('Bạn có chắc muốn xóa mã giảm giá này?');
+    if (!ok) return;
     try {
         const res = await fetch(`${COUPON_EP}/${id}`, {
             method: 'DELETE',
@@ -109,7 +117,9 @@ async function deleteCoupon(id) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('couponForm').addEventListener('submit', async event => {
+    const form = document.getElementById('couponForm');
+    if (!form) return;
+    form.addEventListener('submit', async event => {
         event.preventDefault();
         const id = document.getElementById('couponId').value;
         try {

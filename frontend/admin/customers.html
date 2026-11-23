@@ -3,16 +3,24 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/admin/customers.html">
+    <meta property="og:title" content="Quản lý khách hàng - TechEcommerce">
+    <meta property="og:description" content="Quản trị hồ sơ và lịch sử mua hàng của khách hàng TechEcommerce."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Quản trị hồ sơ và lịch sử mua hàng của khách hàng TechEcommerce.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techshopvn.vercel.app/admin/customers.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Quản lý khách hàng - TechEcommerce</title>
-    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-rbac-modals-20261121-v1">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=20261123-pro-v1">
 </head>
 
 <body class="admin-page">
@@ -189,7 +197,7 @@
         </nav>
     </header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/auth.js?v=admin-rbac-20261121-v1"></script>
+    <script src="../assets/js/auth.js?v=20261123-pro-v1"></script>
 
     <main class="container fade-in">
         <header class="page-header reveal">
@@ -334,41 +342,45 @@
         </section>
 
         <!-- Voucher Modal for Retargeting -->
-        <dialog id="voucherDialog" style="border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--bg-card); color:var(--text-primary); padding:2rem; max-width:480px; width:90%; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
-            <form method="dialog" onsubmit="event.preventDefault(); submitVoucherCampaign();">
-                <h3 id="voucherDialogTitle" style="margin-top:0; font-size:1.2rem;">🎁 Phát hành Voucher Kích cầu</h3>
-                <p id="voucherDialogDesc" style="color:var(--text-secondary); font-size:0.9rem;">Hệ thống sẽ tạo mã ưu đãi độc quyền cho nhóm khách hàng được chọn.</p>
-                
-                <input type="hidden" id="vSegment">
-                <div class="form-group">
-                    <label for="vCode">Mã Voucher (Code)</label>
-                    <input type="text" id="vCode" style="text-transform:uppercase; font-weight:700; letter-spacing:1px;" required>
-                </div>
-                <div class="form-group">
-                    <label for="vName">Tên chiến dịch</label>
-                    <input type="text" id="vName" required>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
-                    <div class="form-group">
-                        <label for="vType">Loại giảm giá</label>
-                        <select id="vType">
-                            <option value="percent">Phần trăm (%)</option>
-                            <option value="fixed">Số tiền cố định (đ)</option>
-                        </select>
+        <dialog id="voucherDialog" class="dash-modal" aria-labelledby="voucherDialogTitle">
+            <form method="dialog" class="dash-modal-form" onsubmit="event.preventDefault(); submitVoucherCampaign();">
+                <header class="dash-modal-header">
+                    <h3 id="voucherDialogTitle">🎁 Phát hành Voucher Kích cầu</h3>
+                    <button type="button" class="dash-modal-close" aria-label="Đóng hộp thoại" onclick="document.getElementById('voucherDialog').close()">✕</button>
+                </header>
+                <div class="dash-modal-body">
+                    <p id="voucherDialogDesc" style="color:var(--admin-text-muted, var(--text-secondary)); font-size:0.88rem; margin:0 0 12px;">Hệ thống sẽ tạo mã ưu đãi độc quyền cho nhóm khách hàng được chọn.</p>
+                    <input type="hidden" id="vSegment">
+                    <div class="dash-form-group">
+                        <label for="vCode">Mã Voucher (Code)</label>
+                        <input type="text" id="vCode" style="text-transform:uppercase; font-weight:700; letter-spacing:1px;" required>
                     </div>
-                    <div class="form-group">
-                        <label for="vValue">Giá trị giảm</label>
-                        <input type="number" id="vValue" min="1" required>
+                    <div class="dash-form-group">
+                        <label for="vName">Tên chiến dịch</label>
+                        <input type="text" id="vName" required>
+                    </div>
+                    <div class="dash-form-row-2">
+                        <div class="dash-form-group">
+                            <label for="vType">Loại giảm giá</label>
+                            <select id="vType">
+                                <option value="percent">Phần trăm (%)</option>
+                                <option value="fixed">Số tiền cố định (đ)</option>
+                            </select>
+                        </div>
+                        <div class="dash-form-group">
+                            <label for="vValue">Giá trị giảm</label>
+                            <input type="number" id="vValue" min="1" required>
+                        </div>
+                    </div>
+                    <div class="dash-form-group">
+                        <label for="vMinOrder">Đơn hàng tối thiểu (đ)</label>
+                        <input type="number" id="vMinOrder" value="300000" min="0">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="vMinOrder">Đơn hàng tối thiểu (đ)</label>
-                    <input type="number" id="vMinOrder" value="300000">
-                </div>
-                <div class="form-actions" style="margin-top:1.5rem;">
-                    <button type="submit" class="btn-primary">Xác nhận gửi Voucher</button>
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('voucherDialog').close()">Đóng</button>
-                </div>
+                <footer class="dash-modal-footer">
+                    <button type="button" class="dash-btn-secondary" onclick="document.getElementById('voucherDialog').close()">Đóng</button>
+                    <button type="submit" class="dash-btn-primary">Xác nhận gửi Voucher</button>
+                </footer>
             </form>
         </dialog>
     </main>
@@ -376,8 +388,8 @@
     <!-- Footer placeholder strictly at the bottom -->
     <footer id="site-footer"></footer>
 
-    <script src="../assets/js/customers.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+    <script src="../assets/js/customers.js?v=20261123-pro-v1"></script>
+    <script src="../assets/js/footer.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

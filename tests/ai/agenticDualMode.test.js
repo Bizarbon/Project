@@ -7,7 +7,11 @@
  */
 
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../backend/.env') });
+const fs = require('fs');
+const rootEnv = path.resolve(__dirname, '../../.env');
+const backendEnv = path.resolve(__dirname, '../../backend/.env');
+if (fs.existsSync(rootEnv)) require('dotenv').config({ path: rootEnv });
+if (fs.existsSync(backendEnv)) require('dotenv').config({ path: backendEnv });
 const mongoose = require('mongoose');
 const connectDB = require('../../backend/src/config/db');
 const agenticChatService = require('../../backend/src/services/ai/agenticChatService');

@@ -3,7 +3,7 @@ const router = express.Router();
 const Review = require('../models/Review');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePermission } = require('../middleware/auth');
 
 async function refreshProductRating(productId) {
     const reviews = await Review.find({ product: productId, status: 'visible' });
@@ -87,7 +87,7 @@ router.post('/product/:productId', protect, async (req, res) => {
     return handleSaveReview(req, res, req.params.productId);
 });
 
-router.get('/', protect, admin, async (req, res) => {
+router.get('/', protect, admin, requirePermission('qa', 'view'), async (req, res) => {
     try {
         const reviews = await Review.find()
             .populate('product', 'name')
@@ -99,7 +99,7 @@ router.get('/', protect, admin, async (req, res) => {
     }
 });
 
-router.put('/:id/status', protect, admin, async (req, res) => {
+router.put('/:id/status', protect, admin, requirePermission('qa', 'edit'), async (req, res) => {
     try {
         const review = await Review.findById(req.params.id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
@@ -109,6 +109,35 @@ router.put('/:id/status', protect, admin, async (req, res) => {
         res.json(review);
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+});
+
+router.put('/:id/reply', protect, admin, requirePermission('qa', 'edit'), async (req, res) => {
+    try {
+        const review = await Review.findById(req.params.id);
+        if (!review) return res.status(404).json({ message: 'Không tìm thấy đánh giá / câu hỏi.' });
+        const replyText = String(req.body?.adminReply ?? req.body?.reply ?? '').trim();
+        if (!replyText) return res.status(400).json({ message: 'Vui lòng nhập nội dung phản hồi.' });
+        review.adminReply = replyText.slice(0, 2000);
+        review.adminRepliedBy = req.user?.name || 'TechEcommerce CSKH';
+        review.adminRepliedAt = new Date();
+        await review.save();
+        res.json({ success: true, message: 'Đã lưu phản hồi chính thức.', review });
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Không thể lưu phản hồi.' });
+    }
+});
+
+router.delete('/:id', protect, admin, requirePermission('qa', 'delete'), async (req, res) => {
+    try {
+        const review = await Review.findById(req.params.id);
+        if (!review) return res.status(404).json({ message: 'Không tìm thấy đánh giá.' });
+        const prodId = review.product;
+        await Review.findByIdAndDelete(req.params.id);
+        await refreshProductRating(prodId);
+        res.json({ success: true, message: 'Đã xóa đánh giá.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });
 

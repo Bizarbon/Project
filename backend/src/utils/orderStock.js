@@ -73,6 +73,7 @@ function shouldReserve(status) {
 
 module.exports = {
     reserveStock,
+    rollbackStock,
     restoreOrderStock,
     reReserveOrderStock,
     shouldRestore,

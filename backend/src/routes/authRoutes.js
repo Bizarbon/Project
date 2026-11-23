@@ -7,7 +7,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const Customer = require('../models/Customer');
 const StaffMember = require('../models/StaffMember');
-const { protect } = require('../middleware/auth');
+const { protect, getJwtSecret } = require('../middleware/auth');
 const googleAuthService = require('../services/auth/googleAuthService');
 const {
     emailEnabled,
@@ -49,10 +49,8 @@ const otpVerifyLimiter = rateLimit({
     message: { message: 'Bạn đã nhập mã quá nhiều lần. Vui lòng thử lại sau 15 phút.' }
 });
 
-router.use(authLimiter);
-
 function signToken(customer) {
-    const secret = process.env.JWT_SECRET || 'ecommerce_super_secret_jwt_key_2026';
+    const secret = getJwtSecret();
     return jwt.sign(
         {
             id: customer._id,
@@ -107,7 +105,7 @@ router.get('/me', protect, async (req, res) => {
 });
 
 // POST register
-router.post('/register', [
+router.post('/register', authLimiter, [
     body('name').trim().isLength({ min: 2, max: 80 }).withMessage('Họ tên phải từ 2 đến 80 ký tự'),
     body('username').trim().matches(/^[a-zA-Z0-9_]{3,30}$/).withMessage('Tên đăng nhập gồm 3-30 chữ, số hoặc dấu gạch dưới'),
     body('email').optional({ checkFalsy: true }).isEmail().withMessage('Email không hợp lệ').normalizeEmail(),
@@ -173,7 +171,7 @@ router.post('/register', [
 });
 
 // POST login
-router.post('/login', [
+router.post('/login', authLimiter, [
     body('identifier').notEmpty().withMessage('Tên đăng nhập, Email hoặc SĐT là bắt buộc'),
     body('password').notEmpty().withMessage('Mật khẩu là bắt buộc')
 ], async (req, res) => {
@@ -196,6 +194,10 @@ router.post('/login', [
         const customer = await Customer.findOne({
             $or: identifiers
         }).select('+password +loginAttempts +lockUntil');
+
+        if (customer?.active === false) {
+            return res.status(403).json({ message: 'Tài khoản của bạn đã bị tạm khóa. Vui lòng liên hệ quản trị viên.' });
+        }
 
         if (customer?.lockUntil && customer.lockUntil > new Date()) {
             const waitMinutes = Math.max(Math.ceil((customer.lockUntil.getTime() - Date.now()) / 60000), 1);
@@ -304,7 +306,7 @@ router.get('/google/config', (req, res) => {
 });
 
 // POST Google Login with verified ID Token
-router.post('/google', [
+router.post('/google', authLimiter, [
     body('credential').trim().notEmpty().withMessage('Mã xác thực Google (credential) là bắt buộc')
 ], async (req, res) => {
     try {
@@ -327,12 +329,16 @@ router.post('/google', [
         }
 
         const customer = await handleGoogleLoginUser(googleUser);
+        if (customer.active === false) {
+            return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị tạm khóa.' });
+        }
+        const resolvedPerms = await resolveUserPermissions(customer);
 
         return res.json({
             success: true,
             message: 'Đăng nhập Google thành công',
             token: signToken(customer),
-            user: publicUser(customer)
+            user: publicUser(customer, resolvedPerms)
         });
     } catch (error) {
         console.error('Google auth route error:', error);
@@ -344,7 +350,7 @@ router.post('/google', [
 });
 
 // POST social-login (Google)
-router.post('/social-login', [
+router.post('/social-login', authLimiter, [
     body('provider').equals('google').withMessage('Chỉ hỗ trợ đăng nhập Google')
 ], async (req, res) => {
     try {
@@ -371,12 +377,16 @@ router.post('/social-login', [
         }
 
         const customer = await handleGoogleLoginUser(googleUser);
+        if (customer.active === false) {
+            return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị tạm khóa.' });
+        }
+        const resolvedPerms = await resolveUserPermissions(customer);
 
         return res.json({
             success: true,
             message: 'Đăng nhập Google thành công!',
             token: signToken(customer),
-            user: publicUser(customer)
+            user: publicUser(customer, resolvedPerms)
         });
     } catch (error) {
         console.error('Social login error:', error);

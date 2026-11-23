@@ -4,6 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/admin/orders.html">
+    <meta property="og:title" content="Quản lý đơn hàng - TechEcommerce Admin">
+    <meta property="og:description" content="Quản trị trạng thái xử lý, phân công shipper, thanh toán và vận chuyển đơn hàng TechEcommerce.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
@@ -13,9 +21,9 @@
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Quản lý đơn hàng - TechEcommerce Admin</title>
-    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-rbac-modals-20261121-v1">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=20261123-pro-v1">
     <style>
         /* Orders Module Modern Dark Theme Enhancements */
         :root {
@@ -957,7 +965,7 @@
     </header>
 
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/auth.js?v=admin-rbac-20261121-v1"></script>
+    <script src="../assets/js/auth.js?v=20261123-pro-v1"></script>
 
     <main class="container fade-in">
         <header class="page-header reveal">
@@ -1012,6 +1020,7 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
+                    <label class="sr-only" for="orderSearchInput">Tìm kiếm đơn hàng theo mã, khách hàng, SĐT hoặc vận đơn</label>
                     <input type="text" id="orderSearchInput" class="search-input-main" placeholder="🔍 Tìm mã đơn, khách hàng, SĐT, email, sản phẩm, mã vận đơn..." autocomplete="off">
                     <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Xóa tìm kiếm">✕</button>
                 </div>
@@ -1130,21 +1139,22 @@
                     <thead>
                         <tr>
                             <th style="width: 40px; text-align: center;">
+                                <label class="sr-only" for="selectAllCheckbox">Chọn tất cả đơn hàng</label>
                                 <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllOrders(this.checked)" title="Chọn tất cả">
                             </th>
-                            <th class="sortable-th" onclick="handleSortColumn('orderId')" title="Bấm để sắp xếp theo mã đơn">
+                            <th class="sortable-th" tabindex="0" role="button" onclick="handleSortColumn('orderId')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleSortColumn('orderId');}" title="Bấm để sắp xếp theo mã đơn">
                                 MÃ ĐƠN <span id="sortIcon_orderId">↕</span>
                             </th>
                             <th>KHÁCH HÀNG</th>
                             <th>SẢN PHẨM</th>
-                            <th class="sortable-th" onclick="handleSortColumn('totalAmount')" title="Bấm để sắp xếp theo tổng tiền">
+                            <th class="sortable-th" tabindex="0" role="button" onclick="handleSortColumn('totalAmount')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleSortColumn('totalAmount');}" title="Bấm để sắp xếp theo tổng tiền">
                                 TỔNG TIỀN <span id="sortIcon_totalAmount">↕</span>
                             </th>
                             <th>THANH TOÁN</th>
                             <th>TRẠNG THÁI</th>
                             <th>SHIPPER</th>
                             <th>VẬN CHUYỂN</th>
-                            <th class="sortable-th" onclick="handleSortColumn('orderDate')" title="Bấm để sắp xếp theo ngày đặt">
+                            <th class="sortable-th" tabindex="0" role="button" onclick="handleSortColumn('orderDate')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();handleSortColumn('orderDate');}" title="Bấm để sắp xếp theo ngày đặt">
                                 NGÀY ĐẶT <span id="sortIcon_orderDate">↕</span>
                             </th>
                             <th style="text-align: center;">HÀNH ĐỘNG</th>
@@ -1330,9 +1340,9 @@
     <!-- Site Footer -->
     <footer id="site-footer"></footer>
 
-    <script src="../assets/js/invoice-template.js?v=20261117-cat-invoice-v1"></script>
-    <script src="../assets/js/orders.js?v=20261117-cat-invoice-v1"></script>
-    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+    <script src="../assets/js/invoice-template.js?v=20261123-pro-v1"></script>
+    <script src="../assets/js/orders.js?v=20261123-pro-v1"></script>
+    <script src="../assets/js/footer.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

@@ -6,11 +6,58 @@ const JWT_OPTIONS = {
     audience: 'techecommerce-web'
 };
 
+const DEV_FALLBACK_JWT_SECRET = 'techecommerce_dev_only_fallback_secret_2026';
+
+function getJwtSecret() {
+    const secret = String(process.env.JWT_SECRET || '').trim();
+    if (secret) return secret;
+    if (process.env.NODE_ENV === 'production') {
+        throw new Error('JWT_SECRET bắt buộc phải được cấu hình trong môi trường production.');
+    }
+    return DEV_FALLBACK_JWT_SECRET;
+}
+
+function getAllowedOrigins() {
+    const list = [
+        process.env.APP_BASE_URL,
+        process.env.FRONTEND_BASE_URL,
+        process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+        process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : '',
+        'https://techshopvn.vercel.app'
+    ];
+    if (process.env.NODE_ENV !== 'production') {
+        list.push(
+            'http://localhost:5000',
+            'http://localhost:5500',
+            'http://localhost:5501',
+            'http://127.0.0.1:5000',
+            'http://127.0.0.1:5500',
+            'http://127.0.0.1:5501'
+        );
+    }
+    return new Set(list.filter(Boolean).map(v => String(v).trim().replace(/\/$/, '')));
+}
+
+function isAllowedOrigin(origin, req = null) {
+    const clean = String(origin || '').trim().replace(/\/$/, '');
+    if (!clean || !/^https?:\/\//i.test(clean)) return false;
+    if (getAllowedOrigins().has(clean)) return true;
+    if (req) {
+        const forwardedProto = String(req.get('x-forwarded-proto') || '').split(',')[0].trim();
+        const protocol = forwardedProto || req.protocol;
+        const host = req.get('host');
+        if (host && clean === `${protocol}://${host}`.replace(/\/$/, '')) return true;
+    }
+    return false;
+}
+
 async function userFromToken(token) {
-    const secret = process.env.JWT_SECRET || 'ecommerce_super_secret_jwt_key_2026';
+    const secret = getJwtSecret();
     const decoded = jwt.verify(token, secret, JWT_OPTIONS);
     const user = await Customer.findById(decoded.id).select('-password');
-    if (!user || Number(decoded.tokenVersion || 0) !== Number(user.tokenVersion || 0)) return null;
+    if (!user) return null;
+    if (user.active === false) return null;
+    if (Number(decoded.tokenVersion || 0) !== Number(user.tokenVersion || 0)) return null;
     return user;
 }
 
@@ -26,7 +73,7 @@ const protect = async (req, res, next) => {
         req.user = await userFromToken(token);
 
         if (!req.user) {
-            return res.status(401).json({ message: 'Người dùng không tồn tại!' });
+            return res.status(401).json({ message: 'Phiên đăng nhập không hợp lệ hoặc tài khoản đã bị khóa!' });
         }
 
         return next();
@@ -52,10 +99,31 @@ const optionalAuth = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-    if (req.user && req.user.isAdmin) {
+    if (req.user && req.user.isAdmin && req.user.active !== false) {
         return next();
     }
     return res.status(403).json({ message: 'Quyền hạn bị từ chối, yêu cầu quyền Admin!' });
 };
 
-module.exports = { protect, optionalAuth, admin };
+const requirePermission = (moduleKey, action = 'view') => (req, res, next) => {
+    if (!req.user || !req.user.isAdmin || req.user.active === false) {
+        return res.status(403).json({ message: 'Quyền hạn bị từ chối!' });
+    }
+    const perms = req.user.permissions;
+    // Super admin (no restricted permission matrix) has full permissions
+    if (!perms || typeof perms !== 'object') return next();
+    if (perms[moduleKey] && perms[moduleKey][action]) return next();
+    return res.status(403).json({
+        message: `Tài khoản của bạn không có quyền thực hiện thao tác (${action}) trên mục ${moduleKey}.`
+    });
+};
+
+module.exports = {
+    getJwtSecret,
+    getAllowedOrigins,
+    isAllowedOrigin,
+    protect,
+    optionalAuth,
+    admin,
+    requirePermission
+};

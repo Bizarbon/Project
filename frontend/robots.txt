@@ -3,6 +3,9 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /api/
+Disallow: /pages/account/
+Disallow: /pages/checkout/
+Disallow: /pages/auth/
 
-# Sitemap index
+# Dynamic Sitemap
 Sitemap: https://techshopvn.vercel.app/sitemap.xml

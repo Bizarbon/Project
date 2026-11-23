@@ -6,6 +6,7 @@
 (function () {
     'use strict';
 
+    const API_BASE = window.API_URL || `${window.location.origin}/api`;
     let currentConversations = [];
     let activeConversation = null;
     let currentFilterStatus = 'all';
@@ -89,15 +90,19 @@
             if (searchQuery) params.append('search', searchQuery);
             if (currentFilterStatus !== 'all') params.append('status', currentFilterStatus);
 
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/chat/admin/conversations?${params.toString()}`, {
-                headers: {
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                }
+            const headers = (window.auth && typeof window.auth.getHeaders === 'function')
+                ? window.auth.getHeaders()
+                : (() => {
+                    const token = localStorage.getItem('token');
+                    return token ? { 'Authorization': `Bearer ${token}` } : {};
+                })();
+            const res = await fetch(`${API_BASE}/chat/admin/conversations?${params.toString()}`, {
+                headers
             });
 
             if (!res.ok) {
-                throw new Error(`Lỗi tải dữ liệu: ${res.status}`);
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.message || `Lỗi tải dữ liệu: ${res.status}`);
             }
 
             const data = await res.json();
@@ -276,9 +281,12 @@
 
             let mediaHtml = '';
             if (msg.isImage && msg.imageUrl) {
+                const resolvedImg = typeof window.resolveAssetUrl === 'function'
+                    ? window.resolveAssetUrl(msg.imageUrl)
+                    : msg.imageUrl;
                 mediaHtml = `
                     <div style="margin-top: 8px;">
-                        <img src="${escapeHtml(msg.imageUrl)}" alt="Ảnh khách gửi" class="chat-bubble-img-preview" loading="lazy">
+                        <img src="${escapeHtml(resolvedImg)}" alt="Ảnh khách gửi" class="chat-bubble-img-preview" loading="lazy">
                         <small style="display:block; margin-top: 4px; font-size: 0.72rem; color: var(--admin-text-muted);">📷 Hình ảnh tìm kiếm / nhận diện</small>
                     </div>
                 `;
@@ -339,19 +347,21 @@
         const nextStatus = statusCycle[activeConversation.status] || 'active';
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/chat/admin/conversations/${activeConversation._id}`, {
-                method: 'PATCH',
-                headers: {
+            const headers = (window.auth && typeof window.auth.getHeaders === 'function')
+                ? window.auth.getHeaders()
+                : {
                     'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                    ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
+                };
+            const res = await fetch(`${API_BASE}/chat/admin/conversations/${activeConversation._id}`, {
+                method: 'PATCH',
+                headers,
                 body: JSON.stringify({ status: nextStatus })
             });
 
-            if (!res.ok) throw new Error('Cập nhật thất bại');
+            const result = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(result.message || 'Cập nhật thất bại');
 
-            const result = await res.json();
             activeConversation.status = nextStatus;
 
             // Update in list
@@ -363,7 +373,7 @@
 
             showToast(`Đã chuyển trạng thái sang: ${getStatusConfig(nextStatus).label}`);
         } catch (err) {
-            alert('Lỗi cập nhật trạng thái: ' + err.message);
+            showToast('Lỗi cập nhật trạng thái: ' + err.message, 'error');
         }
     }
 
@@ -373,17 +383,20 @@
         const newNote = noteInput ? noteInput.value.trim() : '';
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`/api/chat/admin/conversations/${activeConversation._id}`, {
-                method: 'PATCH',
-                headers: {
+            const headers = (window.auth && typeof window.auth.getHeaders === 'function')
+                ? window.auth.getHeaders()
+                : {
                     'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
+                    ...(localStorage.getItem('token') ? { 'Authorization': `Bearer ${localStorage.getItem('token')}` } : {})
+                };
+            const res = await fetch(`${API_BASE}/chat/admin/conversations/${activeConversation._id}`, {
+                method: 'PATCH',
+                headers,
                 body: JSON.stringify({ note: newNote })
             });
 
-            if (!res.ok) throw new Error('Lưu thất bại');
+            const result = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(result.message || 'Lưu thất bại');
 
             activeConversation.intentSummary = newNote;
             const inList = currentConversations.find(c => c._id === activeConversation._id);
@@ -394,7 +407,7 @@
 
             showToast('Đã lưu thông tin ghi chú nhu cầu khách hàng thành công!');
         } catch (err) {
-            alert('Lỗi lưu ghi chú: ' + err.message);
+            showToast('Lỗi lưu ghi chú: ' + err.message, 'error');
         }
     }
 
@@ -468,12 +481,16 @@
             .replace(/'/g, '&#039;');
     }
 
-    function showToast(message) {
+    function showToast(message, type = 'success') {
+        if (typeof window.showLucianToast === 'function') {
+            window.showLucianToast(message, type);
+            return;
+        }
         const toast = document.createElement('div');
         toast.style.position = 'fixed';
         toast.style.bottom = '24px';
         toast.style.right = '24px';
-        toast.style.background = '#10b981';
+        toast.style.background = type === 'error' ? '#ef4444' : '#10b981';
         toast.style.color = '#ffffff';
         toast.style.padding = '12px 20px';
         toast.style.borderRadius = '8px';
@@ -487,7 +504,7 @@
         setTimeout(() => {
             toast.style.opacity = '0';
             setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        }, 3200);
     }
 
 })();

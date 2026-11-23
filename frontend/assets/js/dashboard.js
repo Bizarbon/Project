@@ -240,23 +240,30 @@ function productImage(src) {
 function renderBestSellers(items) {
     const host = document.getElementById('bestSellerList');
     if (!host) return;
-    const max = Math.max(...items.map(item => item.quantity), 1);
-    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+    const max = Math.max(...items.map(item => Number(item.quantity) || 0), 1);
     const rankClasses = ['rank-1', 'rank-2', 'rank-3', 'rank-4', 'rank-5'];
 
-    host.innerHTML = items.length ? items.slice(0, 5).map((item, index) => `
+    host.innerHTML = items.length ? items.slice(0, 5).map((item, index) => {
+        const pct = Math.max(8, Math.round(((Number(item.quantity) || 0) / max) * 100));
+        return `
         <li class="bestseller-item ${rankClasses[index] || ''}">
-            <span class="bestseller-rank-badge" aria-hidden="true">${medals[index] || (index + 1)}</span>
-            <img src="${escapeHTML(productImage(item.image))}" alt="" loading="lazy">
-            <span class="bestseller-copy">
-                <strong title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</strong>
-                <span>${money(item.revenue)} · <small>${item.quantity} đã bán</small></span>
-            </span>
-            <span class="bestseller-track">
-                <span style="width:${Math.round(item.quantity / max * 100)}%"></span>
+            <span class="bestseller-rank-badge" aria-label="Hạng ${index + 1}">#${index + 1}</span>
+            <figure class="bestseller-thumb">
+                <img src="${escapeHTML(productImage(item.image))}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.onerror=null; this.src='../assets/images/product-placeholder.svg';">
+            </figure>
+            <div class="bestseller-copy">
+                <strong class="bestseller-name" title="${escapeHTML(item.name)}">${escapeHTML(item.name)}</strong>
+                <div class="bestseller-meta">
+                    <span class="bestseller-rev">${money(item.revenue)}</span>
+                    <span class="bestseller-qty">${Number(item.quantity || 0)} đã bán</span>
+                </div>
+            </div>
+            <span class="bestseller-track" aria-hidden="true">
+                <span style="width:${pct}%"></span>
             </span>
         </li>
-    `).join('') : '<li class="empty-dashboard">Chưa có sản phẩm bán ra trong kỳ.</li>';
+    `;
+    }).join('') : '<li class="empty-dashboard">Chưa có sản phẩm bán ra trong kỳ.</li>';
 }
 
 function renderRecentOrders(orders) {
@@ -507,12 +514,19 @@ function toggleSoundAlert() {
 }
 window.toggleSoundAlert = toggleSoundAlert;
 
+let sharedExpressAudioCtx = null;
 function playExpressAlertChime(force = false) {
     if (!soundAlertEnabled && !force) return;
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
-        const ctx = new AudioContext();
+        if (!sharedExpressAudioCtx || sharedExpressAudioCtx.state === 'closed') {
+            sharedExpressAudioCtx = new AudioContext();
+        }
+        if (sharedExpressAudioCtx.state === 'suspended') {
+            sharedExpressAudioCtx.resume().catch(() => {});
+        }
+        const ctx = sharedExpressAudioCtx;
         const now = ctx.currentTime;
 
         // Note 1: High crisp chime (A5)
@@ -589,13 +603,48 @@ async function loadExpressOrders() {
         renderExpressOrdersTable();
 
         if (!expressCountdownInterval) {
-            expressCountdownInterval = setInterval(renderExpressOrdersTable, 1000);
+            expressCountdownInterval = setInterval(updateExpressCountdownsInPlace, 1000);
         }
     } catch (err) {
         console.warn('loadExpressOrders error:', err);
     }
 }
 window.loadExpressOrders = loadExpressOrders;
+
+function formatExpressCountdown(deadlineMs, nowMs = Date.now()) {
+    const diffMs = deadlineMs - nowMs;
+    if (diffMs > 0) {
+        const totalSec = Math.floor(diffMs / 1000);
+        const hrs = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSec % 60).padStart(2, '0');
+        const timeStr = `${hrs}:${mins}:${secs}`;
+        if (diffMs > 60 * 60 * 1000) {
+            return { cls: 'express-countdown-pill safe', title: 'Đang trong thời gian an toàn', text: `⏳ Còn ${timeStr}` };
+        }
+        if (diffMs > 30 * 60 * 1000) {
+            return { cls: 'express-countdown-pill warning', title: 'Cần hoàn tất chuẩn bị', text: `⚠️ Còn ${timeStr}` };
+        }
+        return { cls: 'express-countdown-pill urgent pulse', title: 'Khẩn cấp! Sắp hết 2 giờ', text: `🔥 Khẩn cấp: ${timeStr}` };
+    }
+    const overSec = Math.floor(Math.abs(diffMs) / 1000);
+    const overMin = Math.floor(overSec / 60);
+    return { cls: 'express-countdown-pill overdue pulse', title: 'Đã quá cam kết 2 giờ!', text: `🚨 Trễ ${overMin}p` };
+}
+
+function updateExpressCountdownsInPlace() {
+    const pills = document.querySelectorAll('#expressOrdersBody [data-express-deadline]');
+    if (!pills.length) return;
+    const now = Date.now();
+    pills.forEach(el => {
+        const deadline = Number(el.getAttribute('data-express-deadline'));
+        if (!Number.isFinite(deadline)) return;
+        const next = formatExpressCountdown(deadline, now);
+        el.className = next.cls;
+        el.title = next.title;
+        el.textContent = next.text;
+    });
+}
 
 function renderExpressOrdersTable() {
     const tbody = document.getElementById('expressOrdersBody');
@@ -615,29 +664,9 @@ function renderExpressOrdersTable() {
     const now = Date.now();
     tbody.innerHTML = expressOrdersList.map(order => {
         const orderTime = new Date(order.createdAt || order.orderDate).getTime();
-        const deadline = orderTime + (2 * 60 * 60 * 1000); // 2 hours commit
-        const diffMs = deadline - now;
-
-        let countdownHtml = '';
-        if (diffMs > 0) {
-            const totalSec = Math.floor(diffMs / 1000);
-            const hrs = String(Math.floor(totalSec / 3600)).padStart(2, '0');
-            const mins = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
-            const secs = String(totalSec % 60).padStart(2, '0');
-            const timeStr = `${hrs}:${mins}:${secs}`;
-
-            if (diffMs > 60 * 60 * 1000) {
-                countdownHtml = `<span class="express-countdown-pill safe" title="Đang trong thời gian an toàn">⏳ Còn ${timeStr}</span>`;
-            } else if (diffMs > 30 * 60 * 1000) {
-                countdownHtml = `<span class="express-countdown-pill warning" title="Cần hoàn tất chuẩn bị">⚠️ Còn ${timeStr}</span>`;
-            } else {
-                countdownHtml = `<span class="express-countdown-pill urgent pulse" title="Khẩn cấp! Sắp hết 2 giờ">🔥 Khẩn cấp: ${timeStr}</span>`;
-            }
-        } else {
-            const overdueSec = Math.floor(Math.abs(diffMs) / 1000);
-            const ovMins = Math.floor(overdueSec / 60);
-            countdownHtml = `<span class="express-countdown-pill overdue" title="Đơn đã quá hạn 2 giờ">⛔ Quá hạn (-${ovMins}p)</span>`;
-        }
+        const deadline = orderTime + (2 * 60 * 60 * 1000);
+        const cd = formatExpressCountdown(deadline, now);
+        const countdownHtml = `<span class="${cd.cls}" data-express-deadline="${deadline}" title="${cd.title}">${cd.text}</span>`;
 
         const phone = order.recipientPhone || order.customerPhone || '0912345678';
         const address = order.shippingAddress || 'Quận 1, TP. Hồ Chí Minh';
@@ -673,23 +702,43 @@ function renderExpressOrdersTable() {
 
 async function quickDispatchExpressOrder(orderId) {
     try {
+        const currentOrder = expressOrdersList.find(o => String(o._id) === String(orderId));
+        const headers = { ...auth.getHeaders(), 'Content-Type': 'application/json' };
+
+        // State machine requires pending -> processing -> shipping
+        if (currentOrder?.status === 'pending') {
+            const step1 = await fetch(`${API_URL}/orders/${orderId}/status`, {
+                method: 'PATCH',
+                headers,
+                body: JSON.stringify({ status: 'processing', note: 'Xác nhận đơn hỏa tốc 2H để bàn giao shipper.' })
+            });
+            if (!step1.ok) {
+                const err1 = await step1.json().catch(() => ({}));
+                throw new Error(err1.message || 'Không thể chuyển đơn sang trạng thái chuẩn bị.');
+            }
+        }
+
         const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
             method: 'PATCH',
-            headers: {
-                ...auth.getHeaders(),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ status: 'shipping' })
+            headers,
+            body: JSON.stringify({ status: 'shipping', note: 'Bàn giao shipper giao hỏa tốc 2H.' })
         });
-        if (res.ok) {
-            playExpressAlertChime(true);
-            loadExpressOrders();
-            loadDashboard();
-        } else {
-            alert('Không thể cập nhật trạng thái đơn hàng. Vui lòng kiểm tra quyền quản trị!');
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            throw new Error(payload.message || 'Không thể cập nhật trạng thái đơn hàng.');
         }
-    } catch (e) {
-        console.error('quickDispatchExpressOrder error:', e);
+
+        playExpressAlertChime(true);
+        if (typeof window.showLucianToast === 'function') {
+            window.showLucianToast(`Đã bàn giao đơn #${String(orderId).padStart(4, '0')} cho shipper!`, 'success');
+        }
+        loadExpressOrders();
+        loadDashboard();
+    } catch (err) {
+        if (typeof window.showLucianToast === 'function') {
+            window.showLucianToast(err.message || 'Lỗi bàn giao shipper!', 'error');
+        }
+        console.error('quickDispatchExpressOrder error:', err);
     }
 }
 window.quickDispatchExpressOrder = quickDispatchExpressOrder;

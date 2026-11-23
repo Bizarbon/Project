@@ -5,14 +5,23 @@ const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Coupon = require('../models/Coupon');
 const bcrypt = require('bcryptjs');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePermission } = require('../middleware/auth');
+
+function isSuperAdminUser(user) {
+    return Boolean(user && user.isAdmin && (!user.permissions || typeof user.permissions !== 'object'));
+}
 
 function canAccessCustomer(req, id) {
-    return req.user.isAdmin || String(req.user._id) === String(id);
+    if (String(req.user._id) === String(id)) return true;
+    if (!req.user.isAdmin) return false;
+    if (isSuperAdminUser(req.user)) return true;
+    return Boolean(req.user.permissions?.customers?.view || req.user.permissions?.customers?.edit);
 }
 
 function cleanString(value) {
-    return typeof value === 'string' ? value.trim() : value;
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'object') return '';
+    return String(value).trim();
 }
 
 async function assertUniqueCustomerFields(payload, excludeId) {
@@ -94,7 +103,7 @@ router.put('/me/wishlist', protect, async (req, res) => {
 });
 
 // GET all customers (Admin only)
-router.get('/', protect, admin, async (req, res) => {
+router.get('/', protect, admin, requirePermission('customers', 'view'), async (req, res) => {
     try {
         const customers = await Customer.find();
         res.json(customers);
@@ -104,7 +113,7 @@ router.get('/', protect, admin, async (req, res) => {
 });
 
 // GET customer RFM segmentation analysis (Admin only)
-router.get('/rfm-segmentation', protect, admin, async (req, res) => {
+router.get('/rfm-segmentation', protect, admin, requirePermission('customers', 'view'), async (req, res) => {
     try {
         const customers = await Customer.find().select('-password').lean();
         const orders = await Order.find().select('_id customer customerPhone customerName guestEmail totalAmount orderDate status createdAt').lean();
@@ -222,7 +231,7 @@ router.get('/rfm-segmentation', protect, admin, async (req, res) => {
 });
 
 // POST issue retargeting voucher for customer segment (Admin only)
-router.post('/send-segment-voucher', protect, admin, async (req, res) => {
+router.post('/send-segment-voucher', protect, admin, requirePermission('customers', 'edit'), async (req, res) => {
     try {
         const { segment, code, value = 10, type = 'percent', minOrderValue = 300000, maxDiscount = 200000, name } = req.body;
         if (!code) return res.status(400).json({ message: 'Thiếu mã voucher!' });
@@ -270,9 +279,9 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // POST create customer (Admin only)
-router.post('/', protect, admin, async (req, res) => {
+router.post('/', protect, admin, requirePermission('customers', 'edit'), async (req, res) => {
     try {
-        const customerData = pickCustomerPayload(req.body, true);
+        const customerData = pickCustomerPayload(req.body, isSuperAdminUser(req.user));
         if (!customerData.name) return res.status(400).json({ message: 'Tên khách hàng là bắt buộc!' });
         if (!customerData.username) customerData.username = customerData.phone || `cust_${Date.now().toString().slice(-6)}`;
         if (!customerData.password) {
@@ -297,10 +306,15 @@ router.put('/:id', protect, async (req, res) => {
             return res.status(403).json({ message: 'Bạn không có quyền cập nhật khách hàng này!' });
         }
 
+        const isSelf = String(req.user._id) === String(req.params.id);
+        if (!isSelf && !isSuperAdminUser(req.user) && !req.user.permissions?.customers?.edit) {
+            return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa hồ sơ khách hàng khác!' });
+        }
+
         const customer = await Customer.findById(req.params.id).select('+password');
         if (!customer) return res.status(404).json({ message: 'Customer not found' });
 
-        const payload = pickCustomerPayload(req.body, req.user.isAdmin);
+        const payload = pickCustomerPayload(req.body, isSuperAdminUser(req.user));
         const changesOwnPassword = Boolean(payload.password) && String(req.user._id) === String(customer._id);
         if (payload.password) {
             if (String(payload.password).length < 8 || !/[a-z]/.test(payload.password) || !/[A-Z]/.test(payload.password) || !/\d/.test(payload.password)) {
@@ -329,7 +343,7 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // DELETE customer (Admin only)
-router.delete('/:id', protect, admin, async (req, res) => {
+router.delete('/:id', protect, admin, requirePermission('customers', 'delete'), async (req, res) => {
     try {
         const customer = await Customer.findById(req.params.id);
         if (!customer) return res.status(404).json({ message: 'Customer not found' });

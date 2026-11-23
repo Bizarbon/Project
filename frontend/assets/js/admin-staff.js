@@ -594,15 +594,18 @@ async function saveStaffMember() {
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-            if (res.status === 400 || res.status === 403 || res.status === 409) {
-                alert(data.message || 'Không thể lưu hồ sơ nhân viên.');
-                return;
-            }
-        } else if (data.staff) {
+            const msg = data.message || 'Không thể lưu hồ sơ nhân viên.';
+            if (typeof window.showLucianToast === 'function') window.showLucianToast(msg, 'error');
+            else if (typeof window.showToast === 'function') window.showToast(msg, 'error');
+            return;
+        }
+        if (data.staff) {
             savedFromServer = data.staff;
         }
     } catch (err) {
-        console.warn('API /staff unavailable, saving locally:', err.message);
+        const msg = 'Không thể kết nối máy chủ để lưu hồ sơ nhân viên.';
+        if (typeof window.showLucianToast === 'function') window.showLucianToast(msg, 'error');
+        return;
     }
 
     if (idVal) {
@@ -651,41 +654,66 @@ async function toggleStaffStatus(id) {
 
     const nextStatus = staff.status === 'locked' ? 'active' : 'locked';
     try {
-        await fetch(`${getApiBase()}/staff/${encodeURIComponent(id)}/status`, {
+        const res = await fetch(`${getApiBase()}/staff/${encodeURIComponent(id)}/status`, {
             method: 'PATCH',
             headers: getAuthHeaders(),
             body: JSON.stringify({ status: nextStatus })
         });
-    } catch (_) { }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            if (typeof window.showLucianToast === 'function') window.showLucianToast(data.message || 'Không có quyền đổi trạng thái nhân viên.', 'error');
+            return;
+        }
+    } catch (_) {
+        if (typeof window.showLucianToast === 'function') window.showLucianToast('Lỗi kết nối máy chủ.', 'error');
+        return;
+    }
 
     staff.status = nextStatus;
     saveStoredStaffFallback(staffList);
     updateStaffKpis(staffList);
     applyStaffFilters();
+    if (typeof window.showLucianToast === 'function') {
+        window.showLucianToast(nextStatus === 'locked' ? 'Đã khóa tài khoản nhân viên.' : 'Đã mở khóa tài khoản nhân viên.', 'success');
+    }
 }
 
 async function deleteStaffMember(id) {
     const staff = staffList.find(s => Number(s.id) === Number(id));
     if (!staff) return;
 
-    if (!confirm(`Bạn có chắc chắn muốn xóa nhân viên "${staff.name}" (${staff.code}) không?`)) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xóa hồ sơ nhân viên',
+            message: `Bạn có chắc chắn muốn xóa nhân viên "${staff.name}" (${staff.code}) và thu hồi quyền quản trị không?`,
+            confirmLabel: 'Xóa nhân viên',
+            danger: true
+        })
+        : confirm(`Bạn có chắc chắn muốn xóa nhân viên "${staff.name}" (${staff.code}) không?`);
+    if (!ok) return;
 
     try {
         const res = await fetch(`${getApiBase()}/staff/${encodeURIComponent(id)}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         });
-        if (!res.ok && (res.status === 403 || res.status === 400)) {
+        if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
-            alert(errData.message || 'Bạn không có quyền xóa nhân viên này.');
+            if (typeof window.showLucianToast === 'function') {
+                window.showLucianToast(errData.message || 'Bạn không có quyền xóa nhân viên này.', 'error');
+            }
             return;
         }
-    } catch (_) { }
+    } catch (_) {
+        if (typeof window.showLucianToast === 'function') window.showLucianToast('Lỗi kết nối khi xóa nhân viên.', 'error');
+        return;
+    }
 
     staffList = staffList.filter(s => Number(s.id) !== Number(id));
     saveStoredStaffFallback(staffList);
     updateStaffKpis(staffList);
     applyStaffFilters();
+    if (typeof window.showLucianToast === 'function') window.showLucianToast('Đã xóa hồ sơ nhân viên thành công.', 'success');
 }
 
 window.openStaffModal = openStaffModal;

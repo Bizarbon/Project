@@ -47,21 +47,28 @@ function renderCards(suppliers) {
         <div class="supplier-card fade-in">
             <div class="supplier-card-header">
                 <div class="supplier-name">${escapeHTML(supplier.name)}</div>
-                <span class="policy-badge policy-${supplier.returnPolicy}">${policyLabels[supplier.returnPolicy] || supplier.returnPolicy}</span>
+                <span class="policy-badge policy-${escapeHTML(supplier.returnPolicy)}">${escapeHTML(policyLabels[supplier.returnPolicy] || supplier.returnPolicy)}</span>
             </div>
             <ul class="supplier-info-list">
                 ${supplier.phone ? `<li><span>Điện thoại</span><span>${escapeHTML(supplier.phone)}</span></li>` : ''}
                 ${supplier.email ? `<li><span>Email</span><span>${escapeHTML(supplier.email)}</span></li>` : ''}
                 ${supplier.address ? `<li><span>Địa chỉ</span><span>${escapeHTML(supplier.address)}</span></li>` : ''}
-                <li><span>Giao hàng</span><span class="delivery-badge">Trong <strong>${supplier.deliveryTime}</strong> ngày</span></li>
+                <li><span>Giao hàng</span><span class="delivery-badge">Trong <strong>${Number(supplier.deliveryTime) || 3}</strong> ngày</span></li>
             </ul>
             ${supplier.notes ? `<div class="supplier-notes">${escapeHTML(supplier.notes)}</div>` : ''}
             <div class="supplier-actions">
-                <button class="btn-edit" onclick="editSupplier('${supplier._id}')">Sửa</button>
-                <button class="btn-delete" onclick="deleteSupplier('${supplier._id}', '${escapeHTML(supplier.name)}')">Xóa</button>
+                <button type="button" class="btn-edit" data-edit-supplier="${escapeHTML(supplier._id)}">Sửa</button>
+                <button type="button" class="btn-delete" data-delete-supplier="${escapeHTML(supplier._id)}" data-supplier-name="${escapeHTML(supplier.name)}">Xóa</button>
             </div>
         </div>
     `).join('');
+
+    container.querySelectorAll('[data-edit-supplier]').forEach(btn => {
+        btn.addEventListener('click', () => editSupplier(btn.getAttribute('data-edit-supplier')));
+    });
+    container.querySelectorAll('[data-delete-supplier]').forEach(btn => {
+        btn.addEventListener('click', () => deleteSupplier(btn.getAttribute('data-delete-supplier'), btn.getAttribute('data-supplier-name')));
+    });
 }
 
 const supplierForm = document.getElementById('supplierForm');
@@ -129,7 +136,15 @@ async function editSupplier(id) {
 }
 
 async function deleteSupplier(id, name) {
-    if (!confirm(`Xóa nhà cung cấp "${name}"?`)) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xóa nhà cung cấp',
+            message: `Bạn có chắc muốn xóa nhà cung cấp "${name}"?`,
+            confirmLabel: 'Xóa',
+            danger: true
+        })
+        : confirm(`Xóa nhà cung cấp "${name}"?`);
+    if (!ok) return;
     try {
         const res = await fetch(`${EP}/${id}`, {
             method: 'DELETE',

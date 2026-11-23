@@ -93,13 +93,13 @@
         const rawPayStatus = String(order.paymentStatus || '').trim().toLowerCase();
         const isPaid = rawPayStatus === 'paid' || /^đã thanh toán$/i.test(String(paymentStatusLabel || '').trim());
         const deliveryNote = options.note || order.note || 'Cho xem hàng (đồng kiểm ngoại quan) trước khi nhận';
-        const qrTargetUrl = options.qrTargetUrl || `https://techshopvn.vercel.app/pages/account/order-detail.html?id=${order._id}`;
+        const qrTargetUrl = options.qrTargetUrl || `${origin || 'https://techshopvn.vercel.app'}/pages/account/order-detail.html?id=${order._id}`;
         const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrTargetUrl)}`;
 
         let computedSubtotal = 0;
         const itemsRows = (order.products || []).map((item, idx) => {
             const prodName = item.product?.name || item.productName || 'Sản phẩm công nghệ';
-            const variantText = [item.selectedColor, item.selectedStorage].filter(Boolean).join(' · ');
+            const variantText = [item.color || item.selectedColor, item.storage || item.selectedStorage].filter(Boolean).join(' · ');
             const qty = Math.max(1, Number(item.quantity) || 1);
             const unitPrice = Number(item.price) || 0;
             const lineTotal = unitPrice * qty;

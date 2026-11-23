@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Không tìm thấy trang bạn yêu cầu tại TechEcommerce. Quay lại trang chủ hoặc tìm kiếm sản phẩm công nghệ chính hãng.">
+    <meta name="robots" content="noindex, follow">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="/assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@600;700;800&amp;display=swap&amp;subset=vietnamese">
+    <title>404 - Không tìm thấy trang | TechEcommerce</title>
+    <script>
+        (function(){ try { var t = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', t); } catch(e){} })();
+    </script>
+    <style>
+        :root {
+            --nf-bg: #f8fafc;
+            --nf-card: #ffffff;
+            --nf-border: #e2e8f0;
+            --nf-text: #0f172a;
+            --nf-muted: #475569;
+            --nf-accent: #2563eb;
+            --nf-accent-hover: #1d4ed8;
+            --nf-chip-bg: #f1f5f9;
+        }
+        html[data-theme='dark'] {
+            --nf-bg: #0b1120;
+            --nf-card: #111827;
+            --nf-border: rgba(148, 163, 184, 0.18);
+            --nf-text: #f8fafc;
+            --nf-muted: #94a3b8;
+            --nf-accent: #38bdf8;
+            --nf-accent-hover: #0ea5e9;
+            --nf-chip-bg: rgba(30, 41, 59, 0.8);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--nf-bg);
+            color: var(--nf-text);
+            -webkit-font-smoothing: antialiased;
+        }
+        .nf-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--nf-border);
+            background: var(--nf-card);
+        }
+        .nf-header-inner {
+            max-width: 1120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .nf-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--nf-text);
+            text-decoration: none;
+        }
+        .nf-brand img {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+        }
+        .nf-main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .nf-card {
+            width: min(640px, 100%);
+            background: var(--nf-card);
+            border: 1px solid var(--nf-border);
+            border-radius: 24px;
+            padding: clamp(28px, 5vw, 48px);
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+        }
+        .nf-code {
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(3.5rem, 10vw, 5.2rem);
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0 0 12px;
+        }
+        .nf-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.35rem, 3vw, 1.75rem);
+            font-weight: 800;
+            margin: 0 0 10px;
+        }
+        .nf-desc {
+            color: var(--nf-muted);
+            font-size: 0.98rem;
+            line-height: 1.65;
+            margin: 0 auto 24px;
+            max-width: 480px;
+        }
+        .nf-search-form {
+            display: flex;
+            gap: 8px;
+            max-width: 460px;
+            margin: 0 auto 24px;
+        }
+        .nf-search-form input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--nf-border);
+            background: var(--nf-bg);
+            color: var(--nf-text);
+            font: inherit;
+            font-size: 0.94rem;
+        }
+        .nf-search-form button {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .nf-search-form button:hover { background: #1d4ed8; }
+        .nf-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nf-actions a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: 1px solid var(--nf-border);
+            background: var(--nf-chip-bg);
+            color: var(--nf-text);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: transform 0.18s ease, border-color 0.18s ease;
+        }
+        .nf-actions a:hover {
+            transform: translateY(-2px);
+            border-color: var(--nf-accent);
+        }
+        .nf-actions a.primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+        .nf-footer {
+            text-align: center;
+            padding: 18px 20px;
+            color: var(--nf-muted);
+            font-size: 0.84rem;
+            border-top: 1px solid var(--nf-border);
+        }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
+        a:focus-visible, button:focus-visible, input:focus-visible {
+            outline: 2px solid #3b82f6;
+            outline-offset: 2px;
+        }
+        @media (max-width: 520px) {
+            .nf-search-form { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header class="nf-header">
+        <div class="nf-header-inner">
+            <a href="/index.html" class="nf-brand">
+                <img src="/assets/images/logo/tom-cat-logo.png?v=20260925-v4" alt="" width="32" height="32">
+                <span>TechEcommerce</span>
+            </a>
+            <a href="/index.html" style="color:var(--nf-accent);font-weight:600;text-decoration:none;font-size:0.9rem;">&larr; Về cửa hàng</a>
+        </div>
+    </header>
+
+    <main class="nf-main">
+        <section class="nf-card" aria-labelledby="notFoundTitle">
+            <p class="nf-code" aria-hidden="true">404</p>
+            <h1 id="notFoundTitle" class="nf-title">Không tìm thấy trang bạn yêu cầu</h1>
+            <p class="nf-desc">Đường dẫn có thể đã thay đổi, sản phẩm đã ngừng kinh doanh hoặc địa chỉ nhập chưa chính xác. Bạn có thể tìm kiếm nhanh bên dưới hoặc quay lại trang chủ TechEcommerce.</p>
+
+            <form class="nf-search-form" action="/index.html" method="get" role="search">
+                <label class="sr-only" for="notFoundSearch">Tìm kiếm sản phẩm công nghệ</label>
+                <input id="notFoundSearch" name="search" type="search" placeholder="Tìm iPhone, MacBook, tai nghe, laptop gaming..." required>
+                <button type="submit">Tìm kiếm</button>
+            </form>
+
+            <nav aria-label="Liên kết nhanh">
+                <ul class="nf-actions">
+                    <li><a href="/index.html" class="primary">🏠 Trang chủ</a></li>
+                    <li><a href="/pages/ai/assistant.html">✨ Trợ lý AI</a></li>
+                    <li><a href="/pages/tools/setup-builder.html">🖥️ Setup Builder</a></li>
+                    <li><a href="/pages/blog.html">📰 Blog công nghệ</a></li>
+                    <li><a href="/pages/account/orders.html">📦 Tra cứu đơn hàng</a></li>
+                </ul>
+            </nav>
+        </section>
+    </main>
+
+    <footer class="nf-footer">
+        <p>&copy; 2026 TechEcommerce. Hệ thống bán lẻ công nghệ chính hãng.</p>
+    </footer>
+</body>
+</html>

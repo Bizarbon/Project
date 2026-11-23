@@ -4,6 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../manifest.json">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/pages/blog.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Montserrat:wght@500;600;700;800&amp;display=swap&amp;subset=vietnamese">
@@ -13,8 +18,12 @@
     <meta property="og:title" content="Blog Tin tức công nghệ &amp; Thủ thuật - TechEcommerce">
     <meta property="og:description" content="Cập nhật xu hướng thiết bị mới nhất, đánh giá thực tế và hướng dẫn kỹ thuật tại TechEcommerce.">
     <title>Blog Tin tức công nghệ &amp; Thủ thuật - TechEcommerce</title>
-    <link rel="stylesheet" href="../assets/css/style.css?v=20261116-modern-cat-v5">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261117-cart-voucher-v5">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/chatbox.css?v=20261123-pro-v1">
+    <script>
+        (function(){ try { var t = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', t); } catch(e){} })();
+    </script>
     <style>
         .blog-hero-section {
             padding: 24px 0 20px;
@@ -256,6 +265,167 @@
             background: rgba(15, 23, 42, 0.85);
             border-color: rgba(255, 255, 255, 0.1);
         }
+        .blog-featured-card,
+        .blog-card {
+            cursor: pointer;
+        }
+        .blog-read-cta {
+            margin-top: 1.25rem;
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(37, 99, 235, 0.28);
+            background: rgba(37, 99, 235, 0.1);
+            color: #1d4ed8;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+        .blog-read-cta:hover {
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+        html[data-theme='dark'] .blog-read-cta {
+            background: rgba(56, 189, 248, 0.16);
+            border-color: rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+        }
+        html[data-theme='dark'] .blog-read-cta:hover {
+            background: #0284c7;
+            color: #ffffff;
+        }
+        .blog-card-read-link {
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            padding: 0;
+        }
+        html[data-theme='dark'] .blog-card-read-link {
+            color: #38bdf8;
+        }
+        /* Semantic Full-Article Reader Modal */
+        dialog.blog-reader-modal {
+            width: min(820px, calc(100vw - 24px));
+            max-height: calc(100vh - 36px);
+            margin: auto;
+            padding: 0;
+            border: 1px solid var(--neo-border, #e2e8f0);
+            border-radius: 20px;
+            background: var(--neo-card-bg, #ffffff);
+            color: var(--neo-text, #0f172a);
+            box-shadow: 0 28px 70px rgba(15, 23, 42, 0.32);
+            overflow: hidden;
+        }
+        dialog.blog-reader-modal[open] {
+            display: flex;
+            flex-direction: column;
+        }
+        dialog.blog-reader-modal::backdrop {
+            background: rgba(2, 6, 23, 0.68);
+            backdrop-filter: blur(6px);
+        }
+        html[data-theme='dark'] dialog.blog-reader-modal {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.22);
+            color: #f8fafc;
+        }
+        .blog-reader-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--neo-border, #e2e8f0);
+        }
+        html[data-theme='dark'] .blog-reader-head {
+            border-bottom-color: rgba(148, 163, 184, 0.16);
+        }
+        .blog-reader-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--neo-border, #cbd5e1);
+            background: transparent;
+            color: inherit;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .blog-reader-close:hover {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+        .blog-reader-scroll {
+            overflow-y: auto;
+            padding: 0 24px 28px;
+        }
+        .blog-reader-cover {
+            width: calc(100% + 48px);
+            margin: 0 -24px 20px;
+            max-height: 340px;
+            object-fit: cover;
+            display: block;
+        }
+        .blog-reader-title {
+            font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+            font-weight: 800;
+            line-height: 1.3;
+            margin: 0 0 12px;
+        }
+        .blog-reader-content {
+            margin-top: 20px;
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--neo-text, #1e293b);
+        }
+        html[data-theme='dark'] .blog-reader-content {
+            color: #e2e8f0;
+        }
+        .blog-reader-content p {
+            margin: 0 0 1rem;
+        }
+        .blog-reader-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            list-style: none;
+            padding: 0;
+            margin: 22px 0 0;
+        }
+        .blog-reader-tags li {
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        html[data-theme='dark'] .blog-reader-tags li {
+            background: rgba(56, 189, 248, 0.14);
+            color: #38bdf8;
+        }
+        .blog-reader-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 22px;
+            border-top: 1px solid var(--neo-border, #e2e8f0);
+        }
+        html[data-theme='dark'] .blog-reader-actions {
+            border-top-color: rgba(148, 163, 184, 0.16);
+        }
         @media (max-width: 860px) {
             .blog-featured-card {
                 grid-template-columns: 1fr;
@@ -282,15 +452,12 @@
 </head>
 
 <body class="blog-storefront-page">
-    <script>
-        (function(){ try { var t = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', t); } catch(e){} })();
-    </script>
     <nav class="main-site-nav" aria-label="Điều hướng chính">
         <p class="legacy-brand"><a href="../index.html">TechEcommerce</a></p>
     </nav>
     <script src="../assets/js/animations.js"></script>
-    <script src="../assets/js/auth.js?v=20261117-v1"></script>
-    <script src="../assets/js/storefront-header.js?v=20261117-v1"></script>
+    <script src="../assets/js/auth.js?v=20261123-pro-v1"></script>
+    <script src="../assets/js/storefront-header.js?v=20261123-pro-v1"></script>
 
     <!-- Main Content Area -->
     <main class="container" style="max-width: 1300px; margin: 0 auto; padding: 24px 20px 60px;">
@@ -320,6 +487,7 @@
                         <span>📅 <time id="featuredDate" datetime="2026-07-10">10/07/2026</time></span>
                         <span>👁️ <span id="featuredViews">1.420</span> lượt đọc</span>
                     </div>
+                    <button type="button" class="blog-read-cta" id="featuredReadBtn">Đọc bài viết đầy đủ &rarr;</button>
                 </div>
             </article>
         </section>
@@ -345,70 +513,88 @@
         <section class="blog-grid" id="storefrontBlogGrid" aria-label="Danh sách các bài viết">
             <!-- Rendered by JavaScript -->
         </section>
+
+        <!-- Full Article Reader Modal -->
+        <dialog id="blogReaderModal" class="blog-reader-modal" aria-labelledby="readerTitle">
+            <header class="blog-reader-head">
+                <span class="blog-category-tag" id="readerCategory" style="margin-bottom:0;">Đánh giá</span>
+                <button type="button" class="blog-reader-close" id="closeBlogReaderBtn" aria-label="Đóng bài viết">&times;</button>
+            </header>
+            <article class="blog-reader-scroll">
+                <img id="readerCover" class="blog-reader-cover" src="" alt="">
+                <h2 id="readerTitle" class="blog-reader-title"></h2>
+                <div class="blog-meta-row" id="readerMeta"></div>
+                <div id="readerContent" class="blog-reader-content"></div>
+                <ul id="readerTags" class="blog-reader-tags" aria-label="Thẻ bài viết"></ul>
+            </article>
+            <footer class="blog-reader-actions">
+                <button type="button" class="blog-tab-btn" id="copyBlogLinkBtn">🔗 Sao chép liên kết bài viết</button>
+                <button type="button" class="blog-tab-btn active" id="doneBlogReaderBtn">Đóng</button>
+            </footer>
+        </dialog>
     </main>
 
     <!-- Footer placeholder strictly at the bottom -->
     <footer id="site-footer"></footer>
 
     <script>
+        const BLOG_API_URL = `${window.API_URL || (window.location.origin + '/api')}/blog`;
+        const FALLBACK_BLOG_IMG = 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80';
         const DEFAULT_POSTS = [
             {
-                id: 1,
+                _id: 'fallback-1',
                 title: 'Đánh giá chi tiết Laptop ASUS TUF Gaming A16 FA607: Cỗ máy gaming đáng mua nhất phân khúc',
                 category: 'Đánh giá',
                 author: 'Vũ Phi Long',
                 excerpt: 'Sở hữu vi xử lý AMD Ryzen thế hệ mới cùng card đồ họa Radeon mạnh mẽ, ASUS TUF A16 mang lại hiệu năng ổn định vượt bậc cho cả game thủ lẫn người làm sáng tạo nội dung.',
-                image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&auto=format&fit=crop&q=80',
+                content: 'Laptop gaming ASUS TUF Gaming A16 FA607 là một trong những sản phẩm nổi bật nhất năm nay. Với màn hình tần số quét cao 165Hz, độ phân giải 2K sắc nét và hệ thống tản nhiệt buồng hơi tiên tiến, máy xử lý mượt mà mọi tựa game AAA lẫn các tác vụ dựng phim chuyên nghiệp.\n\nThời lượng pin ấn tượng lên tới 90Wh kết hợp sạc nhanh chuẩn Power Delivery giúp người dùng tự tin mang máy đi học và làm việc cả ngày mà không lo gián đoạn.',
+                image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80',
+                tags: ['laptop', 'asus', 'tuf', 'gaming'],
                 views: 1420,
                 createdAt: '2026-07-10'
             },
             {
-                id: 2,
+                _id: 'fallback-2',
                 title: 'Top 5 phụ kiện Apple không thể thiếu cho góc làm việc tối giản năm 2026',
                 category: 'Tư vấn',
                 author: 'TechEcommerce Editorial',
                 excerpt: 'Từ củ sạc đa cổng GaN, tai nghe EarPods Lightning tiện lợi đến bàn phím Magic Keyboard và dock sạc MagSafe tiện ích.',
-                image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&auto=format&fit=crop&q=80',
+                content: 'Để xây dựng một góc làm việc tinh gọn và đồng bộ hệ sinh thái Apple, việc lựa chọn phụ kiện chuẩn chất lượng rất quan trọng.\n\n1. Củ sạc GaN đa cổng công suất 65W-100W giúp sạc đồng thời MacBook, iPhone và AirPods.\n2. Bàn phím Magic Keyboard cùng chuột công thái học giúp gõ êm và bảo vệ cổ tay.\n3. Hub chuyển đổi USB-C đa năng xuất hình 4K 60Hz ổn định.\n4. Đế sạc không dây MagSafe 3-trong-1 tối giản dây cáp.\n5. Tai nghe chống ồn chủ động cho những giờ làm việc tập trung cao độ.',
+                image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&auto=format&fit=crop&q=80',
+                tags: ['apple', 'phu-kien', 'setup'],
                 views: 980,
                 createdAt: '2026-07-25'
             },
             {
-                id: 3,
+                _id: 'fallback-3',
                 title: 'Hướng dẫn tối ưu hóa Windows 11 giúp tăng tốc độ mở ứng dụng và chơi game không giật lag',
                 category: 'Thủ thuật',
                 author: 'Admin Support',
                 excerpt: 'Tổng hợp các mẹo tinh chỉnh hệ thống, quản lý ứng dụng khởi động và bật chế độ Game Mode chuẩn xác nhất.',
-                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80',
+                content: 'Windows 11 có nhiều tính năng hiện đại nhưng mặc định chạy khá nhiều dịch vụ nền.\n\nBạn có thể tăng tốc máy rõ rệt qua 4 bước đơn giản: tắt các ứng dụng không cần thiết trong Startup Apps, kích hoạt Game Mode và Hardware-accelerated GPU scheduling, cập nhật driver đồ họa mới nhất, và giữ trống tối thiểu 15% dung lượng ổ SSD hệ thống.',
+                image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80',
+                tags: ['windows11', 'thu-thuat', 'toi-uu'],
                 views: 2310,
                 createdAt: '2026-08-05'
             },
             {
-                id: 4,
+                _id: 'fallback-4',
                 title: 'Xu hướng chip xử lý AI trên smartphone và máy tính cá nhân trong nửa cuối 2026',
                 category: 'Tin tức',
                 author: 'Vũ Phi Long',
                 excerpt: 'Cuộc đua NPU tích hợp trực tiếp trên vi xử lý di động đang định hình lại toàn bộ hệ sinh thái phần mềm tương lai.',
-                image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80',
+                content: 'Các vi xử lý thế hệ mới tích hợp nhân NPU mạnh mẽ giúp xử lý tác vụ AI cục bộ ngay trên thiết bị: dịch trực tiếp không cần mạng, chỉnh sửa ảnh thông minh và trợ lý tóm tắt văn bản siêu nhanh mà vẫn đảm bảo quyền riêng tư dữ liệu cá nhân.',
+                image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+                tags: ['ai', 'chip', 'cong-nghe'],
                 views: 850,
                 createdAt: '2026-08-18'
             }
         ];
 
+        let blogArticles = [...DEFAULT_POSTS];
         let activeCategory = 'all';
         let searchQuery = '';
-
-        function getArticles() {
-            try {
-                const stored = localStorage.getItem('techBlogArticles');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        return parsed.filter(p => p.status === 'published');
-                    }
-                }
-            } catch (e) {}
-            return DEFAULT_POSTS;
-        }
+        let currentModalArticle = null;
 
         function escapeHTML(str) {
             if (!str) return '';
@@ -420,44 +606,185 @@
                 .replace(/'/g, '&#039;');
         }
 
+        function formatViDate(val) {
+            if (!val) return '';
+            const d = new Date(val);
+            if (isNaN(d.getTime())) return String(val);
+            return d.toLocaleDateString('vi-VN');
+        }
+
+        function getPostId(a) {
+            return String(a._id || a.id || '');
+        }
+
+        function updateFeaturedSpotlight(featured) {
+            if (!featured) return;
+            const img = document.getElementById('featuredImg');
+            const cat = document.getElementById('featuredCategory');
+            const title = document.getElementById('featuredTitle');
+            const desc = document.getElementById('featuredDesc');
+            const author = document.getElementById('featuredAuthor');
+            const dateEl = document.getElementById('featuredDate');
+            const viewsEl = document.getElementById('featuredViews');
+            const box = document.getElementById('featuredArticleBox');
+            const btn = document.getElementById('featuredReadBtn');
+
+            if (img) {
+                img.src = (window.resolveAssetUrl ? window.resolveAssetUrl(featured.image) : featured.image) || FALLBACK_BLOG_IMG;
+                img.alt = featured.title || 'Bài viết nổi bật';
+            }
+            if (cat) cat.textContent = featured.category || 'Tin tức';
+            if (title) title.textContent = featured.title || '';
+            if (desc) desc.textContent = featured.excerpt || '';
+            if (author) author.textContent = featured.author || 'TechEcommerce';
+            if (dateEl) {
+                dateEl.textContent = formatViDate(featured.createdAt);
+                dateEl.setAttribute('datetime', String(featured.createdAt || '').slice(0, 10));
+            }
+            if (viewsEl) viewsEl.textContent = (Number(featured.views) || 0).toLocaleString('vi-VN');
+            const pid = getPostId(featured);
+            if (box) box.onclick = () => openBlogReader(pid);
+            if (btn) btn.onclick = (e) => { e.stopPropagation(); openBlogReader(pid); };
+        }
+
         function renderBlogList() {
-            const articles = getArticles();
             const grid = document.getElementById('storefrontBlogGrid');
             if (!grid) return;
 
-            const filtered = articles.filter(a => {
+            const filtered = blogArticles.filter(a => {
                 const matchCat = activeCategory === 'all' || a.category === activeCategory;
-                const matchQuery = !searchQuery || (a.title + ' ' + (a.excerpt || '')).toLowerCase().includes(searchQuery);
+                const matchQuery = !searchQuery || (
+                    (a.title || '') + ' ' + (a.excerpt || '') + ' ' + (Array.isArray(a.tags) ? a.tags.join(' ') : '')
+                ).toLowerCase().includes(searchQuery);
                 return matchCat && matchQuery;
             });
 
             if (!filtered.length) {
-                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 48px 0; color: #94a3b8; font-size: 1.1rem;">Chưa có bài viết nào trong chuyên mục này.</p>';
+                grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 48px 0; color: var(--neo-muted, #64748b); font-size: 1.05rem;">Chưa có bài viết nào phù hợp trong chuyên mục này.</p>';
                 return;
             }
 
-            grid.innerHTML = filtered.map(a => `
-                <article class="blog-card">
-                    <figure class="blog-card-thumb-wrap" style="margin: 0;">
-                        <img src="${escapeHTML(a.image)}" alt="${escapeHTML(a.title)}" class="blog-card-thumb" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80'">
-                    </figure>
-                    <div class="blog-card-body">
-                        <span class="blog-category-tag" style="font-size: 0.72rem; padding: 2px 10px;">${escapeHTML(a.category)}</span>
-                        <h2 class="blog-card-title">${escapeHTML(a.title)}</h2>
-                        <p class="blog-card-desc">${escapeHTML(a.excerpt || '')}</p>
-                        <footer class="blog-card-footer">
-                            <span>✍️ ${escapeHTML(a.author)}</span>
-                            <span>👁️ ${(Number(a.views) || 0).toLocaleString('vi-VN')}</span>
-                        </footer>
-                    </div>
-                </article>
-            `).join('');
+            grid.innerHTML = filtered.map(a => {
+                const pid = getPostId(a);
+                const cover = (window.resolveAssetUrl ? window.resolveAssetUrl(a.image) : a.image) || FALLBACK_BLOG_IMG;
+                return `
+                    <article class="blog-card" data-post-id="${escapeHTML(pid)}" onclick="openBlogReader(this.dataset.postId)">
+                        <figure class="blog-card-thumb-wrap" style="margin: 0;">
+                            <img src="${escapeHTML(cover)}" alt="${escapeHTML(a.title)}" class="blog-card-thumb" loading="lazy" onerror="this.onerror=null; this.src='${FALLBACK_BLOG_IMG}'">
+                        </figure>
+                        <div class="blog-card-body">
+                            <span class="blog-category-tag" style="font-size: 0.72rem; padding: 2px 10px;">${escapeHTML(a.category)}</span>
+                            <h2 class="blog-card-title">${escapeHTML(a.title)}</h2>
+                            <p class="blog-card-desc">${escapeHTML(a.excerpt || '')}</p>
+                            <footer class="blog-card-footer">
+                                <span>✍️ ${escapeHTML(a.author)} · 👁️ ${(Number(a.views) || 0).toLocaleString('vi-VN')}</span>
+                                <button type="button" class="blog-card-read-link" data-post-id="${escapeHTML(pid)}" onclick="event.stopPropagation(); openBlogReader(this.dataset.postId)">Đọc tiếp &rarr;</button>
+                            </footer>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        async function openBlogReader(postId) {
+            const modal = document.getElementById('blogReaderModal');
+            if (!modal || !postId) return;
+
+            let article = blogArticles.find(a => getPostId(a) === String(postId));
+            // Fetch live detail to increment view count & get complete content
+            if (!String(postId).startsWith('fallback-')) {
+                try {
+                    const res = await fetch(`${BLOG_API_URL}/${encodeURIComponent(postId)}`);
+                    if (res.ok) {
+                        const raw = await res.json();
+                        const fresh = raw?.article || raw;
+                        if (fresh && (fresh._id || fresh.id)) {
+                            article = fresh;
+                            const idx = blogArticles.findIndex(a => getPostId(a) === getPostId(fresh));
+                            if (idx !== -1) blogArticles[idx] = fresh;
+                            else blogArticles.unshift(fresh);
+                            renderBlogList();
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if (!article) return;
+            currentModalArticle = article;
+
+            const cover = (window.resolveAssetUrl ? window.resolveAssetUrl(article.image) : article.image) || FALLBACK_BLOG_IMG;
+            const coverEl = document.getElementById('readerCover');
+            if (coverEl) {
+                coverEl.src = cover;
+                coverEl.alt = article.title || '';
+            }
+            document.getElementById('readerCategory').textContent = article.category || 'Tin tức';
+            document.getElementById('readerTitle').textContent = article.title || '';
+            document.getElementById('readerMeta').innerHTML = `
+                <span>✍️ <strong>${escapeHTML(article.author || 'TechEcommerce')}</strong></span>
+                <span>📅 <time datetime="${escapeHTML(String(article.createdAt || '').slice(0, 10))}">${escapeHTML(formatViDate(article.createdAt))}</time></span>
+                <span>👁️ ${(Number(article.views) || 0).toLocaleString('vi-VN')} lượt đọc</span>
+            `;
+
+            const rawContent = article.content || article.excerpt || '';
+            const paragraphs = rawContent.split(/\n+/).map(p => p.trim()).filter(Boolean);
+            document.getElementById('readerContent').innerHTML = paragraphs.length
+                ? paragraphs.map(p => `<p>${escapeHTML(p)}</p>`).join('')
+                : `<p>${escapeHTML(article.excerpt || '')}</p>`;
+
+            const tagsEl = document.getElementById('readerTags');
+            const tags = Array.isArray(article.tags) ? article.tags.filter(Boolean) : [];
+            tagsEl.innerHTML = tags.map(t => `<li>#${escapeHTML(t)}</li>`).join('');
+            tagsEl.hidden = tags.length === 0;
+
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('post', getPostId(article));
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
+
+            if (!modal.open) modal.showModal();
+        }
+
+        function closeBlogReader() {
+            const modal = document.getElementById('blogReaderModal');
+            if (modal && modal.open) modal.close();
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('post');
+                window.history.replaceState({}, '', url.toString());
+            } catch (e) {}
+        }
+
+        async function loadBlogPostsFromApi() {
+            try {
+                const res = await fetch(`${BLOG_API_URL}?limit=48`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const list = Array.isArray(data) ? data : (data.articles || data.posts || []);
+                    if (list.length > 0) {
+                        blogArticles = list;
+                    }
+                }
+            } catch (e) {
+                // Keep DEFAULT_POSTS gracefully
+            }
+
+            if (blogArticles.length > 0) {
+                updateFeaturedSpotlight(blogArticles[0]);
+            }
+            renderBlogList();
+
+            const deepPostId = new URLSearchParams(window.location.search).get('post');
+            if (deepPostId) {
+                openBlogReader(deepPostId);
+            }
         }
 
         function filterBlogByCat(cat, btn) {
             activeCategory = cat;
             document.querySelectorAll('.blog-tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+            if (btn) btn.classList.add('active');
             renderBlogList();
         }
 
@@ -467,10 +794,25 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderBlogList();
+            const modal = document.getElementById('blogReaderModal');
+            document.getElementById('closeBlogReaderBtn')?.addEventListener('click', closeBlogReader);
+            document.getElementById('doneBlogReaderBtn')?.addEventListener('click', closeBlogReader);
+            modal?.addEventListener('click', (e) => {
+                if (e.target === modal) closeBlogReader();
+            });
+            document.getElementById('copyBlogLinkBtn')?.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    if (typeof window.showLucianToast === 'function') {
+                        window.showLucianToast('Đã sao chép liên kết bài viết!', 'success');
+                    }
+                } catch (e) {}
+            });
+            loadBlogPostsFromApi();
         });
     </script>
-    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+    <script src="../assets/js/footer.js?v=20261123-pro-v1"></script>
+    <script src="../assets/js/chatbox.js?v=20261123-pro-v1" defer></script>
 </body>
 
 </html>

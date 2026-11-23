@@ -121,6 +121,13 @@ function setupProfileHeader() {
     else window.addEventListener('resize', updateHeight);
 }
 
+function autoResizeAddressField() {
+    const el = document.getElementById('pAddress');
+    if (!el || el.tagName !== 'TEXTAREA') return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.max(76, el.scrollHeight + 4)}px`;
+}
+
 // Load Profie
 async function loadProfile() {
     const user = auth.getUser();
@@ -157,6 +164,7 @@ async function loadProfile() {
         document.getElementById('pPhone').value = data.phone || '';
         document.getElementById('pEmail').value = data.email || '';
         document.getElementById('pAddress').value = data.address || '';
+        autoResizeAddressField();
         if (data.address) syncLocalShoppingAddress(data.address);
 
     } catch (err) {
@@ -234,6 +242,7 @@ if (profileForm) {
 document.addEventListener('DOMContentLoaded', () => {
     setupProfileHeader();
     setupAvatarEditor();
+    document.getElementById('pAddress')?.addEventListener('input', autoResizeAddressField);
     loadProfile();
 });
 
@@ -242,7 +251,10 @@ window.addEventListener('storage', event => {
     try {
         const address = JSON.parse(event.newValue);
         const addressInput = document.getElementById('pAddress');
-        if (addressInput && address?.fullAddress) addressInput.value = address.fullAddress;
+        if (addressInput && address?.fullAddress) {
+            addressInput.value = address.fullAddress;
+            autoResizeAddressField();
+        }
         const locationLabel = document.querySelector('[data-shopping-location-label]') || document.getElementById('profileLocationLabel');
         if (locationLabel && address?.label) locationLabel.textContent = address.label;
     } catch (error) {

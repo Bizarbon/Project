@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const Supplier = require('../models/Supplier');
-const { protect, optionalAuth, admin } = require('../middleware/auth');
+const { protect, optionalAuth, admin, requirePermission } = require('../middleware/auth');
 const { recommendProducts } = require('../utils/recommendations');
 
 function escapeRegex(value) {
@@ -48,6 +48,8 @@ function normalizeVariants(value = []) {
         .map(variant => ({
             sku: compactString(variant.sku || ''),
             color: compactString(variant.color || ''),
+            colorHex: compactString(variant.colorHex || ''),
+            image: compactString(variant.image || ''),
             ram: compactString(variant.ram || ''),
             storage: compactString(variant.storage || ''),
             price: Math.max(Number(variant.price) || 0, 0),
@@ -143,16 +145,20 @@ async function normalizeProductPayload(body, existingProduct = null) {
         compareAtPrice: Math.max(Number(body.compareAtPrice) || 0, 0),
         description: compactString(body.description || ''),
         category: compactString(body.category),
-        hearingAidProfile: normalizeHearingAidProfile(body.hearingAidProfile),
+        hearingAidProfile: body.hearingAidProfile !== undefined
+            ? normalizeHearingAidProfile(body.hearingAidProfile)
+            : (existingProduct?.hearingAidProfile || normalizeHearingAidProfile({})),
         stock: Math.max(Number(body.stock) || 0, 0),
-        image: compactString(body.image || ''),
-        images: splitList(body.images),
-        videoUrl: compactString(body.videoUrl || ''),
+        image: body.image !== undefined ? compactString(body.image || '') : (existingProduct?.image || ''),
+        images: body.images !== undefined ? splitList(body.images) : (Array.isArray(existingProduct?.images) ? [...existingProduct.images] : []),
+        videoUrl: body.videoUrl !== undefined ? compactString(body.videoUrl || '') : (existingProduct?.videoUrl || ''),
         supplier: await resolveSupplier(body.supplier),
         minStock: Math.max(Number(body.minStock) || 5, 0),
         warranty: compactString(body.warranty || 'Không bảo hành'),
         specs: normalizeSpecs(body.specs || {}),
-        variants: normalizeVariants(body.variants || []),
+        variants: body.variants !== undefined
+            ? normalizeVariants(body.variants)
+            : (Array.isArray(existingProduct?.variants) ? existingProduct.variants : []),
         tags: splitList(body.tags),
         rating: Math.min(Math.max(Number(body.rating) || 0, 0), 5),
         reviewCount: Math.max(Number(body.reviewCount) || 0, 0),
@@ -192,10 +198,10 @@ async function normalizeProductPayload(body, existingProduct = null) {
 
 const { syncUniformCatalog, ensureCatalogSynchronized } = require('../utils/catalogSync');
 
-// POST endpoint to manually trigger full catalog synchronization
-router.post('/sync-catalog', async (req, res) => {
+// POST endpoint to manually trigger full catalog synchronization (Admin only)
+router.post('/sync-catalog', protect, admin, requirePermission('products', 'edit'), async (req, res) => {
     try {
-        const force = req.query.force !== 'false';
+        const force = req.query.force === 'true' && process.env.NODE_ENV !== 'production';
         const result = await syncUniformCatalog({ force });
         res.json(result);
     } catch (err) {
@@ -203,19 +209,18 @@ router.post('/sync-catalog', async (req, res) => {
     }
 });
 
-// GET endpoint to check or trigger catalog synchronization
-router.get('/sync-catalog', async (req, res) => {
+// GET endpoint to check catalog synchronization (Admin only)
+router.get('/sync-catalog', protect, admin, requirePermission('products', 'view'), async (req, res) => {
     try {
-        const force = req.query.force === 'true';
-        const result = await syncUniformCatalog({ force });
+        const result = await syncUniformCatalog({ force: false });
         res.json(result);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
-// POST endpoint backward compatibility
-router.post('/seed-gaming', async (req, res) => {
+// POST endpoint backward compatibility (Admin only)
+router.post('/seed-gaming', protect, admin, requirePermission('products', 'edit'), async (req, res) => {
     try {
         const result = await syncUniformCatalog({ force: false });
         const total = await Product.countDocuments({ category: 'Máy chơi game' });
@@ -266,17 +271,21 @@ router.get('/recommendations', optionalAuth, async (req, res) => {
 });
 
 // GET products with optional filters
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
     try {
         await ensureCatalogSynchronized();
         const filter = {};
         if (!req.user?.isAdmin) filter.active = { $ne: false };
-        if (req.query.category && req.query.category !== 'all') filter.category = req.query.category;
-        if (req.query.brand && req.query.brand !== 'all') filter.brand = req.query.brand;
+        const category = typeof req.query.category === 'string' ? req.query.category.trim() : '';
+        const brand = typeof req.query.brand === 'string' ? req.query.brand.trim() : '';
+        const tag = typeof req.query.tag === 'string' ? req.query.tag.trim() : '';
+        const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+        if (category && category !== 'all') filter.category = category;
+        if (brand && brand !== 'all') filter.brand = brand;
         if (req.query.featured === 'true') filter.featured = true;
-        if (req.query.tag) filter.tags = req.query.tag;
-        if (req.query.search) {
-            const regex = new RegExp(escapeRegex(req.query.search), 'i');
+        if (tag) filter.tags = tag;
+        if (search) {
+            const regex = new RegExp(escapeRegex(search), 'i');
             filter.$or = [
                 { name: regex },
                 { description: regex },
@@ -287,12 +296,16 @@ router.get('/', async (req, res) => {
             ];
         }
         if (req.query.inStock === 'true') filter.stock = { ...(filter.stock || {}), $gt: 0 };
-        if (req.query.minPrice) filter.price = { ...(filter.price || {}), $gte: Number(req.query.minPrice) };
-        if (req.query.maxPrice) filter.price = { ...(filter.price || {}), $lte: Number(req.query.maxPrice) };
+        if (req.query.minPrice && Number.isFinite(Number(req.query.minPrice))) {
+            filter.price = { ...(filter.price || {}), $gte: Number(req.query.minPrice) };
+        }
+        if (req.query.maxPrice && Number.isFinite(Number(req.query.maxPrice))) {
+            filter.price = { ...(filter.price || {}), $lte: Number(req.query.maxPrice) };
+        }
 
         let query = Product.find(filter)
             .populate('supplier', 'name')
-            .sort(productSort(req.query.sort));
+            .sort(productSort(typeof req.query.sort === 'string' ? req.query.sort : ''));
         if (req.query.limit) {
             query = query.limit(Math.min(Math.max(Number(req.query.limit) || 10, 1), 500));
         }
@@ -300,17 +313,6 @@ router.get('/', async (req, res) => {
         res.json(products);
     } catch (error) {
         res.status(500).json({ message: error.message });
-    }
-});
-
-// GET trigger catalog sync (variants, assets)
-router.get('/sync-catalog', async (req, res) => {
-    try {
-        const { syncUniformCatalog } = require('../utils/catalogSync');
-        const result = await syncUniformCatalog({ force: false });
-        res.json({ success: true, result });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
     }
 });
 
@@ -329,7 +331,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
 });
 
 // POST create product (Admin only)
-router.post('/', protect, admin, async (req, res) => {
+router.post('/', protect, admin, requirePermission('products', 'create'), async (req, res) => {
     try {
         const payload = await normalizeProductPayload(req.body);
         const existing = await Product.findOne({ name: payload.name });
@@ -346,7 +348,7 @@ router.post('/', protect, admin, async (req, res) => {
 });
 
 // PUT update product (Admin only)
-router.put('/:id', protect, admin, async (req, res) => {
+router.put('/:id', protect, admin, requirePermission('products', 'edit'), async (req, res) => {
     try {
         const id = isNaN(req.params.id) ? req.params.id : Number(req.params.id);
         const current = await Product.findById(id);
@@ -371,7 +373,7 @@ router.put('/:id', protect, admin, async (req, res) => {
 });
 
 // DELETE product (Admin only)
-router.delete('/:id', protect, admin, async (req, res) => {
+router.delete('/:id', protect, admin, requirePermission('products', 'delete'), async (req, res) => {
     try {
         const id = isNaN(req.params.id) ? req.params.id : Number(req.params.id);
         const product = await Product.findById(id);

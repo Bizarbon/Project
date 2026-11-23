@@ -286,14 +286,17 @@ function renderCustomerOrderCard(order) {
     const productsHtml = (order.products || []).map(item => {
         const prod = item.product || {};
         const name = prod.name || item.productName || 'Sản phẩm công nghệ';
-        const img = prod.image || prod.images?.[0] || 'https://placehold.co/120x120?text=TechEcommerce';
+        const rawImg = item.image || prod.image || prod.images?.[0] || '';
+        const img = typeof window.resolveAssetUrl === 'function'
+            ? window.resolveAssetUrl(rawImg)
+            : (rawImg || '../../assets/images/product-placeholder.svg');
         const qty = item.quantity || 1;
         const price = item.price || 0;
 
         return `
             <li class="order-product-row">
                 <figure class="order-product-thumb">
-                    <img src="${escapeHTML(img)}" alt="${escapeHTML(name)}" loading="lazy">
+                    <img src="${escapeHTML(img)}" alt="${escapeHTML(name)}" loading="lazy" onerror="this.onerror=null;this.src='../../assets/images/product-placeholder.svg'">
                 </figure>
                 <div class="order-product-info">
                     <h4 class="order-product-name" title="${escapeHTML(name)}">${escapeHTML(name)}</h4>
@@ -404,7 +407,15 @@ async function reorderOrder(orderId) {
 }
 
 async function cancelCustomerOrder(id) {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Hủy đơn hàng',
+            message: 'Bạn có chắc chắn muốn hủy đơn hàng này không? Thao tác không thể hoàn tác.',
+            confirmLabel: 'Xác nhận hủy',
+            danger: true
+        })
+        : confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');
+    if (!ok) return;
     try {
         const res = await fetch(`${API_URL}/orders/${id}/cancel`, {
             method: 'POST',

@@ -41,6 +41,20 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         enum: ['visible', 'hidden'],
         default: 'visible'
+    },
+    adminReply: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    adminRepliedBy: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    adminRepliedAt: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

@@ -269,9 +269,29 @@
             window.location.href = safeUrl;
             return;
         }
-        window.location.href = user && user.isAdmin
-            ? '../../admin/products.html'
-            : '../../index.html';
+        if (user && user.isAdmin) {
+            const perms = user.permissions;
+            if (!perms || typeof perms !== 'object' || perms.dashboard?.view) {
+                window.location.href = '../../admin/dashboard.html';
+                return;
+            }
+            const modulePages = [
+                ['products', '../../admin/products.html'],
+                ['orders', '../../admin/orders.html'],
+                ['customers', '../../admin/customers.html'],
+                ['staff', '../../admin/staff.html'],
+                ['messages', '../../admin/messages.html'],
+                ['blog', '../../admin/blog.html'],
+                ['coupons', '../../admin/coupons.html'],
+                ['finance', '../../admin/finance.html'],
+                ['suppliers', '../../admin/suppliers.html'],
+                ['qa', '../../admin/qa.html']
+            ];
+            const firstAllowed = modulePages.find(([key]) => perms[key]?.view);
+            window.location.href = firstAllowed ? firstAllowed[1] : '../../index.html';
+            return;
+        }
+        window.location.href = '../../index.html';
     }
 
     function initializeLogin() {

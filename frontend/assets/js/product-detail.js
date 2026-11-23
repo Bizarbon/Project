@@ -902,17 +902,22 @@ function renderProduct() {
         `;
     }
 
-    // 4. JSON-LD Schema.org Structured Data
-    document.querySelector('script[data-product-schema]')?.remove();
+    // 4. JSON-LD Schema.org Structured Data (Product + BreadcrumbList) & Open Graph sync
+    document.querySelectorAll('script[data-product-schema]').forEach(s => s.remove());
+    const verifiedReviewCount = Number(product.reviewCount) || reviews.length || 0;
+    const absoluteImages = uniqueGallery.map(img => {
+        const rel = resolveProductImage(img, '');
+        if (/^https?:\/\//i.test(rel)) return rel;
+        return `${window.location.origin}/${rel.replace(/^\/+/, '')}`;
+    });
     const productSchema = document.createElement('script');
     productSchema.type = 'application/ld+json';
     productSchema.dataset.productSchema = 'true';
-    const verifiedReviewCount = Number(product.reviewCount) || reviews.length || 0;
     const schemaData = {
         '@context': 'https://schema.org',
         '@type': 'Product',
         name: product.name,
-        image: uniqueGallery,
+        image: absoluteImages,
         description: product.description || undefined,
         sku: product.sku || undefined,
         brand: product.brand ? { '@type': 'Brand', name: product.brand } : undefined,
@@ -934,6 +939,27 @@ function renderProduct() {
     }
     productSchema.textContent = JSON.stringify(schemaData);
     document.head.appendChild(productSchema);
+
+    const breadcrumbSchema = document.createElement('script');
+    breadcrumbSchema.type = 'application/ld+json';
+    breadcrumbSchema.dataset.productSchema = 'true';
+    breadcrumbSchema.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: `${window.location.origin}/` },
+            { '@type': 'ListItem', position: 2, name: product.category || 'Sản phẩm', item: `${window.location.origin}/?category=${encodeURIComponent(product.category || '')}` },
+            { '@type': 'ListItem', position: 3, name: product.name, item: window.location.href }
+        ]
+    });
+    document.head.appendChild(breadcrumbSchema);
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', `${product.name} - TechEcommerce`);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc && product.description) ogDesc.setAttribute('content', product.description.slice(0, 160));
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', window.location.href);
 
     // 5. Render Main 2-Column Showcase (Left: Media + Guarantees + Video | Right: Price + Promo + CTA)
     const scrollyStoryEl = document.getElementById('productScrollyStory');
@@ -1517,7 +1543,7 @@ function renderBundleUI() {
                             <img src="${escapeHTML(resolveProductImage(acc.image, '../../'))}" alt="${escapeHTML(acc.name)}" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg';" loading="lazy">
                         </figure>
                         <div class="bundle-meta">
-                            <a href="product.html?id=${acc._id}" class="bundle-name" target="_blank" title="${escapeHTML(acc.name)}">${escapeHTML(acc.name)}</a>
+                            <a href="product.html?id=${acc._id}" class="bundle-name" target="_blank" rel="noopener noreferrer" title="${escapeHTML(acc.name)}">${escapeHTML(acc.name)}</a>
                             <div class="bundle-price-row">
                                 <strong class="bundle-price-val">${fmt(acc.discountedPrice)}</strong>
                                 <del class="bundle-price-orig">${fmt(acc.price)}</del>
@@ -1740,7 +1766,7 @@ function renderReviews() {
                         <div class="review-author-avatar">${escapeHTML(initial)}</div>
                         <div>
                             <strong class="review-author-name">${escapeHTML(name)}</strong>
-                            ${review.verifiedPurchase !== false ? '<span class="review-verified-tag">✓ Đã mua tại TechEcommerce</span>' : ''}
+                            ${review.verifiedPurchase === true ? '<span class="review-verified-tag">✓ Đã mua tại TechEcommerce</span>' : ''}
                         </div>
                     </div>
                     <time class="review-date" datetime="${escapeHTML(review.createdAt || '')}">${formatDate(review.createdAt)}</time>
@@ -1748,6 +1774,12 @@ function renderReviews() {
                 <div class="review-stars-row">${'★'.repeat(rRating)}${'☆'.repeat(5 - rRating)}</div>
                 ${review.title ? `<strong style="display:block;margin-bottom:0.35rem;font-size:0.95rem;">${escapeHTML(review.title)}</strong>` : ''}
                 <p class="review-comment-text">${escapeHTML(review.comment || 'Sản phẩm dùng rất tốt, hài lòng với chất lượng phục vụ.')}</p>
+                ${review.adminReply ? `
+                    <aside class="review-official-reply" style="margin-top:0.85rem;padding:0.8rem 1rem;border-radius:10px;border-left:3px solid var(--primary,#2563eb);background:rgba(37,99,235,0.06);">
+                        <strong style="display:block;font-size:0.82rem;color:var(--primary,#2563eb);margin-bottom:0.25rem;">✓ Phản hồi từ ${escapeHTML(review.adminRepliedBy || 'TechEcommerce CSKH')}</strong>
+                        <p style="margin:0;font-size:0.88rem;line-height:1.5;color:var(--text-primary);">${escapeHTML(review.adminReply)}</p>
+                    </aside>
+                ` : ''}
             </article>
         `;
     }).join('');
@@ -2146,9 +2178,23 @@ async function submitExpressCheckout() {
         const cityVal = document.getElementById('expressCitySelect')?.value || '79|Hồ Chí Minh';
         const [shippingProvinceCode, shippingProvince] = cityVal.split('|');
 
+        const guestEmailInput = document.getElementById('expressCustomerEmail');
+        const currentUser = auth.getUser();
+        const guestEmail = String(guestEmailInput?.value || currentUser?.email || '').trim().toLowerCase();
+        if (!auth.isLoggedIn() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail)) {
+            showToast('Vui lòng nhập email hợp lệ để nhận xác nhận đơn hàng!', 'error');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>⚡ XÁC NHẬN ĐẶT MUA NGAY</span>';
+            }
+            guestEmailInput?.focus();
+            return;
+        }
+
         const orderData = {
             products: [orderItem],
             items: [orderItem],
+            guestEmail,
             recipientName: fullName,
             recipientPhone: phone,
             shippingAddress: address,
@@ -2177,8 +2223,13 @@ async function submitExpressCheckout() {
             }
             closeExpressCheckoutModal();
             showToast('Đặt hàng nhanh thành công! Đang chuyển hướng...', 'success');
+            const redirectUrl = data.paymentUrl || data.checkoutUrl || (
+                paymentMethod === 'bank_transfer'
+                    ? `../checkout/payment.html?orderId=${encodeURIComponent(orderId)}`
+                    : `../checkout/payment-result.html?orderId=${encodeURIComponent(orderId)}&provider=${encodeURIComponent(paymentMethod)}&status=success&express=true`
+            );
             setTimeout(() => {
-                window.location.href = `../checkout/payment-result.html?orderId=${encodeURIComponent(orderId)}&express=true`;
+                window.location.href = redirectUrl;
             }, 600);
         } else {
             throw new Error(data.message || 'Không thể tạo đơn hàng nhanh, vui lòng thử lại!');

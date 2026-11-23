@@ -66,13 +66,15 @@ function showOrderToast(msg, type = 'success') {
 let loadedOrderData = null;
 
 async function loadOrderDetail() {
-    if (!auth.isLoggedIn()) {
-        window.location.href = '../auth/login.html';
-        return;
-    }
-
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('id');
+    const guestToken = orderId ? (localStorage.getItem(`guestOrderToken:${orderId}`) || '') : '';
+
+    if (!auth.isLoggedIn() && !guestToken) {
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `../auth/login.html?returnUrl=${returnUrl}`;
+        return;
+    }
 
     const contentEl = document.getElementById('trackingContent');
 
@@ -89,8 +91,10 @@ async function loadOrderDetail() {
     }
 
     try {
+        const headers = auth.getHeaders();
+        if (!auth.isLoggedIn() && guestToken) headers['x-guest-order-token'] = guestToken;
         const res = await fetch(`${API_URL}/orders/${encodeURIComponent(orderId)}`, {
-            headers: auth.getHeaders()
+            headers
         });
         const order = await res.json();
         if (auth.handleApiError(res, order)) return;
@@ -237,7 +241,10 @@ function renderOrderDetail(order) {
     const productsRowsHtml = (order.products || []).map(item => {
         const prod = item.product || {};
         const name = prod.name || item.productName || 'Sản phẩm công nghệ';
-        const img = prod.image || prod.images?.[0] || 'https://placehold.co/120x120?text=TechEcommerce';
+        const rawImg = item.image || prod.image || prod.images?.[0] || '';
+        const img = typeof window.resolveAssetUrl === 'function'
+            ? window.resolveAssetUrl(rawImg)
+            : (rawImg || '../../assets/images/product-placeholder.svg');
         const qty = item.quantity || 1;
         const price = item.price || 0;
         const lineTotal = price * qty;
@@ -248,7 +255,7 @@ function renderOrderDetail(order) {
                 <td>
                     <div class="table-product-cell">
                         <figure class="table-product-thumb">
-                            <img src="${escapeHTML(img)}" alt="${escapeHTML(name)}" loading="lazy">
+                            <img src="${escapeHTML(img)}" alt="${escapeHTML(name)}" loading="lazy" onerror="this.onerror=null;this.src='../../assets/images/product-placeholder.svg'">
                         </figure>
                         <div class="table-product-meta">
                             <a class="table-product-title" href="${prodUrl}">${escapeHTML(name)}</a>
@@ -472,11 +479,22 @@ function renderOrderDetail(order) {
 }
 
 async function cancelCurrentDetailOrder(id) {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Hủy đơn hàng',
+            message: 'Bạn có chắc chắn muốn hủy đơn hàng này không?',
+            confirmLabel: 'Xác nhận hủy',
+            danger: true
+        })
+        : confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');
+    if (!ok) return;
     try {
+        const headers = auth.getHeaders();
+        const guestToken = localStorage.getItem(`guestOrderToken:${id}`) || '';
+        if (!auth.isLoggedIn() && guestToken) headers['x-guest-order-token'] = guestToken;
         const res = await fetch(`${API_URL}/orders/${id}/cancel`, {
             method: 'POST',
-            headers: auth.getHeaders()
+            headers
         });
         const data = await res.json();
         if (!res.ok) {
@@ -501,7 +519,7 @@ function printCustomerInvoice() {
     const shippingAddress = order.shippingAddress || 'Nhận tại showroom TechEcommerce (78 Nguyễn Văn Khối, Gò Vấp, TP.HCM)';
     const orderDateFormatted = orderDate(order.orderDate || order.createdAt);
     const shippingUnit = order.shippingUnit || 'Giao Hàng Tiêu Chuẩn';
-    const qrTargetUrl = `https://techshopvn.vercel.app/pages/account/order-detail.html?id=${order._id}`;
+    const qrTargetUrl = `${window.location.origin}/pages/account/order-detail.html?id=${order._id}`;
 
     const invoiceHtml = window.buildTechEcommerceInvoiceHtml({
         order,
@@ -526,7 +544,7 @@ function printCustomerInvoice() {
         printWin.document.write(invoiceHtml);
         printWin.document.close();
     } else {
-        alert('Trình duyệt đang chặn cửa sổ pop-up. Vui lòng cho phép mở pop-up để in hóa đơn!');
+        showOrderToast('Trình duyệt đang chặn cửa sổ pop-up. Vui lòng cho phép mở pop-up để in hóa đơn!', 'error');
     }
 }
 

@@ -3,6 +3,7 @@ const Counter = require('../models/Counter');
 const uniformCatalog = require('../data/uniformCatalog');
 
 let syncPromise = null;
+let catalogBootVerified = false;
 
 async function repairCanonicalProductAssets() {
     const iphone16ProMax = uniformCatalog.find(item => item.name === 'iPhone 16 Pro Max 256GB');
@@ -49,19 +50,36 @@ async function syncAllProductVariantsAndAssets() {
 
             const targetVariants = Array.isArray(item.variants) ? item.variants : [];
             const dbVariants = Array.isArray(dbProd.variants) ? dbProd.variants : [];
-            const variantsChanged = JSON.stringify(dbVariants) !== JSON.stringify(targetVariants);
+            // Only backfill missing variants or missing colorHex/image without clobbering live stock or admin edits
+            const needsVariantBackfill = targetVariants.length > 0 && (
+                dbVariants.length === 0 ||
+                dbVariants.some((v, idx) => targetVariants[idx] && ((!v.colorHex && targetVariants[idx].colorHex) || (!v.image && targetVariants[idx].image)))
+            );
+            const needsImageBackfill = !dbProd.image && Boolean(item.image);
 
-            if (variantsChanged || dbProd.image !== item.image) {
+            if (needsVariantBackfill || needsImageBackfill) {
+                const updateFields = {};
+                if (needsVariantBackfill) {
+                    updateFields.variants = dbVariants.length === 0
+                        ? targetVariants
+                        : dbVariants.map((v, idx) => {
+                            const plain = typeof v.toObject === 'function' ? v.toObject() : { ...v };
+                            const fallback = targetVariants[idx] || {};
+                            return {
+                                ...plain,
+                                colorHex: plain.colorHex || fallback.colorHex || '',
+                                image: plain.image || fallback.image || ''
+                            };
+                        });
+                }
+                if (needsImageBackfill) {
+                    updateFields.image = item.image;
+                    updateFields.images = item.images || [item.image];
+                }
                 bulkOps.push({
                     updateOne: {
                         filter: { _id: dbProd._id },
-                        update: {
-                            $set: {
-                                variants: targetVariants,
-                                image: item.image,
-                                images: item.images || [item.image]
-                            }
-                        }
+                        update: { $set: updateFields }
                     }
                 });
             }
@@ -134,10 +152,12 @@ async function syncUniformCatalog({ force = false } = {}) {
 }
 
 async function ensureCatalogSynchronized() {
+    if (catalogBootVerified) return;
     if (syncPromise) return syncPromise;
     syncPromise = (async () => {
         try {
             await syncUniformCatalog({ force: false });
+            catalogBootVerified = true;
         } catch (err) {
             console.error('[CatalogSync] Lỗi tự động đồng bộ catalog:', err.message);
         } finally {

@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../../manifest.json">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/pages/checkout/payment.html">
     <meta name="description" content="Xem hướng dẫn thanh toán và theo dõi trạng thái đơn hàng TechEcommerce.">
     <meta property="og:title" content="Thanh toán đơn hàng - TechEcommerce">
     <meta property="og:description" content="Xem hướng dẫn thanh toán và theo dõi trạng thái đơn hàng TechEcommerce.">
@@ -13,16 +18,17 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <title>Thanh toán đơn hàng - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=site-font-20260715-2">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261123-pro-v1">
     <link rel="stylesheet" href="../../assets/css/payment.css?v=payment-qr-20260722-1">
+    <script>(function(){try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 <body>
     <header class="payment-fallback-header">
         <a href="../../index.html" aria-label="TechEcommerce - Trang chủ">TechEcommerce</a>
     </header>
-    <script src="../../assets/js/auth.js?v=payment-qr-20260722-1"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/auth.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/storefront-header.js?v=20261123-pro-v1"></script>
 
     <main class="payment-page">
         <header class="payment-heading">
@@ -79,7 +85,7 @@
                     </dl>
                 </section>
                 <nav class="payment-actions" aria-label="Thao tác thanh toán">
-                    <a id="openPaymentUrl" class="btn btn-primary" href="#" rel="noopener" hidden>Mở ứng dụng thanh toán</a>
+                    <a id="openPaymentUrl" class="btn btn-primary" rel="noopener noreferrer" hidden>Mở ứng dụng thanh toán</a>
                     <a id="viewOrder" class="btn btn-secondary" href="../account/orders.html">Xem đơn hàng</a>
                     <a class="payment-back" href="../../index.html">Tiếp tục mua sắm</a>
                 </nav>
@@ -95,7 +101,7 @@
     </main>
 
     <script src="../../assets/js/payment.js?v=payment-qr-20260722-1"></script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="../../assets/js/chatbox.js"></script>
+    <script src="../../assets/js/footer.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/chatbox.js?v=20261123-pro-v1"></script>
 </body>
 </html>

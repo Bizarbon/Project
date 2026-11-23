@@ -5,7 +5,7 @@ const VNPAY_DEFAULT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 const MOMO_DEFAULT_URL = 'https://test-payment.momo.vn/v2/gateway/api/create';
 const DEFAULT_FRONTEND_BASE_URL = 'http://localhost:5500';
 const GMT7_OFFSET_MINUTES = 7 * 60;
-const MOCK_TOKEN_SECRET = 'shopmini-payment-mock';
+const MOCK_TOKEN_SECRET = 'techecommerce-payment-mock-dev';
 
 const PROVIDER_CONFIG = {
     vnpay: {
@@ -150,7 +150,7 @@ function paymentProviderStatus(provider) {
     };
 }
 
-function getPaymentProvidersStatus() {
+function getPaymentProvidersStatus({ publicSafe = false } = {}) {
     const bankDemo = envValue('BANK_TRANSFER_DEMO').toLowerCase() === 'true';
     const bankMissing = [];
     if (!envValue('BANK_ACCOUNT_NO')) bankMissing.push('BANK_ACCOUNT_NO');
@@ -159,6 +159,15 @@ function getPaymentProvidersStatus() {
     const installmentMode = envValue('INSTALLMENT_MODE') || 'internal_review';
     const installmentConfigured = installmentMode === 'internal_review' || Boolean(envValue('INSTALLMENT_PAYMENT_URL'));
     const installmentMissing = installmentConfigured ? [] : ['INSTALLMENT_PAYMENT_URL'];
+
+    const sanitize = (entry) => {
+        if (!publicSafe || !entry) return entry;
+        const { missingKeys, ...rest } = entry;
+        return {
+            ...rest,
+            message: rest.configured ? rest.message : `${rest.label} hiện chưa khả dụng.`
+        };
+    };
 
     const bankStatus = {
         provider: 'bank_transfer',
@@ -174,15 +183,15 @@ function getPaymentProvidersStatus() {
     };
 
     return {
-        cod: {
+        cod: sanitize({
             provider: 'cod',
             label: 'COD',
             configured: true,
             missingKeys: [],
-            message: 'COD luon kha dung.'
-        },
-        bank_transfer: bankStatus,
-        installment: {
+            message: 'COD luôn khả dụng.'
+        }),
+        bank_transfer: sanitize(bankStatus),
+        installment: sanitize({
             provider: 'installment',
             label: 'Trả góp',
             configured: installmentConfigured,
@@ -193,9 +202,9 @@ function getPaymentProvidersStatus() {
                 : installmentMode === 'internal_review'
                 ? 'Trả góp đang ở chế độ tiếp nhận hồ sơ và chờ quản trị viên duyệt.'
                 : 'Cổng trả góp đã sẵn sàng.'
-        },
-        vnpay: paymentProviderStatus('vnpay'),
-        momo: paymentProviderStatus('momo')
+        }),
+        vnpay: sanitize(paymentProviderStatus('vnpay')),
+        momo: sanitize(paymentProviderStatus('momo'))
     };
 }
 
@@ -340,8 +349,10 @@ function verifyMomoParams(fields) {
     const signature = fields.signature;
     if (!signature) return false;
 
-    const expected = signHmac('sha256', envValue('MOMO_SECRET_KEY'), momoResultRawSignature(fields));
-    return expected.toLowerCase() === String(signature).toLowerCase();
+    const expected = signHmac('sha256', envValue('MOMO_SECRET_KEY'), momoResultRawSignature(fields)).toLowerCase();
+    const received = String(signature).toLowerCase();
+    if (expected.length !== received.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(received, 'utf8'));
 }
 
 async function createMomoPayment(order) {
@@ -361,8 +372,8 @@ async function createMomoPayment(order) {
     const extraData = Buffer.from(JSON.stringify({ orderId: order._id })).toString('base64');
     const body = {
         partnerCode: envValue('MOMO_PARTNER_CODE'),
-        storeName: envValue('MOMO_STORE_NAME') || envValue('MOMO_STORE_ID') || 'ShopMini',
-        storeId: envValue('MOMO_STORE_ID') || 'ShopMini',
+        storeName: envValue('MOMO_STORE_NAME') || envValue('MOMO_STORE_ID') || 'TechEcommerce',
+        storeId: envValue('MOMO_STORE_ID') || 'TechEcommerce',
         requestType: 'captureWallet',
         ipnUrl: `${appBaseUrl()}/api/payments/momo/ipn`,
         redirectUrl: `${appBaseUrl()}/api/payments/momo/return`,

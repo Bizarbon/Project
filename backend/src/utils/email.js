@@ -125,7 +125,7 @@ async function sendMessage({ to, subject, html }) {
 
 async function notifyOrderCreated(order, customer) {
     if (!emailEnabled()) return { configured: false };
-    const adminEmail = envValue('ORDER_NOTIFICATION_EMAIL') || 'banphan272004@gmail.com';
+    const adminEmail = envValue('ORDER_NOTIFICATION_EMAIL');
     const customerEmail = String(customer?.email || '').trim();
     const jobs = [];
 
@@ -252,7 +252,7 @@ async function notifyShipperAssigned(order, shipper) {
             subject: `[TechEcommerce] Đơn hàng #${order._id} đã được phân công người giao hàng`,
             html: emailShell(
                 'Đơn hàng đã được phân công Shipper',
-                `Đơn hàng #${order._id} của bạn đã được phân công cho shipper ${escapeHTML(shipperName)}${escapeHTML(phoneText)} phụ trách vận chuyển.`,
+                `Đơn hàng #${order._id} của bạn đã được phân công cho shipper ${shipperName}${phoneText} phụ trách vận chuyển.`,
                 order,
                 'Shipper sẽ liên hệ trực tiếp với bạn trước khi giao hàng. Bạn có thể theo dõi tiến độ chi tiết trong mục Đơn hàng của tôi.'
             )

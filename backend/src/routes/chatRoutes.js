@@ -13,7 +13,7 @@ const aiModelService = require('../services/ai/aiModelService');
 const ragService = require('../services/ai/ragService');
 const memoryService = require('../services/ai/memoryService');
 const agenticChatService = require('../services/ai/agenticChatService');
-const { optionalAuth, protect, admin } = require('../middleware/auth');
+const { optionalAuth, protect, admin, requirePermission } = require('../middleware/auth');
 
 // Seed curated FAQ / policy / consultation articles into MongoDB if empty
 ragService.ensureKnowledgeBaseSeeded().catch(() => { });
@@ -38,39 +38,53 @@ const chatLimiter = rateLimit({
     message: { message: 'Bạn đã gửi quá nhiều tin nhắn. Vui lòng thử lại sau ít phút.' }
 });
 
-router.get('/knowledge', protect, admin, async (req, res) => {
-    const query = {};
-    if (req.query.type) query.type = String(req.query.type);
-    if (req.query.active !== undefined) query.active = req.query.active === 'true';
-    const articles = await KnowledgeArticle.find(query).sort({ updatedAt: -1 }).limit(200).lean();
-    return res.json({ articles });
+router.get('/knowledge', protect, admin, requirePermission('qa', 'view'), async (req, res) => {
+    try {
+        const query = {};
+        if (req.query.type) query.type = String(req.query.type);
+        if (req.query.active !== undefined) query.active = req.query.active === 'true';
+        const articles = await KnowledgeArticle.find(query).sort({ updatedAt: -1 }).limit(200).lean();
+        return res.json({ articles });
+    } catch (error) {
+        return res.status(500).json({ message: 'Không thể tải kho tri thức.' });
+    }
 });
 
-router.post('/knowledge', protect, admin, async (req, res) => {
-    const { title, slug, type, category, keywords, answer, source, active } = req.body || {};
-    if (!title || !slug || !answer) return res.status(400).json({ message: 'Thiếu title, slug hoặc answer.' });
-    const article = await KnowledgeArticle.create({
-        title: String(title).trim(), slug: String(slug).trim().toLowerCase(),
-        type: type || 'faq', category: category || 'all',
-        keywords: Array.isArray(keywords) ? keywords.map(item => String(item).trim().toLowerCase()).filter(Boolean) : [],
-        answer: String(answer).trim(), source: source || 'admin', active: active !== false,
-        updatedBy: req.user?._id || null
-    });
-    return res.status(201).json({ article });
+router.post('/knowledge', protect, admin, requirePermission('qa', 'edit'), async (req, res) => {
+    try {
+        const { title, slug, type, category, keywords, answer, source, active } = req.body || {};
+        if (!title || !slug || !answer) return res.status(400).json({ message: 'Thiếu title, slug hoặc answer.' });
+        const article = await KnowledgeArticle.create({
+            title: String(title).trim(), slug: String(slug).trim().toLowerCase(),
+            type: type || 'faq', category: category || 'all',
+            keywords: Array.isArray(keywords) ? keywords.map(item => String(item).trim().toLowerCase()).filter(Boolean) : [],
+            answer: String(answer).trim(), source: source || 'admin', active: active !== false,
+            updatedBy: req.user?._id || null
+        });
+        return res.status(201).json({ article });
+    } catch (error) {
+        const status = error?.code === 11000 ? 409 : 400;
+        return res.status(status).json({ message: error?.code === 11000 ? 'Slug bài viết đã tồn tại.' : (error.message || 'Không thể tạo bài knowledge.') });
+    }
 });
 
-router.patch('/knowledge/:id', protect, admin, async (req, res) => {
-    const allowed = ['title', 'slug', 'type', 'category', 'keywords', 'answer', 'source', 'active'];
-    const updates = {};
-    allowed.forEach(key => {
-        if (req.body?.[key] !== undefined) updates[key] = key === 'keywords'
-            ? (Array.isArray(req.body[key]) ? req.body[key].map(item => String(item).trim().toLowerCase()).filter(Boolean) : [])
-            : req.body[key];
-    });
-    updates.updatedBy = req.user?._id || null;
-    const article = await KnowledgeArticle.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
-    if (!article) return res.status(404).json({ message: 'Không tìm thấy bài knowledge.' });
-    return res.json({ article });
+router.patch('/knowledge/:id', protect, admin, requirePermission('qa', 'edit'), async (req, res) => {
+    try {
+        const allowed = ['title', 'slug', 'type', 'category', 'keywords', 'answer', 'source', 'active'];
+        const updates = {};
+        allowed.forEach(key => {
+            if (req.body?.[key] !== undefined) updates[key] = key === 'keywords'
+                ? (Array.isArray(req.body[key]) ? req.body[key].map(item => String(item).trim().toLowerCase()).filter(Boolean) : [])
+                : req.body[key];
+        });
+        updates.updatedBy = req.user?._id || null;
+        const article = await KnowledgeArticle.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+        if (!article) return res.status(404).json({ message: 'Không tìm thấy bài knowledge.' });
+        return res.json({ article });
+    } catch (error) {
+        const status = error?.code === 11000 ? 409 : 400;
+        return res.status(status).json({ message: error.message || 'Không thể cập nhật bài knowledge.' });
+    }
 });
 
 const STATUS_LABELS = {
@@ -3451,6 +3465,10 @@ router.post('/stream', chatLimiter, optionalAuth, async (req, res) => {
 
 router.get('/memory', optionalAuth, async (req, res) => {
     try {
+        const rawRequested = String(req.query?.sessionId || '').trim();
+        if (/^user_/i.test(rawRequested) && (!req.user || rawRequested !== `user_${req.user._id}`)) {
+            return res.status(403).json({ message: 'Không có quyền truy cập phiên hội thoại này.' });
+        }
         const sessionKey = memoryService.resolveSessionKey(req);
         const session = await ChatSession.findOne({ sessionKey }).lean();
         if (!session) {
@@ -3461,6 +3479,9 @@ router.get('/memory', optionalAuth, async (req, res) => {
                 memoryProfile: {},
                 recentMessages: []
             });
+        }
+        if (session.customerId && (!req.user || String(session.customerId) !== String(req.user._id)) && !req.user?.isAdmin) {
+            return res.status(403).json({ message: 'Không có quyền truy cập phiên hội thoại này.' });
         }
         return res.json({
             sessionKey,
@@ -3478,7 +3499,15 @@ router.get('/memory', optionalAuth, async (req, res) => {
 
 router.post('/reset', optionalAuth, async (req, res) => {
     try {
+        const rawRequested = String(req.body?.sessionId || '').trim();
+        if (/^user_/i.test(rawRequested) && (!req.user || rawRequested !== `user_${req.user._id}`)) {
+            return res.status(403).json({ success: false, message: 'Không có quyền đặt lại phiên hội thoại này.' });
+        }
         const sessionKey = memoryService.resolveSessionKey(req);
+        const existing = await ChatSession.findOne({ sessionKey }).select('customerId').lean();
+        if (existing?.customerId && (!req.user || String(existing.customerId) !== String(req.user._id)) && !req.user?.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Không có quyền đặt lại phiên hội thoại này.' });
+        }
         await ChatSession.findOneAndUpdate(
             { sessionKey },
             {
@@ -3786,11 +3815,15 @@ async function ensureSeedConversations() {
 // ==========================================
 
 // GET /api/chat/admin/conversations
-router.get('/admin/conversations', async (req, res) => {
+router.get('/admin/conversations', protect, admin, requirePermission('messages', 'view'), async (req, res) => {
     try {
         await ensureSeedConversations();
 
-        const { search = '', category = 'all', status = 'all', page = 1, limit = 20 } = req.query;
+        const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+        const category = typeof req.query.category === 'string' ? req.query.category.trim() : 'all';
+        const status = typeof req.query.status === 'string' ? req.query.status.trim() : 'all';
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
         const query = {};
 
         if (search) {
@@ -3808,16 +3841,16 @@ router.get('/admin/conversations', async (req, res) => {
             query.interestedCategory = new RegExp(escapeRegex(category), 'i');
         }
 
-        if (status && status !== 'all') {
+        if (status && status !== 'all' && ['active', 'resolved', 'needs_agent'].includes(status)) {
             query.status = status;
         }
 
-        const skip = (Math.max(1, Number(page)) - 1) * Math.min(100, Math.max(1, Number(limit)));
+        const skip = (page - 1) * limit;
         const total = await ChatSession.countDocuments(query);
         const conversations = await ChatSession.find(query)
             .sort({ updatedAt: -1 })
             .skip(skip)
-            .limit(Number(limit));
+            .limit(limit);
 
         // Stats
         const totalAll = await ChatSession.countDocuments();
@@ -3830,8 +3863,8 @@ router.get('/admin/conversations', async (req, res) => {
         return res.json({
             conversations,
             total,
-            page: Number(page),
-            pages: Math.ceil(total / Number(limit)),
+            page,
+            pages: Math.ceil(total / limit),
             stats: {
                 totalAll,
                 memberCount,
@@ -3846,7 +3879,7 @@ router.get('/admin/conversations', async (req, res) => {
 });
 
 // GET /api/chat/admin/conversations/:id
-router.get('/admin/conversations/:id', async (req, res) => {
+router.get('/admin/conversations/:id', protect, admin, requirePermission('messages', 'view'), async (req, res) => {
     try {
         const conv = await ChatSession.findById(req.params.id);
         if (!conv) return res.status(404).json({ message: 'Không tìm thấy cuộc trò chuyện' });
@@ -3857,13 +3890,19 @@ router.get('/admin/conversations/:id', async (req, res) => {
 });
 
 // PATCH /api/chat/admin/conversations/:id
-router.patch('/admin/conversations/:id', async (req, res) => {
+router.patch('/admin/conversations/:id', protect, admin, requirePermission('messages', 'edit'), async (req, res) => {
     try {
-        const { status, note } = req.body;
+        const { status, note } = req.body || {};
         const updates = {};
-        if (status) updates.status = status;
-        if (note !== undefined) updates.intentSummary = note;
-        const conv = await ChatSession.findByIdAndUpdate(req.params.id, updates, { new: true });
+        if (status !== undefined) {
+            if (!['active', 'resolved', 'needs_agent'].includes(String(status))) {
+                return res.status(400).json({ message: 'Trạng thái hội thoại không hợp lệ.' });
+            }
+            updates.status = String(status);
+        }
+        if (note !== undefined) updates.intentSummary = String(note).trim().slice(0, 500);
+        const conv = await ChatSession.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+        if (!conv) return res.status(404).json({ message: 'Không tìm thấy cuộc trò chuyện' });
         return res.json({ message: 'Cập nhật thành công', conversation: conv });
     } catch (err) {
         return res.status(500).json({ message: 'Lỗi cập nhật cuộc trò chuyện' });

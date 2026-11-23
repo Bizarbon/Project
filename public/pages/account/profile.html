@@ -3,13 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/pages/account/profile.html">
+    <meta property="og:title" content="Hồ sơ cá nhân - TechEcommerce">
+    <meta property="og:description" content="Quản lý hồ sơ, địa chỉ nhận hàng, ảnh đại diện và bảo mật tài khoản TechEcommerce."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Quản lý hồ sơ, địa chỉ nhận hàng, ảnh đại diện và bảo mật tài khoản TechEcommerce.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techshopvn.vercel.app/pages/account/profile.html">
     <title>Hồ sơ cá nhân - TechEcommerce</title>
-    <link rel="stylesheet" href="../../assets/css/style.css?v=prod-20260918-1">
-    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=prod-20260918-1">
+    <link rel="stylesheet" href="../../assets/css/style.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../../assets/css/neo-circuit.css?v=20261123-pro-v1">
     <style>
         .profile-grid {
             display: grid;
@@ -73,7 +81,8 @@
         @media (max-width: 992px) { .profile-grid { grid-template-columns: 1fr; } }
         @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
     </style>
-    <link rel="stylesheet" href="../../assets/css/profile.css?v=profile-alignment-20260712-2">
+    <link rel="stylesheet" href="../../assets/css/profile.css?v=20261123-prof-v3">
+    <script>(function(){try{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 </head>
 
 <body class="profile-page account-page">
@@ -107,8 +116,8 @@
         </div>
     </header>
     <script src="../../assets/js/animations.js"></script>
-    <script src="../../assets/js/auth.js?v=prod-20260918-1"></script>
-    <script src="../../assets/js/storefront-header.js?v=navigation-sync-20260712-2"></script>
+    <script src="../../assets/js/auth.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/storefront-header.js?v=20261123-pro-v1"></script>
 
     <main class="container fade-in">
         <header class="page-header reveal">
@@ -172,13 +181,13 @@
                             <label for="pPhone">Số điện thoại</label>
                             <input type="tel" id="pPhone" autocomplete="tel" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group profile-field-full">
                             <label for="pEmail">Địa chỉ Email</label>
                             <input type="email" id="pEmail" autocomplete="email">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group profile-field-full">
                             <label for="pAddress">Địa chỉ nhận hàng</label>
-                            <input type="text" id="pAddress">
+                            <textarea id="pAddress" rows="2" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."></textarea>
                         </div>
                     </div>
 
@@ -212,9 +221,9 @@
         </div>
     </main>
 
-    <script src="../../assets/js/profile.js?v=navigation-sync-20260712-2"></script>
-    <script src="../../assets/js/footer.js?v=navigation-sync-20260712-1"></script>
-    <script src="../../assets/js/chatbox.js"></script>
+    <script src="../../assets/js/profile.js?v=20261123-prof-v3"></script>
+    <script src="../../assets/js/footer.js?v=20261123-pro-v1"></script>
+    <script src="../../assets/js/chatbox.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

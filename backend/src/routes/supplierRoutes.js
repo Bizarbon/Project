@@ -1,12 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const Supplier = require('../models/Supplier');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePermission } = require('../middleware/auth');
 
 router.use(protect);
 router.use(admin);
 
-router.get('/', async (req, res) => {
+function pickSupplierPayload(body = {}) {
+    const allowed = ['name', 'phone', 'email', 'address', 'deliveryTime', 'returnPolicy', 'notes', 'active'];
+    const out = {};
+    for (const key of allowed) {
+        if (body[key] === undefined) continue;
+        if (key === 'active') out.active = Boolean(body.active);
+        else out[key] = typeof body[key] === 'string' ? body[key].trim() : String(body[key] ?? '').trim();
+    }
+    return out;
+}
+
+router.get('/', requirePermission('suppliers', 'view'), async (req, res) => {
     try {
         const suppliers = await Supplier.find().sort({ createdAt: -1 });
         res.json(suppliers);
@@ -15,7 +26,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', requirePermission('suppliers', 'view'), async (req, res) => {
     try {
         const supplier = await Supplier.findById(req.params.id);
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });
@@ -25,20 +36,16 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('suppliers', 'create'), async (req, res) => {
     try {
-        const existing = await Supplier.findOne({ name: req.body.name });
+        const payload = pickSupplierPayload(req.body);
+        if (!payload.name) return res.status(400).json({ message: 'Tên nhà cung cấp là bắt buộc!' });
+        const existing = await Supplier.findOne({ name: payload.name });
         if (existing) return res.status(400).json({ message: 'Đã có nhà cung cấp này!' });
 
         const newSupplier = await new Supplier({
-            name: req.body.name,
-            phone: req.body.phone,
-            email: req.body.email,
-            address: req.body.address,
-            deliveryTime: req.body.deliveryTime,
-            returnPolicy: req.body.returnPolicy,
-            notes: req.body.notes,
-            active: req.body.active !== undefined ? req.body.active : true
+            ...payload,
+            active: payload.active !== undefined ? payload.active : true
         }).save();
 
         res.status(201).json(newSupplier);
@@ -47,13 +54,14 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', requirePermission('suppliers', 'edit'), async (req, res) => {
     try {
-        if (req.body.name) {
-            const existing = await Supplier.findOne({ name: req.body.name, _id: { $ne: req.params.id } });
+        const payload = pickSupplierPayload(req.body);
+        if (payload.name) {
+            const existing = await Supplier.findOne({ name: payload.name, _id: { $ne: req.params.id } });
             if (existing) return res.status(400).json({ message: 'Đã có nhà cung cấp này!' });
         }
-        const updated = await Supplier.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const updated = await Supplier.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true });
         if (!updated) return res.status(404).json({ message: 'Supplier not found' });
         res.json(updated);
     } catch (error) {
@@ -61,7 +69,7 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requirePermission('suppliers', 'delete'), async (req, res) => {
     try {
         const supplier = await Supplier.findById(req.params.id);
         if (!supplier) return res.status(404).json({ message: 'Supplier not found' });

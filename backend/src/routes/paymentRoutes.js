@@ -5,7 +5,9 @@ const Order = require('../models/Order');
 const { restoreOrderStock, reReserveOrderStock } = require('../utils/orderStock');
 const { notifyPaymentConfirmed } = require('../utils/email');
 const { quoteInstallments } = require('../utils/installments');
+const { isAllowedOrigin } = require('../middleware/auth');
 const {
+    isMockMode,
     getPaymentProvidersStatus,
     mockPaymentToken,
     verifyVnpayParams,
@@ -54,8 +56,8 @@ function amountMatches(order, amount, multiplier = 1) {
 }
 
 function checkoutOrigin(order) {
-    const origin = order?.paymentMetadata?.checkoutOrigin;
-    return /^https?:\/\//.test(String(origin || '')) ? String(origin) : undefined;
+    const origin = String(order?.paymentMetadata?.checkoutOrigin || '').trim();
+    return isAllowedOrigin(origin) ? origin : undefined;
 }
 
 function redirectResult(res, order, provider, status, message, fallbackOrderId) {
@@ -93,9 +95,12 @@ function formatVnd(value) {
 }
 
 function verifyMockPaymentRequest(provider, orderId, ref, token) {
+    if (!isMockMode() || process.env.NODE_ENV === 'production') return false;
     if (!['vnpay', 'momo'].includes(provider)) return false;
     if (!orderId || !ref || !token) return false;
-    return mockPaymentToken(provider, orderId, ref) === String(token);
+    const expected = Buffer.from(mockPaymentToken(provider, orderId, ref), 'utf8');
+    const actual = Buffer.from(String(token), 'utf8');
+    return expected.length === actual.length && crypto.timingSafeEqual(expected, actual);
 }
 
 async function markPaid(order, provider, transactionId, metadata = {}) {
@@ -166,7 +171,7 @@ async function markFailed(order, provider, metadata = {}) {
 }
 
 router.get('/providers', (req, res) => {
-    res.json({ providers: getPaymentProvidersStatus() });
+    res.json({ providers: getPaymentProvidersStatus({ publicSafe: true }) });
 });
 
 router.post('/installment/quote', (req, res) => {
@@ -210,6 +215,9 @@ router.post('/bank/webhook', async (req, res) => {
 });
 
 router.get('/mock/:provider', async (req, res) => {
+    if (!isMockMode() || process.env.NODE_ENV === 'production') {
+        return res.status(404).send('Not found.');
+    }
     const provider = String(req.params.provider || '').toLowerCase();
     const orderId = Number(req.query.orderId);
     const ref = String(req.query.ref || '');
@@ -265,6 +273,9 @@ router.get('/mock/:provider', async (req, res) => {
 });
 
 router.get('/mock/:provider/complete', async (req, res) => {
+    if (!isMockMode() || process.env.NODE_ENV === 'production') {
+        return res.status(404).send('Not found.');
+    }
     const provider = String(req.params.provider || '').toLowerCase();
     const orderId = Number(req.query.orderId);
     const ref = String(req.query.ref || '');

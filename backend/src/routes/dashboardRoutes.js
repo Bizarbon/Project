@@ -4,7 +4,7 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const Expense = require('../models/Expense');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePermission } = require('../middleware/auth');
 
 const EXCLUDED_STATUSES = new Set(['cancelled', 'returned', 'boom']);
 
@@ -22,12 +22,13 @@ function endOfDay(value) {
 
 function dashboardRange(query = {}) {
     const now = new Date();
-    const preset = ['today', '7d', 'month', 'custom'].includes(query.range) ? query.range : 'month';
+    const preset = ['today', '7d', 'month', 'year', 'custom'].includes(query.range) ? query.range : 'month';
     let from;
     let to = endOfDay(now);
 
     if (preset === 'today') from = startOfDay(now);
     else if (preset === '7d') from = startOfDay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6));
+    else if (preset === 'year') from = startOfDay(new Date(now.getFullYear(), 0, 1));
     else if (preset === 'custom' && query.from && query.to) {
         from = startOfDay(query.from);
         to = endOfDay(query.to);
@@ -99,7 +100,7 @@ function buildTimeSeries(orders, from, to) {
     return [...buckets.values()];
 }
 
-router.get('/dashboard', protect, admin, async (req, res) => {
+router.get('/dashboard', protect, admin, requirePermission('dashboard', 'view'), async (req, res) => {
     try {
         const range = dashboardRange(req.query);
         const currentFilter = { orderDate: { $gte: range.from, $lte: range.to } };

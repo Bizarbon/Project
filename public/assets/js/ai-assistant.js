@@ -279,9 +279,21 @@
             </a>`).join('')}</section>`;
     }
 
+    function resolveCartStorageKey() {
+        if (window.auth && typeof window.auth.getCartStorageKey === 'function') {
+            return window.auth.getCartStorageKey();
+        }
+        try {
+            const u = JSON.parse(localStorage.getItem('user') || 'null');
+            const id = u?.id ?? u?._id ?? u?.username ?? u?.email;
+            if (localStorage.getItem('token') && id) return `cart:user:${String(id)}`;
+        } catch (_) { }
+        return 'cart:guest';
+    }
+
     function addBatchToStoreCart(cartItems = []) {
         if (!Array.isArray(cartItems) || !cartItems.length) return;
-        const cartKey = localStorage.getItem('token') ? 'cart:user' : 'cart:guest';
+        const cartKey = resolveCartStorageKey();
         let cart = readJSON(cartKey, []);
         if (!Array.isArray(cart)) cart = [];
         cartItems.forEach(item => {
@@ -651,8 +663,16 @@
         localStorage.setItem('ai:voice-output', String(voiceOutputEnabled));
         if (!voiceOutputEnabled && 'speechSynthesis' in window) speechSynthesis.cancel();
     });
-    document.getElementById('clearHistoryButton').addEventListener('click', () => {
-        if (!window.confirm('Xóa toàn bộ lịch sử tư vấn trên thiết bị này?')) return;
+    document.getElementById('clearHistoryButton').addEventListener('click', async () => {
+        const ok = typeof window.showConfirmDialog === 'function'
+            ? await window.showConfirmDialog({
+                title: 'Xóa lịch sử trò chuyện',
+                message: 'Bạn có chắc muốn xóa toàn bộ lịch sử tư vấn AI trên thiết bị này không?',
+                confirmLabel: 'Xóa lịch sử',
+                danger: true
+            })
+            : window.confirm('Xóa toàn bộ lịch sử tư vấn trên thiết bị này?');
+        if (!ok) return;
         sessions = [];
         localStorage.removeItem(historyKey);
         updateCounts();

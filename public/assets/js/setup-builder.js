@@ -165,9 +165,14 @@
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
     }
 
+    function escapeHtmlSafe(v) {
+        if (typeof window.escapeHTML === 'function') return window.escapeHTML(v);
+        return String(v ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch]));
+    }
+
     async function syncLiveCatalogPricing() {
         try {
-            const apiUrl = window.API_URL || (window.location.hostname.includes('vercel.app') ? 'https://techshopvn.vercel.app/api' : 'http://localhost:5000/api');
+            const apiUrl = window.API_URL || `${window.location.origin}/api`;
             const res = await fetch(`${apiUrl}/products?limit=150`);
             if (!res.ok) return;
             const list = await res.json();
@@ -178,7 +183,11 @@
                 if (live) {
                     if (live.price > 0) item.price = Number(live.price);
                     if (live.name) item.title = live.name;
-                    if (live.image) item.image = /^https?:|^\//i.test(live.image) ? `../..${live.image}` : `../../${live.image}`;
+                    if (live.image) {
+                        item.image = /^(?:https?:|data:)/i.test(live.image)
+                            ? live.image
+                            : (live.image.startsWith('/') ? `../..${live.image}` : `../../${live.image.replace(/^\.?\//, '')}`);
+                    }
                     changed = true;
                 }
             });
@@ -219,14 +228,14 @@
 
         const filtered = HARDWARE_CATALOG.filter(item => item.category === activeInventoryCategory);
         list.innerHTML = filtered.map(item => `
-            <li class="inventory-card-item" draggable="true" data-item-id="${item.id}">
-                <img src="${item.image}" alt="${item.title}" class="inventory-item-thumb" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg'">
+            <li class="inventory-card-item" draggable="true" data-item-id="${escapeHtmlSafe(item.id)}">
+                <img src="${escapeHtmlSafe(item.image)}" alt="${escapeHtmlSafe(item.title)}" class="inventory-item-thumb" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg'">
                 <div class="inventory-item-info">
-                    <strong class="inventory-item-title">${item.title}</strong>
-                    <div class="inventory-item-specs">${item.specs}</div>
+                    <strong class="inventory-item-title">${escapeHtmlSafe(item.title)}</strong>
+                    <div class="inventory-item-specs">${escapeHtmlSafe(item.specs)}</div>
                     <div class="inventory-item-price">${fmt(item.price)}</div>
                 </div>
-                <button type="button" class="btn-equip-item" data-equip-id="${item.id}" aria-label="Gắn ${item.title} vào bàn">
+                <button type="button" class="btn-equip-item" data-equip-id="${escapeHtmlSafe(item.id)}" aria-label="Gắn ${escapeHtmlSafe(item.title)} vào bàn">
                     + Thêm
                 </button>
             </li>
@@ -243,7 +252,7 @@
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = btn.getAttribute('data-equip-id');
-                const item = HARDWARE_CATALOG.find(i => i.id === id);
+                const item = HARDWARE_CATALOG.find(i => String(i.id) === String(id));
                 if (item) equipItem(item.category, item);
             });
         });
@@ -252,7 +261,7 @@
     // Drag and Drop Handlers
     function handleDragStart(e) {
         const itemId = this.getAttribute('data-item-id');
-        draggedHardware = HARDWARE_CATALOG.find(i => i.id === itemId);
+        draggedHardware = HARDWARE_CATALOG.find(i => String(i.id) === String(itemId));
         if (draggedHardware) {
             e.dataTransfer.setData('text/plain', itemId);
             e.dataTransfer.effectAllowed = 'copy';
@@ -352,12 +361,12 @@
                 if (cardEl) {
                     cardEl.style.display = 'flex';
                     cardEl.innerHTML = `
-                        <button type="button" class="btn-slot-remove" data-remove-slot="${slotType}" aria-label="Gỡ ${item.title}">×</button>
-                        <img src="${item.image}" alt="${item.title}" class="slot-card-thumb" onerror="this.src='../../assets/images/product-placeholder.svg'">
-                        <strong class="slot-card-title">${item.title}</strong>
+                        <button type="button" class="btn-slot-remove" data-remove-slot="${escapeHtmlSafe(slotType)}" aria-label="Gỡ ${escapeHtmlSafe(item.title)}">×</button>
+                        <img src="${escapeHtmlSafe(item.image)}" alt="${escapeHtmlSafe(item.title)}" class="slot-card-thumb" onerror="this.onerror=null; this.src='../../assets/images/product-placeholder.svg'">
+                        <strong class="slot-card-title">${escapeHtmlSafe(item.title)}</strong>
                         <div class="slot-card-price">${fmt(item.price)}</div>
                         <div class="slot-card-tags">
-                            <span class="badge-tag-spec">${item.specs.split('•')[0] || getCategoryLabel(slotType)}</span>
+                            <span class="badge-tag-spec">${escapeHtmlSafe((item.specs || '').split('•')[0] || getCategoryLabel(slotType))}</span>
                         </div>
                     `;
 

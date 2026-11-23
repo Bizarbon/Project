@@ -218,18 +218,40 @@ async function syncPermissionsToCustomer(staffDoc) {
     const customer = await Customer.findOne({ email: emailNorm });
     if (!customer) return;
 
-    const perms = normalizePermissions(staffDoc.permissions, Boolean(staffDoc.isAdmin && staffDoc.rolePreset === 'super_admin'));
+    const isSuper = Boolean(staffDoc.isAdmin && staffDoc.rolePreset === 'super_admin');
+    const perms = normalizePermissions(staffDoc.permissions, isSuper);
     const hasAnyView = Object.values(perms).some(m => m && m.view);
-    customer.permissions = perms;
+
     if (staffDoc.status === 'locked') {
         customer.active = false;
+        customer.tokenVersion = Number(customer.tokenVersion || 0) + 1;
     } else {
         customer.active = true;
     }
-    if (staffDoc.isAdmin || hasAnyView) {
+
+    if (isSuper || hasAnyView) {
         customer.isAdmin = true;
-        customer.role = staffDoc.rolePreset === 'super_admin' ? 'admin' : 'staff';
+        customer.role = isSuper ? 'admin' : 'staff';
+        customer.permissions = isSuper ? null : perms;
+    } else {
+        customer.isAdmin = false;
+        customer.role = 'customer';
+        customer.permissions = null;
+        customer.tokenVersion = Number(customer.tokenVersion || 0) + 1;
     }
+    customer.markModified('permissions');
+    await customer.save();
+}
+
+async function revokeStaffCustomerAccess(email) {
+    if (!email) return;
+    const customer = await Customer.findOne({ email: String(email).trim().toLowerCase() });
+    if (!customer) return;
+    customer.isAdmin = false;
+    customer.role = 'customer';
+    customer.permissions = null;
+    customer.tokenVersion = Number(customer.tokenVersion || 0) + 1;
+    customer.markModified('permissions');
     await customer.save();
 }
 
@@ -362,7 +384,8 @@ router.delete('/:id', protect, admin, requireStaffAction('delete'), async (req, 
         const id = Number(req.params.id);
         const deleted = await StaffMember.findByIdAndDelete(id);
         if (!deleted) return res.status(404).json({ message: 'Không tìm thấy hồ sơ nhân viên.' });
-        res.json({ message: 'Đã xóa hồ sơ nhân viên.' });
+        await revokeStaffCustomerAccess(deleted.email);
+        res.json({ message: 'Đã xóa hồ sơ nhân viên và thu hồi quyền quản trị.' });
     } catch (error) {
         console.error('DELETE /api/staff/:id error:', error);
         res.status(500).json({ message: 'Không thể xóa hồ sơ nhân viên.' });

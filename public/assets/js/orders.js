@@ -514,9 +514,12 @@ function handleSortColumn(colKey) {
 }
 
 function quickFilterByStatus(status) {
-    activeStatusFilter = status;
+    const mapped = status === 'processing' ? 'processing_group' : (status === 'returned' ? 'returned_group' : status);
+    activeStatusFilter = mapped;
     const filterSelect = document.getElementById('filterStatus');
-    if (filterSelect) filterSelect.value = status;
+    if (filterSelect) {
+        filterSelect.value = ['processing_group', 'returned_group'].includes(mapped) ? status : mapped;
+    }
     currentPage = 1;
     loadOrders();
 }
@@ -559,18 +562,22 @@ function resetFilters() {
 function openModalEl(modal) {
     if (!modal) return;
     modal.classList.add('open');
-    modal.setAttribute('open', '');
     if (typeof modal.showModal === 'function') {
-        try { modal.showModal(); } catch (e) {}
+        if (!modal.open) {
+            try { modal.showModal(); } catch (e) { modal.setAttribute('open', ''); }
+        }
+    } else {
+        modal.setAttribute('open', '');
     }
 }
 
 function closeModalEl(modal) {
     if (!modal) return;
     modal.classList.remove('open');
-    modal.removeAttribute('open');
-    if (typeof modal.close === 'function') {
-        try { modal.close(); } catch (e) {}
+    if (typeof modal.close === 'function' && modal.open) {
+        try { modal.close(); } catch (e) { modal.removeAttribute('open'); }
+    } else {
+        modal.removeAttribute('open');
     }
 }
 
@@ -599,10 +606,13 @@ async function openAssignShipperModal(orderId) {
     const customerEl = document.getElementById('shipperModalCustomer');
     const addressEl = document.getElementById('shipperModalAddress');
     if (orderCodeEl) orderCodeEl.textContent = `#${String(orderId).padStart(4, '0')}`;
-    if (customerEl) customerEl.textContent = order?.customer?.name || order?.customerName || order?.shippingAddress?.recipientName || 'Khách hàng';
+    if (customerEl) customerEl.textContent = order?.recipientName || order?.customer?.name || order?.customerName || 'Khách hàng';
     if (addressEl) {
-        const fullAddr = order?.shippingAddress?.fullAddress || order?.shippingAddress?.address || order?.customer?.address || 'TP. Hồ Chí Minh';
-        addressEl.textContent = fullAddr.length > 35 ? fullAddr.substring(0, 35) + '...' : fullAddr;
+        const rawAddr = typeof order?.shippingAddress === 'string'
+            ? order.shippingAddress
+            : (order?.shippingAddress?.fullAddress || order?.shippingAddress?.address || '');
+        const fullAddr = rawAddr || order?.customer?.address || 'TP. Hồ Chí Minh';
+        addressEl.textContent = fullAddr.length > 42 ? fullAddr.substring(0, 42) + '...' : fullAddr;
         addressEl.title = fullAddr;
     }
 
@@ -772,7 +782,14 @@ async function submitShipperAssignment() {
     const shipperObj = cachedShippers.find(s => s._id === shipperId);
     const shipperName = shipperObj ? shipperObj.name : `Shipper #${shipperId}`;
 
-    if (!confirm(`Bạn có chắc chắn muốn phân công shipper "${shipperName}" cho đơn #${String(currentAssignOrderId).padStart(4, '0')}?`)) {
+    const okAssign = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xác nhận phân công shipper',
+            message: `Bạn có chắc chắn muốn phân công shipper "${shipperName}" cho đơn #${String(currentAssignOrderId).padStart(4, '0')}?`,
+            confirmLabel: 'Phân công ngay'
+        })
+        : confirm(`Bạn có chắc chắn muốn phân công shipper "${shipperName}" cho đơn #${String(currentAssignOrderId).padStart(4, '0')}?`);
+    if (!okAssign) {
         return;
     }
 
@@ -807,7 +824,14 @@ async function submitShipperAssignment() {
 async function handleStatusChange(orderId, newStatus, currentStatus) {
     if (newStatus === currentStatus) return;
 
-    if (!confirm(`Chuyển trạng thái đơn #${String(orderId).padStart(4, '0')} từ "${statusLabels[currentStatus] || currentStatus}" sang "${statusLabels[newStatus] || newStatus}"?`)) {
+    const okStatus = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Cập nhật trạng thái đơn hàng',
+            message: `Chuyển trạng thái đơn #${String(orderId).padStart(4, '0')} từ "${statusLabels[currentStatus] || currentStatus}" sang "${statusLabels[newStatus] || newStatus}"?`,
+            confirmLabel: 'Cập nhật'
+        })
+        : confirm(`Chuyển trạng thái đơn #${String(orderId).padStart(4, '0')} từ "${statusLabels[currentStatus] || currentStatus}" sang "${statusLabels[newStatus] || newStatus}"?`);
+    if (!okStatus) {
         loadOrders();
         return;
     }
@@ -834,7 +858,14 @@ async function handleStatusChange(orderId, newStatus, currentStatus) {
 }
 
 async function promptMarkPaymentPaid(orderId) {
-    const transactionId = prompt('Nhập mã giao dịch / Ghi chú thanh toán xác nhận:', `PAY-${Date.now()}`);
+    const transactionId = typeof window.showPromptDialog === 'function'
+        ? await window.showPromptDialog({
+            title: 'Xác nhận đã thanh toán',
+            message: 'Nhập mã giao dịch ngân hàng hoặc ghi chú đối soát thanh toán:',
+            defaultValue: `PAY-${Date.now()}`,
+            confirmLabel: 'Xác nhận đã thu'
+        })
+        : prompt('Nhập mã giao dịch / Ghi chú thanh toán xác nhận:', `PAY-${Date.now()}`);
     if (transactionId === null) return;
 
     try {
@@ -926,7 +957,14 @@ async function submitCancelOrder() {
 // ==========================================
 
 async function promptAddOrderNote(orderId) {
-    const note = prompt('Nhập nội dung ghi chú nội bộ cho đơn hàng này:');
+    const note = typeof window.showPromptDialog === 'function'
+        ? await window.showPromptDialog({
+            title: 'Thêm ghi chú nội bộ',
+            message: 'Ghi chú chỉ hiển thị với nhân sự quản trị TechEcommerce:',
+            placeholder: 'Ví dụ: Khách hẹn giao sau 18h, cần bọc chống sốc kỹ...',
+            confirmLabel: 'Lưu ghi chú'
+        })
+        : prompt('Nhập nội dung ghi chú nội bộ cho đơn hàng này:');
     if (!note || !note.trim()) return;
 
     try {
@@ -1145,7 +1183,10 @@ function buildOrderDetailHtml(order) {
     // Products table rows
     const productsHtml = (order.products || []).map((p, idx) => {
         const prod = p.product || {};
-        const image = (prod.images && prod.images[0]) || '../assets/images/product-placeholder.svg';
+        const rawImage = p.image || prod.image || (prod.images && prod.images[0]) || '';
+        const image = typeof window.resolveAssetUrl === 'function'
+            ? window.resolveAssetUrl(rawImage)
+            : (rawImage || '../assets/images/product-placeholder.svg');
         const name = p.productName || prod.name || 'Sản phẩm công nghệ';
         const lineTotal = (p.price || 0) * (p.quantity || 1);
 
@@ -1154,7 +1195,7 @@ function buildOrderDetailHtml(order) {
                 <td style="width: 45px; text-align: center;">${idx + 1}</td>
                 <td>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <img src="${escapeHTML(image)}" alt="" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
+                        <img src="${escapeHTML(image)}" alt="${escapeHTML(name)}" onerror="this.onerror=null;this.src='../assets/images/product-placeholder.svg'" style="width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">
                         <div>
                             <strong style="color: var(--admin-text-main);">${escapeHTML(name)}</strong>
                             ${prod.sku ? `<div style="font-size: 0.72rem; color: var(--admin-text-muted);">SKU: ${escapeHTML(prod.sku)}</div>` : ''}
@@ -1464,7 +1505,7 @@ async function printOrderInvoice(id) {
     const shippingAddress = order.shippingAddress || 'Nhận tại showroom TechEcommerce (78 Nguyễn Văn Khối, Gò Vấp, TP.HCM)';
     const orderDateFormatted = formatDate(order.orderDate || order.createdAt);
     const shippingUnit = order.shippingUnit || 'Giao Hàng Nhanh / Tiêu chuẩn';
-    const qrTargetUrl = `https://techshopvn.vercel.app/pages/account/orders.html?id=${order._id}`;
+    const qrTargetUrl = `${window.location.origin}/pages/account/order-detail.html?id=${order._id}`;
 
     const invoiceHtml = window.buildTechEcommerceInvoiceHtml({
         order,
@@ -1527,9 +1568,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Initialize search debounce
+    // Initialize search debounce & apply ?search= query param from Dashboard links
     const searchInput = document.getElementById('orderSearchInput');
     const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSearch = (urlParams.get('search') || '').trim();
+    if (initialSearch) {
+        searchQuery = initialSearch;
+        if (searchInput) searchInput.value = initialSearch;
+        if (clearSearchBtn) clearSearchBtn.classList.add('visible');
+    }
 
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {

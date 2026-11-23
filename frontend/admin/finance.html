@@ -3,27 +3,174 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1120">
+    <link rel="icon" type="image/png" href="../assets/images/logo/tom-cat-logo.png?v=20260925-v4">
+    <link rel="manifest" href="../manifest.json">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="TechEcommerce">
+    <meta property="og:url" content="https://techshopvn.vercel.app/admin/finance.html">
+    <meta property="og:title" content="Phân tích tài chính - TechEcommerce">
+    <meta property="og:description" content="Phân tích doanh thu, chi phí và lợi nhuận của TechEcommerce."><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@500;600;700&amp;display=swap&amp;subset=vietnamese">
     <meta name="description" content="Phân tích doanh thu, chi phí và lợi nhuận của TechEcommerce.">
     <meta name="robots" content="noindex, nofollow">
     <link rel="canonical" href="https://techshopvn.vercel.app/admin/finance.html">
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <title>Phân tích tài chính - TechEcommerce</title>
-    <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
-    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-rbac-modals-20261121-v1">
+    <link rel="stylesheet" href="../assets/css/style.css?v=20261123-rv-v2">
+    <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=20261123-pro-v1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=20261123-dash-v3">
     <style>
+        /* Modern Executive Finance Filter Toolbar (overrides style.css global form 2-col grid) */
+        form.finance-filter-toolbar {
+            display: flex !important;
+            grid-template-columns: none !important;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px 18px !important;
+            padding: 14px 18px;
+            margin: 0 0 1.75rem 0;
+            border-radius: 16px;
+            background: var(--admin-card-bg, rgba(15, 23, 42, 0.85)) !important;
+            border: 1px solid var(--admin-border, rgba(148, 163, 184, 0.16)) !important;
+            box-shadow: var(--admin-card-shadow, 0 8px 24px rgba(0, 0, 0, 0.18));
+            position: relative;
+            z-index: 2;
+        }
+        .finance-preset-group {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 12px;
+            background: var(--admin-surface-muted, rgba(15, 23, 42, 0.55));
+            border: 1px solid var(--admin-border, rgba(148, 163, 184, 0.14));
+        }
+        .finance-preset-btn {
+            padding: 7px 13px;
+            border-radius: 8px;
+            border: 0;
+            background: transparent;
+            color: var(--admin-text-muted, #94a3b8);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+        .finance-preset-btn:hover {
+            color: var(--admin-text-main, #f8fafc);
+            background: rgba(148, 163, 184, 0.12);
+        }
+        .finance-preset-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.32) !important;
+        }
+        .finance-date-controls {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .finance-date-field {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: var(--admin-input-bg, rgba(15, 23, 42, 0.7));
+            border: 1px solid var(--admin-input-border, rgba(148, 163, 184, 0.2));
+        }
+        .finance-date-field label {
+            margin: 0 !important;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--admin-text-muted, #94a3b8) !important;
+            white-space: nowrap;
+        }
+        .finance-date-field input[type="date"] {
+            width: 138px;
+            min-height: 32px;
+            padding: 4px 6px !important;
+            border: 0 !important;
+            background: transparent !important;
+            color: var(--admin-text-main, #f8fafc) !important;
+            font-size: 0.84rem;
+            font-weight: 600;
+            box-shadow: none !important;
+            color-scheme: light;
+        }
+        html[data-theme='dark'] .finance-date-field input[type="date"] {
+            color-scheme: dark;
+        }
+        .finance-date-sep {
+            color: var(--admin-text-dim, #64748b);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .finance-filter-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .finance-btn-apply {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 40px;
+            padding: 0 16px;
+            border-radius: 10px;
+            border: 0;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #ffffff;
+            font-size: 0.84rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+            transition: transform 0.18s ease, filter 0.18s ease;
+            white-space: nowrap;
+        }
+        .finance-btn-apply:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.08);
+        }
+        .finance-btn-reset {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid var(--admin-border, rgba(148, 163, 184, 0.22));
+            background: var(--admin-surface-muted, rgba(30, 41, 59, 0.55));
+            color: var(--admin-text-main, #e2e8f0);
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+        .finance-btn-reset:hover {
+            border-color: var(--admin-blue-accent, #3b82f6);
+            background: var(--admin-surface-hover, rgba(51, 65, 85, 0.7));
+        }
         .finance-summary {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
+            margin-top: 0;
             margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
         }
         .finance-card {
-            border: 1px solid var(--border);
+            border: 1px solid var(--admin-border, var(--border));
             border-radius: var(--radius-lg);
-            padding: 2rem;
+            padding: 1.85rem 1.5rem;
             text-align: center;
             transition: var(--transition);
             position: relative;
@@ -49,11 +196,21 @@
             border-color: var(--primary-light);
         }
         .fc-icon {
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.85rem;
             font-weight: 800;
-            color: var(--text-muted);
+            background: rgba(148, 163, 184, 0.12);
+            color: var(--admin-text-muted, var(--text-muted));
         }
+        .revenue .fc-icon { background: rgba(16, 185, 129, 0.14); color: #10b981; }
+        .expense .fc-icon { background: rgba(239, 68, 68, 0.14); color: #f87171; }
+        .profit .fc-icon { background: rgba(59, 130, 246, 0.16); color: #60a5fa; }
         .fc-value {
             font-size: 2rem;
             font-weight: 800;
@@ -314,7 +471,7 @@
         </nav>
     </header>
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/auth.js?v=admin-rbac-20261121-v1"></script>
+    <script src="../assets/js/auth.js?v=20261123-pro-v1"></script>
 
     <main class="container fade-in">
         <header class="page-header reveal">
@@ -322,17 +479,32 @@
             <p>Theo dõi doanh thu, chi phí và hiệu quả vận hành cửa hàng.</p>
         </header>
 
-        <form class="filter-bar reveal" aria-label="Lọc dữ liệu tài chính" onsubmit="event.preventDefault(); applyFilter();">
-            <div class="form-group" style="flex-direction:row; align-items:center; gap:0.5rem; margin-bottom:0;">
-                <label for="filterFrom" style="margin-bottom:0;">Từ:</label>
-                <input type="date" id="filterFrom" style="width:160px;">
+        <form class="finance-filter-toolbar reveal" aria-label="Lọc dữ liệu tài chính" onsubmit="event.preventDefault(); applyFilter();">
+            <div class="finance-preset-group" role="group" aria-label="Chọn nhanh khoảng thời gian">
+                <button type="button" class="finance-preset-btn active" data-preset="all" onclick="applyFinancePreset('all', this)">Tất cả</button>
+                <button type="button" class="finance-preset-btn" data-preset="today" onclick="applyFinancePreset('today', this)">Hôm nay</button>
+                <button type="button" class="finance-preset-btn" data-preset="7d" onclick="applyFinancePreset('7d', this)">7 ngày</button>
+                <button type="button" class="finance-preset-btn" data-preset="month" onclick="applyFinancePreset('month', this)">Tháng này</button>
+                <button type="button" class="finance-preset-btn" data-preset="quarter" onclick="applyFinancePreset('quarter', this)">Quý này</button>
             </div>
-            <div class="form-group" style="flex-direction:row; align-items:center; gap:0.5rem; margin-bottom:0;">
-                <label for="filterTo" style="margin-bottom:0;">Đến:</label>
-                <input type="date" id="filterTo" style="width:160px;">
+            <div class="finance-date-controls">
+                <div class="finance-date-field">
+                    <label for="filterFrom">Từ</label>
+                    <input type="date" id="filterFrom" onchange="clearFinancePresetActive()">
+                </div>
+                <span class="finance-date-sep" aria-hidden="true">→</span>
+                <div class="finance-date-field">
+                    <label for="filterTo">Đến</label>
+                    <input type="date" id="filterTo" onchange="clearFinancePresetActive()">
+                </div>
+                <div class="finance-filter-actions">
+                    <button type="submit" class="finance-btn-apply">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                        <span>Lọc dữ liệu</span>
+                    </button>
+                    <button type="button" class="finance-btn-reset" onclick="clearFilter()">Đặt lại</button>
+                </div>
             </div>
-            <button type="submit" class="btn-primary">Lọc dữ liệu</button>
-            <button type="button" class="btn-secondary" onclick="clearFilter()">Đặt lại</button>
         </form>
 
         <section class="finance-summary reveal" aria-label="Tổng hợp tài chính">
@@ -357,7 +529,7 @@
         </section>
 
         <section class="chart-section glass-card reveal">
-            <h3>So sánh thu chi</h3>
+            <h2>So sánh thu chi</h2>
             <div class="comparison-board">
                 <div class="comp-item">
                     <div class="comp-label">Doanh thu</div>
@@ -377,7 +549,7 @@
             </div>
 
             <div style="margin-top:3rem;">
-                <h4 style="margin-bottom:1rem; font-size:1rem;">Chi phí theo danh mục</h4>
+                <h3 style="margin-bottom:1rem; font-size:1rem;">Chi phí theo danh mục</h3>
                 <div class="type-breakdown" id="typeBreakdown" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:1rem;"></div>
             </div>
         </section>
@@ -386,7 +558,7 @@
         <section class="chart-section glass-card reveal" aria-label="Biên lợi nhuận gộp theo danh mục">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem;">
                 <div>
-                    <h3 style="margin-bottom:0.3rem;">📊 Biên lợi nhuận gộp theo Danh mục (Gross Margin)</h3>
+                    <h2 style="margin-bottom:0.3rem;">📊 Biên lợi nhuận gộp theo Danh mục (Gross Margin)</h2>
                     <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:0;">So sánh Doanh thu thực tế, Chi phí nhập hàng (COGS) và Tỷ suất lợi nhuận gộp từng nhóm ngành hàng.</p>
                 </div>
                 <span class="badge" style="background:rgba(16, 185, 129, 0.15); color:var(--success); border:1px solid rgba(16, 185, 129, 0.3); padding:0.4rem 0.8rem; border-radius:50px; font-weight:700; font-size:0.8rem;">
@@ -414,14 +586,14 @@
 
         <!-- 2. Payment Methods & COD Pending Cashflow Tracker -->
         <section class="chart-section glass-card reveal" aria-label="Phân tích phương thức thanh toán và dòng tiền COD">
-            <h3 style="margin-bottom:0.3rem;">💳 Phân tích Phương thức Thanh toán & Dòng tiền COD</h3>
+            <h2 style="margin-bottom:0.3rem;">💳 Phân tích Phương thức Thanh toán &amp; Dòng tiền COD</h2>
             <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">Kiểm soát dòng tiền về tài khoản ngay lập tức so với lượng tiền COD đang đọng tại bưu tá giao hàng (chờ đối soát).</p>
             
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; margin-bottom:1.5rem;">
                 <article class="glass-card" style="padding:1.5rem; border:1px solid rgba(16, 185, 129, 0.3); border-radius:var(--radius-md); background:rgba(16, 185, 129, 0.04);">
                     <div style="font-size:0.8rem; font-weight:800; color:var(--success); text-transform:uppercase;">TIỀN VỀ NGAY (DIRECT CASHFLOW)</div>
                     <div id="directCashVal" style="font-size:1.8rem; font-weight:800; color:var(--success); margin:0.4rem 0;">0 đ</div>
-                    <p style="font-size:0.85rem; color:var(--text-secondary); margin:0;">Từ Chuyển khoản VietQR & Thẻ tín dụng. Tiền nổi về tài khoản ngân hàng ngay lập tức.</p>
+                    <p style="font-size:0.85rem; color:var(--text-secondary); margin:0;">Từ Chuyển khoản VietQR &amp; Thẻ tín dụng. Tiền nổi về tài khoản ngân hàng ngay lập tức.</p>
                 </article>
 
                 <article class="glass-card" style="padding:1.5rem; border:1px solid rgba(245, 158, 11, 0.3); border-radius:var(--radius-md); background:rgba(245, 158, 11, 0.04);">
@@ -439,7 +611,7 @@
             <div style="display:flex; align-items:center; gap:0.8rem; margin-bottom:1.5rem;">
                 <span style="font-size:1.5rem;">🔮</span>
                 <div>
-                    <h3 style="margin-bottom:0.2rem;">Dự báo Dòng tiền & Khuyến nghị Tài chính AI</h3>
+                    <h2 style="margin-bottom:0.2rem;">Dự báo Dòng tiền &amp; Khuyến nghị Tài chính AI</h2>
                     <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:0;">Thuật toán phân tích chuỗi thời gian dự báo tăng trưởng và tư vấn vốn lưu động.</p>
                 </div>
             </div>
@@ -521,8 +693,8 @@
     <!-- Footer placeholder strictly at the bottom -->
     <footer id="site-footer"></footer>
 
-    <script src="../assets/js/finance.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
+    <script src="../assets/js/finance.js?v=20261123-dash-v3"></script>
+    <script src="../assets/js/footer.js?v=20261123-pro-v1"></script>
 </body>
 
 </html>

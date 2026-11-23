@@ -5,7 +5,7 @@ const Order = require('../models/Order');
 const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const Coupon = require('../models/Coupon');
-const { protect, optionalAuth, admin } = require('../middleware/auth');
+const { protect, optionalAuth, admin, requirePermission, isAllowedOrigin } = require('../middleware/auth');
 const {
     reserveStock,
     rollbackStock,
@@ -135,7 +135,6 @@ async function buildOrderProducts(items) {
         const color = String(item.color || item.selectedColor || '').trim();
         const storage = String(item.storage || item.selectedStorage || '').trim();
         const image = String(item.image || item.selectedImage || '').trim();
-        const customPrice = Number(item.price);
         const lineKey = `${productId}__${color}__${storage}`;
 
         if (!merged.has(lineKey)) {
@@ -144,8 +143,7 @@ async function buildOrderProducts(items) {
                 quantity,
                 color,
                 storage,
-                image,
-                price: Number.isFinite(customPrice) && customPrice > 0 ? customPrice : null
+                image
             });
         } else {
             merged.get(lineKey).quantity += quantity;
@@ -163,22 +161,31 @@ async function buildOrderProducts(items) {
             throw error;
         }
 
-        let effectivePrice = line.price;
-        if (!effectivePrice) {
-            if (line.color && Array.isArray(product.variants) && product.variants.length > 0) {
-                const matchedVar = product.variants.find(v => (v.color || '').toLowerCase() === line.color.toLowerCase());
-                if (matchedVar && Number(matchedVar.price) > 0) {
-                    effectivePrice = matchedVar.price;
-                }
-            }
-            if (!effectivePrice) {
-                effectivePrice = product.price;
-            }
+        // Authoritative server-side pricing: NEVER trust unit price from client request
+        let matchedVar = null;
+        if (Array.isArray(product.variants) && product.variants.length > 0) {
+            const cLower = line.color.toLowerCase();
+            const sLower = line.storage.toLowerCase();
+            matchedVar = product.variants.find(v => {
+                const vc = String(v.color || '').toLowerCase();
+                const vs = String(v.storage || '').toLowerCase();
+                if (cLower && sLower) return vc === cLower && vs === sLower;
+                if (cLower) return vc === cLower;
+                if (sLower) return vs === sLower;
+                return false;
+            }) || (cLower ? product.variants.find(v => String(v.color || '').toLowerCase() === cLower) : null);
         }
 
-        const effectiveImage = line.image || (line.color && Array.isArray(product.variants)
-            ? product.variants.find(v => (v.color || '').toLowerCase() === line.color.toLowerCase())?.image
-            : null) || product.image;
+        let effectivePrice = (matchedVar && Number(matchedVar.price) > 0)
+            ? Number(matchedVar.price)
+            : Number(product.price);
+
+        // Apply storage surcharge only if variant did not carry its own price and storage upgrade is selected
+        if ((!matchedVar || !Number(matchedVar.price)) && line.storage && Array.isArray(product.variants) && product.variants.length === 0) {
+            effectivePrice = Number(product.price);
+        }
+
+        const effectiveImage = (matchedVar && matchedVar.image) || product.image || line.image;
 
         productsWithNames.push({
             product: product._id,
@@ -221,36 +228,50 @@ function buildOrderFilter(query) {
         filter.$or = conditions;
     }
 
-    // Order status filter
-    if (query.status && query.status !== 'all') {
-        filter.status = query.status;
+    // Order status filter (coerce to string & support grouped KPI filters safely)
+    const statusParam = typeof query.status === 'string' ? query.status.trim() : '';
+    if (statusParam && statusParam !== 'all') {
+        if (statusParam === 'processing_group') {
+            filter.status = { $in: ['confirmed', 'processing', 'ready_to_ship'] };
+        } else if (statusParam === 'returned_group') {
+            filter.status = { $in: ['returned', 'return_requested'] };
+        } else if (statusParam.includes(',')) {
+            const parts = statusParam.split(',').map(s => s.trim()).filter(Boolean);
+            if (parts.length) filter.status = { $in: parts };
+        } else {
+            filter.status = statusParam;
+        }
     }
 
     // Payment status filter
-    if (query.paymentStatus && query.paymentStatus !== 'all') {
-        filter.paymentStatus = query.paymentStatus;
+    const paymentStatusParam = typeof query.paymentStatus === 'string' ? query.paymentStatus.trim() : '';
+    if (paymentStatusParam && paymentStatusParam !== 'all') {
+        filter.paymentStatus = paymentStatusParam;
     }
 
     // Payment method filter
-    if (query.paymentMethod && query.paymentMethod !== 'all') {
-        filter.paymentMethod = query.paymentMethod;
+    const paymentMethodParam = typeof query.paymentMethod === 'string' ? query.paymentMethod.trim() : '';
+    if (paymentMethodParam && paymentMethodParam !== 'all') {
+        filter.paymentMethod = paymentMethodParam;
     }
 
     // Shipping status filter
-    if (query.shippingStatus && query.shippingStatus !== 'all') {
-        if (query.shippingStatus === 'unassigned') {
+    const shippingStatusParam = typeof query.shippingStatus === 'string' ? query.shippingStatus.trim() : '';
+    if (shippingStatusParam && shippingStatusParam !== 'all') {
+        if (shippingStatusParam === 'unassigned') {
             filter.shippingStatus = { $in: ['unassigned', null, ''] };
         } else {
-            filter.shippingStatus = query.shippingStatus;
+            filter.shippingStatus = shippingStatusParam;
         }
     }
 
     // Shipper filter
-    if (query.shipper && query.shipper !== 'all') {
-        if (query.shipper === 'unassigned') {
+    const shipperParam = typeof query.shipper === 'string' ? query.shipper.trim() : '';
+    if (shipperParam && shipperParam !== 'all') {
+        if (shipperParam === 'unassigned') {
             filter.shipper = null;
         } else {
-            const sId = Number(query.shipper);
+            const sId = Number(shipperParam);
             if (sId) filter.shipper = sId;
         }
     }
@@ -324,10 +345,11 @@ router.get('/shippers', protect, admin, async (req, res) => {
 // ==========================================
 // 2. EXPORT ORDERS TO CSV (Admin only)
 // ==========================================
-router.get('/export', protect, admin, async (req, res) => {
+router.get('/export', protect, admin, requirePermission('orders', 'view'), async (req, res) => {
     try {
         const filter = buildOrderFilter(req.query);
-        const sortBy = req.query.sortBy || 'createdAt';
+        const allowedExportSort = ['orderDate', 'createdAt', 'totalAmount', '_id', 'status'];
+        const sortBy = allowedExportSort.includes(req.query.sortBy) ? req.query.sortBy : 'createdAt';
         const sortOrder = req.query.sortOrder === 'asc' ? 1 : -1;
 
         const orders = await Order.find(filter)
@@ -360,8 +382,9 @@ router.get('/export', protect, admin, async (req, res) => {
         ];
 
         const escapeCsv = (val) => {
-            const str = String(val ?? '').replace(/"/g, '""');
-            return `"${str}"`;
+            let str = String(val ?? '');
+            if (/^[=+\-@\t\r]/.test(str)) str = `'${str}`;
+            return `"${str.replace(/"/g, '""')}"`;
         };
 
         const rows = orders.map(o => {
@@ -415,7 +438,7 @@ router.get('/export', protect, admin, async (req, res) => {
 // ==========================================
 // 3. GET ORDERS (Admin List with Search & Pagination)
 // ==========================================
-router.get('/', protect, admin, async (req, res) => {
+router.get('/', protect, admin, requirePermission('orders', 'view'), async (req, res) => {
     try {
         const filter = buildOrderFilter(req.query);
 
@@ -581,7 +604,8 @@ router.post('/', optionalAuth, async (req, res) => {
         const recipientName = String(req.body.recipientName || customer?.name || '').trim();
         const recipientPhone = String(req.body.recipientPhone || customer?.phone || '').trim();
         const shippingAddress = String(req.body.shippingAddress || customer?.address || '').trim();
-        const checkoutOrigin = String(req.get('origin') || '').trim();
+        const rawOrigin = String(req.get('origin') || '').trim();
+        const checkoutOrigin = isAllowedOrigin(rawOrigin, req) ? rawOrigin : '';
         const guestAccessToken = isGuest ? crypto.randomBytes(32).toString('hex') : '';
 
         if (!recipientName || !recipientPhone || !shippingAddress) {
@@ -937,7 +961,7 @@ router.patch('/:id/shipper-delivery', protect, async (req, res) => {
 // ==========================================
 // 8d. PATCH ADMIN RECONCILE COD (Admin only)
 // ==========================================
-router.patch('/:id/reconcile-cod', protect, admin, async (req, res) => {
+router.patch('/:id/reconcile-cod', protect, admin, requirePermission('orders', 'edit'), async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng!' });
@@ -1072,8 +1096,8 @@ const handleStatusUpdate = async (req, res) => {
     }
 };
 
-router.patch('/:id/status', protect, admin, handleStatusUpdate);
-router.put('/:id', protect, admin, handleStatusUpdate);
+router.patch('/:id/status', protect, admin, requirePermission('orders', 'edit'), handleStatusUpdate);
+router.put('/:id', protect, admin, requirePermission('orders', 'edit'), handleStatusUpdate);
 
 // ==========================================
 // 10. PATCH / PUT PAYMENT STATUS (Admin only)
@@ -1134,8 +1158,8 @@ const handlePaymentUpdate = async (req, res) => {
     }
 };
 
-router.patch('/:id/payment', protect, admin, handlePaymentUpdate);
-router.put('/:id/payment', protect, admin, handlePaymentUpdate);
+router.patch('/:id/payment', protect, admin, requirePermission('orders', 'edit'), handlePaymentUpdate);
+router.put('/:id/payment', protect, admin, requirePermission('orders', 'edit'), handlePaymentUpdate);
 
 // ==========================================
 // 11. POST CANCEL ORDER (Admin or Customer)
@@ -1202,7 +1226,7 @@ router.post('/:id/cancel', optionalAuth, async (req, res) => {
 // ==========================================
 // 12. POST ADD ADMIN INTERNAL NOTE (Admin only)
 // ==========================================
-router.post('/:id/notes', protect, admin, async (req, res) => {
+router.post('/:id/notes', protect, admin, requirePermission('orders', 'edit'), async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng!' });
@@ -1242,7 +1266,7 @@ router.post('/:id/notes', protect, admin, async (req, res) => {
 // ==========================================
 // 13. POST BULK OPERATIONS (Admin only)
 // ==========================================
-router.post('/bulk', protect, admin, async (req, res) => {
+router.post('/bulk', protect, admin, requirePermission('orders', 'edit'), async (req, res) => {
     try {
         const { action, orderIds, shipperId, status, note } = req.body;
         if (!Array.isArray(orderIds) || orderIds.length === 0) {
@@ -1366,7 +1390,7 @@ router.post('/bulk', protect, admin, async (req, res) => {
 // ==========================================
 // 14. DELETE ORDER (Admin only with safe guard)
 // ==========================================
-router.delete('/:id', protect, admin, async (req, res) => {
+router.delete('/:id', protect, admin, requirePermission('orders', 'delete'), async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng!' });

@@ -115,11 +115,11 @@ function renderCustomerTable() {
                 </td>
                 <td>
                     <div class="td-actions" style="display:flex; gap:0.4rem;">
-                        <button type="button" class="btn-sm btn-secondary" title="Tặng voucher ưu đãi" onclick="openSingleVoucherModal('${customer._id}', '${escapeHTML(customer.name)}')">
+                        <button type="button" class="btn-sm btn-secondary" title="Tặng voucher ưu đãi" data-customer-id="${escapeHTML(customer._id)}" data-customer-name="${escapeHTML(customer.name)}" onclick="openSingleVoucherModal(this.dataset.customerId, this.dataset.customerName)">
                             🎁 Tặng mã
                         </button>
-                        <button class="btn-edit" onclick="editCustomer('${customer._id}')">Sửa</button>
-                        <button class="btn-delete" onclick="deleteCustomer('${customer._id}')">Xóa</button>
+                        <button type="button" class="btn-edit" data-customer-id="${escapeHTML(customer._id)}" onclick="editCustomer(this.dataset.customerId)">Sửa</button>
+                        <button type="button" class="btn-delete" data-customer-id="${escapeHTML(customer._id)}" onclick="deleteCustomer(this.dataset.customerId)">Xóa</button>
                     </div>
                 </td>
             </tr>
@@ -244,7 +244,15 @@ async function editCustomer(id) {
 }
 
 async function deleteCustomer(id) {
-    if (!confirm('Xóa khách hàng này?')) return;
+    const ok = typeof window.showConfirmDialog === 'function'
+        ? await window.showConfirmDialog({
+            title: 'Xóa khách hàng',
+            message: 'Bạn có chắc muốn xóa vĩnh viễn hồ sơ khách hàng này?',
+            confirmLabel: 'Xóa khách hàng',
+            danger: true
+        })
+        : confirm('Xóa khách hàng này?');
+    if (!ok) return;
 
     try {
         const res = await fetch(`${EP}/${id}`, {

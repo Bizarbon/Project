@@ -186,6 +186,10 @@
     margin: 0;
 }
 
+.profile-page .profile-field-full {
+    grid-column: 1 / -1;
+}
+
 .profile-page .form-group label {
     display: block;
     min-height: 20px;
@@ -195,9 +199,45 @@
     font-weight: 700;
 }
 
-.profile-page .form-group input {
+.profile-page .form-group input,
+.profile-page .form-group textarea {
     width: 100%;
     min-height: 44px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 0.92rem;
+    color: var(--neo-text);
+    background: var(--neo-surface-2, var(--bg-input));
+    border: 1px solid var(--neo-border-strong);
+    border-radius: 10px;
+}
+
+.profile-page .form-group textarea {
+    min-height: 76px;
+    padding: 0.72rem 0.95rem;
+    line-height: 1.55;
+    resize: vertical;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.profile-page .form-group input:focus,
+.profile-page .form-group textarea:focus {
+    border-color: var(--neo-primary, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22);
+    outline: none;
+}
+
+html[data-theme='dark'] .profile-page input:-webkit-autofill,
+html[data-theme='dark'] .profile-page input:-webkit-autofill:hover,
+html[data-theme='dark'] .profile-page input:-webkit-autofill:focus,
+html[data-theme='dark'] .profile-page textarea:-webkit-autofill {
+    -webkit-text-fill-color: #f8fafc !important;
+    -webkit-box-shadow: 0 0 0 1000px #0f172a inset !important;
+    box-shadow: 0 0 0 1000px #0f172a inset !important;
+    caret-color: #f8fafc;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 .security-section {

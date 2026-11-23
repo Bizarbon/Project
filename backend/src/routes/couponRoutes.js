@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Coupon = require('../models/Coupon');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePermission } = require('../middleware/auth');
 const { validateCoupon } = require('../utils/coupons');
 
 function couponPayload(body) {
@@ -59,7 +59,7 @@ router.post('/validate', async (req, res) => {
     }
 });
 
-router.get('/', protect, admin, async (req, res) => {
+router.get('/', protect, admin, requirePermission('coupons', 'view'), async (req, res) => {
     try {
         const coupons = await Coupon.find().sort({ createdAt: -1 });
         res.json(coupons);
@@ -68,7 +68,7 @@ router.get('/', protect, admin, async (req, res) => {
     }
 });
 
-router.post('/', protect, admin, async (req, res) => {
+router.post('/', protect, admin, requirePermission('coupons', 'create'), async (req, res) => {
     try {
         const payload = couponPayload(req.body);
         if (await Coupon.findOne({ code: payload.code })) {
@@ -81,7 +81,7 @@ router.post('/', protect, admin, async (req, res) => {
     }
 });
 
-router.put('/:id', protect, admin, async (req, res) => {
+router.put('/:id', protect, admin, requirePermission('coupons', 'edit'), async (req, res) => {
     try {
         const coupon = await Coupon.findById(req.params.id);
         if (!coupon) return res.status(404).json({ message: 'Coupon not found' });
@@ -96,7 +96,7 @@ router.put('/:id', protect, admin, async (req, res) => {
     }
 });
 
-router.delete('/:id', protect, admin, async (req, res) => {
+router.delete('/:id', protect, admin, requirePermission('coupons', 'delete'), async (req, res) => {
     try {
         const coupon = await Coupon.findByIdAndDelete(req.params.id);
         if (!coupon) return res.status(404).json({ message: 'Coupon not found' });

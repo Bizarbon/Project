@@ -651,16 +651,17 @@ async function execGetActiveCoupons(args = {}) {
     const coupons = await Coupon.find({
         active: { $ne: false },
         $or: [{ expiresAt: { $exists: false } }, { expiresAt: null }, { expiresAt: { $gte: now } }]
-    }).sort({ discountValue: -1 }).limit(10).lean();
+    }).sort({ value: -1 }).limit(10).lean();
 
     const orderAmt = Number(args.orderAmountVnd || 0);
     return {
         count: coupons.length,
         coupons: coupons.map(c => ({
             code: c.code,
-            description: c.description || '',
-            discountType: c.discountType,
-            discountValue: c.discountValue,
+            name: c.name || c.description || '',
+            description: c.name || c.description || '',
+            discountType: c.type || c.discountType || 'percent',
+            discountValue: Number(c.value ?? c.discountValue ?? 0),
             minOrderValue: Number(c.minOrderValue || 0),
             maxDiscount: Number(c.maxDiscount || 0),
             applicableForOrder: orderAmt > 0 ? orderAmt >= Number(c.minOrderValue || 0) : null
@@ -677,34 +678,38 @@ async function execLookupOrder(args = {}, runtimeCtx = {}) {
         return {
             found: false,
             requiresInfo: true,
-            message: 'Khách cần cung cấp mã đơn hàng (ví dụ #54) hoặc số điện thoại đặt hàng (hoặc đăng nhập tài khoản) để tra cứu đơn hàng bảo mật.'
+            message: 'Khách cần cung cấp mã đơn hàng (ví dụ #54) kèm số điện thoại đặt hàng (hoặc đăng nhập tài khoản) để tra cứu đơn hàng bảo mật.'
         };
     }
 
     let order = null;
     if (rawId) {
         order = await Order.findOne({ _id: Number(rawId) }).lean().catch(() => null);
-    } else if (rawPhone) {
-        order = await Order.findOne({ phone: { $regex: escapeRegex(rawPhone.slice(-9)) } }).sort({ createdAt: -1 }).lean();
+    } else if (rawPhone && rawPhone.length >= 8) {
+        const phoneRx = { $regex: escapeRegex(rawPhone.slice(-9)) };
+        order = await Order.findOne({
+            $or: [{ recipientPhone: phoneRx }, { customerPhone: phoneRx }]
+        }).sort({ createdAt: -1 }).lean();
     } else if (req?.user?._id) {
-        order = await Order.findOne({ customerId: req.user._id }).sort({ createdAt: -1 }).lean();
+        order = await Order.findOne({ customer: req.user._id }).sort({ createdAt: -1 }).lean();
     }
 
     if (!order) {
         return { found: false, message: 'Chưa tìm thấy đơn hàng khớp với mã/số điện thoại đã cung cấp.' };
     }
 
-    // Bảo vệ quyền riêng tư nếu tìm bằng mã đơn nhưng khách chưa đăng nhập trùng chủ đơn & không gửi SĐT khớp
-    const userOwns = req?.user?._id && String(order.customerId) === String(req.user._id);
-    const phoneMatches = rawPhone && order.phone && String(order.phone).replace(/[^0-9]/g, '').endsWith(rawPhone.slice(-8));
-    if (!userOwns && !phoneMatches && req?.user?.role !== 'admin') {
+    // Bảo vệ quyền riêng tư tuyệt đối: chỉ trả dữ liệu khi trùng chủ đơn, khớp SĐT hoặc là Admin
+    const userOwns = Boolean(req?.user?._id && order.customer && String(order.customer) === String(req.user._id));
+    const storedPhones = [order.recipientPhone, order.customerPhone]
+        .filter(Boolean)
+        .map(p => String(p).replace(/[^0-9]/g, ''));
+    const phoneMatches = Boolean(rawPhone && rawPhone.length >= 8 && storedPhones.some(p => p.endsWith(rawPhone.slice(-8))));
+    if (!userOwns && !phoneMatches && !req?.user?.isAdmin) {
         return {
             found: true,
+            requiresVerification: true,
             orderId: order._id,
-            status: STATUS_LABELS[order.status] || order.status,
-            createdAt: order.createdAt,
-            total: order.total,
-            privacyNote: 'Đã ẩn địa chỉ và số điện thoại chi tiết để bảo vệ thông tin cá nhân.'
+            message: 'Để bảo vệ thông tin đơn hàng cá nhân, vui lòng cung cấp số điện thoại đặt hàng khớp với đơn này hoặc đăng nhập đúng tài khoản đã mua.'
         };
     }
 
@@ -712,11 +717,20 @@ async function execLookupOrder(args = {}, runtimeCtx = {}) {
         found: true,
         orderId: order._id,
         status: STATUS_LABELS[order.status] || order.status,
-        paymentMethod: order.paymentMethod || 'COD',
+        paymentMethod: order.paymentMethod || 'cod',
         paymentStatus: order.paymentStatus || 'unpaid',
-        total: order.total,
-        createdAt: order.createdAt,
-        items: (order.items || []).map(i => ({ name: i.name, quantity: i.quantity, price: i.price }))
+        total: Number(order.totalAmount || 0),
+        totalAmount: Number(order.totalAmount || 0),
+        trackingNumber: order.trackingNumber || '',
+        shippingUnit: order.shippingUnit || '',
+        createdAt: order.orderDate || order.createdAt,
+        items: (order.products || []).map(i => ({
+            name: i.productName || 'Sản phẩm',
+            color: i.color || '',
+            storage: i.storage || '',
+            quantity: Number(i.quantity || 1),
+            price: Number(i.price || 0)
+        }))
     };
 }
 

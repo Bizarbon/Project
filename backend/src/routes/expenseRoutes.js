@@ -3,13 +3,13 @@ const router = express.Router();
 const Expense = require('../models/Expense');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
-const { protect, admin } = require('../middleware/auth');
+const { protect, admin, requirePermission } = require('../middleware/auth');
 
 router.use(protect);
 router.use(admin);
 
 // GET all expenses (with optional date range filter)
-router.get('/', async (req, res) => {
+router.get('/', requirePermission('finance', 'view'), async (req, res) => {
     try {
         const { from, to } = req.query;
         const filter = {};
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET financial summary (revenue - expenses = profit) with advanced analytics
-router.get('/summary', async (req, res) => {
+router.get('/summary', requirePermission('finance', 'view'), async (req, res) => {
     try {
         const { from, to } = req.query;
         const dateFilter = {};
@@ -144,19 +144,8 @@ router.get('/summary', async (req, res) => {
             };
         }).sort((a, b) => b.revenue - a.revenue);
 
-        // Fallback benchmarks if database has few completed orders so admin dashboard is rich and informative
-        if (categoryAnalysis.length === 0) {
-            categoryAnalysis = [
-                { category: 'Điện thoại', revenue: 64990000, cogs: 55891400, grossProfit: 9098600, marginPct: 14.0, soldCount: 3 },
-                { category: 'Laptop', revenue: 47980000, cogs: 40783000, grossProfit: 7197000, marginPct: 15.0, soldCount: 2 },
-                { category: 'Phụ kiện', revenue: 14450000, cogs: 8381000, grossProfit: 6069000, marginPct: 42.0, soldCount: 18 },
-                { category: 'Tai nghe', revenue: 9890000, cogs: 6428500, grossProfit: 3461500, marginPct: 35.0, soldCount: 7 },
-                { category: 'Đồng hồ thông minh', revenue: 8490000, cogs: 6112800, grossProfit: 2377200, marginPct: 28.0, soldCount: 2 }
-            ];
-        }
-
         const totalPayAmt = Object.values(paymentStats).reduce((sum, p) => sum + p.total, 0);
-        let paymentBreakdown = {};
+        const paymentBreakdown = {};
         if (totalPayAmt > 0) {
             Object.keys(paymentStats).forEach(k => {
                 if (paymentStats[k].count > 0 || paymentStats[k].total > 0) {
@@ -167,39 +156,35 @@ router.get('/summary', async (req, res) => {
                 }
             });
         }
-        if (Object.keys(paymentBreakdown).length === 0) {
-            paymentBreakdown = {
-                cod: { name: 'Thanh toán khi nhận hàng (COD)', total: 68500000, count: 18, pct: 47.6 },
-                vietqr: { name: 'Chuyển khoản VietQR tức thì', total: 52400000, count: 12, pct: 36.4 },
-                credit_card: { name: 'Thẻ tín dụng / Trả góp 0%', total: 23000000, count: 4, pct: 16.0 }
-            };
-            codPendingSettlement = 24500000;
-            directReceived = 75400000;
-        }
 
-        const totalTrackedRevenue = revenue || 145800000;
-        const totalTrackedExpense = totalExpenses || 18450000;
-
-        // 2. Dự báo dòng tiền AI (AI Cashflow Forecast)
-        const forecast7Days = Math.round(totalTrackedRevenue * 0.28);
-        const forecast30Days = Math.round(totalTrackedRevenue * 1.15);
+        // Authentic cashflow forecast strictly derived from actual revenue (0 when no completed orders yet)
+        const forecast7Days = Math.round(revenue * 0.28);
+        const forecast30Days = Math.round(revenue * 1.15);
         const requiredWorkingCapital = Math.round(forecast30Days * 0.65);
 
-        const aiCashflowInsights = [
+        const aiCashflowInsights = revenue > 0 ? [
             {
                 type: 'margin',
                 title: 'Chiến lược tối ưu biên lợi nhuận',
-                text: 'Nhóm sản phẩm Phụ kiện & Âm thanh có biên lợi nhuận gộp vượt trội (35% – 42%), cao gấp gần 3 lần so với Điện thoại & Laptop (14% – 15%). Bạn nên tiếp tục thúc đẩy gói Combo "Mua kèm trợ giá" tại trang chi tiết để gia tăng lợi nhuận ròng trên từng đơn hàng.'
+                text: 'Nhóm sản phẩm Phụ kiện & Âm thanh có biên lợi nhuận gộp vượt trội (35% – 42%), cao hơn Điện thoại & Laptop (14% – 15%). Khuyến khích đẩy mạnh combo mua kèm để tối ưu lợi nhuận ròng.'
             },
             {
                 type: 'cod',
                 title: 'Kiểm soát dòng tiền COD tồn đọng',
-                text: `Hiện tại tỷ lệ COD chiếm ${paymentBreakdown.cod?.pct || 47.6}% tổng doanh thu. Lượng tiền mặt đang nằm tại đối tác giao hàng (chờ phiên đối soát 3-5 ngày). Đề xuất tặng thêm voucher 20k hoặc giảm 1% cho khách chọn chuyển khoản VietQR để tiền về tài khoản ngay lập tức.`
+                text: paymentBreakdown.cod
+                    ? `Tỷ lệ COD đang chiếm ${paymentBreakdown.cod.pct}% tổng doanh thu (${paymentBreakdown.cod.total.toLocaleString('vi-VN')} đ). Có thể khuyến khích khách chuyển khoản VietQR để dòng tiền về tài khoản nhanh hơn.`
+                    : 'Đa số đơn hàng hoàn thành đã được thanh toán trực tiếp qua chuyển khoản hoặc cổng thanh toán.'
             },
             {
                 type: 'forecast',
                 title: 'Dự báo dòng tiền & Vốn lưu động',
-                text: `Dự báo doanh thu 30 ngày tới ước đạt ${forecast30Days.toLocaleString('vi-VN')} đ (+15% so với tháng trước). Cần duy trì dòng tiền lưu động tối thiểu ${requiredWorkingCapital.toLocaleString('vi-VN')} đ để đảm bảo lượng hàng hóa cung ứng không bị đứt gãy.`
+                text: `Dựa trên dữ liệu thực tế trong kỳ, doanh thu 30 ngày tới ước đạt ${forecast30Days.toLocaleString('vi-VN')} đ. Vốn lưu động nhập hàng khuyến nghị tối thiểu ${requiredWorkingCapital.toLocaleString('vi-VN')} đ.`
+            }
+        ] : [
+            {
+                type: 'info',
+                title: 'Chưa phát sinh đơn hàng hoàn thành trong kỳ',
+                text: 'Hệ thống sẽ tự động tính toán biên lợi nhuận gộp, phân bổ dòng tiền COD/VietQR và dự báo doanh thu ngay khi có đơn hàng hoàn tất.'
             }
         ];
 
@@ -228,7 +213,7 @@ router.get('/summary', async (req, res) => {
 });
 
 // POST add expense
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('finance', 'create'), async (req, res) => {
     const expense = new Expense({
         type: req.body.type,
         amount: req.body.amount,
@@ -243,8 +228,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// DELETE expense + renumber
-router.delete('/:id', async (req, res) => {
+// DELETE expense
+router.delete('/:id', requirePermission('finance', 'delete'), async (req, res) => {
     try {
         const expense = await Expense.findById(req.params.id);
         if (!expense) {

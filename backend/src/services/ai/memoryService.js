@@ -29,10 +29,24 @@ function sanitizeStoredChatText(value) {
 function resolveSessionKey(req) {
     const user = req.user;
     const rawSid = String(req.body?.sessionId || req.body?.context?.sessionKey || req.query?.sessionId || '').trim();
-    if (rawSid && rawSid.length >= 4 && rawSid.length <= 120) {
-        return rawSid.replace(/[^a-zA-Z0-9_:-]/g, '');
+    const cleaned = rawSid.replace(/[^a-zA-Z0-9_:-]/g, '');
+
+    if (user?._id) {
+        const ownKey = `user_${user._id}`;
+        // Logged-in users can only access their own user_* key or an explicit non-user session key
+        if (cleaned && cleaned.length >= 4 && cleaned.length <= 120) {
+            if (/^user_/i.test(cleaned)) {
+                return cleaned === ownKey ? ownKey : ownKey;
+            }
+            return cleaned;
+        }
+        return ownKey;
     }
-    if (user?._id) return `user_${user._id}`;
+
+    // Guests may NEVER access another member's user_* session key (prevents IDOR)
+    if (cleaned && cleaned.length >= 4 && cleaned.length <= 120 && !/^user_/i.test(cleaned)) {
+        return cleaned;
+    }
     return `guest_${String(req.headers['x-forwarded-for'] || req.ip || 'session').replace(/[^a-zA-Z0-9]/g, '').slice(-8)}`;
 }
 
