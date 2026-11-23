@@ -48,6 +48,36 @@
         if (btnSaveAdminNote) {
             btnSaveAdminNote.addEventListener('click', handleSaveAdminNote);
         }
+
+        const btnToggleInsight = document.getElementById('btnToggleInsightBox');
+        const insightBox = document.getElementById('activeConvInsightBox');
+        if (btnToggleInsight && insightBox) {
+            btnToggleInsight.addEventListener('click', () => {
+                const collapsed = insightBox.classList.toggle('is-collapsed');
+                btnToggleInsight.textContent = collapsed ? 'Mở rộng' : 'Thu gọn';
+                btnToggleInsight.setAttribute('aria-expanded', String(!collapsed));
+            });
+        }
+    }
+
+    function formatIntentLabel(rawIntent) {
+        const raw = String(rawIntent || '').trim();
+        if (!raw) return 'Tư vấn thông tin sản phẩm';
+        const map = {
+            agentic_open_ai: 'Trò chuyện AI Toàn năng',
+            agentic_tech_advisor: 'Tư vấn công nghệ chuyên sâu',
+            agentic_search_products: 'Tìm kiếm & chọn mua sản phẩm',
+            agentic_get_product_detail: 'Xem thông số & giá chi tiết',
+            agentic_compare_products: 'So sánh sản phẩm',
+            compare_products: 'So sánh sản phẩm',
+            agentic_calculate_installment: 'Tính toán trả góp 0%',
+            agentic_get_active_coupons: 'Săn mã giảm giá / Voucher',
+            agentic_add_to_cart: 'Thêm sản phẩm vào giỏ hàng',
+            agentic_web_search: 'Tra cứu tin tức công nghệ mới',
+            agentic_lookup_order: 'Tra cứu đơn hàng',
+            agentic_search_store_knowledge: 'Hỏi chính sách & bảo hành'
+        };
+        return map[raw] || raw;
     }
 
     async function loadConversations() {
@@ -138,8 +168,8 @@
                         <span class="conv-status-badge ${statusConfig.className}">${statusConfig.label}</span>
                     </div>
 
-                    <div class="conv-intent-preview" title="${escapeHtml(c.intentSummary)}">
-                        <span>🎯 ${escapeHtml(c.intentSummary)}</span>
+                    <div class="conv-intent-preview" title="${escapeHtml(formatIntentLabel(c.intentSummary))}">
+                        <span>🎯 ${escapeHtml(formatIntentLabel(c.intentSummary))}</span>
                     </div>
 
                     <p class="conv-last-message">${escapeHtml(lastMsg)}</p>
@@ -206,10 +236,10 @@
         const actionNoteEl = document.getElementById('activeConvActionNote');
         const adminNoteInput = document.getElementById('adminNoteInput');
 
-        if (intentEl) intentEl.textContent = conv.intentSummary || 'Tư vấn thông tin sản phẩm';
+        if (intentEl) intentEl.textContent = formatIntentLabel(conv.intentSummary);
         if (budgetEl) budgetEl.textContent = conv.budgetRange || 'Theo mức niêm yết';
         if (categoryEl) categoryEl.textContent = formatCategory(conv.interestedCategory);
-        if (adminNoteInput) adminNoteInput.value = conv.intentSummary || '';
+        if (adminNoteInput) adminNoteInput.value = formatIntentLabel(conv.intentSummary);
 
         if (actionNoteEl) {
             if (conv.status === 'needs_agent') {

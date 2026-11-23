@@ -15,7 +15,7 @@
     <title>Quản lý nhân viên &amp; Phân quyền - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
     <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-rbac-modals-20261121-v1">
 
     <script type="application/ld+json">
     {
@@ -220,7 +220,7 @@
     </header>
 
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=admin-rbac-20261121-v1"></script>
 
     <!-- Main Content Area -->
     <main class="dashboard-main-container">
@@ -357,14 +357,14 @@
                 <table class="dash-orders-table">
                     <thead>
                         <tr>
-                            <th scope="col" style="width: 75px;">Mã NV</th>
-                            <th scope="col" style="width: 220px;">Họ tên nhân viên</th>
-                            <th scope="col" style="width: 160px;">Chức vụ / Vị trí</th>
-                            <th scope="col" style="width: 140px;">Phòng ban</th>
-                            <th scope="col" style="width: 200px;">Thông tin liên hệ</th>
-                            <th scope="col" style="width: 120px;">Ca làm việc</th>
-                            <th scope="col" style="width: 120px;">Trạng thái</th>
-                            <th scope="col" style="width: 150px; text-align: center;">Thao tác</th>
+                            <th scope="col" style="width: 72px;">Mã NV</th>
+                            <th scope="col" style="width: 190px;">Họ tên nhân viên</th>
+                            <th scope="col" style="width: 145px;">Chức vụ / Phòng ban</th>
+                            <th scope="col" style="width: 220px;">Phân quyền truy cập</th>
+                            <th scope="col" style="width: 190px;">Thông tin liên hệ</th>
+                            <th scope="col" style="width: 115px;">Ca làm việc</th>
+                            <th scope="col" style="width: 115px;">Trạng thái</th>
+                            <th scope="col" style="width: 210px; text-align: center;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody id="staffTableBody">
@@ -375,88 +375,140 @@
         </section>
     </main>
 
-    <!-- Modal Dialog: Create / Edit Staff -->
+    <!-- Modal Dialog: Create / Edit Staff + Granular RBAC Permissions -->
     <dialog id="staffModal" class="dash-modal" aria-labelledby="staffModalTitle">
-        <article class="dash-modal-content" style="max-width: 580px;">
+        <article class="dash-modal-content dash-modal-wide">
             <header class="dash-modal-header">
                 <h3 id="staffModalTitle">Thêm nhân viên mới</h3>
                 <button type="button" class="btn-close-modal" onclick="closeStaffModal()" aria-label="Đóng">✕</button>
             </header>
             <form id="staffForm" onsubmit="event.preventDefault(); saveStaffMember();">
                 <input type="hidden" id="editStaffId">
-                <fieldset style="display: flex; flex-direction: column; gap: 14px; margin: 0 0 20px; border: none; padding: 0;">
-                    <legend class="sr-only">Thông tin nhân viên</legend>
+                <input type="hidden" id="staffRolePreset" value="custom">
+                <div class="dash-modal-scroll-body">
+                    <fieldset style="border: none; padding: 0; margin: 0;">
+                        <legend class="sr-only">Thông tin hồ sơ nhân viên</legend>
+                        <div class="modal-form-grid">
+                            <p class="modal-form-field">
+                                <label for="staffFullName">Họ và tên *</label>
+                                <input type="text" id="staffFullName" required placeholder="Ví dụ: Nguyễn Văn An">
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffCode">Mã nhân viên *</label>
+                                <input type="text" id="staffCode" required placeholder="NV001...">
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffEmail">Email công ty *</label>
+                                <input type="email" id="staffEmail" required placeholder="nhanvien@techecommerce.vn">
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffPhone">Số điện thoại *</label>
+                                <input type="tel" id="staffPhone" required placeholder="0912345678">
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffDepartment">Phòng ban *</label>
+                                <select id="staffDepartment" required>
+                                    <option value="Bán hàng">Kinh doanh &amp; Bán hàng</option>
+                                    <option value="Quản trị">Ban Quản trị</option>
+                                    <option value="Kỹ thuật">Kỹ thuật &amp; Hỗ trợ</option>
+                                    <option value="Kho vận">Kho vận &amp; Giao hàng</option>
+                                    <option value="CSKH">Chăm sóc khách hàng</option>
+                                    <option value="Marketing">Marketing &amp; Nội dung</option>
+                                </select>
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffPosition">Chức vụ *</label>
+                                <select id="staffPosition" required>
+                                    <option value="Nhân viên tư vấn">Nhân viên tư vấn</option>
+                                    <option value="Quản trị viên">Quản trị viên hệ thống</option>
+                                    <option value="Quản lý cửa hàng">Quản lý cửa hàng</option>
+                                    <option value="Biên tập viên Blog">Biên tập viên Blog / Marketing</option>
+                                    <option value="Kỹ thuật viên">Kỹ thuật viên phần cứng</option>
+                                    <option value="Thu ngân">Thu ngân &amp; Kế toán</option>
+                                    <option value="Thủ kho">Thủ kho vận hành</option>
+                                </select>
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffShift">Ca làm việc *</label>
+                                <select id="staffShift">
+                                    <option value="Toàn thời gian">Toàn thời gian (Hành chính)</option>
+                                    <option value="Ca sáng (8h-16h)">Ca sáng (8h - 16h)</option>
+                                    <option value="Ca tối (14h-22h)">Ca tối (14h - 22h)</option>
+                                    <option value="Bán thời gian">Bán thời gian (Part-time)</option>
+                                </select>
+                            </p>
+                            <p class="modal-form-field">
+                                <label for="staffStatus">Trạng thái hoạt động *</label>
+                                <select id="staffStatus">
+                                    <option value="active">Đang làm việc</option>
+                                    <option value="leave">Nghỉ phép</option>
+                                    <option value="locked">Tạm khóa</option>
+                                </select>
+                            </p>
+                        </div>
+                    </fieldset>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <p style="margin: 0;">
-                            <label for="staffFullName" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Họ và tên *</label>
-                            <input type="text" id="staffFullName" required placeholder="Ví dụ: Nguyễn Văn An" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                        </p>
-                        <p style="margin: 0;">
-                            <label for="staffCode" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Mã nhân viên *</label>
-                            <input type="text" id="staffCode" required placeholder="NV001..." style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                        </p>
-                    </div>
+                    <fieldset id="staffPermissionsSection" class="rbac-section">
+                        <legend class="sr-only">Ma trận phân quyền truy cập và thao tác theo từng mục</legend>
+                        <header class="rbac-section-head">
+                            <h4 class="rbac-section-title">🔐 Phân quyền truy cập &amp; thao tác theo từng mục</h4>
+                            <span id="rbacSummaryPill" class="rbac-summary-pill">0/11 mục · 0 quyền</span>
+                        </header>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <p style="margin: 0;">
-                            <label for="staffEmail" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Email công ty *</label>
-                            <input type="email" id="staffEmail" required placeholder="nhanvien@techecommerce.vn" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                        </p>
-                        <p style="margin: 0;">
-                            <label for="staffPhone" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Số điện thoại *</label>
-                            <input type="tel" id="staffPhone" required placeholder="0912345678" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                        </p>
-                    </div>
+                        <div class="rbac-preset-row" role="group" aria-label="Mẫu phân quyền nhanh theo vai trò">
+                            <span class="rbac-preset-label">Chọn nhanh:</span>
+                            <button type="button" class="rbac-preset-btn" data-preset="super_admin" onclick="applyRolePreset('super_admin')">Quản trị toàn quyền</button>
+                            <button type="button" class="rbac-preset-btn" data-preset="store_manager" onclick="applyRolePreset('store_manager')">Quản lý cửa hàng</button>
+                            <button type="button" class="rbac-preset-btn" data-preset="sales_cskh" onclick="applyRolePreset('sales_cskh')">Bán hàng / CSKH</button>
+                            <button type="button" class="rbac-preset-btn" data-preset="warehouse" onclick="applyRolePreset('warehouse')">Kho &amp; Sản phẩm</button>
+                            <button type="button" class="rbac-preset-btn" data-preset="content_marketing" onclick="applyRolePreset('content_marketing')">Biên tập Blog</button>
+                            <button type="button" class="rbac-preset-btn" data-preset="accountant" onclick="applyRolePreset('accountant')">Kế toán</button>
+                            <span class="rbac-bulk-actions">
+                                <button type="button" class="rbac-preset-btn" onclick="setBulkPermissions('readonly')">Chỉ xem</button>
+                                <button type="button" class="rbac-preset-btn" onclick="setBulkPermissions('none')">Bỏ chọn hết</button>
+                            </span>
+                        </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <p style="margin: 0;">
-                            <label for="staffDepartment" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Phòng ban *</label>
-                            <select id="staffDepartment" required style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                                <option value="Bán hàng">Kinh doanh &amp; Bán hàng</option>
-                                <option value="Quản trị">Ban Quản trị</option>
-                                <option value="Kỹ thuật">Kỹ thuật &amp; Hỗ trợ</option>
-                                <option value="Kho vận">Kho vận &amp; Giao hàng</option>
-                                <option value="CSKH">Chăm sóc khách hàng</option>
-                            </select>
-                        </p>
-                        <p style="margin: 0;">
-                            <label for="staffPosition" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Chức vụ *</label>
-                            <select id="staffPosition" required style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                                <option value="Nhân viên tư vấn">Nhân viên tư vấn</option>
-                                <option value="Quản trị viên">Quản trị viên hệ thống</option>
-                                <option value="Quản lý cửa hàng">Quản lý cửa hàng</option>
-                                <option value="Kỹ thuật viên">Kỹ thuật viên phần cứng</option>
-                                <option value="Thu ngân">Thu ngân &amp; Kế toán</option>
-                                <option value="Thủ kho">Thủ kho vận hành</option>
-                            </select>
-                        </p>
-                    </div>
+                        <div class="rbac-table-wrap">
+                            <table class="rbac-matrix-table" aria-label="Bảng phân quyền chi tiết từng mục quản trị">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Mục quản trị</th>
+                                        <th scope="col">
+                                            <label class="rbac-col-toggle" title="Chọn/bỏ toàn bộ quyền Xem">
+                                                <input type="checkbox" id="rbacColAll_view" class="rbac-checkbox" onchange="togglePermissionColumn('view', this.checked)">
+                                                <span>Xem mục</span>
+                                            </label>
+                                        </th>
+                                        <th scope="col">
+                                            <label class="rbac-col-toggle" title="Chọn/bỏ toàn bộ quyền Thêm / Viết">
+                                                <input type="checkbox" id="rbacColAll_create" class="rbac-checkbox" onchange="togglePermissionColumn('create', this.checked)">
+                                                <span>Thêm / Viết</span>
+                                            </label>
+                                        </th>
+                                        <th scope="col">
+                                            <label class="rbac-col-toggle" title="Chọn/bỏ toàn bộ quyền Sửa">
+                                                <input type="checkbox" id="rbacColAll_edit" class="rbac-checkbox" onchange="togglePermissionColumn('edit', this.checked)">
+                                                <span>Sửa</span>
+                                            </label>
+                                        </th>
+                                        <th scope="col">
+                                            <label class="rbac-col-toggle" title="Chọn/bỏ toàn bộ quyền Xóa">
+                                                <input type="checkbox" id="rbacColAll_delete" class="rbac-checkbox" onchange="togglePermissionColumn('delete', this.checked)">
+                                                <span>Xóa</span>
+                                            </label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffPermissionMatrixBody"></tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <p style="margin: 0;">
-                            <label for="staffShift" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Ca làm việc *</label>
-                            <select id="staffShift" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                                <option value="Toàn thời gian">Toàn thời gian (Hành chính)</option>
-                                <option value="Ca sáng (8h-16h)">Ca sáng (8h - 16h)</option>
-                                <option value="Ca tối (14h-22h)">Ca tối (14h - 22h)</option>
-                                <option value="Bán thời gian">Bán thời gian (Part-time)</option>
-                            </select>
-                        </p>
-                        <p style="margin: 0;">
-                            <label for="staffStatus" style="display: block; font-size: 0.84rem; font-weight: 600; color: #e2e8f0; margin-bottom: 6px;">Trạng thái hoạt động *</label>
-                            <select id="staffStatus" style="width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; color: #ffffff; font-size: 0.88rem; box-sizing: border-box;">
-                                <option value="active">Đang làm việc</option>
-                                <option value="leave">Nghỉ phép</option>
-                                <option value="locked">Tạm khóa</option>
-                            </select>
-                        </p>
-                    </div>
-                </fieldset>
-
-                <footer class="dash-modal-footer" style="gap: 10px;">
-                    <button type="button" onclick="closeStaffModal()" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; color: #cbd5e1; font-size: 0.88rem; cursor: pointer;">Hủy</button>
-                    <button type="submit" class="btn-primary" style="padding: 8px 20px; background: #3b82f6; border: none; border-radius: 8px; color: #ffffff; font-size: 0.88rem; font-weight: 600; cursor: pointer;">Lưu thông tin</button>
+                <footer class="dash-modal-footer">
+                    <button type="button" class="btn-modal-cancel" onclick="closeStaffModal()">Hủy</button>
+                    <button type="submit" class="btn-primary">Lưu thông tin &amp; Phân quyền</button>
                 </footer>
             </form>
         </article>
@@ -465,7 +517,7 @@
     <!-- Footer placeholder strictly at the bottom -->
     <footer id="site-footer"></footer>
 
-    <script src="../assets/js/admin-staff.js?v=techecommerce-20261001-1"></script>
+    <script src="../assets/js/admin-staff.js?v=admin-rbac-20261121-v1"></script>
     <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
 </body>
 

@@ -98,7 +98,24 @@ const auth = {
     isAdmin: () => {
         if (!auth.isLoggedIn()) return false;
         const user = auth.getUser();
-        return Boolean(user && user.isAdmin);
+        return Boolean(user && (user.isAdmin || user.role === 'admin' || user.role === 'staff'));
+    },
+    getPermissions: () => {
+        const user = auth.getUser();
+        if (!user || !user.permissions || typeof user.permissions !== 'object') return null;
+        return user.permissions;
+    },
+    canViewModule: (moduleKey) => {
+        if (!auth.isAdmin()) return false;
+        const perms = auth.getPermissions();
+        if (!perms) return true; // Quản trị viên toàn quyền (chưa giới hạn ma trận)
+        return Boolean(perms[moduleKey] && perms[moduleKey].view);
+    },
+    canAction: (moduleKey, action) => {
+        if (!auth.isAdmin()) return false;
+        const perms = auth.getPermissions();
+        if (!perms) return true;
+        return Boolean(perms[moduleKey] && perms[moduleKey][action]);
     },
     getCartStorageKey: () => auth.isLoggedIn()
         ? cartStorageKeyForUser(auth.getUser())
@@ -597,6 +614,103 @@ function updateNavbar() {
     }
 }
 
+const ADMIN_PAGE_MODULE_MAP = {
+    'dashboard.html': 'dashboard',
+    'products.html': 'products',
+    'orders.html': 'orders',
+    'customers.html': 'customers',
+    'staff.html': 'staff',
+    'messages.html': 'messages',
+    'blog.html': 'blog',
+    'coupons.html': 'coupons',
+    'finance.html': 'finance',
+    'suppliers.html': 'suppliers',
+    'qa.html': 'qa'
+};
+
+function getCurrentAdminModule() {
+    const p = window.location.pathname.replace(/\\/g, '/').toLowerCase();
+    const file = p.split('/').pop() || '';
+    return ADMIN_PAGE_MODULE_MAP[file] || '';
+}
+
+function applyAdminPermissions() {
+    if (!window.location.pathname.includes('/admin/')) return;
+    const perms = auth.getPermissions();
+    if (!perms) return; // Quản trị viên toàn quyền
+
+    // 1. Ẩn các mục sidebar nhân viên không có quyền xem
+    document.querySelectorAll('.admin-sidebar a[href]').forEach(link => {
+        const hrefFile = (link.getAttribute('href') || '').split('?')[0].split('/').pop();
+        const mod = ADMIN_PAGE_MODULE_MAP[hrefFile];
+        if (!mod) return;
+        const allowed = auth.canViewModule(mod);
+        const li = link.closest('li');
+        if (li) li.hidden = !allowed;
+    });
+
+    // Ẩn nhóm accordion "Người dùng" nếu không được xem cả Nhân viên & Khách hàng
+    document.querySelectorAll('.admin-sidebar .nav-item.has-dropdown').forEach(groupLi => {
+        const visibleSubs = [...groupLi.querySelectorAll('.nav-sub-menu li')].filter(sub => !sub.hidden);
+        groupLi.hidden = visibleSubs.length === 0;
+    });
+
+    // 2. Ẩn thẻ module trong Trung tâm quản lý trên Dashboard
+    document.querySelectorAll('#moduleGrid a.module-link').forEach(link => {
+        const hrefFile = (link.getAttribute('href') || '').split('?')[0].split('/').pop();
+        const mod = ADMIN_PAGE_MODULE_MAP[hrefFile];
+        if (!mod) return;
+        const li = link.closest('li');
+        if (li) li.hidden = !auth.canViewModule(mod);
+    });
+
+    // 3. Chặn truy cập trực tiếp trang không có quyền Xem
+    const currentMod = getCurrentAdminModule();
+    if (currentMod && !auth.canViewModule(currentMod)) {
+        const main = document.querySelector('main');
+        if (main && !main.dataset.permBlocked) {
+            main.dataset.permBlocked = '1';
+            const firstAllowedFile = Object.entries(ADMIN_PAGE_MODULE_MAP).find(([, m]) => auth.canViewModule(m))?.[0];
+            main.innerHTML = `
+                <section class="admin-access-denied-card" role="alert">
+                    <h2>🔒 Bạn chưa được cấp quyền truy cập mục này</h2>
+                    <p>Tài khoản nhân viên hiện tại chưa có quyền <strong>Xem</strong> cho phân hệ này. Vui lòng liên hệ Quản trị viên để cập nhật ma trận phân quyền.</p>
+                    <a href="${firstAllowedFile || '../index.html'}" class="btn-return-home">${firstAllowedFile ? 'Quay lại mục được phép' : 'Về trang chủ'}</a>
+                </section>
+            `;
+        }
+        return;
+    }
+
+    // 4. Ẩn các nút Thêm/Viết khi nhân viên không có quyền create trên trang hiện tại
+    if (currentMod && !auth.canAction(currentMod, 'create')) {
+        document.querySelectorAll('[onclick*="openBlogEditorModal"], [onclick*="openStaffModal"], [onclick*="openAdd"], [data-perm-action="create"]').forEach(btn => {
+            btn.hidden = true;
+        });
+    }
+    if (currentMod && !auth.canAction(currentMod, 'edit')) {
+        document.querySelectorAll('#btnSaveAdminNote, #btnToggleStatus, [data-perm-action="edit"]').forEach(btn => {
+            btn.disabled = true;
+            btn.title = 'Bạn không có quyền chỉnh sửa mục này';
+        });
+    }
+}
+window.applyAdminPermissions = applyAdminPermissions;
+
+async function refreshLiveAdminPermissions() {
+    if (!auth.isLoggedIn() || !window.location.pathname.includes('/admin/')) return;
+    try {
+        const res = await fetch(`${API_URL}/auth/me`, { headers: auth.getHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.user) {
+            const merged = { ...(auth.getUser() || {}), ...data.user };
+            localStorage.setItem('user', JSON.stringify(merged));
+            applyAdminPermissions();
+        }
+    } catch (_) { }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     renderThemeToggle();
 
@@ -606,6 +720,8 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '../pages/auth/login.html';
             return;
         }
+        applyAdminPermissions();
+        refreshLiveAdminPermissions();
     }
     updateNavbar();
 });

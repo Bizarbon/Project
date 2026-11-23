@@ -108,7 +108,7 @@
         if (!document.querySelector('link[data-ai-chat-style]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = `${root}assets/css/chatbox.css?v=20261120-agentic-cart-v1`;
+            link.href = `${root}assets/css/chatbox.css?v=20261121-color-variant-v1`;
             link.dataset.aiChatStyle = 'true';
             document.head.appendChild(link);
         }
@@ -1079,6 +1079,38 @@
         };
     }
 
+    function resolveChatImageUrl(src, fallback = '') {
+        const raw = String(src || fallback || '').trim();
+        if (!raw) return `${root}assets/images/product-placeholder.svg`;
+        if (/^(https?:\/\/|data:|blob:|\/)/i.test(raw)) return raw;
+        return `${root}${raw.replace(/^\.?\//, '')}`;
+    }
+
+    function resolveChatColorHex(colorName, variantHex = '') {
+        if (variantHex && /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(String(variantHex).trim())) {
+            return String(variantHex).trim();
+        }
+        const s = String(colorName || '').toLowerCase();
+        if (s.includes('cam') || s.includes('orange')) return '#e06b3a';
+        if (s.includes('xanh băng') || s.includes('ice blue') || s.includes('sky')) return '#8aa8be';
+        if (s.includes('xanh ngọc') || s.includes('turquoise') || s.includes('mint')) return '#14b8a6';
+        if (s.includes('xanh đậm') || s.includes('deep blue') || s.includes('navy') || s.includes('titan xanh')) return '#2f3e52';
+        if (s.includes('xanh lá') || s.includes('xanh rêu') || s.includes('green') || s.includes('olive')) return '#16a34a';
+        if (s.includes('mòng két') || s.includes('teal')) return '#0d9488';
+        if (s.includes('xanh') || s.includes('blue')) return '#2563eb';
+        if (s.includes('sa mạc') || s.includes('desert') || s.includes('titan tự nhiên') || s.includes('natural')) return '#b8a898';
+        if (s.includes('vàng') || s.includes('gold') || s.includes('yellow')) return '#eab308';
+        if (s.includes('tím') || s.includes('purple') || s.includes('violet') || s.includes('lavender')) return '#6d5e85';
+        if (s.includes('hồng') || s.includes('pink') || s.includes('rose')) return '#ec4899';
+        if (s.includes('đỏ') || s.includes('red') || s.includes('crimson')) return '#dc2626';
+        if (s.includes('trắng') || s.includes('white') || s.includes('starlight') || s.includes('kem') || s.includes('cream')) return '#f1f5f9';
+        if (s.includes('bạc') || s.includes('silver') || s.includes('platinum')) return '#cbd5e1';
+        if (s.includes('xám') || s.includes('gray') || s.includes('grey') || s.includes('space') || s.includes('mecha')) return '#64748b';
+        if (s.includes('đen') || s.includes('black') || s.includes('midnight') || s.includes('eclipse') || s.includes('obsidian')) return '#1e293b';
+        if (s.includes('titan')) return '#7c7872';
+        return '#64748b';
+    }
+
     function renderInteractiveProductCard(body, product, coupon = null, shouldScroll = true) {
         if (!product) return null;
 
@@ -1087,24 +1119,59 @@
         card.setAttribute('role', 'region');
         card.setAttribute('aria-label', `Bộ chọn cấu hình & Mua nhanh ${escapeHTML(product.name)}`);
 
-        // Xử lý biến thể màu sắc
-        let colors = [];
+        const fallbackImageUrl = resolveChatImageUrl(product.image);
+        const placeholderUrl = `${root}assets/images/product-placeholder.svg`;
+
+        // Xử lý biến thể màu sắc (giữ nguyên colorHex, image, price, compareAtPrice, stock, sku từ MongoDB)
+        let colorOptions = [];
         if (Array.isArray(product.variants) && product.variants.length > 0) {
-            colors = [...new Set(product.variants.map(v => v.color).filter(Boolean))];
+            const seenColors = new Set();
+            product.variants.forEach((v, idx) => {
+                const label = String(v?.color || '').trim();
+                if (!label) return;
+                const key = label.toLowerCase();
+                if (seenColors.has(key)) return;
+                seenColors.add(key);
+                const stockNum = typeof v.stock === 'number' ? v.stock : Number(product.stock ?? 10);
+                colorOptions.push({
+                    color: label,
+                    colorHex: resolveChatColorHex(label, v.colorHex),
+                    image: resolveChatImageUrl(v.image || product.image),
+                    hasDistinctImage: Boolean(v.image),
+                    price: Number(v.price) > 0 ? Number(v.price) : Number(product.price || 0),
+                    compareAtPrice: Number(v.compareAtPrice) > 0 ? Number(v.compareAtPrice) : Number(product.compareAtPrice || 0),
+                    stock: stockNum,
+                    sku: v.sku || `${product.sku || 'TECH'}-${idx + 1}`,
+                    isOutOfStock: stockNum <= 0
+                });
+            });
         }
-        if (!colors.length) {
+        if (!colorOptions.length) {
             const nameLower = (product.name || '').toLowerCase();
+            let fallbackNames = ['Đen Tiêu Chuẩn', 'Bạc Sang Trọng'];
             if (nameLower.includes('titan') || nameLower.includes('iphone')) {
-                colors = ['Titan Tự Nhiên', 'Titan Đen', 'Titan Trắng', 'Titan Xanh'];
+                fallbackNames = ['Titan Tự Nhiên', 'Titan Đen', 'Titan Trắng', 'Titan Xanh'];
             } else if (nameLower.includes('galaxy') || nameLower.includes('samsung')) {
-                colors = ['Đen Titan', 'Xám Bạc', 'Tím Violet'];
+                fallbackNames = ['Đen Titan', 'Xám Bạc', 'Tím Violet'];
             } else if (nameLower.includes('macbook')) {
-                colors = ['Xám Không Gian', 'Bạc Tinh Khiết', 'Đen Nửa Đêm'];
+                fallbackNames = ['Xám Không Gian', 'Bạc Tinh Khiết', 'Đen Nửa Đêm'];
             } else if (nameLower.includes('laptop') || nameLower.includes('asus') || nameLower.includes('lenovo')) {
-                colors = ['Xám Mecha', 'Đen Eclipse', 'Bạc Platinum'];
-            } else {
-                colors = ['Đen Tiêu Chuẩn', 'Bạc Sang Trọng'];
+                fallbackNames = ['Xám Mecha', 'Đen Eclipse', 'Bạc Platinum'];
             }
+            const galleryPool = Array.isArray(product.images) && product.images.length > 0
+                ? product.images.filter(Boolean)
+                : [];
+            colorOptions = fallbackNames.map((label, idx) => ({
+                color: label,
+                colorHex: resolveChatColorHex(label),
+                image: resolveChatImageUrl(galleryPool[idx] || product.image),
+                hasDistinctImage: Boolean(galleryPool[idx]),
+                price: Number(product.price || 0),
+                compareAtPrice: Number(product.compareAtPrice || 0),
+                stock: Number(product.stock ?? 10),
+                sku: product.sku || '',
+                isOutOfStock: Number(product.stock ?? 10) <= 0
+            }));
         }
 
         // Xử lý cấu hình bộ nhớ / thông số
@@ -1128,36 +1195,39 @@
             ];
         }
 
-        const basePrice = Number(product.price || 0);
-        let selectedColor = colors[0] || 'Mặc định';
+        let selectedColorIdx = 0;
+        let selectedColorOption = colorOptions[0] || {
+            color: 'Mặc định',
+            colorHex: '#64748b',
+            image: fallbackImageUrl,
+            price: Number(product.price || 0),
+            compareAtPrice: Number(product.compareAtPrice || 0),
+            stock: Number(product.stock ?? 10),
+            sku: product.sku || '',
+            isOutOfStock: false
+        };
+        let selectedColor = selectedColorOption.color;
         let selectedSpec = specs[0] || { label: 'Tiêu chuẩn', extra: 0 };
-        let currentPrice = basePrice + selectedSpec.extra;
+        let currentPrice = (selectedColorOption.price || Number(product.price || 0)) + selectedSpec.extra;
 
-        const colorMap = {
-            'titan tự nhiên': '#b8aba0',
-            'titan đen': '#2d3033',
-            'titan trắng': '#e3e4e5',
-            'titan xanh': '#394653',
-            'đen titan': '#1e2022',
-            'xám bạc': '#9ba1a6',
-            'tím violet': '#685e79',
-            'xám không gian': '#53565b',
-            'bạc tinh khiết': '#e3e4e5',
-            'đen nửa đêm': '#1a222d',
-            'xám mecha': '#4a5568',
-            'đen eclipse': '#1a202c',
-            'bạc platinum': '#cbd5e1',
-            'đen tiêu chuẩn': '#0f172a',
-            'bạc sang trọng': '#94a3b8'
+        const computePricing = () => {
+            const vBase = Number(selectedColorOption?.price || product.price || 0);
+            const cur = vBase + (selectedSpec?.extra || 0);
+            const rawCompare = Number(selectedColorOption?.compareAtPrice || product.compareAtPrice || 0);
+            const compare = rawCompare > vBase
+                ? (rawCompare + (selectedSpec?.extra || 0))
+                : Math.round(cur * 1.15 / 100000) * 100000;
+            const discountPct = compare > cur ? Math.max(1, Math.round((1 - cur / compare) * 100)) : 0;
+            const perMonthVal = Math.round((cur * 0.7) / 12);
+            return { cur, compare, discountPct, perMonthVal };
         };
 
-        const renderColorChips = () => colors.map(c => {
-            const hex = colorMap[c.toLowerCase()] || '#0068FF';
-            const isActive = c === selectedColor;
+        const renderColorChips = () => colorOptions.map((opt, idx) => {
+            const isActive = idx === selectedColorIdx;
             return `
-                <button type="button" class="ai-variant-chip color-chip ${isActive ? 'active' : ''}" data-color="${escapeHTML(c)}" role="radio" aria-checked="${isActive}">
-                    <span class="ai-color-dot" style="background:${hex};" aria-hidden="true"></span>
-                    <span>${escapeHTML(c)}</span>
+                <button type="button" class="ai-variant-chip color-chip ${isActive ? 'active' : ''} ${opt.isOutOfStock ? 'is-out' : ''}" data-color-idx="${idx}" data-color="${escapeHTML(opt.color)}" role="radio" aria-checked="${isActive}" title="${escapeHTML(opt.color)}${opt.isOutOfStock ? ' (Tạm hết)' : ''}">
+                    <span class="ai-color-dot" style="background:${escapeHTML(opt.colorHex)};" aria-hidden="true"></span>
+                    <span>${escapeHTML(opt.color)}</span>
                 </button>
             `;
         }).join('');
@@ -1173,24 +1243,79 @@
             `;
         }).join('');
 
-        const updateDisplay = () => {
-            currentPrice = basePrice + selectedSpec.extra;
+        const updateDisplay = (animateImage = false) => {
+            const { cur, compare, discountPct, perMonthVal } = computePricing();
+            currentPrice = cur;
             const priceEl = card.querySelector('.ai-icard-price-current');
             const compareEl = card.querySelector('.ai-icard-price-compare');
+            const discountEl = card.querySelector('.ai-icard-discount-pill');
             const instEl = card.querySelector('.ai-icard-inst-val');
-            if (priceEl) priceEl.textContent = `${Number(currentPrice).toLocaleString('vi-VN')} đ`;
-            if (compareEl) {
-                const orig = Math.round(currentPrice * 1.15 / 100000) * 100000;
-                compareEl.textContent = `${Number(orig).toLocaleString('vi-VN')} đ`;
+            const colorNameEl = card.querySelector('.ai-selected-color-name');
+            const stockBadgeEl = card.querySelector('.ai-badge-stock');
+            const figEl = card.querySelector('.ai-icard-fig');
+            const imgEl = card.querySelector('.ai-icard-fig img');
+            const swatchEl = card.querySelector('.ai-icard-color-swatch');
+            const buyEl = card.querySelector('.ai-icard-btn-buy');
+            const cartEl = card.querySelector('.ai-icard-btn-cart');
+
+            if (priceEl) priceEl.textContent = `${Number(cur).toLocaleString('vi-VN')} đ`;
+            if (compareEl) compareEl.textContent = `${Number(compare).toLocaleString('vi-VN')} đ`;
+            if (discountEl) {
+                discountEl.textContent = discountPct > 0 ? `-${discountPct}%` : '';
+                discountEl.hidden = discountPct <= 0;
             }
-            if (instEl) {
-                const perMonth = Math.round((currentPrice * 0.7) / 12);
-                instEl.textContent = `~${Number(perMonth).toLocaleString('vi-VN')} đ/tháng`;
+            if (instEl) instEl.textContent = `~${Number(perMonthVal).toLocaleString('vi-VN')} đ/tháng`;
+            if (colorNameEl) colorNameEl.textContent = selectedColorOption.color;
+            if (figEl) figEl.style.setProperty('--variant-accent', selectedColorOption.colorHex);
+            if (swatchEl) {
+                swatchEl.style.background = selectedColorOption.colorHex;
+                swatchEl.title = `Màu đang chọn: ${selectedColorOption.color}`;
+            }
+
+            if (stockBadgeEl) {
+                if (selectedColorOption.isOutOfStock) {
+                    stockBadgeEl.classList.add('is-out');
+                    stockBadgeEl.textContent = '⚠️ Tạm hết màu này';
+                } else {
+                    stockBadgeEl.classList.remove('is-out');
+                    stockBadgeEl.textContent = selectedColorOption.stock > 0
+                        ? `⚡ Sẵn hàng (${selectedColorOption.stock})`
+                        : '⚡ Sẵn hàng';
+                }
+            }
+            if (buyEl) buyEl.disabled = Boolean(selectedColorOption.isOutOfStock);
+            if (cartEl) cartEl.disabled = Boolean(selectedColorOption.isOutOfStock);
+
+            if (imgEl && selectedColorOption.image) {
+                const targetSrc = selectedColorOption.image;
+                const applySwap = () => {
+                    imgEl.onerror = function () {
+                        if (this.dataset.fallbackStage !== '1' && fallbackImageUrl && this.src !== fallbackImageUrl) {
+                            this.dataset.fallbackStage = '1';
+                            this.src = fallbackImageUrl;
+                        } else {
+                            this.onerror = null;
+                            this.src = placeholderUrl;
+                        }
+                    };
+                    imgEl.dataset.fallbackStage = '0';
+                    imgEl.src = targetSrc;
+                    imgEl.alt = `${product.name} - ${selectedColorOption.color}`;
+                };
+                if (animateImage) {
+                    imgEl.classList.add('is-swapping');
+                    setTimeout(() => {
+                        applySwap();
+                        requestAnimationFrame(() => imgEl.classList.remove('is-swapping'));
+                    }, 110);
+                } else {
+                    applySwap();
+                }
             }
         };
 
-        const origPrice = Math.round(currentPrice * 1.15 / 100000) * 100000;
-        const perMonth = Math.round((currentPrice * 0.7) / 12);
+        const initPricing = computePricing();
+        currentPrice = initPricing.cur;
         const voucherCode = (typeof consultationContext !== 'undefined' && consultationContext && consultationContext.activeVoucher)
             ? consultationContext.activeVoucher
             : (product.price >= 20000000 ? 'DEALHOT500' : (product.price >= 3000000 ? 'TECHVIP' : 'TECHWELCOME'));
@@ -1198,13 +1323,14 @@
 
         card.innerHTML = `
             <header class="ai-icard-header">
-                <figure class="ai-icard-fig">
-                    <img src="${escapeHTML(product.image)}" alt="${escapeHTML(product.name)}" width="70" height="70" loading="lazy">
+                <figure class="ai-icard-fig" style="--variant-accent:${escapeHTML(selectedColorOption.colorHex)};">
+                    <img src="${escapeHTML(selectedColorOption.image || fallbackImageUrl)}" alt="${escapeHTML(product.name)} - ${escapeHTML(selectedColorOption.color)}" width="70" height="70" loading="lazy">
+                    <span class="ai-icard-color-swatch" style="background:${escapeHTML(selectedColorOption.colorHex)};" title="Màu đang chọn: ${escapeHTML(selectedColorOption.color)}" aria-hidden="true"></span>
                 </figure>
                 <div class="ai-icard-info">
                     <div class="ai-icard-badges">
                         <span class="ai-badge-verified">✓ Chính hãng 100%</span>
-                        <span class="ai-badge-stock">⚡ Sẵn hàng</span>
+                        <span class="ai-badge-stock ${selectedColorOption.isOutOfStock ? 'is-out' : ''}">${selectedColorOption.isOutOfStock ? '⚠️ Tạm hết màu này' : (selectedColorOption.stock > 0 ? `⚡ Sẵn hàng (${selectedColorOption.stock})` : '⚡ Sẵn hàng')}</span>
                     </div>
                     <h4 class="ai-icard-title">
                         <a href="${root}pages/catalog/product.html?id=${encodeURIComponent(product._id)}" title="Xem chi tiết ${escapeHTML(product.name)}">
@@ -1213,15 +1339,15 @@
                     </h4>
                     <div class="ai-icard-rating">
                         <span class="ai-stars" aria-hidden="true">★★★★★</span>
-                        <small>4.9/5 (142 đánh giá)</small>
+                        <small>${Number(product.rating || 4.9).toFixed(1)}/5 (${Number(product.reviewCount || 142)} đánh giá)</small>
                     </div>
                 </div>
             </header>
 
             <section class="ai-icard-body">
-                ${colors.length > 1 ? `
+                ${colorOptions.length > 1 ? `
                 <div class="ai-icard-group">
-                    <span class="ai-group-label">Chọn màu sắc:</span>
+                    <span class="ai-group-label">Chọn màu sắc: <strong class="ai-selected-color-name">${escapeHTML(selectedColorOption.color)}</strong></span>
                     <div class="ai-variant-chips ai-color-chips-container" role="radiogroup" aria-label="Màu sắc">
                         ${renderColorChips()}
                     </div>
@@ -1239,12 +1365,12 @@
 
                 <div class="ai-icard-pricing">
                     <div class="ai-icard-price-row">
-                        <strong class="ai-icard-price-current">${Number(currentPrice).toLocaleString('vi-VN')} đ</strong>
-                        <span class="ai-icard-price-compare">${Number(origPrice).toLocaleString('vi-VN')} đ</span>
-                        <span class="ai-icard-discount-pill">-15%</span>
+                        <strong class="ai-icard-price-current">${Number(initPricing.cur).toLocaleString('vi-VN')} đ</strong>
+                        <span class="ai-icard-price-compare">${Number(initPricing.compare).toLocaleString('vi-VN')} đ</span>
+                        <span class="ai-icard-discount-pill"${initPricing.discountPct <= 0 ? ' hidden' : ''}>-${initPricing.discountPct}%</span>
                     </div>
                     <div class="ai-icard-installment">
-                        <span>💳 Trả góp 0%: <strong class="ai-icard-inst-val">~${Number(perMonth).toLocaleString('vi-VN')} đ/tháng</strong> (Duyệt nhanh CCCD)</span>
+                        <span>💳 Trả góp 0%: <strong class="ai-icard-inst-val">~${Number(initPricing.perMonthVal).toLocaleString('vi-VN')} đ/tháng</strong> (Duyệt nhanh CCCD)</span>
                     </div>
                 </div>
 
@@ -1255,10 +1381,10 @@
             </section>
 
             <footer class="ai-icard-footer">
-                <button type="button" class="ai-icard-btn-buy" aria-label="Mua ngay và thanh toán nhanh">
+                <button type="button" class="ai-icard-btn-buy" aria-label="Mua ngay và thanh toán nhanh"${selectedColorOption.isOutOfStock ? ' disabled' : ''}>
                     ⚡ Mua Ngay (1 chạm)
                 </button>
-                <button type="button" class="ai-icard-btn-cart" aria-label="Thêm vào giỏ hàng">
+                <button type="button" class="ai-icard-btn-cart" aria-label="Thêm vào giỏ hàng"${selectedColorOption.isOutOfStock ? ' disabled' : ''}>
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
@@ -1267,17 +1393,36 @@
             </footer>
         `;
 
-        // Sự kiện chọn màu
+        // Gắn fallback ảnh ban đầu
+        const initImgEl = card.querySelector('.ai-icard-fig img');
+        if (initImgEl) {
+            initImgEl.onerror = function () {
+                if (this.dataset.fallbackStage !== '1' && fallbackImageUrl && this.src !== fallbackImageUrl) {
+                    this.dataset.fallbackStage = '1';
+                    this.src = fallbackImageUrl;
+                } else {
+                    this.onerror = null;
+                    this.src = placeholderUrl;
+                }
+            };
+        }
+
+        // Sự kiện chọn màu -> đổi ảnh sản phẩm, chấm màu, nhãn màu, giá & trạng thái tồn kho ngay lập tức
         card.querySelectorAll('.color-chip').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                selectedColor = btn.getAttribute('data-color');
+                const idx = parseInt(btn.getAttribute('data-color-idx'), 10);
+                if (Number.isNaN(idx) || !colorOptions[idx]) return;
+                selectedColorIdx = idx;
+                selectedColorOption = colorOptions[idx];
+                selectedColor = selectedColorOption.color;
                 card.querySelectorAll('.color-chip').forEach(b => {
                     b.classList.remove('active');
                     b.setAttribute('aria-checked', 'false');
                 });
                 btn.classList.add('active');
                 btn.setAttribute('aria-checked', 'true');
+                updateDisplay(true);
             });
         });
 
@@ -1293,7 +1438,7 @@
                 });
                 btn.classList.add('active');
                 btn.setAttribute('aria-checked', 'true');
-                updateDisplay();
+                updateDisplay(false);
             });
         });
 
@@ -1301,7 +1446,13 @@
         const buyBtn = card.querySelector('.ai-icard-btn-buy');
         if (buyBtn) {
             buyBtn.addEventListener('click', () => {
-                const variantInfo = { color: selectedColor, spec: selectedSpec.label };
+                const variantInfo = {
+                    color: selectedColorOption.color,
+                    colorHex: selectedColorOption.colorHex,
+                    image: selectedColorOption.image,
+                    sku: selectedColorOption.sku || '',
+                    spec: selectedSpec.label
+                };
                 handleAddToCartWithVariant(product._id, 1, variantInfo, currentPrice);
                 const code = (typeof consultationContext !== 'undefined' && consultationContext && consultationContext.activeVoucher)
                     ? consultationContext.activeVoucher
@@ -1333,7 +1484,13 @@
         const cartBtn = card.querySelector('.ai-icard-btn-cart');
         if (cartBtn) {
             cartBtn.addEventListener('click', () => {
-                const variantInfo = { color: selectedColor, spec: selectedSpec.label };
+                const variantInfo = {
+                    color: selectedColorOption.color,
+                    colorHex: selectedColorOption.colorHex,
+                    image: selectedColorOption.image,
+                    sku: selectedColorOption.sku || '',
+                    spec: selectedSpec.label
+                };
                 handleAddToCartWithVariant(product._id, 1, variantInfo, currentPrice);
                 cartBtn.innerHTML = `<span>✓ Đã thêm</span>`;
                 cartBtn.classList.add('added');

@@ -69,6 +69,10 @@ const customerSchema = new mongoose.Schema({
         default: 'customer',
         index: true
     },
+    permissions: {
+        type: mongoose.Schema.Types.Mixed,
+        default: null
+    },
     active: {
         type: Boolean,
         default: true,

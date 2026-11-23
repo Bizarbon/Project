@@ -36,6 +36,7 @@ const reviewRoutes = require('./routes/reviewRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const shippingRoutes = require('./routes/shippingRoutes');
+const staffRoutes = require('./routes/staffRoutes');
 
 const app = express();
 const FRONTEND_DIR = path.resolve(__dirname, '../../frontend');
@@ -136,6 +137,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/shipping', shippingRoutes);
+app.use('/api/staff', staffRoutes);
 
 app.use('/api', (req, res) => {
     res.status(404).json({ message: 'API endpoint không tồn tại.' });

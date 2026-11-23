@@ -15,7 +15,7 @@
     <title>Tin nhắn &amp; Lịch sử Chatbox AI - TechEcommerce</title>
     <link rel="stylesheet" href="../assets/css/style.css?v=techecommerce-20260918-1">
     <link rel="stylesheet" href="../assets/css/neo-circuit.css?v=admin-layout-20260918-1">
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-dashboard-20261001-1">
+    <link rel="stylesheet" href="../assets/css/admin-dashboard.css?v=admin-rbac-modals-20261121-v1">
 
     <script type="application/ld+json">
     {
@@ -214,7 +214,7 @@
     </header>
 
     <script src="../assets/js/animations.js?v=techecommerce-20260709-2"></script>
-    <script src="../assets/js/auth.js?v=techecommerce-20260709-2"></script>
+    <script src="../assets/js/auth.js?v=admin-rbac-20261121-v1"></script>
 
     <!-- Main Content Area -->
     <main class="dashboard-main-container">
@@ -358,9 +358,12 @@
                 <section class="ai-intent-insight-box" id="activeConvInsightBox" aria-label="Phân tích nhu cầu khách hàng từ AI">
                     <header class="insight-box-title">
                         <span>🎯 Phân tích nhu cầu khách hàng (AI Insight)</span>
-                        <span class="ai-sparkle-pill">✨ Chatbox AI</span>
+                        <span class="insight-box-actions">
+                            <button type="button" class="insight-toggle-btn" id="btnToggleInsightBox" aria-expanded="true" aria-controls="insightDetailsGrid">Thu gọn</button>
+                            <span class="ai-sparkle-pill">✨ Chatbox AI</span>
+                        </span>
                     </header>
-                    <div class="insight-details-grid">
+                    <div class="insight-details-grid" id="insightDetailsGrid">
                         <div class="insight-item">
                             <span class="insight-item-label">Nhu cầu trọng tâm:</span>
                             <span class="insight-item-value" id="activeConvIntent">Chưa chọn cuộc trò chuyện</span>
@@ -398,7 +401,7 @@
 
     <!-- Admin footer -->
     <script src="../assets/js/footer.js?v=full-admin-footer-20260715-2"></script>
-    <script src="../assets/js/admin-messages.js?v=20261002-1"></script>
+    <script src="../assets/js/admin-messages.js?v=admin-messages-20261121-v1"></script>
 </body>
 
 </html>

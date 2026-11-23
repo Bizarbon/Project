@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const Customer = require('../models/Customer');
+const StaffMember = require('../models/StaffMember');
+const { protect } = require('../middleware/auth');
 const googleAuthService = require('../services/auth/googleAuthService');
 const {
     emailEnabled,
@@ -66,16 +68,43 @@ function signToken(customer) {
     );
 }
 
-function publicUser(customer) {
+function publicUser(customer, resolvedPermissions = undefined) {
+    const perms = resolvedPermissions !== undefined ? resolvedPermissions : (customer.permissions || null);
     return {
         id: customer._id,
         name: customer.name,
         username: customer.username,
         email: customer.email || '',
         avatar: customer.avatar || '',
-        isAdmin: customer.isAdmin
+        isAdmin: customer.isAdmin,
+        role: customer.role || (customer.isAdmin ? 'admin' : 'customer'),
+        permissions: perms
     };
 }
+
+async function resolveUserPermissions(customer) {
+    if (!customer) return null;
+    if (customer.permissions && typeof customer.permissions === 'object') return customer.permissions;
+    if (customer.isAdmin && customer.email) {
+        try {
+            const staff = await StaffMember.findOne({ email: String(customer.email).toLowerCase() }).lean();
+            if (staff && staff.permissions && typeof staff.permissions === 'object') {
+                return staff.permissions;
+            }
+        } catch (_) { }
+    }
+    return null;
+}
+
+// GET /api/auth/me - Đồng bộ thông tin & phân quyền nhân sự mới nhất
+router.get('/me', protect, async (req, res) => {
+    try {
+        const perms = await resolveUserPermissions(req.user);
+        return res.json({ user: publicUser(req.user, perms) });
+    } catch (error) {
+        return res.status(500).json({ message: 'Không thể tải thông tin tài khoản.' });
+    }
+});
 
 // POST register
 router.post('/register', [
@@ -194,10 +223,11 @@ router.post('/login', [
         customer.lastLoginAt = new Date();
         await customer.save({ validateBeforeSave: false });
 
+        const resolvedPerms = await resolveUserPermissions(customer);
         res.json({
             message: 'Đăng nhập thành công!',
             token: signToken(customer),
-            user: publicUser(customer)
+            user: publicUser(customer, resolvedPerms)
         });
     } catch (error) {
         console.error('Login error:', error);
