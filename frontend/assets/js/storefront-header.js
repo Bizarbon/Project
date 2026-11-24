@@ -49,7 +49,7 @@
                     </a>
                     <form class="header-search" action="${root}index.html" method="get" role="search">
                         <label class="sr-only" for="sharedStorefrontSearch">Tìm kiếm sản phẩm</label>
-                        <span class="header-search-icon" aria-hidden="true">⌕</span>
+                        <span class="header-search-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"></circle><path d="m20.5 20.5-4.1-4.1"></path></svg></span>
                         <input id="sharedStorefrontSearch" name="search" type="search" value="${escapeHTML(currentSearch)}" placeholder="Bạn đang tìm sản phẩm gì?" autocomplete="off">
                         <span class="u322-search-ticker" id="sharedTrendingTicker" aria-hidden="true"></span>
                         <button type="submit">Tìm kiếm</button>

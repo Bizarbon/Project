@@ -36,7 +36,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>TechEcommerce - Cửa hàng công nghệ</title>
   <link rel="stylesheet" href="assets/css/style.css?v=20261123-rv-v2" />
-  <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261123-pro-v1" />
+  <link rel="stylesheet" href="assets/css/neo-circuit.css?v=20261124-search-v1" />
   <link rel="stylesheet" href="assets/css/chatbox.css?v=20261123-pro-v1" data-ai-chat-style="true" />
   <link rel="stylesheet" href="assets/css/exit-intent.css?v=20261111-v1" />
   <link rel="stylesheet" href="assets/css/mascot.css?v=20261116-mobile-fix-v3" data-tm-mascot-style="true" />
@@ -415,7 +415,12 @@
 
         <form class="header-search" id="headerSearchForm" role="search">
           <label class="sr-only" for="headerSearchInput">Tìm kiếm sản phẩm</label>
-          <span class="header-search-icon" aria-hidden="true">⌕</span>
+          <span class="header-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7.5"></circle>
+              <path d="m20.5 20.5-4.1-4.1"></path>
+            </svg>
+          </span>
           <input id="headerSearchInput" type="search" autocomplete="off" placeholder="Bạn đang tìm sản phẩm gì?" />
           <span class="u322-search-ticker" id="headerTrendingTicker" aria-hidden="true"></span>
           <button type="submit">Tìm kiếm</button>
@@ -501,7 +506,7 @@
         <label class="address-list-search">
           <span class="sr-only">Tìm khu vực</span>
           <input id="addressListSearch" type="search" autocomplete="off" placeholder="Tìm nhanh tỉnh thành" />
-          <span aria-hidden="true">⌕</span>
+          <span aria-hidden="true" style="display:inline-flex;align-items:center;"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"></circle><path d="m20.5 20.5-4.1-4.1"></path></svg></span>
         </label>
         <div class="address-options" id="addressOptions"></div>
         <button type="button" class="address-back" id="addressBackButton">‹ Nhập bằng gợi ý địa chỉ</button>
